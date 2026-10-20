@@ -1,5 +1,7 @@
 # 立项调研：Harness 发行制品与 Windows 接入
 
+> 日期补充（2026-10-20）：下文“今日”指10-19，不是当前安装指令。10-20审查复核dsh latest/next均0.2.1-rc.2，SDK latest仍0.0.1-rc.1、next为0.2.1-rc.2；精确锁版要求继续有效。旧probe未发送prompt，modelRequestsSent=0是预设标记，结合脚本与拒绝stub支持无模型边界，不是独立网络计数。本轮仅核既有wheel元数据/hash，未重跑空会话或学习profile；下一步见[V1方案](/D:/Codex/Learning/docs/验证/V1-Harness最小路线执行方案.md)。
+
 日期：2026-10-19（Asia/Shanghai）。范围：既定 Windows Harness 主执行路线的发行可取得性、Windows 载荷、无模型运行与内部 Peer 接入；不重新讨论是否弃用 Harness。
 
 **结论：可以继续以官方 Web Host＋FastAPI 内部适配作为主线，且今日已获得局部运行证据。** 实际发布的 Windows runtime 能启动、不展示官方 UI，也能完成 API Peer、空会话创建、follow snapshot、idle cancel 和 Peer 重连。但同一制品存在 workspace-controller 与 Office provider 未激活，真实图片、流式生成中取消、学习 preset 和跨端接续仍未验证。
