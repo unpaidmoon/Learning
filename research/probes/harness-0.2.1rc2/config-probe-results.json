@@ -1,0 +1,16 @@
+{
+  "command": "<bundled-runtime> --profile web --dump-config",
+  "credentialsInherited": false,
+  "returncode": 0,
+  "elapsedSeconds": 0.161,
+  "stdoutBytes": 44560,
+  "hasSessionController": true,
+  "hasSdkServer": false,
+  "hasOfficeProvider": true,
+  "hasAttachmentLocal": true,
+  "hasCodingShellByDefault": true,
+  "stderr": "",
+  "remainingJobPids": [],
+  "resourceCacheExists": false,
+  "resourceCacheBytes": 0
+}

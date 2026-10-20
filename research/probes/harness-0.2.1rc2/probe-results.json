@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-19",
+  "artifactVersion": "0.2.1rc2",
+  "modelRequestsSent": 0,
+  "credentialsInherited": false,
+  "steps": [
+    {
+      "step": "web_host_ready",
+      "passed": true
+    },
+    {
+      "step": "api_peer_connect",
+      "status": 302,
+      "passed": true,
+      "cookieReceived": true
+    },
+    {
+      "step": "api_peer_websocket",
+      "passed": true
+    },
+    {
+      "step": "empty_session_create",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "empty_session_follow",
+      "passed": true,
+      "carrierFrame": "item",
+      "valueType": "snapshot",
+      "snapshotHasAssistantStream": true
+    },
+    {
+      "step": "idle_session_cancel_contract",
+      "status": 200,
+      "passed": true,
+      "activeGenerationCancellationTested": false
+    },
+    {
+      "step": "follow_stream_cancel_sent",
+      "passed": true,
+      "isModelCancel": false
+    },
+    {
+      "step": "closed_peer_cookie_rejected",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "step": "api_peer_reconnect",
+      "status": 302,
+      "passed": true
+    }
+  ],
+  "limits": {
+    "startupSeconds": 35,
+    "contractSeconds": 30,
+    "rssBytes": 1073741824,
+    "jobCommitBytes": 1610612736
+  },
+  "cleanup": {
+    "ownedPidsBeforeTermination": [
+      8032,
+      5404
+    ],
+    "method": "TerminateJobObject (forced idle-probe cleanup; not graceful-shutdown proof)",
+    "remainingJobPids": [],
+    "hostPortClosed": true
+  },
+  "port": 56952,
+  "command": "<bundled-runtime> web --host 127.0.0.1 --port <local-port> --no-open",
+  "jobObjectAssigned": true,
+  "pid": 8032,
+  "startupSeconds": 1.513,
+  "peakAggregateRssBytes": 318836736,
+  "peakOwnedProcessCount": 2,
+  "memoryCapTriggered": false,
+  "localRejectStubHits": [],
+  "elapsedSeconds": 3.021,
+  "sanitizedDiagnosticTail": [
+    {
+      "channel": "stderr",
+      "text": "dsh: warning: 2 entries did not activate"
+    },
+    {
+      "channel": "stderr",
+      "text": "workspace-controller (@deepseek-ai/dsh-api-workspace-controller): failed to import: Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/dsh-host-directory-picker' imported from D:\\snapshot\\node\\node_modules\\@deepseek-ai\\dsh\\node_modules\\@deepseek-ai\\dsh-web-app\\node_modules\\@deepseek-ai\\dsh-api-workspace-controller\\lib\\index.js"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at packageResolve (node:internal/modules/esm/resolve:784:25)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at moduleResolve (node:internal/modules/esm/resolve:873:18)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at defaultResolve (node:internal/modules/esm/resolve:1006:11)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at nextStep (node:internal/modules/customization_hooks:189:26)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at resolveBareSpecifier (C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pkg-sea-wXIhYh\\sea-main.js:3001:14)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at vfsResolveHook (C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pkg-sea-wXIhYh\\sea-main.js:3021:16)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at nextStep (node:internal/modules/customization_hooks:189:26)"
+    },
+    {
+      "channel": "stderr",
+      "text": "office-to-pdf (@deepseek-ai/dsh-office-to-pdf): failed to import: Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/libreoffice-kit' imported from D:\\snapshot\\node\\node_modules\\@deepseek-ai\\dsh\\node_modules\\@deepseek-ai\\dsh-office-to-pdf\\lib\\index.js"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at packageResolve (node:internal/modules/esm/resolve:784:25)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at moduleResolve (node:internal/modules/esm/resolve:873:18)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at defaultResolve (node:internal/modules/esm/resolve:1006:11)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at nextStep (node:internal/modules/customization_hooks:189:26)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at resolveBareSpecifier (C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pkg-sea-wXIhYh\\sea-main.js:3001:14)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at vfsResolveHook (C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pkg-sea-wXIhYh\\sea-main.js:3021:16)"
+    },
+    {
+      "channel": "stderr",
+      "text": "    at nextStep (node:internal/modules/customization_hooks:189:26)"
+    },
+    {
+      "channel": "stdout",
+      "text": "dsh web: http://127.0.0.1:56952/?token=<redacted>"
+    }
+  ]
+}
