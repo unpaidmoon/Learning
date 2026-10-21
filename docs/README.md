@@ -5,9 +5,9 @@
 | 分类 | 入口与主要内容 |
 | --- | --- |
 | 产品需求 | [需求总结](product/AI辅助学习项目需求总结.md)、[技术原则与分阶段范围](product/AI辅助学习项目技术原则与分阶段范围.md) |
-| 架构设计 | [技术选型方案](architecture/AI辅助学习项目技术选型方案.md)、[前端方案](architecture/前端方案.md)、[应用契约](architecture/应用契约.md) |
+| 架构设计 | [技术选型方案](architecture/AI辅助学习项目技术选型方案.md)、[前端方案](architecture/前端方案.md)、[前端开发规范](architecture/前端开发规范.md)、[应用契约](architecture/应用契约.md) |
 | 开发规则 | [开发规范](development/开发规范.md)、[开发环境与命令](development/开发环境与命令.md) |
-| 工作计划 | [MVP 开发计划](plans/MVP开发计划.md)、[P0-01 执行方案](plans/P0-01执行方案.md) |
+| 工作计划 | [MVP 开发计划](plans/MVP开发计划.md)、[P0-01 执行方案](plans/P0-01执行方案.md)、[MVP-A 重设计交接与新聊天 prompt](plans/MVP-A重设计交接-2026-10-21.md) |
 | 验证准备 | [V1～V7 方案、样本与模板](validation/README.md) |
 | 研究与验收 | [研究导航](../research/README.md)：专题调研、验收报告、脱敏结果与隔离实验 |
 | 历史与迁移 | [讨论及授权历史](product/讨论与授权历史-截至2026-10-21.md)、[目录迁移记录](development/目录整理与迁移记录-2026-10-21.md) |

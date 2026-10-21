@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from learning_app.storage import Repository, StorageError
+from learning_app.storage.repository import SCHEMA_REVISION
 
 PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC"
@@ -61,7 +62,7 @@ def test_runtime_reports_real_sqlite_and_conservative_journal(tmp_path):
     assert info["journal_mode"] == "delete"
     assert info["synchronous"] == 2
     assert info["foreign_keys"] == 1
-    assert info["schema_revision"] == "0003_drafts"
+    assert info["schema_revision"] == SCHEMA_REVISION
 
 
 def test_failed_attachment_write_never_publishes_message_or_model_work(tmp_path):
@@ -501,6 +502,6 @@ def test_migration_recovery_snapshot_preserves_existing_assets_on_failure(tmp_pa
                 is None
             )
     recovered = Repository(root)
-    assert recovered.runtime_info()["schema_revision"] == "0003_drafts"
+    assert recovered.runtime_info()["schema_revision"] == SCHEMA_REVISION
     with sqlite3.connect(root / "business.sqlite3") as conn:
         assert conn.execute("SELECT value FROM previous_asset").fetchone()[0] == "用户已有数据"

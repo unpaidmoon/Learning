@@ -33,7 +33,7 @@ from . import schema as s
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0003_drafts"
+SCHEMA_REVISION = "0004_course_files"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -201,8 +201,17 @@ class Repository:
         return values
 
     def list_courses(self) -> list[dict[str, Any]]:
+        from learning_app.course_files_schema import course_roots
+
         with self.engine.connect() as conn:
-            return [dict(row) for row in conn.execute(select(s.courses)).mappings()]
+            return [
+                dict(row)
+                for row in conn.execute(
+                    select(s.courses)
+                    .outerjoin(course_roots, course_roots.c.course_id == s.courses.c.course_id)
+                    .where(or_(course_roots.c.state.is_(None), course_roots.c.state != "detached"))
+                ).mappings()
+            ]
 
     def create_chat(self, course_id: str, chat_id: str | None = None) -> dict[str, Any]:
         values = {

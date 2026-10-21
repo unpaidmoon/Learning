@@ -24,6 +24,7 @@ class AppConfig(BaseModel):
     instance_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     mode: Literal["dev", "start", "test"] = "dev"
     harness_enabled: bool = False
+    credential_route: Literal["account", "api_key"] = "account"
     model: str = "deepseek-flash"
     thinking: str = "high"
     max_output_tokens: int = Field(default=16384, ge=256, le=131072)

@@ -1,5 +1,11 @@
 # 固定 Harness 执行组件
 
+2026-10-21 重设计增补：正式运行默认官方账号，固定 AccountController / DeepSeekAccount 仅在账号功能启用时按有效 profile 打开；fixture 保持关闭并仅访问本地 provider。凭据由官方 Harness home 管理；模型目录和额度优先复用官方，账号失败不隐式改用 API Key。公开接口见 [应用契约](../docs/architecture/应用契约.md)，真实登录及只读结果见 [本轮账号记录](../research/reports/redesign/官方账号接入只读验证-2026-10-21.json)。
+
+账号认证网络额外仅允许固定 `https://platform.deepseek.com`；推理仍经本机出站边界转交固定官方上游，认证头不落日志或公共 DTO，模型工具没有新增文件／网络权限。API Key 路线仅由用户明确选择，私钥仍只从既有私有配置读取。下文旧“账号全部关闭”按原批次保留，不覆盖本轮条件启用。
+
+正式应用的“账号与模型”提供实际登录、取消、刷新、退出和路线切换。独立辅助命令已实际登录成功：`backend/.venv/Scripts/python.exe scripts/harness/account_login.py --data-dir .runtime/app/data --timeout 1200`。同一官方 home 不并发启动多个 Host，已有正式实例应通过自身安全退出接口停止。
+
 本目录是正式应用的配置和窄适配。运行时由 `scripts/harness/bootstrap.py` 从校验过的 wheel 缓存安装到忽略的 `.runtime/harness/install/`，应用不导入研究 runner、probe 环境或其临时运行目录。
 
 固定版本为 `deepseek-harness-runtime-bin==0.2.1rc2`（可执行文件报告 `0.2.1-rc.2`），Windows x64。`runtime.lock.json` 记录官方 wheel URL、SHA-256、可执行文件与 sidecar 身份、许可证、官方源提交、部署依赖闭包及补丁范围。来源是 [官方 PyPI 固定版本元数据](https://pypi.org/pypi/deepseek-harness-runtime-bin/0.2.1rc2/json) 与 [固定官方源提交](https://github.com/deepseek-ai/deepseek-harness/tree/687f282e8625c6b8d11ff58211a90524be2e4317)。本项目不安装 Python SDK；内部 Web Host 使用 wheel 中的原始 SEA 执行文件。

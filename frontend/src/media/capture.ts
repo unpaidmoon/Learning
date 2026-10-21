@@ -8,6 +8,7 @@ export interface CropRect {
 
 export interface CaptureSource {
   sourceId: string;
+  origin?: "video" | "image" | "workspace";
   dataUrl: string;
   width: number;
   height: number;

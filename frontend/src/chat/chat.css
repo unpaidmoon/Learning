@@ -1,4 +1,392 @@
+.chat-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  color: var(--foreground);
+  background: var(--surface, var(--background));
+}
+.chat-workspace .messages {
+  flex: 1;
+  min-height: 0;
+  padding: 26px 24px 18px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  scroll-behavior: auto;
+}
+.chat-workspace .conversation-empty {
+  max-width: 320px;
+  margin: 14vh auto 30px;
+  text-align: left;
+}
+.chat-workspace .conversation-empty h3 {
+  font-size: 23px;
+  line-height: 1.4;
+  font-weight: 550;
+  letter-spacing: -0.6px;
+  margin-bottom: 12px;
+}
+.chat-workspace .conversation-empty p {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.chat-workspace .message {
+  display: block;
+  margin: 0 0 28px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.chat-workspace .message-label {
+  display: none;
+}
+.chat-workspace .message.user {
+  margin-left: 24px;
+  display: flex;
+  align-items: flex-end;
+}
+.chat-workspace .message.user .message-content {
+  display: block;
+  max-width: 100%;
+  width: fit-content;
+  padding: 10px 15px;
+  border-radius: 18px 18px 4px 18px;
+  background: var(--chat-user, var(--secondary));
+}
+.chat-workspace .message-body {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.chat-workspace .reasoning {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+.chat-workspace .reasoning summary {
+  cursor: pointer;
+  padding: 2px 0;
+}
+.chat-workspace .reasoning pre {
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.7;
+  max-height: 260px;
+  overflow: auto;
+}
+.chat-workspace .generation-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.chat-workspace .generation-footer small {
+  font-size: 10px;
+}
+.chat-workspace .generation-footer button {
+  border-radius: 16px;
+}
+.chat-workspace .message-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.chat-workspace .message-attachment {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.chat-workspace .message-attachments img {
+  max-height: 220px;
+  max-width: 100%;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.chat-workspace .attachment-source {
+  padding: 3px 7px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.chat-workspace .composer-area {
+  padding: 8px 16px 12px;
+  border-top: 0;
+  flex-shrink: 0;
+}
+.chat-workspace .composer {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface-elevated, var(--background));
+  padding: 13px 14px 10px;
+  box-shadow: 0 2px 8px #00000005;
+}
+.chat-workspace .composer:focus-within {
+  border-color: var(--muted-foreground);
+}
+.chat-workspace .composer > textarea {
+  width: 100%;
+  display: block;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.65;
+  min-height: 72px;
+  max-height: 200px;
+  resize: vertical;
+  padding: 2px 1px 10px;
+  color: var(--foreground);
+}
+.chat-workspace .composer > textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.85;
+}
+.chat-workspace .composer-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 5px 0 0;
+}
+.chat-workspace .composer-toolbar > button {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 21px;
+  line-height: 1;
+}
+.chat-workspace .composer-toolbar > button:disabled {
+  opacity: 0.25;
+}
+.chat-workspace .file-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  min-height: 28px;
+}
+.chat-workspace .file-picker:hover {
+  color: var(--foreground);
+}
+.chat-workspace .file-picker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: pointer;
+}
+.chat-workspace .model-field,
+.chat-workspace .thinking-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.chat-workspace .model-field input,
+.chat-workspace .thinking-field select {
+  width: 110px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  padding: 5px 2px;
+  font-size: 10px;
+  box-shadow: none;
+}
+.chat-workspace .thinking-field select {
+  width: 50px;
+}
+.chat-workspace .input-context {
+  padding: 1px 1px 5px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.chat-workspace .input-context summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.chat-workspace .context-fields {
+  display: grid;
+  gap: 10px;
+  padding: 9px 0;
+}
+.chat-workspace .context-fields label {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+}
+.chat-workspace .context-fields textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  background: transparent;
+}
+.chat-workspace .draft-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.chat-workspace .draft-attachments figure {
+  width: 88px;
+  margin: 0;
+}
+.chat-workspace .draft-attachments img {
+  display: block;
+  height: 62px;
+  width: 88px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface, var(--background));
+}
+.chat-workspace .draft-attachments figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.chat-workspace .draft-attachments button {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.chat-workspace .draft-save-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  padding: 2px 5px 0;
+}
+.chat-workspace .draft-save-status button {
+  height: 24px;
+  padding: 2px 4px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.chat-workspace .composer-hint {
+  margin: 3px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+.chat-workspace .pending-notice,
+.chat-workspace .draft-warning {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--foreground);
+  background: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.chat-workspace .pending-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.chat-workspace .inline-error {
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.chat-workspace .draft-references {
+  display: grid;
+  gap: 7px;
+  max-height: 230px;
+  overflow: auto;
+  margin: 0 0 11px;
+}
+.chat-workspace .reference-card,
+.chat-workspace .message-reference {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 9px;
+  background: var(--surface, var(--background));
+  padding: 7px 10px;
+}
+.chat-workspace .reference-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.chat-workspace .reference-source,
+.chat-workspace .reference-remove {
+  border: 0;
+  background: none;
+  color: var(--muted-foreground);
+  padding: 0;
+  font-size: 11px;
+}
+.chat-workspace .reference-remove {
+  font-size: 18px;
+  width: 22px;
+  height: 22px;
+}
+.chat-workspace .reference-card .markdown-answer {
+  font-size: 12px;
+  line-height: 1.65;
+  max-height: 150px;
+  overflow: auto;
+}
+.chat-workspace .reference-card .markdown-answer p {
+  margin: 3px 0;
+}
+.chat-workspace .message-reference {
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.chat-workspace .message-reference small {
+  color: var(--muted-foreground);
+}
 .markdown-answer {
+  position: relative;
   overflow-wrap: anywhere;
   line-height: 1.85;
   min-width: 0;
@@ -11,6 +399,7 @@
 .markdown-answer h3 {
   font-size: 1.12em;
   margin: 1.2em 0 0.55em;
+  font-weight: 600;
 }
 .markdown-answer ul,
 .markdown-answer ol {
@@ -21,7 +410,8 @@
   overflow: auto;
   background: var(--muted);
   padding: 12px;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 .markdown-answer code {
   font-size: 0.9em;
@@ -46,57 +436,35 @@
 .markdown-answer .katex {
   font-size: 1.08em;
 }
-.markdown-answer a,
-.formula-actions button {
+.markdown-answer a {
   color: var(--primary);
-}
-.formula-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-block: 10px;
-}
-.formula-actions button,
-.attachment-source {
-  font-size: 11px;
-  padding: 3px 7px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--background);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .blocked-image {
   color: var(--muted-foreground);
   font-size: 12px;
 }
-.message-attachment {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
+.selection-quote-button {
+  z-index: 40;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-elevated, var(--background));
+  color: var(--foreground);
+  box-shadow: 0 3px 14px #0000001a;
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
 }
-.draft-save-status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+.selection-quote-error {
   font-size: 11px;
   color: var(--muted-foreground);
 }
-.draft-attachments figcaption {
-  flex-wrap: wrap;
-  gap: 5px;
-}
-.messages {
-  overscroll-behavior: contain;
-}
-.messages .user .message-body {
-  white-space: pre-wrap;
-}
-.draft-warning {
-  color: #ac7336;
-  font-size: 12px;
-  padding-block: 6px;
-}
-.chat-heading p {
-  overflow-wrap: anywhere;
+@media (max-width: 600px) {
+  .chat-workspace .messages {
+    padding: 18px 16px;
+  }
+  .chat-workspace .composer-area {
+    padding: 8px 10px 10px;
+  }
 }

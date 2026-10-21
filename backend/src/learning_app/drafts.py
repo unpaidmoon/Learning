@@ -6,6 +6,7 @@ Uncropped capture originals stay in the browser and are never accepted here.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Literal
@@ -46,6 +47,33 @@ attachment_sources = Table(
 Thinking = Literal["none", "low", "medium", "high", "xhigh", "max"]
 
 
+class DraftReference(BaseModel):
+    """A user-selected contiguous range of one already visible answer.
+
+    Source offsets use UTF-16 code units, matching browser string offsets. They
+    identify Markdown source rather than DOM text, whose formatting may differ.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    reference_id: str = Field(min_length=1, max_length=160, pattern=r"^[A-Za-z0-9_-]+$")
+    message_id: str = Field(min_length=1, max_length=160)
+    text: str = Field(min_length=1, max_length=100_000)
+    markdown: str = Field(min_length=1, max_length=100_000)
+    source_start: int | None = Field(default=None, ge=0)
+    source_end: int | None = Field(default=None, gt=0)
+
+    @model_validator(mode="after")
+    def validate_range(self):
+        if (self.source_start is None) != (self.source_end is None):
+            raise ValueError("Reference source range requires both offsets")
+        if self.source_start is not None and self.source_end <= self.source_start:
+            raise ValueError("Reference source range must not be empty")
+        if not self.text.strip() or not self.markdown.strip():
+            raise ValueError("Reference selection must not be blank")
+        return self
+
+
 class DraftContent(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -53,6 +81,7 @@ class DraftContent(BaseModel):
     attachment_ids: list[str] = Field(default_factory=list, max_length=8)
     conditions: list[str] = Field(default_factory=list, max_length=100)
     corrections: list[str] = Field(default_factory=list, max_length=100)
+    references: list[DraftReference] = Field(default_factory=list, max_length=100)
     model: str | None = Field(default=None, min_length=1, max_length=200)
     thinking: Thinking | None = None
 
@@ -62,6 +91,8 @@ class DraftContent(BaseModel):
             raise ValueError("Duplicate attachment identities")
         if any(len(value) > 100_000 for value in self.conditions + self.corrections):
             raise ValueError("Condition or correction too long")
+        if len({value.reference_id for value in self.references}) != len(self.references):
+            raise ValueError("Duplicate reference identities")
         return self
 
 
@@ -93,7 +124,7 @@ class AttachmentSourceInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     chat_id: str = Field(min_length=1, max_length=160)
-    origin: Literal["video", "image"] = "video"
+    origin: Literal["video", "image", "workspace"] = "video"
     asset_id: str | None = Field(default=None, min_length=1, max_length=160)
     source_version: str | None = Field(default=None, min_length=1, max_length=160)
     time_ms: int | None = Field(default=None, ge=0)
@@ -114,6 +145,12 @@ class AttachmentSourceInput(BaseModel):
         if self.origin == "video":
             if self.asset_id is None or self.source_version is None or self.time_ms is None:
                 raise ValueError("Video provenance requires a version and source time")
+        elif self.origin == "workspace":
+            locator = (self.asset_id, self.source_version, self.time_ms)
+            if any(value is not None for value in locator) and not all(
+                value is not None for value in locator
+            ):
+                raise ValueError("Workspace video locator requires all source fields")
         elif any(value is not None for value in (self.asset_id, self.source_version, self.time_ms)):
             raise ValueError("External images cannot claim a video source")
         return self
@@ -145,7 +182,120 @@ def _draft(conn, chat_id: str):
 def _view(row) -> dict:
     if row is None:
         return {"revision": 0, **DraftContent().model_dump()}
-    return {"revision": row["revision"], **row["payload"]}
+    # Earlier saved drafts predate reference cards. Supplying their default
+    # keeps direct reads, HTTP serialization and reopen behavior consistent.
+    return {"revision": row["revision"], **DraftContent.model_validate(row["payload"]).model_dump()}
+
+
+REFERENCE_CONDITION_PREFIX = "用户选区引用（只读来源）：\n"
+
+
+def _unwrapped_math(value: str) -> str:
+    value = value.strip()
+    for left, right in (("$$", "$$"), (r"\[", r"\]"), (r"\(", r"\)"), ("$", "$")):
+        if value.startswith(left) and value.endswith(right) and len(value) > len(left + right):
+            return value[len(left) : -len(right)].strip()
+    return value
+
+
+def _canonical_markdown(value: str) -> str:
+    # The renderer normalizes standard LaTeX delimiters. Accept that exact
+    # syntactic change; never expand a selected subexpression to a whole formula.
+    return (
+        value.strip()
+        .replace(r"\[", "$$")
+        .replace(r"\]", "$$")
+        .replace(r"\(", "$")
+        .replace(r"\)", "$")
+    )
+
+
+def _validate_reference_sources(conn, chat_id: str, references: Iterable[DraftReference]) -> None:
+    for reference in references:
+        supplied = _canonical_markdown(reference.markdown)
+        candidate = _unwrapped_math(supplied)
+        if not candidate:
+            raise AppError("REFERENCE_SELECTION_MISMATCH", "引用选区不能为空，请重新选择", 422)
+        message = (
+            conn.execute(
+                select(business.messages).where(
+                    business.messages.c.message_id == reference.message_id,
+                    business.messages.c.chat_id == chat_id,
+                    business.messages.c.role == "assistant",
+                )
+            )
+            .mappings()
+            .first()
+        )
+        if message is None:
+            raise AppError("REFERENCE_SOURCE_NOT_IN_CHAT", "引用来源不属于当前对话的回答", 422)
+        source = message["text"]
+        if reference.source_start is not None:
+            encoded = source.encode("utf-16-le")
+            start, end = reference.source_start * 2, reference.source_end * 2
+            if end > len(encoded):
+                raise AppError("REFERENCE_RANGE_INVALID", "引用选区超出来源，请重新选择", 422)
+            try:
+                selected = encoded[start:end].decode("utf-16-le")
+            except UnicodeDecodeError as exc:
+                raise AppError(
+                    "REFERENCE_RANGE_INVALID", "引用选区边界不完整，请重新选择", 422
+                ) from exc
+            expected = _canonical_markdown(selected)
+            matches = bool(expected) and (
+                supplied == expected or candidate == _unwrapped_math(expected)
+            )
+        else:
+            # Legacy/native selection adapters may not supply source offsets.
+            # Their exact selected source must still occur in this same answer.
+            expected = _canonical_markdown(source)
+            matches = supplied in expected or candidate in expected
+        if not matches:
+            raise AppError(
+                "REFERENCE_SELECTION_MISMATCH", "引用内容与实际来源选区不一致，请重新选择", 422
+            )
+
+
+def reference_conditions(references: Iterable[DraftReference | dict]) -> list[str]:
+    """Freeze card identity/range/content in the existing immutable input payload."""
+    return [
+        REFERENCE_CONDITION_PREFIX
+        + json.dumps(
+            DraftReference.model_validate(reference).model_dump(),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        for reference in references
+    ]
+
+
+def submission_reference_conditions(
+    repository: Repository, chat_id: str, references: Iterable[DraftReference | dict]
+) -> list[str]:
+    selected = [DraftReference.model_validate(reference) for reference in references]
+    if len(selected) > 100 or len({item.reference_id for item in selected}) != len(selected):
+        raise AppError("REFERENCE_IDENTITIES_INVALID", "引用数量或身份不正确", 422)
+    with repository.engine.connect() as conn:
+        _chat(conn, chat_id)
+        _validate_reference_sources(conn, chat_id, selected)
+    return reference_conditions(selected)
+
+
+def message_references(conditions: Iterable[str]) -> list[dict]:
+    """Restore display cards from their frozen submission metadata."""
+    result = []
+    for condition in conditions:
+        if not condition.startswith(REFERENCE_CONDITION_PREFIX):
+            continue
+        try:
+            reference = DraftReference.model_validate_json(
+                condition[len(REFERENCE_CONDITION_PREFIX) :]
+            )
+        except ValueError:
+            continue
+        result.append(reference.model_dump())
+    return result
 
 
 def read_draft(repository: Repository, chat_id: str) -> dict:
@@ -167,6 +317,7 @@ def save_draft(repository: Repository, chat_id: str, value: DraftInput) -> dict:
         revision = previous["revision"] if previous else 0
         if revision != value.expected_revision:
             raise AppError("DRAFT_REVISION_CONFLICT", "草稿已有较新版本，请先核对已保存内容")
+        _validate_reference_sources(conn, chat_id, value.references)
         for attachment_id in value.attachment_ids:
             source = (
                 conn.execute(
@@ -210,15 +361,16 @@ def clear_draft(repository: Repository, chat_id: str, value: DraftClearInput) ->
         revision = previous["revision"] if previous else 0
         if revision != value.expected_revision:
             raise AppError("DRAFT_REVISION_CONFLICT", "新草稿已保存，未清除新的输入")
-        payload = previous["payload"] if previous else DraftContent().model_dump()
+        payload = DraftContent.model_validate(previous["payload"] if previous else {}).model_dump()
         submitted = conn.execute(
             select(business.input_revisions.c.payload).where(
                 business.input_revisions.c.message_id == submission["user_message_id"]
             )
         ).scalar_one()
-        if any(
-            payload[key] != submitted[key]
-            for key in ("text", "attachment_ids", "conditions", "corrections")
+        expected_conditions = payload["conditions"] + reference_conditions(payload["references"])
+        if (
+            any(payload[key] != submitted[key] for key in ("text", "attachment_ids", "corrections"))
+            or expected_conditions != submitted["conditions"]
         ):
             raise AppError("DRAFT_SUBMISSION_MISMATCH", "草稿与已提交内容不同，保留草稿以便核对")
         cleared = {
@@ -303,12 +455,17 @@ def submission_source_locators(
             if source_chat["course_id"] != chat["course_id"]:
                 raise AppError("SOURCE_NOT_IN_COURSE", "截图来源不属于当前课程")
             payload = row["payload"]
-            if payload["origin"] != "video":
+            if payload["origin"] not in {"video", "workspace"}:
+                continue
+            if payload["asset_id"] is None:
+                # Software-only captures retain immutable provenance keyed by
+                # attachment identity, but do not pretend to be video locators.
                 continue
             _validate_video_locator(conn, chat["course_id"], payload)
             locators.append(
                 {
                     "attachment_id": attachment_id,
+                    **({"origin": "workspace"} if payload["origin"] == "workspace" else {}),
                     **{
                         key: payload[key]
                         for key in (
@@ -341,7 +498,7 @@ def save_attachment_source(
     payload = value.model_dump()
     with repository.engine.begin() as conn:
         chat = _chat(conn, value.chat_id)
-        if value.origin == "video":
+        if value.origin == "video" or (value.origin == "workspace" and value.asset_id is not None):
             _validate_video_locator(conn, chat["course_id"], payload)
         if value.parent_attachment_id:
             parent = (

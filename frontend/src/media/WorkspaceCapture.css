@@ -1,0 +1,97 @@
+.workspace-capture {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  user-select: none;
+  touch-action: none;
+  background: #0008;
+  color: #fff;
+}
+
+.workspace-capture-surface {
+  position: absolute;
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.workspace-capture-frozen,
+.workspace-capture-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.workspace-capture-shade {
+  background: #0006;
+}
+
+.workspace-capture-selection {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid #fff;
+  outline: 1px solid #0008;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+
+.workspace-capture-selection > span {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding: 3px 6px;
+  white-space: nowrap;
+  background: #222;
+  border-radius: 4px;
+  font:
+    12px/1.4 "Segoe UI",
+    sans-serif;
+}
+
+.workspace-capture-instructions {
+  position: fixed;
+  z-index: 1;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid #ffffff30;
+  border-radius: 12px;
+  background: #242424f0;
+  box-shadow: 0 6px 24px #0004;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.workspace-capture-instructions button {
+  border: 1px solid #ffffff40;
+  border-radius: 7px;
+  padding: 5px 9px;
+  color: #fff;
+  background: #ffffff15;
+  cursor: pointer;
+}
+
+.workspace-capture-instructions button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.workspace-capture-error {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: #fff;
+  background: #842b2bf2;
+  font-size: 13px;
+}

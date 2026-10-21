@@ -73,10 +73,15 @@ class ExecutionAdapter:
         max_tokens: int = 16384,
         timeout: float = 240,
         boundary: MessagesBoundary | None = None,
+        credential_route: str = "api_key",
+        account_home: Path | None = None,
     ) -> None:
         self.repository, self.run_dir = Path(repository), Path(run_dir)
         self.model, self.thinking = model, thinking
         self.timeout = timeout
+        self.mode, self.credential_route = mode, credential_route
+        self._account_models: list[dict] = []
+        self._account_signed_in = False
         self.boundary = boundary or MessagesBoundary(
             self.run_dir / "boundary",
             mode=mode,
@@ -85,6 +90,8 @@ class ExecutionAdapter:
             thinking=thinking,
             max_tokens=max_tokens,
             timeout=timeout,
+            credential_route=credential_route,
+            account_enabled=mode == "official",
         )
         self.host = HarnessHost(
             self.repository,
@@ -95,6 +102,8 @@ class ExecutionAdapter:
             thinking=thinking,
             max_tokens=max_tokens,
             timeout=timeout,
+            account_enabled=mode == "official",
+            home_directory=account_home,
         )
         self.peer: RemotePeer | None = None
         self._streams: dict[str, str] = {}
@@ -188,8 +197,8 @@ class ExecutionAdapter:
         if binding.generation_id in self._started or binding.status != "prepared":
             raise ExecutionError("GENERATION_ALREADY_DISPATCHED")
         selected_model, selected_thinking = model or self.model, thinking or self.thinking
-        validate_selection(self.model, selected_model, selected_thinking)
-        if not supports_images(selected_model) and (
+        await self.validate_choice(selected_model, selected_thinking)
+        if not self.supports_model_images(selected_model) and (
             attachments or binding.session_id in self._image_sessions
         ):
             raise ExecutionError("MODEL_IMAGE_UNSUPPORTED")
@@ -228,7 +237,7 @@ class ExecutionAdapter:
             "session/selectModel",
             {
                 "sessionId": binding.session_id,
-                "provider": "deepseek-official",
+                "provider": "deepseek-account" if self.mode == "official" and self.credential_route == "account" else "deepseek-official",
                 "model": selected_model,
                 "reasoningEffort": native_thinking(selected_thinking),
             },
@@ -256,6 +265,100 @@ class ExecutionAdapter:
         except (httpx.TransportError, asyncio.TimeoutError):
             binding.status = "unknown"
         return binding
+
+    async def account_state(self) -> dict:
+        if not self.peer or self.mode != "official":
+            raise ExecutionError("ACCOUNT_NOT_AVAILABLE")
+        try:
+            state = await self.peer.rpc_args("account/getState", {})
+        except (ExecutionError, httpx.HTTPError, OSError, TimeoutError):
+            self._account_signed_in = False
+            self._account_models = []
+            raise
+        self._account_signed_in = state.get("status") == "credential-stored"
+        if not self._account_signed_in:
+            self._account_models = []
+        return state
+
+    @property
+    def api_key_configured(self) -> bool:
+        return self.boundary.api_key_configured
+
+    @property
+    def question_answering_ready(self) -> bool:
+        """Known route capability only; this property never performs IO."""
+        if not self._open:
+            return False
+        if self.mode == "fixture":
+            return True
+        if self.credential_route == "api_key":
+            return self.api_key_configured
+        return (
+            self._account_signed_in
+            and bool(self._account_models)
+            and not self.boundary.account_token_rejected
+        )
+
+    async def refresh_account_models(self) -> list[dict]:
+        if not self.peer:
+            raise ExecutionError("EXECUTION_NOT_OPEN")
+        # A failed refresh cannot leave an old success advertised as the result
+        # of the newly requested capability check.
+        self._account_models = []
+        view = await self.account_state()
+        if view.get("status") != "credential-stored":
+            self._account_models = []
+            raise ExecutionError("ACCOUNT_SIGN_IN_REQUIRED")
+        catalog = await self.peer.rpc_args("session/modelCatalog", {})
+        group = next((item for item in catalog.get("groups", []) if item.get("id") == "deepseek-account"), None)
+        if not self.boundary.account_catalog_observed or group is None:
+            self._account_models = []
+            raise ExecutionError("ACCOUNT_CATALOG_UNAVAILABLE")
+        choices = []
+        for model in group.get("models", []):
+            model_id = model.get("id")
+            if model_id not in self.boundary.account_model_modalities:
+                continue
+            efforts = model.get("reasoning", {}).get("efforts", [])
+            levels = ["none" if effort.get("id") == "off" else effort.get("id") for effort in efforts]
+            choices.append({
+                "id": model_id,
+                "name": model.get("name", model_id),
+                "supports_images": "image" in self.boundary.account_model_modalities[model_id],
+                "thinking_levels": [level for level in levels if level in {"none", "low", "high", "max"}],
+            })
+        self._account_models = choices
+        return choices
+
+    def supports_model_images(self, model: str) -> bool:
+        if self.mode == "official" and self.credential_route == "account":
+            return any(choice["id"] == model and choice["supports_images"] for choice in self._account_models)
+        return supports_images(model)
+
+    async def validate_choice(self, model: str, thinking: str) -> None:
+        if self.mode != "official" or self.credential_route != "account":
+            if self.mode == "official" and not self.api_key_configured:
+                raise ExecutionError("MODEL_KEY_NOT_CONFIGURED")
+            validate_selection(self.model, model, thinking)
+            return
+        state = await self.account_state()
+        if state.get("status") != "credential-stored":
+            raise ExecutionError("ACCOUNT_SIGN_IN_REQUIRED")
+        if not self._account_models:
+            await self.refresh_account_models()
+        choice = next((choice for choice in self._account_models if choice["id"] == model), None)
+        if choice is None:
+            raise ExecutionError("MODEL_SELECTION_UNAVAILABLE")
+        if thinking not in choice["thinking_levels"]:
+            raise ExecutionError("THINKING_SELECTION_UNAVAILABLE")
+
+    def set_credential_route(self, route: str) -> None:
+        if route not in {"account", "api_key"}:
+            raise ExecutionError("CREDENTIAL_ROUTE_INVALID")
+        if route == "api_key" and self.mode == "official" and not self.api_key_configured:
+            raise ExecutionError("MODEL_KEY_NOT_CONFIGURED")
+        self.credential_route = route
+        self.boundary.credential_route = route
 
     def _event(self, binding, event_id, kind, **kwargs) -> NormalizedEvent:
         number = self._sequences.get(binding.generation_id, 0) + 1

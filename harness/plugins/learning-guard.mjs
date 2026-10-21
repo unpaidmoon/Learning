@@ -12,6 +12,8 @@ function required(name) {
   return value;
 }
 const endpoint = new URL(required('BOUNDARY_URL'));
+const accountEnabled = process.env.LEARNING_HARNESS_ACCOUNT_ENABLED === '1';
+const accountOrigin = 'https://platform.deepseek.com';
 if (endpoint.protocol !== 'http:' || endpoint.hostname !== '127.0.0.1'
   || !endpoint.port || endpoint.username || endpoint.password || endpoint.search || endpoint.hash) {
   throw Error('LEARNING_HARNESS_BOUNDARY_INVALID');
@@ -29,6 +31,11 @@ function audit(type, fields = {}) {
   fs.appendFileSync(auditPath, JSON.stringify({ time: Date.now(), type, ...fields }) + '\n');
 }
 function check(url, carrier) {
+  if (accountEnabled && url.origin === accountOrigin && !url.username && !url.password) {
+    state.networkAllowed += 1;
+    audit('account-network-allowed', { carrier, path: url.pathname });
+    return;
+  }
   if (url.protocol !== 'http:' || url.hostname !== endpoint.hostname
     || url.port !== endpoint.port || url.username || url.password) {
     state.networkBlocked += 1;
@@ -68,6 +75,10 @@ net.Socket.prototype.connect = function(...args) {
   const head = Array.isArray(args[0]) ? args[0][0] : args[0];
   const options = typeof head === 'object' && head !== null
     ? head : { port: head, host: typeof args[1] === 'string' ? args[1] : 'localhost' };
+  if (accountEnabled && !options.path && String(options.port) === '443'
+    && (options.host || options.hostname) === 'platform.deepseek.com') {
+    return originalConnect.apply(this, args);
+  }
   if (options.path || String(options.port) !== endpoint.port
     || (options.host || options.hostname || 'localhost') !== '127.0.0.1') {
     state.networkBlocked += 1;

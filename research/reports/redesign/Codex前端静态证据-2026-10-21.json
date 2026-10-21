@@ -1,0 +1,701 @@
+{
+  "schema_version": 1,
+  "artifact": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1013.4894.0_x64__2p2nqsd0c76g0\\app\\resources\\app.asar",
+  "canonical_artifact": "D:\\WindowsApps\\OpenAI.Codex_26.1013.4894.0_x64__2p2nqsd0c76g0\\app\\resources\\app.asar",
+  "sha256": "bbec1d64e135b718a154b31655bb8ad9a39472bac1b2cabba991a9d97a339dd8",
+  "package": {
+    "name": "openai-codex-electron",
+    "version": "26.1013.40934"
+  },
+  "rea_evidence_ids": [
+    "ev_ea893c72aab8124679fa7fbfd50b254304cf47f78d0f9de343cdd1e142865e5a",
+    "ev_72180854f7a2355cfc06b369634e4188243df779be4158ecc9dfa33a498bbc96"
+  ],
+  "scope": "packaged static CSS declarations and desktop theme seed candidates",
+  "styles": [
+    {
+      "path": "webview/assets/app-initial-e7c27dd40beb.css",
+      "sha256": "6de949e9037e0038f9d4f18530e3bc8a5aa6274fa53ec9e59be85c05218003bc",
+      "archive_byte_offset": 70016274,
+      "size_bytes": 277453,
+      "declarations": [
+        {
+          "name": "--text-base",
+          "literal": "16px",
+          "source_character_offset": 121734
+        },
+        {
+          "name": "--text-sm",
+          "literal": "14px",
+          "source_character_offset": 121751
+        },
+        {
+          "name": "--text-xs",
+          "literal": "12px",
+          "source_character_offset": 121766
+        },
+        {
+          "name": "--text-lg",
+          "literal": "18px",
+          "source_character_offset": 121781
+        },
+        {
+          "name": "--spacing",
+          "literal": "4px",
+          "source_character_offset": 121796
+        },
+        {
+          "name": "--radius-lg",
+          "literal": "10px",
+          "source_character_offset": 123569
+        }
+      ]
+    },
+    {
+      "path": "webview/assets/app-primary-71492d0e9e92.css",
+      "sha256": "ec041bcd9be08d800225b53e612771b179d5a8082f1e7a5e225519b33163c80b",
+      "archive_byte_offset": 70316579,
+      "size_bytes": 41521,
+      "declarations": [
+        {
+          "name": "--text-xs",
+          "literal": "12px",
+          "source_character_offset": 33922
+        },
+        {
+          "name": "--text-sm",
+          "literal": "14px",
+          "source_character_offset": 33937
+        },
+        {
+          "name": "--text-base",
+          "literal": "16px",
+          "source_character_offset": 33952
+        },
+        {
+          "name": "--text-lg",
+          "literal": "18px",
+          "source_character_offset": 33969
+        }
+      ]
+    },
+    {
+      "path": "webview/assets/app-shared-dc7535e633d7.css",
+      "sha256": "282dd3546bccfba48212a186641a73dedb27af6af7962dad40b3f5db6a9a08f2",
+      "archive_byte_offset": 78650146,
+      "size_bytes": 1307139,
+      "declarations": [
+        {
+          "name": "--font-sans",
+          "literal": "var(--font-ui-family,var(--font-sans-default))",
+          "source_character_offset": 125235
+        },
+        {
+          "name": "--font-mono",
+          "literal": "var(--font-code-family,var(--font-mono-default))",
+          "source_character_offset": 125367
+        },
+        {
+          "name": "--spacing",
+          "literal": ".25rem",
+          "source_character_offset": 126643
+        },
+        {
+          "name": "--text-xs",
+          "literal": "11px",
+          "source_character_offset": 127030
+        },
+        {
+          "name": "--text-sm",
+          "literal": "12px",
+          "source_character_offset": 127082
+        },
+        {
+          "name": "--text-base",
+          "literal": "14px",
+          "source_character_offset": 127138
+        },
+        {
+          "name": "--text-lg",
+          "literal": "16px",
+          "source_character_offset": 127194
+        },
+        {
+          "name": "--radius-sm",
+          "literal": "calc(var(--radius-sm-base) * var(--corner-radius-scale))",
+          "source_character_offset": 127927
+        },
+        {
+          "name": "--radius-md",
+          "literal": "calc(var(--radius-md-base) * var(--corner-radius-scale))",
+          "source_character_offset": 127996
+        },
+        {
+          "name": "--radius-lg",
+          "literal": "calc(var(--radius-lg-base) * var(--corner-radius-scale))",
+          "source_character_offset": 128065
+        },
+        {
+          "name": "--radius-xl",
+          "literal": "calc(var(--radius-xl-base) * var(--corner-radius-scale))",
+          "source_character_offset": 128134
+        },
+        {
+          "name": "--radius-2xl",
+          "literal": "calc(var(--radius-2xl-base) * var(--corner-radius-scale))",
+          "source_character_offset": 128203
+        },
+        {
+          "name": "--radius-3xl",
+          "literal": "calc(var(--radius-3xl-base) * var(--corner-radius-scale))",
+          "source_character_offset": 128274
+        },
+        {
+          "name": "--radius-4xl",
+          "literal": "calc(var(--radius-4xl-base) * var(--corner-radius-scale))",
+          "source_character_offset": 128345
+        },
+        {
+          "name": "--font-sans-default",
+          "literal": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "source_character_offset": 130360
+        },
+        {
+          "name": "--font-content",
+          "literal": "var(--codex-content-font-family,var(--font-sans))",
+          "source_character_offset": 130438
+        },
+        {
+          "name": "--border-width-hairline",
+          "literal": ".5px",
+          "source_character_offset": 132365
+        },
+        {
+          "name": "--composer-gutter",
+          "literal": "calc(var(--spacing) * 3)",
+          "source_character_offset": 184267
+        },
+        {
+          "name": "--composer-compact-gutter",
+          "literal": "calc(var(--spacing) * 2)",
+          "source_character_offset": 184310
+        },
+        {
+          "name": "--composer-radius",
+          "literal": "var(--radius-4xl)",
+          "source_character_offset": 184361
+        },
+        {
+          "name": "--composer-background-color",
+          "literal": "var(--color-surface-elevated)",
+          "source_character_offset": 184397
+        },
+        {
+          "name": "--app-color-background-surface",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-900))",
+          "source_character_offset": 196213
+        },
+        {
+          "name": "--app-color-background-surface-under",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-50))var(--lightningcss-dark,black)",
+          "source_character_offset": 196336
+        },
+        {
+          "name": "--app-color-background-application-menu",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-50))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 196450
+        },
+        {
+          "name": "--app-color-border-application-menu-separator",
+          "literal": "var(--lightningcss-light,var(--app-color-border-heavy))var(--lightningcss-dark,var(--app-color-background-application-menu))",
+          "source_character_offset": 196751
+        },
+        {
+          "name": "--app-color-background-editor-opaque",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-100))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 196922
+        },
+        {
+          "name": "--app-color-background-elevated-primary",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 197053
+        },
+        {
+          "name": "--app-color-background-elevated-primary-opaque",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-750))",
+          "source_character_offset": 197185
+        },
+        {
+          "name": "--app-color-background-elevated-secondary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 197324
+        },
+        {
+          "name": "--app-color-background-elevated-secondary-opaque",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-100))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 197469
+        },
+        {
+          "name": "--app-color-background-elevated-tertiary-opaque",
+          "literal": "var(--lightningcss-light,var(--gray-75))var(--lightningcss-dark,var(--gray-200))",
+          "source_character_offset": 197612
+        },
+        {
+          "name": "--app-color-background-button-primary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-1000))",
+          "source_character_offset": 197741
+        },
+        {
+          "name": "--app-color-background-button-primary-hover",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-1000))",
+          "source_character_offset": 197885
+        },
+        {
+          "name": "--app-color-background-button-primary-active",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-1000))",
+          "source_character_offset": 198035
+        },
+        {
+          "name": "--app-color-background-button-primary-inactive",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-1000))",
+          "source_character_offset": 198186
+        },
+        {
+          "name": "--app-color-background-button-secondary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 198339
+        },
+        {
+          "name": "--app-color-background-button-secondary-hover",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 198482
+        },
+        {
+          "name": "--app-color-background-button-secondary-active",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 198631
+        },
+        {
+          "name": "--app-color-background-button-secondary-inactive",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 198781
+        },
+        {
+          "name": "--app-color-background-button-tertiary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 198933
+        },
+        {
+          "name": "--app-color-background-button-tertiary-hover",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 199075
+        },
+        {
+          "name": "--app-color-background-button-tertiary-active",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 199223
+        },
+        {
+          "name": "--app-color-background-accent",
+          "literal": "var(--lightningcss-light,var(--blue-50))var(--lightningcss-dark,var(--blue-900))",
+          "source_character_offset": 199372
+        },
+        {
+          "name": "--app-color-background-accent-hover",
+          "literal": "var(--lightningcss-light,var(--blue-50))var(--lightningcss-dark,var(--blue-900))",
+          "source_character_offset": 199483
+        },
+        {
+          "name": "--app-color-background-accent-active",
+          "literal": "var(--lightningcss-light,var(--blue-50))var(--lightningcss-dark,var(--blue-900))",
+          "source_character_offset": 199600
+        },
+        {
+          "name": "--app-color-background-status-success",
+          "literal": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-400))",
+          "source_character_offset": 199718
+        },
+        {
+          "name": "--app-color-background-status-warning",
+          "literal": "var(--lightningcss-light,var(--orange-50))var(--lightningcss-dark,var(--orange-900))",
+          "source_character_offset": 199840
+        },
+        {
+          "name": "--app-color-background-status-error",
+          "literal": "var(--lightningcss-light,var(--red-50))var(--lightningcss-dark,var(--red-900))",
+          "source_character_offset": 199963
+        },
+        {
+          "name": "--app-color-background-tip-badge",
+          "literal": "var(--lightningcss-light,#e8f3fe)var(--lightningcss-dark,var(--blue-300))",
+          "source_character_offset": 200078
+        },
+        {
+          "name": "--app-color-background-danger-active",
+          "literal": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-400))",
+          "source_character_offset": 200185
+        },
+        {
+          "name": "--app-color-text-foreground",
+          "literal": "var(--lightningcss-light,#1a1c1f)var(--lightningcss-dark,var(--gray-fixed-150))",
+          "source_character_offset": 200302
+        },
+        {
+          "name": "--app-color-text-foreground-secondary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 200410
+        },
+        {
+          "name": "--app-color-text-foreground-tertiary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "source_character_offset": 200551
+        },
+        {
+          "name": "--app-color-border-application-menu-separator",
+          "literal": "var(--lightningcss-light,var(--app-color-border-heavy))var(--lightningcss-dark,color-mix(in srgb, var(--app-color-background-application-menu), var(--app-color-text-foreground) 28%))",
+          "source_character_offset": 201086
+        },
+        {
+          "name": "--app-color-background-editor-opaque",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--gray-fixed-100) 40%, transparent))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 201315
+        },
+        {
+          "name": "--app-color-background-elevated-primary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--gray-fixed-0) 70%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-800) 96%, transparent))",
+          "source_character_offset": 201484
+        },
+        {
+          "name": "--app-color-background-elevated-secondary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 2%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 3%, transparent))",
+          "source_character_offset": 201692
+        },
+        {
+          "name": "--app-color-background-elevated-secondary-opaque",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--gray-fixed-100) 40%, transparent))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "source_character_offset": 201911
+        },
+        {
+          "name": "--app-color-background-button-primary-hover",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 8%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-1000) 6%, transparent))",
+          "source_character_offset": 202092
+        },
+        {
+          "name": "--app-color-background-button-primary-active",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 16%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-1000) 10%, transparent))",
+          "source_character_offset": 202316
+        },
+        {
+          "name": "--app-color-background-button-primary-inactive",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 24%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-1000) 3%, transparent))",
+          "source_character_offset": 202543
+        },
+        {
+          "name": "--app-color-background-button-secondary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 5%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 5%, transparent))",
+          "source_character_offset": 202771
+        },
+        {
+          "name": "--app-color-background-button-secondary-hover",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 5%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 8%, transparent))",
+          "source_character_offset": 202988
+        },
+        {
+          "name": "--app-color-background-button-secondary-active",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 4%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 12%, transparent))",
+          "source_character_offset": 203211
+        },
+        {
+          "name": "--app-color-background-button-secondary-inactive",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 2%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 4%, transparent))",
+          "source_character_offset": 203436
+        },
+        {
+          "name": "--app-color-background-button-tertiary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 0%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 3%, transparent))",
+          "source_character_offset": 203662
+        },
+        {
+          "name": "--app-color-background-button-tertiary-hover",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 10%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 7.0%, transparent))",
+          "source_character_offset": 203878
+        },
+        {
+          "name": "--app-color-background-button-tertiary-active",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 20%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 10%, transparent))",
+          "source_character_offset": 204103
+        },
+        {
+          "name": "--app-color-background-status-success",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--green-500) 7.0%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--green-400) 16%, transparent))",
+          "source_character_offset": 204328
+        },
+        {
+          "name": "--app-color-background-tip-badge",
+          "literal": "var(--lightningcss-light,#e8f3fe)var(--lightningcss-dark,color-mix(in oklab, var(--blue-300) 16%, transparent))",
+          "source_character_offset": 204527
+        },
+        {
+          "name": "--app-color-background-danger-active",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--red-500) 90%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--red-400) 36%, transparent))",
+          "source_character_offset": 204672
+        },
+        {
+          "name": "--app-color-text-foreground-secondary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 70%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 70%, transparent))",
+          "source_character_offset": 204865
+        },
+        {
+          "name": "--app-color-text-foreground-tertiary",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 50%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 50%, transparent))",
+          "source_character_offset": 205082
+        },
+        {
+          "name": "--app-color-text-button-primary",
+          "literal": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-1000))",
+          "source_character_offset": 205420
+        },
+        {
+          "name": "--app-color-text-button-secondary",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-300))",
+          "source_character_offset": 205545
+        },
+        {
+          "name": "--app-color-text-button-tertiary",
+          "literal": "var(--gray-fixed-500)",
+          "source_character_offset": 205684
+        },
+        {
+          "name": "--app-color-text-accent",
+          "literal": "var(--blue-300)",
+          "source_character_offset": 205739
+        },
+        {
+          "name": "--app-color-text-accent",
+          "literal": "var(--blue-100)",
+          "source_character_offset": 205930
+        },
+        {
+          "name": "--app-color-text-on-accent",
+          "literal": "var(--gray-fixed-1000)",
+          "source_character_offset": 206091
+        },
+        {
+          "name": "--app-color-text-success",
+          "literal": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-300))",
+          "source_character_offset": 206141
+        },
+        {
+          "name": "--app-color-text-warning",
+          "literal": "var(--lightningcss-light,var(--orange-500))var(--lightningcss-dark,var(--orange-300))",
+          "source_character_offset": 206250
+        },
+        {
+          "name": "--app-color-text-error",
+          "literal": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-300))",
+          "source_character_offset": 206361
+        },
+        {
+          "name": "--app-color-text-tip-badge",
+          "literal": "var(--lightningcss-light,#3a83f7)var(--lightningcss-dark,var(--blue-300))",
+          "source_character_offset": 206464
+        },
+        {
+          "name": "--app-color-border",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--white))",
+          "source_character_offset": 207882
+        },
+        {
+          "name": "--app-color-border-heavy",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--white))",
+          "source_character_offset": 207997
+        },
+        {
+          "name": "--app-color-border-light",
+          "literal": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--white))",
+          "source_character_offset": 208118
+        },
+        {
+          "name": "--app-color-border-warning",
+          "literal": "var(--lightningcss-light,var(--orange-500))var(--lightningcss-dark,var(--orange-300))",
+          "source_character_offset": 208239
+        },
+        {
+          "name": "--app-color-border-error",
+          "literal": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-400))",
+          "source_character_offset": 208352
+        },
+        {
+          "name": "--app-color-border-focus",
+          "literal": "var(--lightningcss-light,var(--blue-300))var(--lightningcss-dark,var(--blue-300))",
+          "source_character_offset": 208457
+        },
+        {
+          "name": "--app-color-border",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 8%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--white) 8%, transparent))",
+          "source_character_offset": 209972
+        },
+        {
+          "name": "--app-color-border-heavy",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 12%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--white) 16%, transparent))",
+          "source_character_offset": 210161
+        },
+        {
+          "name": "--app-color-border-light",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 5%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--white) 4%, transparent))",
+          "source_character_offset": 210358
+        },
+        {
+          "name": "--app-color-border-warning",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--orange-500) 15%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--orange-300) 40%, transparent))",
+          "source_character_offset": 210553
+        },
+        {
+          "name": "--app-color-border-error",
+          "literal": "var(--lightningcss-light,color-mix(in oklab, var(--red-500) 15%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--red-400) 40%, transparent))",
+          "source_character_offset": 210742
+        },
+        {
+          "name": "--app-color-border-focus",
+          "literal": "var(--lightningcss-light,var(--blue-300))var(--lightningcss-dark,color-mix(in oklab, var(--blue-300) 70%, transparent))",
+          "source_character_offset": 210923
+        },
+        {
+          "name": "--app-color-background-recovery",
+          "literal": "#f8f7f5",
+          "source_character_offset": 211798
+        },
+        {
+          "name": "--composer-radius",
+          "literal": "calc(var(--spacing) * 5.5)",
+          "source_character_offset": 214464
+        },
+        {
+          "name": "--app-color-background-shell",
+          "literal": "var(--color-surface-tertiary)",
+          "source_character_offset": 222104
+        },
+        {
+          "name": "--app-color-background-elevated-tertiary-opaque",
+          "literal": "var(--vscode-editor-background)",
+          "source_character_offset": 265363
+        },
+        {
+          "name": "--text-base",
+          "literal": "var(--comment-font-size)",
+          "source_character_offset": 561747
+        },
+        {
+          "name": "--text-base",
+          "literal": "var(--text-sm)",
+          "source_character_offset": 674622
+        },
+        {
+          "name": "--font-content",
+          "literal": "var(--font-openai-sans)",
+          "source_character_offset": 682855
+        },
+        {
+          "name": "--radius-md",
+          "literal": ".5rem",
+          "source_character_offset": 685928
+        },
+        {
+          "name": "--radius-sm",
+          "literal": ".375rem",
+          "source_character_offset": 685974
+        },
+        {
+          "name": "--text-sm",
+          "literal": "var(--font-text-sm-size)",
+          "source_character_offset": 689071
+        },
+        {
+          "name": "--text-sm",
+          "literal": "13px",
+          "source_character_offset": 1285936
+        },
+        {
+          "name": "--text-xs",
+          "literal": "12px",
+          "source_character_offset": 1285951
+        },
+        {
+          "name": "--font-sans-default",
+          "literal": "-apple-system-body, ui-sans-serif, -apple-system, system-ui, \"Segoe UI\", \"Helvetica\", \"Apple Color Emoji\", \"Arial\", sans-serif, \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+          "source_character_offset": 1287004
+        },
+        {
+          "name": "--text-lg",
+          "literal": "1.125rem",
+          "source_character_offset": 1287305
+        },
+        {
+          "name": "--text-base",
+          "literal": "1rem",
+          "source_character_offset": 1287324
+        },
+        {
+          "name": "--text-sm",
+          "literal": ".875rem",
+          "source_character_offset": 1287341
+        },
+        {
+          "name": "--text-xs",
+          "literal": ".75rem",
+          "source_character_offset": 1287359
+        },
+        {
+          "name": "--composer-radius",
+          "literal": "calc(var(--spacing) * 7)",
+          "source_character_offset": 1289388
+        },
+        {
+          "name": "--app-color-background-elevated-primary",
+          "literal": "var(--app-color-background-elevated-primary-opaque)",
+          "source_character_offset": 1295458
+        },
+        {
+          "name": "--app-color-background-surface",
+          "literal": "var(--color-surface-tertiary)",
+          "source_character_offset": 1299057
+        },
+        {
+          "name": "--app-color-background-surface-under",
+          "literal": "var(--color-surface-secondary)",
+          "source_character_offset": 1299118
+        }
+      ]
+    }
+  ],
+  "desktop_seed_candidates": [
+    {
+      "path": "webview/assets/app-initial-5851df3f6cb1.js",
+      "sha256": "c70d95da34ba7e5962a559dbf68d0102d10b4b47b877f5d9933629bb5a1f3a10",
+      "archive_byte_offset": 55612341,
+      "source_character_offset": 8031060,
+      "variants": {
+        "dark": {
+          "accent": "#339cff",
+          "ink": "#ffffff",
+          "surface": "#181818",
+          "contrast": 60
+        },
+        "light": {
+          "accent": "#339cff",
+          "ink": "#1a1c1f",
+          "surface": "#ffffff",
+          "contrast": 45
+        }
+      },
+      "classification": "static desktop seed candidate; not observed active theme"
+    }
+  ],
+  "limitations": [
+    "CSS extraction is a separate read-only operation, not REA semantic JavaScript analysis.",
+    "Variable declarations are not resolved computed styles; selector/variant precedence is not inferred.",
+    "Static seeds do not establish the user's active theme, OS fonts or runtime behavior.",
+    "REA recorded eight native companion integrity contradictions; those resources were not executed.",
+    "No user chat, video, screen, cookie or credential was read by this extractor."
+  ]
+}

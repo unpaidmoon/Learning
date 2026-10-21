@@ -55,13 +55,17 @@ class RemotePeer:
                 await queue.put({"type": "disconnected"})
 
     async def rpc(self, method: str, request: dict) -> Any:
+        return await self.rpc_args(method, {"request": request})
+
+    async def rpc_args(self, method: str, arguments: dict) -> Any:
+        """Named official controller arguments remain inside the adapter."""
         response = await self.client.post(
             "/api/" + method,
             json={
                 "type": "client-request",
                 "rpcId": str(uuid.uuid4()),
                 "method": method,
-                "payload": {"args": {"request": request}},
+                "payload": {"args": arguments},
             },
         )
         try:

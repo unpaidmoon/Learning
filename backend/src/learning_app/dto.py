@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from learning_app.drafts import DraftReference
+
 
 class InputDTO(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -41,6 +43,7 @@ class MessageResponse(BaseModel):
     reasoning: str = ""
     status: str = "completed"
     attachment_ids: list[str] = Field(default_factory=list)
+    references: list[DraftReference] = Field(default_factory=list)
     generation_id: str | None = None
 
 
@@ -65,6 +68,7 @@ class SubmissionInput(InputDTO):
     attachment_ids: list[str] = Field(default_factory=list, max_length=8)
     conditions: list[str] = Field(default_factory=list)
     corrections: list[str] = Field(default_factory=list)
+    references: list[DraftReference] = Field(default_factory=list, max_length=100)
     model: str = "deepseek-flash"
     thinking: Literal["none", "low", "medium", "high", "xhigh", "max"] = "high"
 

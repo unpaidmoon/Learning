@@ -250,7 +250,7 @@ describe("学习聊天与正式执行边界", () => {
     );
     expect(request.mock.calls.filter(([url]) => url === "/api/v1/submissions")).toHaveLength(1);
   });
-  it("Markdown数学可读、整式引用保留LaTeX且禁止回答远图及HTML加载", async () => {
+  it("Markdown数学可读、没有常驻整式按钮且禁止回答远图及HTML加载", async () => {
     fixture({
       ...chat,
       generations: [
@@ -263,8 +263,8 @@ describe("学习聊天与正式执行边界", () => {
     });
     const view = render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
     await ready();
-    await userEvent.click(await screen.findByRole("button", { name: "引用整条公式 1" }));
-    expect(screen.getByLabelText("问题或追问")).toHaveValue("$$\nx^2+1=2\n$$\n");
+    expect(screen.queryByRole("button", { name: "引用整条公式 1" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("");
     expect(view.container.querySelector(".katex")).toBeInTheDocument();
     expect(view.container.querySelector('img[src^="https:"]')).toBeNull();
     expect(view.container.querySelector("script")).toBeNull();
@@ -364,6 +364,265 @@ describe("学习聊天与正式执行边界", () => {
     expect(
       screen.queryByText("仅支持文字；包含题图的对话请使用支持图片的模型。"),
     ).not.toBeInTheDocument();
+  });
+  it("拖选确认的截图直接加入草稿并聚焦输入，只上传选区且不弹独立裁剪器", async () => {
+    const request = fixture(emptyChat);
+    const consumed = vi.fn();
+    const result: CaptureResult = {
+      source: {
+        sourceId: "workspace-capture",
+        dataUrl: "data:image/png;base64,T1JJR0lOQUw=",
+        width: 100,
+        height: 80,
+        origin: "workspace",
+      },
+      crop: { x: 10, y: 5, width: 20, height: 15 },
+      dataUrl: "data:image/png;base64,Q1JPUA==",
+      width: 20,
+      height: 15,
+    };
+    render(
+      <ChatWorkspace
+        chatId="chat-one"
+        connected
+        canSubmit
+        incomingConfirmedCapture={result}
+        onConfirmedCaptureConsumed={consumed}
+      />,
+    );
+    await screen.findByAltText("待发送的确认图片 1");
+    expect(screen.queryByRole("dialog", { name: "截图编辑" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("问题或追问")).toHaveFocus();
+    expect(consumed).toHaveBeenCalledTimes(1);
+    expect(request.mock.calls.filter(([url]) => url.endsWith("/attachments"))).toHaveLength(1);
+    const payload = JSON.parse(
+      request.mock.calls.find(([url]) => url.endsWith("/attachments"))![1]!.body as string,
+    );
+    expect(payload.data_base64).toBe("Q1JPUA==");
+    expect(JSON.stringify(request.mock.calls)).not.toContain("T1JJR0lOQUw=");
+    const source = JSON.parse(
+      request.mock.calls.find(
+        ([url, options]) => url.endsWith("/source") && options?.method === "POST",
+      )![1]!.body as string,
+    );
+    expect(source.origin).toBe("workspace");
+    expect(request.mock.calls.some(([url]) => url.endsWith("/submissions"))).toBe(false);
+  });
+  it("截图上传跨过disabled真实DOM提交后才聚焦输入，不在上传锁定期间丢失focus", async () => {
+    let releaseUpload!: (value: Response) => void;
+    const upload = new Promise<Response>((resolve) => {
+      releaseUpload = resolve;
+    });
+    const request = fixture(emptyChat, (url) =>
+      url.endsWith("/attachments") ? upload : undefined,
+    );
+    render(
+      <ChatWorkspace
+        chatId="chat-one"
+        connected
+        canSubmit
+        incomingConfirmedCapture={{
+          source: {
+            sourceId: "deferred-workspace",
+            dataUrl: "data:image/png;base64,T1JJR0lOQUw=",
+            width: 100,
+            height: 80,
+            origin: "workspace",
+          },
+          crop: { x: 10, y: 5, width: 20, height: 15 },
+          dataUrl: "data:image/png;base64,Q1JPUA==",
+          width: 20,
+          height: 15,
+        }}
+      />,
+    );
+    await waitFor(() =>
+      expect(request.mock.calls.filter(([url]) => url.endsWith("/attachments"))).toHaveLength(1),
+    );
+    const question = screen.getByLabelText("问题或追问");
+    expect(question).toBeDisabled();
+    expect(question).not.toHaveFocus();
+    releaseUpload(
+      new Response(
+        JSON.stringify({
+          attachment_id: "delayed-crop",
+          media_type: "image/png",
+          size_bytes: 4,
+          sha256: "fixture-crop-hash",
+          confirmed: true,
+        }),
+      ),
+    );
+    await screen.findByAltText("待发送的确认图片 1");
+    await waitFor(() => expect(question).toBeEnabled());
+    await waitFor(() => expect(question).toHaveFocus());
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+  });
+  it("截图加入失败时阻止漏图发送，用户显式取消后才可发送保留的问题", async () => {
+    const request = fixture(emptyChat, (url) =>
+      url.endsWith("/attachments")
+        ? answer({ code: "UPLOAD_UNAVAILABLE", message: "图片暂未保存" }, 503)
+        : undefined,
+    );
+    const consumed = vi.fn();
+    render(
+      <ChatWorkspace
+        chatId="chat-one"
+        connected
+        canSubmit
+        incomingConfirmedCapture={{
+          source: {
+            sourceId: "failed-workspace",
+            dataUrl: "data:image/png;base64,T1JJR0lOQUw=",
+            width: 100,
+            height: 80,
+            origin: "workspace",
+          },
+          crop: { x: 10, y: 5, width: 20, height: 15 },
+          dataUrl: "data:image/png;base64,Q1JPUA==",
+          width: 20,
+          height: 15,
+        }}
+        onConfirmedCaptureConsumed={consumed}
+      />,
+    );
+    await screen.findByRole("button", { name: "重新加入截图" });
+    await ready();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "请解释这个选区");
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    fireEvent.keyDown(screen.getByLabelText("问题或追问"), { key: "Enter", ctrlKey: true });
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+    expect(consumed).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole("button", { name: "取消这张截图" }));
+    expect(consumed).toHaveBeenCalledWith("failed-workspace");
+    await userEvent.click(screen.getByRole("button", { name: "发送" }));
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(true),
+    );
+    expect(screen.queryByRole("button", { name: "重新加入截图" })).not.toBeInTheDocument();
+  });
+  it("持久草稿引用以卡片呈现，不改问题文本，并按引用原身份提交", async () => {
+    const reference = {
+      reference_id: "quote-one",
+      message_id: "assistant-one",
+      text: "x",
+      markdown: "$x$",
+      source_start: 0,
+      source_end: 1,
+    };
+    savedDraft = { ...blankDraft, text: "解释这个符号", references: [reference] };
+    const request = fixture(emptyChat);
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    expect(screen.getByLabelText("引用 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("解释这个符号");
+    await userEvent.click(screen.getByRole("button", { name: "发送" }));
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(true),
+    );
+    const submitted = JSON.parse(
+      request.mock.calls.find(([url]) => url === "/api/v1/submissions")![1]!.body as string,
+    );
+    expect(submitted.references).toEqual([reference]);
+    expect(submitted.text).toBe("解释这个符号");
+  });
+  it("仅有引用时提示补充问题，按钮与快捷键都不发空请求，补问后连同引用提交", async () => {
+    const reference = {
+      reference_id: "quote-only",
+      message_id: "assistant-one",
+      text: "x",
+      markdown: "$x$",
+      source_start: 0,
+      source_end: 1,
+    };
+    savedDraft = { ...blankDraft, references: [reference] };
+    const request = fixture(emptyChat);
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    expect(screen.getByLabelText("引用 1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    expect(screen.getByText("已加入引用，请补充问题后发送。")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByLabelText("问题或追问"), { key: "Enter", ctrlKey: true });
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+    await userEvent.type(screen.getByLabelText("问题或追问"), "这个符号表示什么？");
+    expect(screen.queryByText("已加入引用，请补充问题后发送。")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "发送" }));
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(true),
+    );
+    const submitted = JSON.parse(
+      request.mock.calls.find(([url]) => url === "/api/v1/submissions")![1]!.body as string,
+    );
+    expect(submitted.references).toEqual([reference]);
+    expect(submitted.text).toBe("这个符号表示什么？");
+  });
+  it("移除引用只改引用列表，保留问题与已确认附件", async () => {
+    savedDraft = {
+      ...blankDraft,
+      text: "保留补充问题",
+      attachment_ids: ["retained-image"],
+      references: [
+        {
+          reference_id: "quote-one",
+          message_id: "assistant-one",
+          text: "x",
+          markdown: "$x$",
+          source_start: 0,
+          source_end: 1,
+        },
+      ],
+    };
+    fixture(emptyChat);
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    await userEvent.click(screen.getByRole("button", { name: "移除引用 1" }));
+    expect(screen.queryByLabelText("本次引用")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("保留补充问题");
+    expect(screen.getByAltText("待发送的确认图片 1")).toHaveAttribute(
+      "src",
+      "/api/v1/attachments/retained-image",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "保存草稿" }));
+    await waitFor(() => expect(savedDraft.references).toEqual([]));
+  });
+  it("官方目录按所选模型提供思考档位，不自动替换不可用选择", async () => {
+    const request = fixture(emptyChat);
+    render(
+      <ChatWorkspace
+        chatId="chat-one"
+        connected
+        canSubmit
+        configuredModel="account-flash"
+        configuredThinking="high"
+        modelChoices={["account-flash", "account-pro"]}
+        modelThinkingChoices={{ "account-flash": ["high", "max"], "account-pro": ["none", "low"] }}
+      />,
+    );
+    await ready();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "解释原因");
+    fireEvent.change(screen.getByLabelText("模型名称"), { target: { value: "account-pro" } });
+    expect(screen.getByLabelText("思考强度")).toHaveValue("high");
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    expect(screen.getByText("当前模型不支持已选思考强度，请手动重新选择。")).toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText("思考强度"), "low");
+    await userEvent.click(screen.getByRole("button", { name: "发送" }));
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(true),
+    );
+    const submitted = JSON.parse(
+      request.mock.calls.find(([url]) => url === "/api/v1/submissions")![1]!.body as string,
+    );
+    expect(submitted.model).toBe("account-pro");
+    expect(submitted.thinking).toBe("low");
+  });
+  it("空官方模型目录保留草稿和选择并禁发，不悄悄退回API模型", async () => {
+    fixture(emptyChat);
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit modelChoices={[]} />);
+    await ready();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "稍后发送");
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    expect(screen.getByText("当前接入方式尚未提供可用模型，请检查连接状态。")).toBeInTheDocument();
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("稍后发送");
   });
   it("已知提交回执后草稿清理失败仍禁止重复提交，并提供核对", async () => {
     const request = fixture(emptyChat, (url) =>

@@ -331,6 +331,16 @@ class MediaStore:
 
     def register(self, course_id: str, value: str) -> dict:
         path, media_type = _video_path(value)
+        from learning_app.course_files_schema import course_roots
+
+        with self.engine.connect() as conn:
+            root = conn.execute(
+                select(course_roots.c.local_path).where(course_roots.c.course_id == course_id)
+            ).scalar_one_or_none()
+        if root is not None and not path.is_relative_to(Path(root)):
+            raise AppError(
+                "COURSE_SOURCE_OUTSIDE_ROOT", "请先将外部资料显式导入课程根目录，不能继续原地关联", 422
+            )
         with self._lock:
             # Reuse a previously registered file identity across courses. A
             # changed file at an old path must not retarget previous sources.
@@ -361,6 +371,14 @@ class MediaStore:
             else:
                 # Existing repository owns the path/version/hash identity.
                 source = self.repository.register_source(course_id, path)
+            return self.attach_source(source, path)
+
+    def attach_source(self, source: dict, path: Path) -> dict:
+        """Use a course file's exact version without changing historical sources."""
+        path, media_type = _video_path(str(path))
+        if _hash_file(path) != source["content_hash"]:
+            raise AppError("SOURCE_VERSION_MISMATCH", "视频内容在打开时改变，请重新主动打开")
+        with self._lock:
             with self.engine.begin() as conn:
                 registered = conn.execute(
                     select(media_assets.c.asset_id).where(
@@ -376,6 +394,23 @@ class MediaStore:
                             file_signature=_signature(path),
                         )
                     )
+                else:
+                    conn.execute(
+                        update(media_assets)
+                        .where(media_assets.c.asset_id == source["asset_id"])
+                        .values(
+                            source_version=source["source_version"],
+                            media_type=media_type,
+                            file_signature=_signature(path),
+                        )
+                    )
+                position = conn.execute(
+                    select(media_positions.c.asset_id).where(
+                        media_positions.c.asset_id == source["asset_id"],
+                        media_positions.c.source_version == source["source_version"],
+                    )
+                ).first()
+                if position is None:
                     conn.execute(
                         insert(media_positions).values(
                             asset_id=source["asset_id"],

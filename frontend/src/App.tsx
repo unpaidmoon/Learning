@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties, FormEvent, PointerEvent } from "react";
+import type { CSSProperties, PointerEvent } from "react";
 import { api, errorMessage } from "./api/client";
 import type { Schema } from "./api/client";
 import { Button } from "./components/ui/button";
@@ -7,7 +7,20 @@ import { ChatWorkspace } from "./chat/ChatWorkspace";
 import type { ChatWorkspaceHandle } from "./chat/ChatWorkspace";
 import { VideoWorkspace } from "./media/VideoWorkspace";
 import type { VideoWorkspaceHandle } from "./media/VideoWorkspace";
-import type { CaptureSource } from "./media/capture";
+import type { CaptureResult, CaptureSource } from "./media/capture";
+import { WorkspaceCapture } from "./media/WorkspaceCapture";
+import { AccountPanel } from "./account/AccountPanel";
+import { CourseExplorer } from "./library/CourseExplorer";
+import { ResourceViewer } from "./library/ResourceViewer";
+import { Icon } from "./components/ui/Icon";
+
+type StudyTab = {
+  id: string;
+  title: string;
+  file?: Schema<"CourseFileOpenResponse">;
+  video?: Schema<"MediaAssetResponse">;
+  timeMs?: number;
+};
 
 const capabilityNames: Record<keyof Schema<"Capabilities">, string> = {
   harness: "Harness 执行层",
@@ -40,14 +53,24 @@ export function App() {
   const [courseId, setCourseId] = useState("");
   const [chats, setChats] = useState<Schema<"ChatResponse">[]>([]);
   const [chatId, setChatId] = useState("");
-  const [title, setTitle] = useState("");
   const [busy, setBusy] = useState(false);
   const [dark, setDark] = useState(() => localStorage.getItem("learning.theme") === "dark");
-  const [sidebarVisible, setSidebarVisible] = useState(true);
   const [chatVisible, setChatVisible] = useState(true);
-  const [chatWidth, setChatWidth] = useState(43);
+  const [chatWidth, setChatWidth] = useState(35);
   const [immersive, setImmersive] = useState(false);
   const [capture, setCapture] = useState<CaptureSource>();
+  const [confirmedCapture, setConfirmedCapture] = useState<CaptureResult>();
+  const [capturing, setCapturing] = useState(false);
+  const [captureRoot, setCaptureRoot] = useState<HTMLElement | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [account, setAccount] = useState<Schema<"AccountResponse"> | null>(null);
+  const [courseDialog, setCourseDialog] = useState(false);
+  const [folderPath, setFolderPath] = useState("");
+  const [tabs, setTabs] = useState<StudyTab[]>([]);
+  const [activeTabId, setActiveTabId] = useState("");
+  const [libraryRevision, setLibraryRevision] = useState(0);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const captureTarget = useRef<{ courseId: string; chatId: string } | null>(null);
   const [exitStatus, setExitStatus] = useState("");
   const [exitConfirmation, setExitConfirmation] = useState<Schema<"RuntimeResponse"> | null>(null);
   const [exiting, setExiting] = useState(false);
@@ -65,6 +88,10 @@ export function App() {
       const value = await loadConnection();
       setHealth(value.health);
       setCourses(value.courses);
+      void api
+        .read<Schema<"AccountResponse">>("/account")
+        .then(setAccount)
+        .catch(() => setAccount(null));
     } catch (reason) {
       setHealth(null);
       setError(errorMessage(reason));
@@ -80,6 +107,12 @@ export function App() {
         if (!controller.signal.aborted) {
           setHealth(value.health);
           setCourses(value.courses);
+          void api
+            .read<Schema<"AccountResponse">>("/account", controller.signal)
+            .then((state) => {
+              if (!controller.signal.aborted) setAccount(state);
+            })
+            .catch(() => undefined);
         }
       })
       .catch((reason) => {
@@ -114,6 +147,10 @@ export function App() {
   }, [exiting]);
 
   const chooseCourse = async (id: string) => {
+    if (captureTarget.current) {
+      setError("截图正在加入原对话，请完成或取消后切换课程（CAPTURE_CONTEXT_LOCKED）");
+      return;
+    }
     const epoch = ++courseEpoch.current;
     try {
       await videoRef.current?.savePosition();
@@ -128,6 +165,9 @@ export function App() {
     setChatId(courseChats.current.get(id) || "");
     setChats([]);
     setCapture(undefined);
+    setConfirmedCapture(undefined);
+    setTabs([]);
+    setActiveTabId("");
     setImmersive(false);
     setError("");
     if (!id) return;
@@ -139,17 +179,21 @@ export function App() {
     }
   };
 
-  const createCourse = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!title.trim()) return;
+  const createCourse = async () => {
     setBusy(true);
     try {
-      const course = await api.write<Schema<"CourseResponse">>("/courses", {
-        title: title.trim(),
-      } satisfies Schema<"CourseInput">);
-      setCourses((values) => [...values, course]);
-      setTitle("");
-      await chooseCourse(course.course_id);
+      const folder = await api.write<Schema<"CourseFolderResponse">>(
+        "/courses/folder",
+        {
+          ...(folderPath.trim() ? { path: folderPath.trim() } : {}),
+        },
+        { timeoutMs: 120_000 },
+      );
+      if (!folder) return;
+      setCourses(await api.read<Schema<"CourseResponse">[]>("/courses"));
+      setCourseDialog(false);
+      setFolderPath("");
+      await chooseCourse(folder.course_id);
     } catch (reason) {
       setError(errorMessage(reason));
     } finally {
@@ -180,6 +224,10 @@ export function App() {
   };
 
   const createChat = async () => {
+    if (captureTarget.current) {
+      setError("截图正在加入原对话，请完成或取消后新建对话（CAPTURE_CONTEXT_LOCKED）");
+      return;
+    }
     setBusy(true);
     try {
       await chatRef.current?.saveDraft();
@@ -196,6 +244,11 @@ export function App() {
 
   const openChat = async (source?: CaptureSource) => {
     if (!courseId) return;
+    if (!source) {
+      setChatVisible(true);
+      chatRef.current?.focusInput();
+      return;
+    }
     try {
       await newChat(courseId);
       if (selectedCourse.current !== courseId) return;
@@ -207,8 +260,16 @@ export function App() {
   };
 
   const selectChat = async (id: string) => {
+    if (captureTarget.current) {
+      setError("截图正在加入原对话，请完成或取消后切换对话（CAPTURE_CONTEXT_LOCKED）");
+      return;
+    }
     try {
       await chatRef.current?.saveDraft();
+      if (captureTarget.current) {
+        setError("截图正在加入原对话，请完成或取消后切换对话（CAPTURE_CONTEXT_LOCKED）");
+        return;
+      }
       courseChats.current.set(courseId, id);
       setChatId(id);
       setCapture(undefined);
@@ -258,35 +319,152 @@ export function App() {
     }
   };
   const ignoreLibraryChange = useCallback(() => {}, []);
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  const selectedCourseValue = courses.find((value) => value.course_id === courseId);
+  const videoActive = Boolean(activeTab?.video);
+  useEffect(() => {
+    if (activeTab?.video) void videoRef.current?.openAsset(activeTab.video, activeTab.timeMs);
+  }, [activeTab]);
+
+  const refreshAccount = async () => {
+    try {
+      setAccount(await api.read<Schema<"AccountResponse">>("/account"));
+      await connect();
+    } catch (reason) {
+      setError(errorMessage(reason));
+    }
+  };
+  const refreshCourses = async () => {
+    setCourses(await api.read<Schema<"CourseResponse">[]>("/courses"));
+    setLibraryRevision((value) => value + 1);
+  };
+  const openTab = (tab: StudyTab) => {
+    setTabs((values) =>
+      values.some((value) => value.id === tab.id)
+        ? values.map((value) => (value.id === tab.id ? tab : value))
+        : [...values, tab],
+    );
+    setActiveTabId(tab.id);
+  };
+  const openFile = (file: Schema<"CourseFileOpenResponse">) => {
+    openTab({ id: file.asset_id, title: file.entry.name, file, video: file.video ?? undefined });
+  };
+  const openVideo = (video: Schema<"MediaAssetResponse">) => {
+    openTab({ id: video.asset_id, title: video.display_name, video });
+  };
+  const selectTab = (tab: StudyTab) => {
+    setActiveTabId(tab.id);
+  };
+  const closeTab = async (id: string) => {
+    try {
+      await videoRef.current?.savePosition();
+      const remaining = tabs.filter((tab) => tab.id !== id);
+      setTabs(remaining);
+      if (activeTabId === id) {
+        const next = remaining[remaining.length - 1];
+        setActiveTabId(next?.id ?? "");
+      }
+    } catch (reason) {
+      setError(errorMessage(reason));
+    }
+  };
+  const openSource = async (source: NonNullable<CaptureSource["source"]>) => {
+    try {
+      const asset = await api.write<Schema<"MediaAssetResponse">>(
+        `/videos/${source.asset_id}/open`,
+        {
+          source_version: source.source_version,
+        },
+      );
+      openTab({
+        id: asset.asset_id,
+        title: asset.display_name,
+        video: asset,
+        timeMs: source.time_ms,
+      });
+    } catch (reason) {
+      setError(errorMessage(reason));
+    }
+  };
+  const finishCapture = async (result: CaptureResult) => {
+    const target = captureTarget.current;
+    if (!target || selectedCourse.current !== target.courseId)
+      throw new Error("截图的原课程已改变，请取消后重新框选（CAPTURE_CONTEXT_CHANGED）");
+    try {
+      const id = await newChat(target.courseId);
+      if (selectedCourse.current !== target.courseId || (target.chatId && target.chatId !== id))
+        throw new Error("截图的原对话已改变，请取消后重新框选（CAPTURE_CONTEXT_CHANGED）");
+      target.chatId = id;
+      setConfirmedCapture(result);
+      setChatVisible(true);
+      setCapturing(false);
+      window.setTimeout(() => chatRef.current?.focusInput(), 0);
+    } catch (reason) {
+      setError(errorMessage(reason));
+      throw reason;
+    }
+  };
+  const cancelCapture = () => {
+    captureTarget.current = null;
+    setCapturing(false);
+    setCaptureRoot(null);
+  };
+  const beginCapture = () => {
+    if (!courseId || capturing || exiting || busy || captureTarget.current) return;
+    ++courseEpoch.current;
+    captureTarget.current = { courseId, chatId: courseChats.current.get(courseId) ?? "" };
+    videoRef.current?.pauseForCapture();
+    setCaptureRoot(workspaceRef.current);
+    setCapturing(true);
+  };
+  // Only the focused application document owns these shortcuts.
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.repeat) return;
+      if (event.code === "KeyS") {
+        event.preventDefault();
+        beginCapture();
+      }
+      if (event.code === "KeyA") {
+        event.preventDefault();
+        if (chatVisible && immersive) void closeChat();
+        else void openChat();
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  });
 
   return (
-    <div className={dark ? "app-shell dark" : "app-shell"}>
+    <div
+      ref={workspaceRef}
+      className={`app-shell${dark ? " dark" : ""}${immersive ? " immersive" : ""}`}
+    >
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            学
-          </span>
-          <div>
-            <h1>AI 辅助学习</h1>
-            <p>边看，边问，慢慢弄明白。</p>
-          </div>
+          <Icon name="panel" />
+          <h1>学习空间</h1>
+          <span className="app-divider" />
+          <span className="header-course">{selectedCourseValue?.title || "我的课程"}</span>
         </div>
         <div className="header-actions">
           <span className={`connection-badge ${health?.ready ? "connected" : ""}`} role="status">
-            <span aria-hidden="true" />
+            <span />
             {connecting ? "正在连接后台" : health?.ready ? "后台已连接" : "后台未连接"}
           </span>
-          <Button
-            variant="ghost"
+          <button
+            className="icon-button"
+            aria-label={dark ? "切换浅色" : "切换深色"}
+            title={dark ? "切换浅色" : "切换深色"}
             onClick={() => {
-              setDark((value) => !value);
+              setDark(!dark);
               localStorage.setItem("learning.theme", dark ? "light" : "dark");
             }}
           >
-            {dark ? "浅色" : "深色"}
-          </Button>
+            <Icon name={dark ? "sun" : "moon"} />
+          </button>
           <Button
-            variant="outline"
+            variant="ghost"
             disabled={connecting || exiting}
             onClick={() => {
               setConnecting(true);
@@ -296,38 +474,18 @@ export function App() {
           >
             重新连接
           </Button>
-          <Button
-            variant="ghost"
-            disabled={!health?.ready || busy || exiting}
-            onClick={() => void requestExit()}
-          >
-            安全退出
+          <Button variant="ghost" onClick={() => setAccountOpen(true)}>
+            <Icon name="settings" />
+            账号与模型
           </Button>
         </div>
       </header>
-      <div className="workspace-toolbar">
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setSidebarVisible((value) => !value);
-            setImmersive(false);
-          }}
-        >
-          {sidebarVisible && !immersive ? "收起课程目录" : "展开课程目录"}
-        </Button>
-        <span>
-          {courses.find((value) => value.course_id === courseId)?.title || "我的学习空间"}
-        </span>
-        {!chatVisible && (
-          <Button variant="outline" disabled={!courseId} onClick={() => void openChat()}>
-            展开聊天
-          </Button>
-        )}
-        <small>关闭网页后，后台继续回答</small>
-      </div>
       {error && (
         <div className="global-error" role="alert">
           {error}
+          <button className="icon-button" aria-label="关闭提示" onClick={() => setError("")}>
+            <Icon name="close" size={14} />
+          </button>
         </div>
       )}
       {exitStatus && (
@@ -335,12 +493,10 @@ export function App() {
           {exitStatus}
         </div>
       )}
-      <div
-        className={`workspace learning-workspace ${sidebarVisible && !immersive ? "" : "directory-collapsed"}`}
-      >
-        <aside className="sidebar" aria-label="课程与对话" hidden={!sidebarVisible || immersive}>
-          <section>
-            <h2>课程</h2>
+      <div className="workspace learning-workspace">
+        <aside className="sidebar" aria-label="课程与文件" hidden={immersive}>
+          <div className="course-switcher">
+            <span className="sidebar-kicker">课程</span>
             <label className="sr-only" htmlFor="course-select">
               选择课程
             </label>
@@ -350,112 +506,175 @@ export function App() {
               disabled={!health?.ready || exiting}
               onChange={(event) => void chooseCourse(event.target.value)}
             >
-              <option value="">请选择课程</option>
+              <option value="">选择一门课程</option>
               {courses.map((course) => (
                 <option key={course.course_id} value={course.course_id}>
                   {course.title}
                 </option>
               ))}
             </select>
-            <form className="course-form" onSubmit={(event) => void createCourse(event)}>
-              <label className="sr-only" htmlFor="course-title">
-                新课程名称
-              </label>
-              <input
-                id="course-title"
-                placeholder="新课程名称"
-                maxLength={200}
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                disabled={!health?.ready || busy || exiting}
+            <button
+              className="sidebar-add"
+              disabled={!health?.ready || exiting}
+              onClick={() => setCourseDialog(true)}
+            >
+              <Icon name="plus" size={16} />
+              打开课程文件夹
+            </button>
+          </div>
+          <div className="sidebar-library">
+            {courseId ? (
+              <CourseExplorer
+                key={`${courseId}-${libraryRevision}`}
+                courseId={courseId}
+                connected={Boolean(health?.ready) && !exiting}
+                onOpen={openFile}
+                onLegacyVideo={openVideo}
+                onCourseChanged={() => void refreshCourses()}
+                onDetached={() => {
+                  void chooseCourse("");
+                  void refreshCourses();
+                }}
               />
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={!health?.ready || busy || !title.trim() || exiting}
-              >
-                新建
-              </Button>
-            </form>
-          </section>
-          <section className="chat-nav">
-            <div className="section-row">
-              <h2>对话记录</h2>
-              <Button
-                variant="ghost"
-                disabled={!courseId || busy || exiting}
-                onClick={() => void createChat()}
-              >
-                ＋ 新对话
-              </Button>
-            </div>
-            {!courseId ? (
-              <p className="muted">先选择一门课程。</p>
-            ) : chats.length ? (
-              <ul>
-                {chats.map((chat, index) => (
-                  <li key={chat.chat_id}>
-                    <button
-                      className={chatId === chat.chat_id ? "chat-link selected" : "chat-link"}
-                      onClick={() => void selectChat(chat.chat_id)}
-                    >
-                      <span>对话 {index + 1}</span>
-                      <small>{chat.chat_id.slice(0, 8)}</small>
-                    </button>
-                  </li>
-                ))}
-              </ul>
             ) : (
-              <p className="muted">截图或展开问答即可开始新对话，也可稍后从这里重开历史。</p>
+              <div className="sidebar-empty">
+                <Icon name="folder" size={24} />
+                <p>课程资料，井井有条。</p>
+                <small>选择已有课程，或打开本地课程文件夹。</small>
+              </div>
             )}
-          </section>
-          <details className="capabilities">
-            <summary>连接与能力</summary>
-            {Object.entries(capabilityNames).map(([name, label]) => {
-              const state = health?.capabilities[name as keyof Schema<"Capabilities">];
-              return (
-                <div className="capability-row" key={name}>
-                  <span>{label}</span>
-                  <span className={state === "ready" ? "available" : "muted"}>
-                    {state ? capabilityLabels[state] : "状态未知"}
-                  </span>
-                </div>
-              );
-            })}
-          </details>
+          </div>
+          <div className="sidebar-footer">
+            <details className="capabilities">
+              <summary>连接状态</summary>
+              {Object.entries(capabilityNames).map(([name, label]) => {
+                const state = health?.capabilities[name as keyof Schema<"Capabilities">];
+                return (
+                  <div className="capability-row" key={name}>
+                    <span>{label}</span>
+                    <span>{state ? capabilityLabels[state] : "状态未知"}</span>
+                  </div>
+                );
+              })}
+            </details>
+            <button
+              className="sidebar-settings"
+              aria-label="打开账号设置"
+              onClick={() => setAccountOpen(true)}
+            >
+              <Icon name="settings" size={16} />
+              账号与模型
+            </button>
+            <button
+              className="sidebar-settings muted"
+              disabled={!health?.ready || busy || exiting}
+              onClick={() => void requestExit()}
+            >
+              安全退出
+            </button>
+          </div>
         </aside>
         <main
           className={`study-columns ${chatVisible ? "" : "chat-collapsed"}`}
           ref={studyColumns}
           style={{ "--chat-width": `${chatWidth}%` } as CSSProperties}
         >
-          <div className="media-panel main-panel">
-            {courseId ? (
-              <VideoWorkspace
-                key={courseId}
-                ref={videoRef}
-                courseId={courseId}
-                connected={Boolean(health?.ready) && !exiting}
-                onLibraryChange={ignoreLibraryChange}
-                onImmersiveChange={setImmersive}
-                onOpenChat={() => void openChat()}
-                onCapture={(source) => void openChat(source)}
-              />
-            ) : (
-              <div className="empty-state">
-                <span className="empty-mark" aria-hidden="true">
-                  ▷
-                </span>
-                <h2>留在课程里，把问题问清楚</h2>
-                <p>选择或新建课程，再关联本地视频。从当前画面截取题目，确认后直接开始问答。</p>
-                <div className="empty-detail">
-                  <span>原件原地播放</span>
-                  <span>确认选区提问</span>
-                  <span>随时接续聊天</span>
-                </div>
+          <section className="media-panel main-panel" aria-label="学习资料">
+            <div className="resource-toolbar">
+              <div className="resource-tabs" role="tablist" aria-label="资料标签页">
+                {tabs.length ? (
+                  tabs.map((tab) => (
+                    <div
+                      className={`resource-tab ${activeTabId === tab.id ? "selected" : ""}`}
+                      key={tab.id}
+                    >
+                      <button
+                        role="tab"
+                        aria-selected={activeTabId === tab.id}
+                        onClick={() => selectTab(tab)}
+                      >
+                        <Icon name={tab.video ? "video" : "file"} size={15} />
+                        <span>{tab.title}</span>
+                      </button>
+                      <button
+                        className="tab-close"
+                        aria-label={`关闭 ${tab.title}`}
+                        onClick={() => void closeTab(tab.id)}
+                      >
+                        <Icon name="close" size={12} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <span className="tab-placeholder">课程资料</span>
+                )}
               </div>
-            )}
-          </div>
+              {!chatVisible && (
+                <button
+                  className="icon-button"
+                  aria-label="展开聊天"
+                  title="展开聊天 · Ctrl+Shift+A"
+                  disabled={!courseId}
+                  onClick={() => void openChat()}
+                >
+                  <Icon name="chat" />
+                </button>
+              )}
+            </div>
+            <div className="resource-content">
+              {courseId && (
+                <div className="video-content" hidden={!videoActive}>
+                  <VideoWorkspace
+                    key={courseId}
+                    ref={videoRef}
+                    courseId={courseId}
+                    connected={Boolean(health?.ready) && !exiting}
+                    onLibraryChange={ignoreLibraryChange}
+                    onImmersiveChange={(value) => {
+                      setImmersive(value);
+                      if (value) setChatVisible(false);
+                    }}
+                    onOpenChat={() => void openChat()}
+                    onCapture={(source) => void openChat(source)}
+                    workspaceRef={workspaceRef}
+                    minimal
+                    active={videoActive}
+                  />
+                </div>
+              )}
+              {activeTab?.file && !activeTab.video && (
+                <ResourceViewer
+                  key={`${activeTab.id}-${activeTab.file.source_version}`}
+                  file={activeTab.file}
+                />
+              )}
+              {!activeTab && (
+                <div className="empty-state">
+                  <span className="empty-mark">
+                    <Icon name="folder" size={36} />
+                  </span>
+                  <h2>{courseId ? "从一份资料开始" : "让学习，有自己的空间"}</h2>
+                  <p>
+                    {courseId
+                      ? "在左侧打开视频或资料。需要时，右侧就是你的学习对话。"
+                      : "打开课程文件夹，把资料、问题和思路放在一起。"}
+                  </p>
+                  <div className="shortcut-hints">
+                    <span>
+                      <kbd>Ctrl</kbd>
+                      <kbd>Shift</kbd>
+                      <kbd>S</kbd>框选截图
+                    </span>
+                    <span>
+                      <kbd>Ctrl</kbd>
+                      <kbd>Shift</kbd>
+                      <kbd>A</kbd>唤起问答
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
           {chatVisible && (
             <div
               className="panel-resizer"
@@ -467,8 +686,11 @@ export function App() {
               aria-valuemax={65}
               tabIndex={0}
               onPointerDown={(event) => {
-                const width = studyColumns.current?.getBoundingClientRect().width || 1;
-                resizeStart.current = { x: event.clientX, width, percent: chatWidth };
+                resizeStart.current = {
+                  x: event.clientX,
+                  width: studyColumns.current?.getBoundingClientRect().width || 1,
+                  percent: chatWidth,
+                };
                 event.currentTarget.setPointerCapture(event.pointerId);
               }}
               onPointerMove={resize}
@@ -488,12 +710,50 @@ export function App() {
               <span />
             </div>
           )}
-          <div className="chat-panel main-panel" hidden={!chatVisible}>
+          <section className="chat-panel main-panel" aria-label="学习问答" hidden={!chatVisible}>
             <div className="chat-panel-toolbar">
-              <span>学习问答</span>
-              <Button variant="ghost" onClick={() => void closeChat()}>
-                收起聊天
-              </Button>
+              <div className="chat-title">
+                <Icon name="chat" size={17} />
+                <span>学习问答</span>
+              </div>
+              <div className="chat-heading-actions">
+                <label className="sr-only" htmlFor="chat-history">
+                  历史对话
+                </label>
+                <select
+                  id="chat-history"
+                  aria-label="历史对话"
+                  value={chatId}
+                  disabled={!courseId || busy}
+                  onChange={(event) => {
+                    if (event.target.value) void selectChat(event.target.value);
+                  }}
+                >
+                  <option value="">历史对话</option>
+                  {chats.map((chat, index) => (
+                    <option key={chat.chat_id} value={chat.chat_id}>
+                      对话 {index + 1}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="icon-button"
+                  aria-label="新对话"
+                  title="新对话"
+                  disabled={!courseId || busy || exiting}
+                  onClick={() => void createChat()}
+                >
+                  <Icon name="plus" size={17} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label="收起聊天"
+                  title="收起聊天 · Ctrl+Shift+A"
+                  onClick={() => void closeChat()}
+                >
+                  <Icon name="panel" size={17} />
+                </button>
+              </div>
             </div>
             {chatId ? (
               <ChatWorkspace
@@ -504,27 +764,137 @@ export function App() {
                 connected={Boolean(health?.ready)}
                 configuredModel={health?.configured_model}
                 configuredThinking={health?.configured_thinking}
+                modelChoices={account?.models?.map((model) => model.id) ?? []}
+                modelImageSupport={
+                  account
+                    ? Object.fromEntries(
+                        (account.models ?? []).map((model) => [model.id, model.supports_images]),
+                      )
+                    : undefined
+                }
+                modelThinkingChoices={
+                  account
+                    ? Object.fromEntries(
+                        (account.models ?? []).map((model) => [
+                          model.id,
+                          model.thinking_levels as Schema<"SubmissionInput">["thinking"][],
+                        ]),
+                      )
+                    : undefined
+                }
                 incomingCapture={capture}
                 onCaptureConsumed={() => setCapture(undefined)}
-                onOpenSource={(source) => void videoRef.current?.openSource(source)}
+                incomingConfirmedCapture={confirmedCapture}
+                onConfirmedCaptureConsumed={(sourceId) => {
+                  if (confirmedCapture?.source.sourceId !== sourceId) return;
+                  captureTarget.current = null;
+                  setConfirmedCapture(undefined);
+                  setCaptureRoot(null);
+                }}
+                onOpenSource={(source) => void openSource(source)}
               />
             ) : (
               <div className="chat-welcome">
-                <span className="eyebrow">把疑问留在这里</span>
-                <h2>这一处，为什么？</h2>
-                <p>截图确认题目，或直接输入问题。只会提交你确认的图片、文字与相关聊天历史。</p>
+                <span className="chat-welcome-symbol">
+                  <Icon name="chat" size={27} />
+                </span>
+                <h2>一起弄懂这一处</h2>
+                <p>描述你的疑问，或框选一张题图。</p>
                 <Button disabled={!courseId || busy || exiting} onClick={() => void createChat()}>
                   开始问答
+                  <Icon name="plus" size={15} />
                 </Button>
+                <small>
+                  截图快捷键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>
+                </small>
               </div>
             )}
-          </div>
+          </section>
         </main>
       </div>
-      {exitConfirmation && (
-        <div className="exit-overlay">
+      {immersive && !chatVisible && (
+        <div className="fullscreen-ai-edge">
+          <button aria-label="全屏唤起AI" title="打开学习问答" onClick={() => void openChat()}>
+            <Icon name="chat" size={20} />
+            <span>学习问答</span>
+          </button>
+        </div>
+      )}
+      {capturing && captureRoot && (
+        <WorkspaceCapture root={captureRoot} onConfirm={finishCapture} onCancel={cancelCapture} />
+      )}
+      {accountOpen && (
+        <div className="dialog-overlay">
           <section
-            className="exit-dialog"
+            className="settings-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-title"
+          >
+            <div className="dialog-heading">
+              <h2 id="account-title">账号与模型</h2>
+              <button
+                className="icon-button"
+                aria-label="关闭账号设置"
+                onClick={() => setAccountOpen(false)}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+            <AccountPanel
+              connected={Boolean(health?.ready)}
+              onChanged={() => void refreshAccount()}
+              onClose={() => setAccountOpen(false)}
+            />
+          </section>
+        </div>
+      )}
+      {courseDialog && (
+        <div className="dialog-overlay">
+          <form
+            className="settings-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="course-dialog-title"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void createCourse();
+            }}
+          >
+            <div className="dialog-heading">
+              <h2 id="course-dialog-title">打开课程文件夹</h2>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="取消打开课程"
+                onClick={() => setCourseDialog(false)}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+            <p className="muted">课程名称与文件夹名称保持一致。已有文件保留在原位置。</p>
+            <label htmlFor="course-folder-path">课程文件夹路径</label>
+            <input
+              id="course-folder-path"
+              value={folderPath}
+              onChange={(event) => setFolderPath(event.target.value)}
+              placeholder="留空后选择本地文件夹"
+            />
+            <div className="dialog-actions">
+              <Button type="button" variant="ghost" onClick={() => setCourseDialog(false)}>
+                取消
+              </Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? "正在打开…" : folderPath.trim() ? "打开文件夹" : "选择文件夹"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+      {exitConfirmation && (
+        <div className="dialog-overlay">
+          <section
+            className="settings-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby="exit-title"
@@ -534,8 +904,8 @@ export function App() {
               还有 {exitConfirmation.active_generations.length}{" "}
               个回答在进行。确认后会保存已收到的内容，停止所属生成并退出。
             </p>
-            <div className="button-row">
-              <Button variant="outline" onClick={() => setExitConfirmation(null)}>
+            <div className="dialog-actions">
+              <Button variant="ghost" onClick={() => setExitConfirmation(null)}>
                 继续学习
               </Button>
               <Button disabled={busy} onClick={() => void requestExit(exitConfirmation)}>

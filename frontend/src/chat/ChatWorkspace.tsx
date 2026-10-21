@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import type { FormEvent, Ref } from "react";
 import { ApiError, api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
@@ -8,6 +8,7 @@ import { CaptureError, readImageFile } from "../media/capture";
 import type { CaptureResult, CaptureSource } from "../media/capture";
 import { loadCapture, saveCapture } from "./captureCache";
 import { saveAllDrafts, useDraft } from "./draft";
+import type { DraftReference } from "./draft";
 import { MarkdownAnswer } from "./MarkdownAnswer";
 import { generationActive, stateLabel } from "./state";
 import "./chat.css";
@@ -35,6 +36,7 @@ function retainPending(chatId: string, value: Schema<"SubmissionInput"> | null) 
 export type VideoSource = NonNullable<CaptureSource["source"]>;
 export interface ChatWorkspaceHandle {
   saveDraft: () => Promise<void>;
+  focusInput: () => void;
 }
 interface Props {
   chatId: string;
@@ -42,7 +44,13 @@ interface Props {
   canSubmit: boolean;
   configuredModel?: string;
   configuredThinking?: string;
+  modelChoices?: string[];
+  thinkingChoices?: Schema<"SubmissionInput">["thinking"][];
+  modelThinkingChoices?: Record<string, Schema<"SubmissionInput">["thinking"][]>;
+  modelImageSupport?: Record<string, boolean>;
   incomingCapture?: CaptureSource;
+  incomingConfirmedCapture?: CaptureResult;
+  onConfirmedCaptureConsumed?: (sourceId: string) => void;
   onCaptureConsumed?: () => void;
   onOpenSource?: (source: VideoSource) => void;
   ref?: Ref<ChatWorkspaceHandle>;
@@ -98,7 +106,13 @@ export function ChatWorkspace({
   canSubmit,
   configuredModel,
   configuredThinking,
+  modelChoices,
+  thinkingChoices,
+  modelThinkingChoices,
+  modelImageSupport,
   incomingCapture,
+  incomingConfirmedCapture,
+  onConfirmedCaptureConsumed,
   onCaptureConsumed,
   onOpenSource,
   ref,
@@ -118,6 +132,15 @@ export function ChatWorkspace({
   const messagesRef = useRef<HTMLDivElement>(null);
   const followBottom = useRef(true);
   const composing = useRef(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [focusRequest, setFocusRequest] = useState(0);
+  const focusHandled = useRef(0);
+  const receivedCaptureIds = useRef(new Set<string>());
+  const [capturedSources, setCapturedSources] = useState<Set<string>>(() => new Set());
+  const captureTask = useRef<Promise<void> | null>(null);
+  const captureInProgress = useRef(false);
+  const captureFailure = useRef(false);
+  const [failedIncomingCapture, setFailedIncomingCapture] = useState<CaptureResult | null>(null);
   const candidate = useMemo(
     () =>
       candidates[0] || (incomingCapture ? { source: incomingCapture, replaces: undefined } : null),
@@ -127,18 +150,53 @@ export function ChatWorkspace({
   const thinking = (value.thinking ||
     configuredThinking ||
     "high") as Schema<"SubmissionInput">["thinking"];
+  const allowedThinking = modelThinkingChoices?.[model] ??
+    thinkingChoices ?? ["none", "low", "high", "max"];
+  const modelSupported = modelChoices === undefined || modelChoices.includes(model);
+  const thinkingSupported = allowedThinking.includes(thinking);
   const editable = draft.ready && !busy && !pending;
+  const captureQueued = Boolean(
+    incomingConfirmedCapture && !capturedSources.has(incomingConfirmedCapture.source.sourceId),
+  );
+  const textOnlyModel = modelImageSupport
+    ? modelImageSupport[model] === false
+    : model === "deepseek-v4-pro";
+
+  useEffect(() => {
+    // Uploads temporarily disable the textarea. Focus only after React has
+    // committed its enabled DOM, and keep the request scoped to this chat view.
+    if (
+      !editable ||
+      captureQueued ||
+      failedIncomingCapture ||
+      candidate ||
+      focusHandled.current === focusRequest
+    )
+      return;
+    const input = inputRef.current;
+    if (!input || input.disabled) return;
+    focusHandled.current = focusRequest;
+    input.focus();
+  }, [editable, captureQueued, failedIncomingCapture, candidate, focusRequest]);
 
   useImperativeHandle(
     ref,
     () => ({
+      focusInput: () => setFocusRequest((current) => current + 1),
       saveDraft: async () => {
+        await captureTask.current;
+        if (
+          captureFailure.current ||
+          (incomingConfirmedCapture &&
+            !receivedCaptureIds.current.has(incomingConfirmedCapture.source.sourceId))
+        )
+          throw new Error("截图尚未加入草稿，请重新加入或取消后退出");
         if (candidate) throw new Error("还有未确认的图片选区，请确认或取消后退出");
         await controller.flush();
         await saveAllDrafts();
       },
     }),
-    [candidate, controller],
+    [candidate, controller, incomingConfirmedCapture],
   );
   useEffect(() => {
     const abort = new AbortController();
@@ -175,7 +233,13 @@ export function ChatWorkspace({
       if (document.visibilityState === "hidden") flush();
     };
     const protect = (event: BeforeUnloadEvent) => {
-      if (controller.snapshot().dirty || candidate) {
+      if (
+        controller.snapshot().dirty ||
+        candidate ||
+        captureInProgress.current ||
+        captureFailure.current ||
+        incomingConfirmedCapture
+      ) {
         event.preventDefault();
         flush();
       }
@@ -189,7 +253,7 @@ export function ChatWorkspace({
       document.removeEventListener("visibilitychange", hide);
       flush();
     };
-  }, [controller, candidate]);
+  }, [controller, candidate, incomingConfirmedCapture]);
   const generations = chat?.generations || [];
   const locked =
     Boolean(acceptedGeneration) ||
@@ -247,6 +311,11 @@ export function ChatWorkspace({
       locked ||
       busy ||
       !draft.ready ||
+      !modelSupported ||
+      !thinkingSupported ||
+      !model.trim() ||
+      failedIncomingCapture ||
+      captureQueued ||
       candidate ||
       composing.current ||
       (!value.text.trim() && !value.attachment_ids.length)
@@ -257,6 +326,7 @@ export function ChatWorkspace({
       submission_id: crypto.randomUUID(),
       text: value.text,
       attachment_ids: value.attachment_ids,
+      references: value.references,
       conditions: value.conditions,
       corrections: value.corrections,
       model,
@@ -331,62 +401,104 @@ export function ChatWorkspace({
       setBusy(false);
     }
   };
+  const persistAttachment = useCallback(
+    async (result: CaptureResult, replaces?: string) => {
+      const currentIds = controller.snapshot().value.attachment_ids;
+      if ((!replaces && currentIds.length >= 8) || (replaces && !currentIds.includes(replaces))) {
+        throw new CaptureError(
+          replaces ? "ATTACHMENT_REPLACEMENT_STALE" : "ATTACHMENT_LIMIT",
+          replaces
+            ? "原附件已移除，请取消后重新选择。"
+            : "每次最多加入 8 张确认图片，请取消后移除其他图片。",
+        );
+      }
+      setBusy(true);
+      setError("");
+      try {
+        const attachment = await api.write<Schema<"AttachmentResponse">>("/attachments", {
+          data_base64: result.dataUrl.split(",")[1],
+          media_type: "image/png",
+          confirmed: true,
+        } satisfies Schema<"AttachmentInput">);
+        // API requests contain the confirmed rectangle only; originals remain in this browser.
+        await api.write<Schema<"AttachmentSourceResponse">>(
+          `/attachments/${attachment.attachment_id}/source`,
+          {
+            chat_id: chatId,
+            origin: result.source.origin || (result.source.source ? "video" : "image"),
+            ...result.source.source,
+            source_width: result.source.width,
+            source_height: result.source.height,
+            crop: result.crop,
+            edit_root_id: result.source.sourceId,
+            parent_attachment_id: replaces,
+          } satisfies Schema<"AttachmentSourceInput">,
+        );
+        try {
+          await saveCapture(attachment.attachment_id, result);
+        } catch {
+          setError(
+            "选区已加入；本机原图编辑缓存不可用，重开后需重新选择原图。已确认选区不受影响。",
+          );
+        }
+        const latestIds = controller.snapshot().value.attachment_ids;
+        controller.update({
+          attachment_ids: replaces
+            ? latestIds.map((id) => (id === replaces ? attachment.attachment_id : id))
+            : [...latestIds, attachment.attachment_id],
+        });
+        setFocusRequest((current) => current + 1);
+      } catch (reason) {
+        setError(errorMessage(reason));
+        throw reason;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [chatId, controller],
+  );
   const confirmAttachment = async (result: CaptureResult) => {
     if (!candidate || !editable) return;
-    const currentIds = controller.snapshot().value.attachment_ids;
-    if (
-      (!candidate.replaces && currentIds.length >= 8) ||
-      (candidate.replaces && !currentIds.includes(candidate.replaces))
-    ) {
-      throw new CaptureError(
-        candidate.replaces ? "ATTACHMENT_REPLACEMENT_STALE" : "ATTACHMENT_LIMIT",
-        candidate.replaces
-          ? "原附件已移除，请取消后重新选择。"
-          : "每次最多加入 8 张确认图片，请取消后移除其他图片。",
-      );
-    }
-    setBusy(true);
-    setError("");
-    try {
-      const attachment = await api.write<Schema<"AttachmentResponse">>("/attachments", {
-        data_base64: result.dataUrl.split(",")[1],
-        media_type: "image/png",
-        confirmed: true,
-      } satisfies Schema<"AttachmentInput">);
-      // The full original is never accepted by these API calls.
-      await api.write<Schema<"AttachmentSourceResponse">>(
-        `/attachments/${attachment.attachment_id}/source`,
-        {
-          chat_id: chatId,
-          origin: result.source.source ? "video" : "image",
-          ...result.source.source,
-          source_width: result.source.width,
-          source_height: result.source.height,
-          crop: result.crop,
-          edit_root_id: result.source.sourceId,
-          parent_attachment_id: candidate.replaces,
-        } satisfies Schema<"AttachmentSourceInput">,
-      );
-      try {
-        await saveCapture(attachment.attachment_id, result);
-      } catch {
-        setError("选区已加入；本机原图编辑缓存不可用，重开后需重新选择原图。已确认选区不受影响。");
-      }
-      controller.update({
-        attachment_ids: candidate.replaces
-          ? value.attachment_ids.map((id) =>
-              id === candidate.replaces ? attachment.attachment_id : id,
-            )
-          : [...value.attachment_ids, attachment.attachment_id],
-      });
-      consumeCandidate();
-    } catch (reason) {
-      setError(errorMessage(reason));
-      throw reason;
-    } finally {
-      setBusy(false);
-    }
+    await persistAttachment(result, candidate.replaces);
+    consumeCandidate();
   };
+  const receiveConfirmedCapture = useCallback(
+    (result: CaptureResult) => {
+      setCapturedSources((current) =>
+        current.has(result.source.sourceId)
+          ? current
+          : new Set([...current, result.source.sourceId]),
+      );
+      captureInProgress.current = true;
+      captureFailure.current = false;
+      const task = persistAttachment(result)
+        .then(() => {
+          setFailedIncomingCapture(null);
+          onConfirmedCaptureConsumed?.(result.source.sourceId);
+        })
+        .catch((reason) => {
+          setError(
+            reason instanceof CaptureError
+              ? `${reason.message}（${reason.code}）`
+              : errorMessage(reason),
+          );
+          captureFailure.current = true;
+          setFailedIncomingCapture(result);
+        })
+        .finally(() => {
+          captureInProgress.current = false;
+        });
+      captureTask.current = task;
+    },
+    [persistAttachment, onConfirmedCaptureConsumed],
+  );
+  useEffect(() => {
+    if (!incomingConfirmedCapture || !editable || busy) return;
+    const identity = incomingConfirmedCapture.source.sourceId;
+    if (receivedCaptureIds.current.has(identity)) return;
+    receivedCaptureIds.current.add(identity);
+    receiveConfirmedCapture(incomingConfirmedCapture);
+  }, [incomingConfirmedCapture, editable, busy, receiveConfirmedCapture]);
   const reedit = async (id: string) => {
     setBusy(true);
     try {
@@ -404,13 +516,6 @@ export function ChatWorkspace({
   };
   return (
     <div className="chat-workspace">
-      <div className="chat-heading">
-        <div>
-          <h2>课程对话</h2>
-          <p>只在发送后提交文字与确认选区</p>
-        </div>
-        <small className="muted">{chatId.slice(0, 8)}</small>
-      </div>
       <div
         className="messages"
         aria-label="对话内容"
@@ -439,7 +544,11 @@ export function ChatWorkspace({
             const body = generation?.body || message.text;
             const reasoning = generation?.reasoning || message.reasoning;
             return (
-              <article className={`message ${message.role}`} key={message.message_id}>
+              <article
+                id={`message-${message.message_id}`}
+                className={`message ${message.role}`}
+                key={message.message_id}
+              >
                 <div className="message-label">{message.role === "user" ? "我" : "学习 AI"}</div>
                 <div className="message-content">
                   {reasoning && message.role === "assistant" && (
@@ -453,15 +562,40 @@ export function ChatWorkspace({
                       text={body || "正在等待内容…"}
                       onQuote={
                         editable
-                          ? (latex) =>
+                          ? (selection) => {
+                              const current = controller.snapshot().value.references;
+                              if (current.length >= 20) {
+                                setError("每次最多加入 20 条引用，请先移除其他引用。");
+                                return;
+                              }
                               controller.update({
-                                text: `${value.text}${value.text ? "\n\n" : ""}$$\n${latex}\n$$\n`,
-                              })
+                                references: [
+                                  ...current,
+                                  {
+                                    reference_id: crypto.randomUUID(),
+                                    message_id: message.message_id,
+                                    ...selection,
+                                  },
+                                ],
+                              });
+                              inputRef.current?.focus();
+                            }
                           : undefined
                       }
                     />
                   ) : (
-                    <pre className="message-body">{body}</pre>
+                    <>
+                      {(
+                        (message as typeof message & { references?: DraftReference[] })
+                          .references || []
+                      ).map((reference) => (
+                        <div className="message-reference" key={reference.reference_id}>
+                          <small>↗ 引用回答</small>
+                          <MarkdownAnswer text={reference.markdown} />
+                        </div>
+                      ))}
+                      <pre className="message-body">{body}</pre>
+                    </>
                   )}
                   {Boolean(message.attachment_ids?.length) && (
                     <div className="message-attachments">
@@ -478,8 +612,7 @@ export function ChatWorkspace({
                   {generation && (
                     <div className="generation-footer">
                       <span role="status">{stateLabel(generation.state)}</span>
-                      <small>事件水位 {generation.event_watermark}</small>
-                      <small>
+                      <small title={`事件水位 ${generation.event_watermark}`}>
                         {generation.usage?.status === "known"
                           ? `用量：输入 ${generation.usage.input_tokens ?? "未知"} / 输出 ${generation.usage.output_tokens ?? "未知"}`
                           : "用量未知"}
@@ -517,6 +650,30 @@ export function ChatWorkspace({
         {error && (
           <div className="inline-error" role="alert">
             {error}
+          </div>
+        )}
+        {failedIncomingCapture && (
+          <div className="draft-warning" role="alert">
+            截图尚未加入，选区仍保留。
+            <Button
+              variant="ghost"
+              disabled={!editable}
+              onClick={() => receiveConfirmedCapture(failedIncomingCapture)}
+            >
+              重新加入截图
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={busy}
+              onClick={() => {
+                captureFailure.current = false;
+                setFailedIncomingCapture(null);
+                setError("");
+                onConfirmedCaptureConsumed?.(failedIncomingCapture.source.sourceId);
+              }}
+            >
+              取消这张截图
+            </Button>
           </div>
         )}
         {draft.error && (
@@ -570,6 +727,48 @@ export function ChatWorkspace({
             }
           }}
         >
+          {value.references.length > 0 && (
+            <div className="draft-references" aria-label="本次引用">
+              {value.references.map((reference, index) => (
+                <section
+                  className="reference-card"
+                  aria-label={`引用 ${index + 1}`}
+                  key={reference.reference_id}
+                >
+                  <header>
+                    <button
+                      type="button"
+                      className="reference-source"
+                      aria-label={`查看引用来源 ${index + 1}`}
+                      onClick={() =>
+                        document
+                          .getElementById(`message-${reference.message_id}`)
+                          ?.scrollIntoView({ block: "center", behavior: "smooth" })
+                      }
+                    >
+                      ↗ 对话引用 {index + 1}
+                    </button>
+                    <button
+                      type="button"
+                      className="reference-remove"
+                      aria-label={`移除引用 ${index + 1}`}
+                      disabled={!editable}
+                      onClick={() =>
+                        controller.update({
+                          references: value.references.filter(
+                            (entry) => entry.reference_id !== reference.reference_id,
+                          ),
+                        })
+                      }
+                    >
+                      ×
+                    </button>
+                  </header>
+                  <MarkdownAnswer text={reference.markdown} />
+                </section>
+              ))}
+            </div>
+          )}
           {value.attachment_ids.length > 0 && (
             <div className="draft-attachments" aria-label="本次确认图片">
               {value.attachment_ids.map((id, index) => (
@@ -606,8 +805,9 @@ export function ChatWorkspace({
             问题或追问
           </label>
           <textarea
+            ref={inputRef}
             id="question-input"
-            placeholder="输入问题或继续追问…"
+            placeholder="问点什么，或继续追问…"
             rows={3}
             value={value.text}
             onChange={(event) => controller.update({ text: event.target.value })}
@@ -684,7 +884,12 @@ export function ChatWorkspace({
               />
               <datalist id="learning-models">
                 {Array.from(
-                  new Set([configuredModel, "deepseek-flash", "deepseek-v4-pro"].filter(Boolean)),
+                  new Set(
+                    [
+                      configuredModel,
+                      ...(modelChoices ?? ["deepseek-flash", "deepseek-v4-pro"]),
+                    ].filter(Boolean),
+                  ),
                 ).map((entry) => (
                   <option key={entry} value={entry} />
                 ))}
@@ -702,7 +907,12 @@ export function ChatWorkspace({
                 }
                 disabled={!editable}
               >
-                {["none", "low", "high", "max"].map((entry) => (
+                {!thinkingSupported && (
+                  <option value={thinking} disabled>
+                    {thinking}（不可用）
+                  </option>
+                )}
+                {allowedThinking.map((entry) => (
                   <option key={entry} value={entry}>
                     {entry === "none" ? "关闭" : entry}
                   </option>
@@ -718,13 +928,35 @@ export function ChatWorkspace({
                 locked ||
                 (!value.text.trim() && !value.attachment_ids.length) ||
                 !model.trim() ||
+                !modelSupported ||
+                !thinkingSupported ||
+                Boolean(failedIncomingCapture) ||
+                captureQueued ||
                 Boolean(candidate)
               }
             >
-              {busy ? "处理中…" : "发送"}
+              <span aria-hidden="true">↑</span>
+              <span className="sr-only">{busy ? "处理中…" : "发送"}</span>
             </Button>
           </div>
-          {model === "deepseek-v4-pro" && (
+          {value.references.length > 0 && !value.text.trim() && !value.attachment_ids.length && (
+            <p className="composer-hint" role="status">
+              已加入引用，请补充问题后发送。
+            </p>
+          )}
+          {!modelSupported && (
+            <p className="composer-hint" role="status">
+              {modelChoices?.length
+                ? "当前选择不在可用模型目录中，请手动选择模型。"
+                : "当前接入方式尚未提供可用模型，请检查连接状态。"}
+            </p>
+          )}
+          {modelSupported && !thinkingSupported && (
+            <p className="composer-hint" role="status">
+              当前模型不支持已选思考强度，请手动重新选择。
+            </p>
+          )}
+          {textOnlyModel && (
             <p className="composer-hint">仅支持文字；包含题图的对话请使用支持图片的模型。</p>
           )}
         </form>

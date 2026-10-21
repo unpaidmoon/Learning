@@ -1,0 +1,240 @@
+.course-explorer {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.explorer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 12px 8px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.explorer-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.course-root-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.course-root-row:hover {
+  background: var(--muted);
+}
+.file-tree,
+.file-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.file-tree {
+  overflow: auto;
+  padding: 0 6px 16px;
+  min-height: 0;
+}
+.file-tree-row {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  padding-right: 4px;
+  min-height: 30px;
+  position: relative;
+}
+.file-tree-row:hover,
+.file-tree-row.selected {
+  background: var(--muted);
+}
+.file-tree-open {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  min-height: 30px;
+  padding: 4px 0;
+  text-align: left;
+  color: var(--foreground);
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+}
+.file-tree-open > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-tree-open > svg {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+.tree-chevron {
+  width: 9px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+.file-row-menu,
+.explorer-menu {
+  position: relative;
+}
+.file-row-menu summary,
+.explorer-menu summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0 5px;
+  font-size: 18px;
+  color: var(--muted-foreground);
+}
+.file-row-menu {
+  opacity: 0;
+}
+.file-tree-row:hover .file-row-menu,
+.file-tree-row:focus-within .file-row-menu,
+.file-row-menu[open] {
+  opacity: 1;
+}
+.file-actions-menu {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  right: 0;
+  padding: 5px;
+  min-width: 145px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-elevated, var(--background));
+  box-shadow: 0 8px 24px #00000016;
+}
+.file-actions-menu button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  text-align: left;
+  border: 0;
+  color: var(--foreground);
+  padding: 8px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+.file-actions-menu button:hover {
+  background: var(--muted);
+}
+.file-actions-menu button.danger {
+  color: var(--destructive);
+}
+.explorer-empty {
+  padding: 8px 16px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.explorer-empty p {
+  margin: 4px 0 12px;
+}
+.explorer-error,
+.explorer-notice,
+.explorer-destination {
+  margin: 8px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.explorer-error {
+  color: var(--destructive);
+}
+.explorer-notice,
+.explorer-destination {
+  color: var(--muted-foreground);
+}
+.file-reconcile {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.file-dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #00000066;
+}
+.file-dialog {
+  width: min(460px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  background: var(--surface-elevated, var(--background));
+  border-radius: 16px;
+  box-shadow: 0 16px 64px #00000030;
+  color: var(--foreground);
+}
+.file-dialog h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 18px;
+}
+.file-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 15px 0;
+  font-size: 13px;
+}
+.file-dialog input,
+.file-dialog select,
+.file-dialog textarea {
+  width: 100%;
+}
+.file-dialog textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.file-dialog > p,
+.file-conflicts {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.file-dialog-path {
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+}
+.file-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+.file-conflicts {
+  padding: 8px 12px;
+  background: var(--muted);
+  border-radius: 8px;
+}
+.file-conflicts ul {
+  padding-left: 20px;
+}
+.legacy-videos {
+  margin-top: 20px;
+}
+.legacy-videos button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: var(--foreground);
+  border: 0;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 12px;
+}

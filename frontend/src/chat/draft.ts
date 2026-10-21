@@ -2,16 +2,26 @@ import { useMemo, useSyncExternalStore } from "react";
 import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 
+export interface DraftReference {
+  reference_id: string;
+  message_id: string;
+  text: string;
+  markdown: string;
+  source_start?: number;
+  source_end?: number;
+}
+
 export type Draft = Required<
   Pick<
     Schema<"DraftResponse">,
     "text" | "attachment_ids" | "conditions" | "corrections" | "model" | "thinking"
   >
->;
+> & { references: DraftReference[] };
 
 const emptyDraft: Draft = {
   text: "",
   attachment_ids: [],
+  references: [],
   conditions: [],
   corrections: [],
   model: null,
@@ -37,7 +47,11 @@ class DraftController {
       const cached = JSON.parse(localStorage.getItem(key(chatId)) || "null");
       if (cached?.value && typeof cached.revision === "number") {
         this.revision = cached.revision;
-        this.view = { ...this.view, value: cached.value, dirty: Boolean(cached.dirty) };
+        this.view = {
+          ...this.view,
+          value: { ...emptyDraft, ...cached.value },
+          dirty: Boolean(cached.dirty),
+        };
       }
     } catch {
       // The server copy remains available if browser storage was cleared or is unavailable.
@@ -80,10 +94,12 @@ class DraftController {
       this.revision = remote.revision;
       if (!this.view.dirty || useServer) {
         const { text, attachment_ids, conditions, corrections, model, thinking } = remote;
+        const references = (remote as typeof remote & { references?: DraftReference[] }).references;
         this.savedSequence = this.sequence;
         this.emit({
           value: {
             text: text ?? "",
+            references: references ?? [],
             attachment_ids: attachment_ids ?? [],
             conditions: conditions ?? [],
             corrections: corrections ?? [],

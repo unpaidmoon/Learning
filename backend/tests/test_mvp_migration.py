@@ -64,7 +64,7 @@ def test_p0_upgrade_preserves_assets_and_recovery(tmp_path, fail_before_commit):
 
     repository = Repository(root)
     try:
-        assert repository.runtime_info()["schema_revision"] == "0003_drafts"
+        assert repository.runtime_info()["schema_revision"] == storage.SCHEMA_REVISION
         assert repository.get_chat("chat_preserved") == before
         assert repository.resolve_attachment(attachment["attachment_id"])["content_hash"] == (
             attachment["content_hash"]

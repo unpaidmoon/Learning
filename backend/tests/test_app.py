@@ -83,6 +83,21 @@ def test_real_health_and_private_api_capability(tmp_path):
         assert client.get("/api/does-not-exist").status_code == 404
 
 
+def test_host_connection_does_not_claim_question_answering_is_available(tmp_path, monkeypatch):
+    with TestClient(create_app(config_at(tmp_path)), base_url="http://127.0.0.1:8765") as client:
+        service = client.app.state.service
+        service.execution_ready = True
+        monkeypatch.setattr(
+            type(service), "question_answering_ready", property(lambda _service: False)
+        )
+        value = client.get("/api/v1/health").json()
+        assert value["ready"] is True
+        assert value["capabilities"]["harness"] == "ready"
+        assert value["capabilities"]["question_answering"] == "unavailable"
+        assert value["capabilities"]["video"] == "ready"
+        assert value["capabilities"]["persistence"] == "ready"
+
+
 def test_origin_host_ws_and_unregistered_asset_are_denied(tmp_path):
     app = create_app(config_at(tmp_path))
     with TestClient(app, base_url="http://127.0.0.1:8765") as client:

@@ -10,7 +10,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from learning_app import __version__
+from learning_app.accounts import install_account_routes
 from learning_app.config import AppConfig, load_config
+from learning_app.course_files import install_course_file_routes
 from learning_app.drafts import install_draft_routes
 from learning_app.dto import (
     AttachmentInput,
@@ -128,6 +130,15 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
             if harness_ready
             else ("unavailable" if config.harness_enabled else "not_configured")
         )
+        question_answering = (
+            "ready"
+            if harness_ready and app.state.service.question_answering_ready
+            else (
+                "unavailable"
+                if harness_ready or config.harness_enabled
+                else "not_configured"
+            )
+        )
         return HealthResponse(
             instance_id=config.instance_id,
             ready=ready,
@@ -137,7 +148,7 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
                 persistence="ready" if ready else "unavailable",
                 video="ready" if ready else "unavailable",
                 harness=harness,
-                question_answering=harness,
+                question_answering=question_answering,
             ),
         )
 
@@ -251,6 +262,8 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
         except WebSocketDisconnect:
             pass
 
+    install_account_routes(app)
+    install_course_file_routes(app)
     install_media_routes(app)
     install_draft_routes(app)
     install_runtime_routes(app)

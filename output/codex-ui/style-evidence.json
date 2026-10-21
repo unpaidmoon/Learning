@@ -1,0 +1,1072 @@
+{
+  "artifact": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.1013.4894.0_x64__2p2nqsd0c76g0\\app\\resources\\app.asar",
+  "sha256": "bbec1d64e135b718a154b31655bb8ad9a39472bac1b2cabba991a9d97a339dd8",
+  "scope": "static CSS declarations; no runtime or computed-style observation",
+  "styles": [
+    {
+      "path": "webview/assets/app-connect-modal-content-8102d824cf6b.css",
+      "sha256": "91f724a348c94bcb14c2790d6cd5047179790b36d7f9dbd517ec3a3ed893a992",
+      "rules": []
+    },
+    {
+      "path": "webview/assets/app-initial-e7c27dd40beb.css",
+      "sha256": "6de949e9037e0038f9d4f18530e3bc8a5aa6274fa53ec9e59be85c05218003bc",
+      "rules": [
+        {
+          "selector": "._composer_hs61p_1",
+          "declarations": {
+            "--color-background-composer-primary": "var(--messaging-send-background,var(--color-background-primary-solid))",
+            "--color-text-composer-primary": "var(--messaging-send-foreground,var(--color-text-primary-solid))"
+          }
+        },
+        {
+          "selector": "._shell_151xi_3",
+          "declarations": {
+            "--color-background-primary": "var(--app-color-background-surface,var(--color-surface-tertiary))"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-chrome=application-menu] ._SelectedSurface_p64dj_1",
+          "declarations": {
+            "--color-border": "var(--color-border-strong)"
+          }
+        },
+        {
+          "selector": "._root_10eah_11",
+          "declarations": {
+            "--spacing": "4px"
+          }
+        },
+        {
+          "selector": "._creditPage_10eah_100,._root_10eah_11._modal_10eah_101[data-checkout-presentation=inline]",
+          "declarations": {
+            "--radius-xs": "4px",
+            "--radius-lg": "10px"
+          }
+        },
+        {
+          "selector": "._root_10eah_11._offerNotice_10eah_150",
+          "declarations": {
+            "--color-text": "var(--checkout-text-primary)",
+            "--color-text-secondary": "var(--checkout-text-secondary)",
+            "--color-surface-elevated": "var(--checkout-bg-primary)",
+            "--color-border": "var(--checkout-border-default)"
+          }
+        },
+        {
+          "selector": "._root_10eah_11._modal_10eah_101",
+          "declarations": {
+            "--color-text": "var(--checkout-text-primary)",
+            "--color-surface": "var(--checkout-bg-primary)",
+            "--color-surface-tertiary": "var(--checkout-bg-primary)"
+          }
+        },
+        {
+          "selector": "._Navigation_1uxfp_2",
+          "declarations": {
+            "--color-text": "var(--color-background-primary-solid)"
+          }
+        },
+        {
+          "selector": "._Navigation_1uxfp_2",
+          "declarations": {
+            "--color-text": "color-mix(in oklab, var(--color-background-primary-solid) 85%, transparent)"
+          }
+        },
+        {
+          "selector": "._Navigation_1uxfp_2",
+          "declarations": {
+            "--color-text-primary-ghost": "var(--color-text)",
+            "--color-text-primary-ghost-hover": "var(--color-text)",
+            "--color-text-secondary-ghost-hover": "var(--color-text)"
+          }
+        },
+        {
+          "selector": "._Material_9q659_2[data-avatar-overlay-material-variant=activity-dismiss]:has(>button:enabled:active:hover)",
+          "declarations": {
+            "--color-background-primary-ghost-hover": "var(--color-background-primary-ghost-active)"
+          }
+        },
+        {
+          "selector": "._Control_9q659_2[data-avatar-overlay-control=reply]",
+          "declarations": {
+            "--color-background-primary-soft-alpha": "var(--color-surface)"
+          }
+        },
+        {
+          "selector": "._Control_9q659_2:enabled:hover",
+          "declarations": {
+            "--color-text": "#f7f7f7",
+            "--color-text-tertiary": "#f7f7f7",
+            "--color-background-primary-ghost-hover": "#202020d1"
+          }
+        },
+        {
+          "selector": "._Control_9q659_2:enabled:where([data-theme=dark]):hover",
+          "declarations": {
+            "--color-background-primary-ghost-hover": "#ffffff2e"
+          }
+        },
+        {
+          "selector": "._Control_9q659_2:enabled:where(:not([data-theme])):hover",
+          "declarations": {
+            "--color-background-primary-ghost-hover": "#ffffff2e"
+          }
+        },
+        {
+          "selector": "._compactMessageBubble_1hoj5_1",
+          "declarations": {
+            "--color-text": "var(--compact-message-bubble-foreground,var(--lightningcss-light,#0c274a)var(--lightningcss-dark,#f6fafe))",
+            "--color-text-info": "var(--color-text)"
+          }
+        }
+      ]
+    },
+    {
+      "path": "webview/assets/app-primary-71492d0e9e92.css",
+      "sha256": "ec041bcd9be08d800225b53e612771b179d5a8082f1e7a5e225519b33163c80b",
+      "rules": [
+        {
+          "selector": "._composer_u07j5_2",
+          "declarations": {
+            "--color-text-info": "var(--color-text)",
+            "--color-text-accent": "var(--color-text)",
+            "--color-background-accent": "var(--color-surface-tertiary)",
+            "--color-background-accent-hover": "var(--color-surface-tertiary)"
+          }
+        },
+        {
+          "selector": "._unpersonalizedComposer_u07j5_10",
+          "declarations": {
+            "--color-background-composer-primary": "var(--color-background-primary-solid)",
+            "--color-text-composer-primary": "var(--color-text-primary-solid)"
+          }
+        },
+        {
+          "selector": "._unpersonalizedUserMessage_u07j5_16",
+          "declarations": {
+            "--color-background-user-message": "var(--color-surface-tertiary)",
+            "--color-text-user-message": "var(--color-text)",
+            "--color-text-info": "var(--color-text)",
+            "--color-text-accent": "var(--color-text)"
+          }
+        },
+        {
+          "selector": "._EnterpriseFooterBackground_18ixn_2",
+          "declarations": {
+            "--color-surface": "var(--app-color-background-surface)"
+          }
+        },
+        {
+          "selector": "._surface_ubz2o_3",
+          "declarations": {
+            "--color-surface": "var(--lightningcss-light,#fff)var(--lightningcss-dark,#212121)",
+            "--color-surface-secondary": "var(--lightningcss-light,#e8e8e8)var(--lightningcss-dark,#303030)",
+            "--color-surface-tertiary": "var(--lightningcss-light,#f3f3f3)var(--lightningcss-dark,#414141)",
+            "--color-text": "var(--lightningcss-light,#0d0d0d)var(--lightningcss-dark,#fff)",
+            "--color-text-secondary": "var(--lightningcss-light,#5d5d5d)var(--lightningcss-dark,#cdcdcd)",
+            "--color-text-tertiary": "var(--lightningcss-light,#8f8f8f)var(--lightningcss-dark,#afafaf)",
+            "--color-text-info": "var(--lightningcss-light,#3a83f7)var(--lightningcss-dark,#63a8f8)",
+            "--color-border": "var(--lightningcss-light,#0000001a)var(--lightningcss-dark,#ffffff26)",
+            "--color-border-heavy": "var(--lightningcss-light,#00000026)var(--lightningcss-dark,#fff3)",
+            "--color-border-light": "var(--lightningcss-light,#0000000d)var(--lightningcss-dark,#ffffff0d)",
+            "--color-border-subtle": "var(--color-border-light)",
+            "--color-border-primary-outline": "var(--color-border-heavy)",
+            "--color-text-inverse": "var(--lightningcss-light,#fff)var(--lightningcss-dark,#0d0d0d)",
+            "--color-background-primary-ghost-hover": "var(--lightningcss-light,#0000000d)var(--lightningcss-dark,#ffffff1a)"
+          }
+        }
+      ]
+    },
+    {
+      "path": "webview/assets/app-shared-dc7535e633d7.css",
+      "sha256": "282dd3546bccfba48212a186641a73dedb27af6af7962dad40b3f5db6a9a08f2",
+      "rules": [
+        {
+          "selector": "._Tooltip_phecw_2",
+          "declarations": {
+            "--color-text": "var(--tooltip-text-color)",
+            "--color-text-prose": "var(--tooltip-text-color)",
+            "--color-text-secondary": "var(--color-text-tooltip-secondary,var(--tooltip-text-color))"
+          }
+        },
+        {
+          "selector": "._Tooltip_phecw_2",
+          "declarations": {
+            "--color-text-secondary": "var(--color-text-tooltip-secondary,color-mix(in oklab, var(--tooltip-text-color) 90%, transparent))"
+          }
+        },
+        {
+          "selector": "._Tooltip_phecw_2",
+          "declarations": {
+            "--color-text-tertiary": "var(--color-text-tooltip-tertiary,var(--tooltip-text-color))"
+          }
+        },
+        {
+          "selector": "._Tooltip_phecw_2",
+          "declarations": {
+            "--color-text-tertiary": "var(--color-text-tooltip-tertiary,color-mix(in oklab, var(--tooltip-text-color) 80%, transparent))"
+          }
+        },
+        {
+          "selector": "._Tooltip_phecw_2",
+          "declarations": {
+            "--color-text-info": "var(--tooltip-text-info-color)",
+            "--color-text-danger": "var(--tooltip-text-danger-color)",
+            "--color-text-warning": "var(--tooltip-text-warning-color)",
+            "--color-text-success": "var(--tooltip-text-success-color)"
+          }
+        },
+        {
+          "selector": "._accentTheme_1djtm_1",
+          "declarations": {
+            "--color-background-coachmark": "var(--color-background-info-solid)"
+          }
+        },
+        {
+          "selector": "._textTheme_1djtm_6",
+          "declarations": {
+            "--color-text": "var(--color-text-tooltip)",
+            "--color-text-prose": "var(--color-text-tooltip)",
+            "--color-text-secondary": "var(--color-text-tooltip-secondary)",
+            "--color-text-tertiary": "var(--color-text-tooltip-tertiary)",
+            "--color-text-info": "var(--color-text-tooltip-info)",
+            "--color-text-danger": "var(--color-text-tooltip-danger)",
+            "--color-text-warning": "var(--color-text-tooltip-warning)",
+            "--color-text-success": "var(--color-text-tooltip-success)"
+          }
+        },
+        {
+          "selector": "._voicePickerSurface_rq2f8_2",
+          "declarations": {
+            "--color-text": "var(--gray-1000)",
+            "--color-text-tertiary": "var(--lightningcss-light,var(--gray-400))var(--lightningcss-dark,var(--gray-700))",
+            "--color-background-primary-solid": "var(--lightningcss-light,var(--gray-1000))var(--lightningcss-dark,var(--gray-975))",
+            "--color-background-primary-solid-hover": "var(--lightningcss-light,#333)var(--lightningcss-dark,#ededed)",
+            "--color-background-primary-ghost-hover": "var(--lightningcss-light,#0000000d)var(--lightningcss-dark,#ffffff1a)"
+          }
+        },
+        {
+          "selector": "._annotationTheme_7bp1p_6",
+          "declarations": {
+            "--color-background-info-solid": "var(--draggable-toolbar-accent)",
+            "--color-text-info-solid": "var(--color-media-foreground)"
+          }
+        },
+        {
+          "selector": ":root,:host",
+          "declarations": {
+            "--font-sans": "var(--font-ui-family,var(--font-sans-default))",
+            "--spacing": ".25rem",
+            "--radius-xs": "calc(var(--radius-xs-base) * var(--corner-radius-scale))",
+            "--radius-sm": "calc(var(--radius-sm-base) * var(--corner-radius-scale))",
+            "--radius-md": "calc(var(--radius-md-base) * var(--corner-radius-scale))",
+            "--radius-lg": "calc(var(--radius-lg-base) * var(--corner-radius-scale))",
+            "--radius-xl": "calc(var(--radius-xl-base) * var(--corner-radius-scale))",
+            "--radius-2xl": "calc(var(--radius-2xl-base) * var(--corner-radius-scale))",
+            "--radius-3xl": "calc(var(--radius-3xl-base) * var(--corner-radius-scale))",
+            "--radius-4xl": "calc(var(--radius-4xl-base) * var(--corner-radius-scale))",
+            "--radius-2xs": "calc(var(--radius-2xs-base) * var(--corner-radius-scale))",
+            "--radius-full": "9999px",
+            "--radius-unread-badge": "var(--spacing)",
+            "--font-sans-default": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "--font-content": "var(--codex-content-font-family,var(--font-sans))",
+            "--radius-2xs-base": ".125rem",
+            "--radius-xs-base": ".25rem",
+            "--radius-sm-base": ".375rem",
+            "--radius-md-base": ".5rem",
+            "--radius-lg-base": ".625rem",
+            "--radius-xl-base": ".75rem",
+            "--radius-2xl-base": "1rem",
+            "--radius-3xl-base": "1.25rem",
+            "--radius-4xl-base": "1.5rem",
+            "--radius-form-dialog": "calc(var(--spacing) * 6 * var(--corner-radius-scale))",
+            "--spacing-token-sidebar": "clamp(240px, var(--codex-sidebar-preferred-width,275px), min(520px, calc(100vw - 320px)))",
+            "--radius-button-action": "var(--radius-lg)",
+            "--radius-button-toolbar": "var(--radius-lg)",
+            "--radius-map-card": "calc(var(--radius-xl) + var(--spacing) * 3)",
+            "--radius-map-frame": "calc(var(--radius-map-card) + var(--spacing) * 3)",
+            "--radius-token-composer-single-line": "calc(var(--spacing) * 5.5)"
+          }
+        },
+        {
+          "selector": ":where(:root),:where([data-theme])",
+          "declarations": {
+            "--color-text": "var(--lightningcss-light,var(--gray-750))var(--lightningcss-dark,var(--gray-850))",
+            "--color-text-emphasis": "var(--gray-1000)",
+            "--color-text-prose": "var(--color-text-emphasis)",
+            "--color-text-secondary": "var(--lightningcss-light,var(--gray-500))var(--lightningcss-dark,var(--gray-700))",
+            "--color-text-tertiary": "var(--lightningcss-light,var(--gray-400))var(--lightningcss-dark,var(--gray-600))",
+            "--color-text-inverse": "var(--gray-0)",
+            "--color-text-primary": "var(--color-text-emphasis)",
+            "--color-background-primary-soft": "var(--lightningcss-light,var(--gray-100))var(--lightningcss-dark,var(--gray-300))",
+            "--color-background-primary-soft-hover": "var(--lightningcss-light,var(--gray-150))var(--lightningcss-dark,var(--gray-350))",
+            "--color-background-primary-soft-active": "var(--lightningcss-light,var(--gray-200))var(--lightningcss-dark,var(--gray-400))",
+            "--color-background-primary-soft-alpha": "var(--lightningcss-light,var(--alpha-08))var(--lightningcss-dark,var(--alpha-12))",
+            "--color-background-primary-soft-alpha-hover": "var(--lightningcss-light,var(--alpha-12))var(--lightningcss-dark,var(--alpha-16))",
+            "--color-background-primary-soft-alpha-active": "var(--lightningcss-light,var(--alpha-16))var(--lightningcss-dark,var(--alpha-20))",
+            "--color-text-primary-soft": "var(--color-text-emphasis)",
+            "--color-background-primary-soft-alt": "var(--alpha-05)",
+            "--color-border-primary-soft-alt": "var(--alpha-06)",
+            "--color-text-primary-soft-alt": "var(--color-text-emphasis)",
+            "--color-background-primary-surface": "var(--lightningcss-light,var(--alpha-05))var(--lightningcss-dark,var(--alpha-08))",
+            "--color-border-primary-surface": "var(--lightningcss-light,var(--alpha-05))var(--lightningcss-dark,var(--alpha-08))",
+            "--color-text-primary-surface": "var(--color-text-emphasis)",
+            "--color-background-primary-solid": "var(--lightningcss-light,var(--gray-900))var(--lightningcss-dark,var(--gray-950))",
+            "--color-background-primary-solid-hover": "var(--lightningcss-light,var(--gray-700))var(--lightningcss-dark,var(--gray-900))",
+            "--color-background-primary-solid-active": "var(--lightningcss-light,var(--gray-600))var(--lightningcss-dark,var(--gray-850))",
+            "--color-text-primary-solid": "var(--color-text-inverse)",
+            "--color-background-primary-outline-hover": "var(--lightningcss-light,var(--alpha-02))var(--lightningcss-dark,var(--alpha-04))",
+            "--color-background-primary-outline-active": "var(--lightningcss-light,var(--alpha-04))var(--lightningcss-dark,var(--alpha-06))",
+            "--color-border-primary-outline": "var(--lightningcss-light,var(--alpha-16))var(--lightningcss-dark,var(--alpha-25))",
+            "--color-border-primary-outline-hover": "var(--lightningcss-light,var(--alpha-20))var(--lightningcss-dark,var(--alpha-30))",
+            "--color-text-primary-outline": "var(--color-text-emphasis)",
+            "--color-text-primary-outline-hover": "var(--color-text-emphasis)",
+            "--color-background-primary-ghost-hover": "var(--lightningcss-light,var(--alpha-08))var(--lightningcss-dark,var(--alpha-12))",
+            "--color-background-primary-ghost-active": "var(--lightningcss-light,var(--alpha-12))var(--lightningcss-dark,var(--alpha-16))",
+            "--color-text-primary-ghost": "var(--color-text)",
+            "--color-text-primary-ghost-hover": "var(--color-text)",
+            "--color-background-secondary-soft": "var(--lightningcss-light,var(--gray-100))var(--lightningcss-dark,var(--gray-300))",
+            "--color-background-secondary-soft-hover": "var(--lightningcss-light,var(--gray-150))var(--lightningcss-dark,var(--gray-350))",
+            "--color-background-secondary-soft-active": "var(--lightningcss-light,var(--gray-200))var(--lightningcss-dark,var(--gray-400))",
+            "--color-background-secondary-soft-alpha": "var(--lightningcss-light,var(--alpha-08))var(--lightningcss-dark,var(--alpha-12))",
+            "--color-background-secondary-soft-alpha-hover": "var(--lightningcss-light,var(--alpha-12))var(--lightningcss-dark,var(--alpha-16))",
+            "--color-background-secondary-soft-alpha-active": "var(--lightningcss-light,var(--alpha-16))var(--lightningcss-dark,var(--alpha-20))",
+            "--color-text-secondary-soft": "var(--color-text)",
+            "--color-background-secondary-soft-alt": "var(--alpha-05)",
+            "--color-border-secondary-soft-alt": "var(--alpha-06)",
+            "--color-text-secondary-soft-alt": "var(--color-text)",
+            "--color-background-secondary-solid": "var(--lightningcss-light,var(--gray-500))var(--lightningcss-dark,var(--gray-400))",
+            "--color-background-secondary-solid-hover": "var(--lightningcss-light,var(--gray-600))var(--lightningcss-dark,var(--gray-450))",
+            "--color-background-secondary-solid-active": "var(--lightningcss-light,var(--gray-700))var(--lightningcss-dark,var(--gray-500))",
+            "--color-text-secondary-solid": "var(--white)",
+            "--color-background-secondary-outline-hover": "var(--lightningcss-light,var(--alpha-02))var(--lightningcss-dark,var(--alpha-04))",
+            "--color-background-secondary-outline-active": "var(--lightningcss-light,var(--alpha-04))var(--lightningcss-dark,var(--alpha-06))",
+            "--color-border-secondary-outline": "var(--lightningcss-light,var(--alpha-16))var(--lightningcss-dark,var(--alpha-25))",
+            "--color-border-secondary-outline-hover": "var(--lightningcss-light,var(--alpha-20))var(--lightningcss-dark,var(--alpha-30))",
+            "--color-text-secondary-outline": "var(--color-text-secondary)",
+            "--color-text-secondary-outline-hover": "var(--color-text)",
+            "--color-background-secondary-ghost-hover": "var(--lightningcss-light,var(--alpha-08))var(--lightningcss-dark,var(--alpha-12))",
+            "--color-background-secondary-ghost-active": "var(--lightningcss-light,var(--alpha-12))var(--lightningcss-dark,var(--alpha-16))",
+            "--color-text-secondary-ghost": "var(--color-text-tertiary)",
+            "--color-text-secondary-ghost-hover": "var(--color-text)",
+            "--color-text-info": "var(--lightningcss-light,var(--blue-500))var(--lightningcss-dark,var(--blue-200))",
+            "--color-background-info-soft": "var(--blue-50)",
+            "--color-background-info-soft-hover": "var(--blue-75)",
+            "--color-background-info-soft-active": "var(--blue-75)",
+            "--color-background-info-soft-alpha": "var(--blue-a50)",
+            "--color-background-info-soft-alpha-hover": "var(--blue-a75)",
+            "--color-background-info-soft-alpha-active": "var(--blue-a75)",
+            "--color-text-info-soft": "var(--lightningcss-light,var(--blue-600))var(--lightningcss-dark,var(--blue-300))",
+            "--color-background-info-surface": "var(--lightningcss-light,var(--blue-a25))var(--lightningcss-dark,var(--blue-a50))",
+            "--color-border-info-surface": "var(--lightningcss-light,var(--blue-a25))var(--lightningcss-dark,var(--blue-a50))",
+            "--color-text-info-surface": "var(--lightningcss-light,var(--blue-600))var(--lightningcss-dark,var(--blue-300))",
+            "--color-background-info-solid": "var(--blue-400)",
+            "--color-background-info-solid-hover": "var(--blue-500)",
+            "--color-background-info-solid-active": "var(--blue-500)",
+            "--color-text-info-solid": "var(--white)",
+            "--color-background-info-outline-hover": "var(--blue-a25)",
+            "--color-background-info-outline-active": "var(--blue-a25)",
+            "--color-border-info-outline": "var(--blue-500)",
+            "--color-border-info-outline-hover": "var(--blue-500)",
+            "--color-text-info-outline": "var(--blue-500)",
+            "--color-text-info-outline-hover": "var(--blue-500)",
+            "--color-background-info-ghost-hover": "var(--blue-a50)",
+            "--color-background-info-ghost-active": "var(--blue-a50)",
+            "--color-text-info-ghost": "var(--lightningcss-light,var(--blue-500))var(--lightningcss-dark,var(--blue-200))",
+            "--color-text-info-ghost-hover": "var(--lightningcss-light,var(--blue-500))var(--lightningcss-dark,var(--blue-200))",
+            "--color-text-warning": "var(--lightningcss-light,var(--orange-700))var(--lightningcss-dark,var(--orange-500))",
+            "--color-background-warning-soft": "var(--orange-50)",
+            "--color-background-warning-soft-hover": "var(--orange-75)",
+            "--color-background-warning-soft-active": "var(--orange-75)",
+            "--color-background-warning-soft-alpha": "var(--orange-a50)",
+            "--color-background-warning-soft-alpha-hover": "var(--orange-a75)",
+            "--color-background-warning-soft-alpha-active": "var(--orange-a75)",
+            "--color-text-warning-soft": "var(--lightningcss-light,var(--orange-700))var(--lightningcss-dark,var(--orange-400))",
+            "--color-background-warning-surface": "var(--lightningcss-light,var(--orange-a25))var(--lightningcss-dark,var(--orange-a50))",
+            "--color-border-warning-surface": "var(--lightningcss-light,var(--orange-a25))var(--lightningcss-dark,var(--orange-a50))",
+            "--color-text-warning-surface": "var(--lightningcss-light,var(--orange-700))var(--lightningcss-dark,var(--orange-400))",
+            "--color-background-warning-solid": "var(--orange-500)",
+            "--color-background-warning-solid-hover": "var(--orange-600)",
+            "--color-background-warning-solid-active": "var(--orange-600)",
+            "--color-text-warning-solid": "var(--white)",
+            "--color-background-warning-outline-hover": "var(--orange-a25)",
+            "--color-background-warning-outline-active": "var(--orange-a25)",
+            "--color-border-warning-outline": "var(--orange-500)",
+            "--color-border-warning-outline-hover": "var(--orange-500)",
+            "--color-text-warning-outline": "var(--orange-500)",
+            "--color-text-warning-outline-hover": "var(--orange-500)",
+            "--color-background-warning-ghost-hover": "var(--orange-a50)",
+            "--color-background-warning-ghost-active": "var(--orange-a50)",
+            "--color-text-warning-ghost": "var(--orange-500)",
+            "--color-text-warning-ghost-hover": "var(--orange-500)",
+            "--color-text-caution": "var(--lightningcss-light,var(--yellow-700))var(--lightningcss-dark,var(--yellow-500))",
+            "--color-text-caution-hover": "var(--yellow-800)",
+            "--color-background-caution-soft": "var(--yellow-50)",
+            "--color-background-caution-soft-hover": "var(--yellow-75)",
+            "--color-background-caution-soft-active": "var(--yellow-75)",
+            "--color-background-caution-soft-alpha": "var(--yellow-a50)",
+            "--color-background-caution-soft-alpha-hover": "var(--yellow-a75)",
+            "--color-background-caution-soft-alpha-active": "var(--yellow-a75)",
+            "--color-text-caution-soft": "var(--lightningcss-light,var(--yellow-800))var(--lightningcss-dark,var(--yellow-400))",
+            "--color-background-caution-surface": "var(--lightningcss-light,var(--yellow-a25))var(--lightningcss-dark,var(--yellow-a50))",
+            "--color-border-caution-surface": "var(--lightningcss-light,var(--yellow-a25))var(--lightningcss-dark,var(--yellow-a50))",
+            "--color-text-caution-surface": "var(--lightningcss-light,var(--yellow-800))var(--lightningcss-dark,var(--yellow-400))",
+            "--color-background-caution-solid": "var(--yellow-600)",
+            "--color-background-caution-solid-hover": "var(--yellow-700)",
+            "--color-background-caution-solid-active": "var(--yellow-700)",
+            "--color-text-caution-solid": "var(--white)",
+            "--color-background-caution-outline-hover": "var(--yellow-a25)",
+            "--color-background-caution-outline-active": "var(--yellow-a25)",
+            "--color-border-caution-outline": "var(--yellow-700)",
+            "--color-border-caution-outline-hover": "var(--yellow-700)",
+            "--color-text-caution-outline": "var(--yellow-700)",
+            "--color-text-caution-outline-hover": "var(--yellow-700)",
+            "--color-background-caution-ghost-hover": "var(--yellow-a50)",
+            "--color-background-caution-ghost-active": "var(--yellow-a50)",
+            "--color-text-caution-ghost": "var(--yellow-700)",
+            "--color-text-caution-ghost-hover": "var(--yellow-700)",
+            "--color-text-danger": "var(--lightningcss-light,var(--red-700))var(--lightningcss-dark,var(--red-500))",
+            "--color-background-danger-soft": "var(--red-50)",
+            "--color-background-danger-soft-hover": "var(--red-75)",
+            "--color-background-danger-soft-active": "var(--red-75)",
+            "--color-background-danger-soft-alpha": "var(--red-a50)",
+            "--color-background-danger-soft-alpha-hover": "var(--red-a75)",
+            "--color-background-danger-soft-alpha-active": "var(--red-a75)",
+            "--color-text-danger-soft": "var(--lightningcss-light,var(--red-600))var(--lightningcss-dark,var(--red-400))",
+            "--color-background-danger-surface": "var(--lightningcss-light,var(--red-a25))var(--lightningcss-dark,var(--red-a50))",
+            "--color-border-danger-surface": "var(--lightningcss-light,var(--red-a25))var(--lightningcss-dark,var(--red-a50))",
+            "--color-text-danger-surface": "var(--lightningcss-light,var(--red-600))var(--lightningcss-dark,var(--red-400))",
+            "--color-background-danger-solid": "var(--red-500)",
+            "--color-background-danger-solid-hover": "var(--red-600)",
+            "--color-background-danger-solid-active": "var(--red-600)",
+            "--color-text-danger-solid": "var(--white)",
+            "--color-background-danger-outline-hover": "var(--red-a25)",
+            "--color-background-danger-outline-active": "var(--red-a25)",
+            "--color-border-danger-outline": "var(--red-500)",
+            "--color-border-danger-outline-hover": "var(--red-500)",
+            "--color-text-danger-outline": "var(--red-500)",
+            "--color-text-danger-outline-hover": "var(--red-500)",
+            "--color-background-danger-ghost-hover": "var(--red-a50)",
+            "--color-background-danger-ghost-active": "var(--red-a50)",
+            "--color-text-danger-ghost": "var(--red-500)",
+            "--color-text-danger-ghost-hover": "var(--red-500)",
+            "--color-text-success": "var(--lightningcss-light,var(--green-700))var(--lightningcss-dark,var(--green-400))",
+            "--color-background-success-soft": "var(--green-50)",
+            "--color-background-success-soft-hover": "var(--green-75)",
+            "--color-background-success-soft-active": "var(--green-75)",
+            "--color-background-success-soft-alpha": "var(--green-a50)",
+            "--color-background-success-soft-alpha-hover": "var(--green-a75)",
+            "--color-background-success-soft-alpha-active": "var(--green-a75)",
+            "--color-text-success-soft": "var(--lightningcss-light,var(--green-600))var(--lightningcss-dark,var(--green-400))",
+            "--color-background-success-surface": "var(--lightningcss-light,var(--green-a25))var(--lightningcss-dark,var(--green-a50))",
+            "--color-border-success-surface": "var(--lightningcss-light,var(--green-a25))var(--lightningcss-dark,var(--green-a50))",
+            "--color-text-success-surface": "var(--lightningcss-light,var(--green-600))var(--lightningcss-dark,var(--green-400))",
+            "--color-background-success-solid": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-600))",
+            "--color-background-success-solid-hover": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-600))",
+            "--color-background-success-solid-active": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-600))",
+            "--color-text-success-solid": "var(--white)",
+            "--color-background-success-outline-hover": "var(--green-a25)",
+            "--color-background-success-outline-active": "var(--green-a25)",
+            "--color-border-success-outline": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-600))",
+            "--color-border-success-outline-hover": "var(--lightningcss-light,var(--green-500))var(--lightningcss-dark,var(--green-600))",
+            "--color-text-success-outline": "var(--green-500)",
+            "--color-text-success-outline-hover": "var(--green-500)",
+            "--color-background-success-ghost-hover": "var(--green-a50)",
+            "--color-background-success-ghost-active": "var(--green-a50)",
+            "--color-text-success-ghost": "var(--green-500)",
+            "--color-text-success-ghost-hover": "var(--green-500)",
+            "--color-text-discovery": "var(--lightningcss-light,var(--purple-700))var(--lightningcss-dark,var(--purple-500))",
+            "--color-background-discovery-soft": "var(--purple-50)",
+            "--color-background-discovery-soft-hover": "var(--purple-75)",
+            "--color-background-discovery-soft-active": "var(--purple-75)",
+            "--color-background-discovery-soft-alpha": "var(--purple-a50)",
+            "--color-background-discovery-soft-alpha-hover": "var(--purple-a75)",
+            "--color-background-discovery-soft-alpha-active": "var(--purple-a75)",
+            "--color-text-discovery-soft": "var(--lightningcss-light,var(--purple-600))var(--lightningcss-dark,var(--purple-200))",
+            "--color-background-discovery-surface": "var(--lightningcss-light,var(--purple-a25))var(--lightningcss-dark,var(--purple-a50))",
+            "--color-border-discovery-surface": "var(--lightningcss-light,var(--purple-a25))var(--lightningcss-dark,var(--purple-a50))",
+            "--color-text-discovery-surface": "var(--lightningcss-light,var(--purple-600))var(--lightningcss-dark,var(--purple-200))",
+            "--color-background-discovery-solid": "var(--purple-400)",
+            "--color-background-discovery-solid-hover": "var(--purple-500)",
+            "--color-background-discovery-solid-active": "var(--purple-500)",
+            "--color-text-discovery-solid": "var(--white)",
+            "--color-background-discovery-outline-hover": "var(--purple-a25)",
+            "--color-background-discovery-outline-active": "var(--purple-a25)",
+            "--color-border-discovery-outline": "var(--purple-500)",
+            "--color-border-discovery-outline-hover": "var(--purple-500)",
+            "--color-text-discovery-outline": "var(--lightningcss-light,var(--purple-500))var(--lightningcss-dark,var(--purple-400))",
+            "--color-text-discovery-outline-hover": "var(--lightningcss-light,var(--purple-500))var(--lightningcss-dark,var(--purple-400))",
+            "--color-background-discovery-ghost-hover": "var(--purple-a50)",
+            "--color-background-discovery-ghost-active": "var(--purple-a50)",
+            "--color-text-discovery-ghost": "var(--purple-500)",
+            "--color-text-discovery-ghost-hover": "var(--purple-500)",
+            "--color-background-disabled": "var(--alpha-05)",
+            "--color-border-disabled": "var(--alpha-06)",
+            "--color-text-disabled": "var(--lightningcss-light,var(--gray-400))var(--lightningcss-dark,var(--gray-500))",
+            "--color-border-subtle": "var(--lightningcss-light,var(--alpha-05))var(--lightningcss-dark,var(--alpha-06))",
+            "--color-border": "var(--lightningcss-light,var(--alpha-10))var(--lightningcss-dark,var(--alpha-12))",
+            "--color-border-strong": "var(--lightningcss-light,var(--alpha-15))var(--lightningcss-dark,var(--alpha-20))",
+            "--color-surface": "var(--lightningcss-light,var(--gray-0))var(--lightningcss-dark,var(--gray-200))",
+            "--color-surface-secondary": "var(--lightningcss-light,var(--gray-50))var(--lightningcss-dark,var(--gray-100))",
+            "--color-surface-tertiary": "var(--lightningcss-light,var(--gray-75))var(--lightningcss-dark,var(--gray-50))",
+            "--color-surface-elevated": "var(--lightningcss-light,var(--gray-0))var(--lightningcss-dark,var(--gray-300))",
+            "--color-surface-elevated-secondary": "var(--lightningcss-light,var(--gray-50))var(--lightningcss-dark,var(--gray-400))",
+            "--color-surface-canvas": "var(--color-surface)"
+          }
+        },
+        {
+          "selector": ":where(:root),:where([data-theme])",
+          "declarations": {
+            "--color-surface-canvas": "color-mix(in srgb, var(--color-surface) 98%, var(--black))"
+          }
+        },
+        {
+          "selector": ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)",
+          "declarations": {
+            "--color-text": "var(--gray-950)",
+            "--color-text-secondary": "var(--lightningcss-light,var(--gray-500))var(--lightningcss-dark,var(--gray-800))",
+            "--color-text-primary-ghost": "var(--color-text-emphasis)",
+            "--color-text-primary-ghost-hover": "var(--color-text-emphasis)",
+            "--color-text-secondary-ghost": "var(--color-text-secondary)",
+            "--color-text-info": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-300))",
+            "--color-text-info-soft": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-300))",
+            "--color-border-info-outline": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-200))",
+            "--color-border-info-outline-hover": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-300))",
+            "--color-text-info-outline": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-200))",
+            "--color-text-info-outline-hover": "var(--lightningcss-light,var(--blue-400))var(--lightningcss-dark,var(--blue-200))",
+            "--color-text-warning-surface": "var(--lightningcss-light,var(--orange-600))var(--lightningcss-dark,var(--orange-300))",
+            "--color-text-danger": "var(--lightningcss-light,var(--red-400))var(--lightningcss-dark,var(--red-300))",
+            "--color-text-danger-soft": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-300))",
+            "--color-background-danger-solid": "var(--red-400)",
+            "--color-background-danger-solid-hover": "var(--red-500)",
+            "--color-background-danger-solid-active": "var(--red-500)",
+            "--color-border-danger-outline": "var(--color-border-primary-outline)",
+            "--color-border-danger-outline-hover": "var(--lightningcss-light,var(--red-a100))var(--lightningcss-dark,var(--red-a75))",
+            "--color-text-danger-outline": "var(--lightningcss-light,var(--red-400))var(--lightningcss-dark,var(--red-300))",
+            "--color-text-danger-outline-hover": "var(--lightningcss-light,var(--red-400))var(--lightningcss-dark,var(--red-500))",
+            "--color-text-danger-ghost": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-400))",
+            "--color-text-danger-ghost-hover": "var(--lightningcss-light,var(--red-500))var(--lightningcss-dark,var(--red-400))",
+            "--color-text-discovery": "var(--lightningcss-light,var(--purple-500))var(--lightningcss-dark,var(--purple-200))",
+            "--color-border-discovery-outline": "var(--lightningcss-light,var(--purple-400))var(--lightningcss-dark,var(--purple-200))",
+            "--color-border-discovery-outline-hover": "var(--lightningcss-light,var(--purple-400))var(--lightningcss-dark,var(--purple-200))",
+            "--color-text-discovery-outline": "var(--lightningcss-light,var(--purple-400))var(--lightningcss-dark,var(--purple-200))",
+            "--color-text-discovery-outline-hover": "var(--lightningcss-light,var(--purple-400))var(--lightningcss-dark,var(--purple-200))"
+          }
+        },
+        {
+          "selector": ":where(:root),:where([data-theme])",
+          "declarations": {
+            "--composer-radius": "var(--radius-4xl)"
+          }
+        },
+        {
+          "selector": ":where(:root,[data-theme])",
+          "declarations": {
+            "--color-text": "var(--app-color-text-foreground)",
+            "--color-text-prose": "var(--color-text)",
+            "--color-text-emphasis": "var(--app-color-text-foreground,var(--color-text))",
+            "--color-text-secondary": "var(--app-color-text-secondary,var(--app-color-text-foreground))",
+            "--color-text-tertiary": "var(--app-color-text-foreground-tertiary)",
+            "--color-text-chatgpt-recovery": "var(--lightningcss-light,var(--gray-1000))var(--lightningcss-dark,var(--white))",
+            "--color-text-toolbar-action": "var(--color-text-tertiary)",
+            "--color-text-execution-output": "var(--color-text)",
+            "--color-text-execution-output-label": "var(--color-text-tertiary)",
+            "--color-text-execution-output-error": "var(--color-text-danger)",
+            "--color-text-execution-traceback": "var(--white)",
+            "--color-text-mode-toggle-inactive": "var(--color-text)",
+            "--color-text-mode-toggle-primary": "var(--color-text)",
+            "--color-text-mode-toggle-accent": "var(--color-text-info)",
+            "--color-text-button-outline": "var(--color-text)",
+            "--color-text-disabled": "var(--app-color-text-foreground-tertiary)",
+            "--color-text-info": "var(--app-color-text-accent)",
+            "--color-text-connected": "var(--blue-300)",
+            "--color-text-header-upgrade": "var(--lightningcss-light,var(--chatgpt-blue-400))var(--lightningcss-dark,var(--chatgpt-blue-200))",
+            "--color-background-header-upgrade-hover": "var(--lightningcss-light,var(--chatgpt-blue-400))var(--lightningcss-dark,var(--chatgpt-blue-100))",
+            "--color-text-unread-badge": "var(--app-color-text-unread-badge,var(--white))",
+            "--color-text-business-claim": "var(--lightningcss-light,var(--blue-500))var(--lightningcss-dark,var(--blue-200))",
+            "--color-text-info-soft": "var(--app-color-accent-blue)",
+            "--color-text-danger": "var(--app-color-text-error)",
+            "--color-text-danger-soft": "var(--app-color-accent-red)",
+            "--color-text-warning": "var(--app-color-text-warning)",
+            "--color-text-warning-soft": "var(--app-color-accent-orange)",
+            "--color-text-success": "var(--app-color-accent-green)",
+            "--color-text-caution": "var(--app-color-accent-yellow)",
+            "--color-text-internal-badge": "var(--lightningcss-light,var(--yellow-1000))var(--lightningcss-dark,var(--yellow-25))",
+            "--color-background-internal-badge": "var(--lightningcss-light,var(--yellow-200))var(--lightningcss-dark,var(--yellow-800))",
+            "--color-text-discovery": "var(--app-color-accent-purple)",
+            "--color-text-tip": "var(--app-color-text-tip-badge,var(--app-color-accent-blue))",
+            "--color-text-inverse": "var(--app-color-text-button-primary)",
+            "--color-text-primary-solid": "var(--app-color-text-primary-solid,var(--color-background-control-opaque,var(--app-color-background-surface)))",
+            "--composer-radius": "calc(var(--spacing) * 5.5)",
+            "--color-text-composer-primary": "var(--color-text-primary-solid)",
+            "--color-text-accent-action": "var(--color-text-info-solid)",
+            "--color-text-composer-reference": "var(--color-text-info)",
+            "--color-text-user-message": "var(--color-text)",
+            "--color-text-secondary-solid": "var(--app-color-text-foreground-secondary)",
+            "--color-text-info-solid": "var(--app-color-text-on-accent,var(--app-color-text-button-primary))",
+            "--color-text-coachmark": "var(--white)",
+            "--color-text-danger-solid": "var(--white)",
+            "--color-text-warning-solid": "var(--app-color-text-button-primary)",
+            "--color-text-success-solid": "var(--white)",
+            "--color-background-tooltip": "var(--lightningcss-light,var(--color-background-primary-solid))var(--lightningcss-dark,var(--color-surface-elevated-secondary))",
+            "--color-text-tooltip": "var(--lightningcss-light,var(--color-text-primary-solid))var(--lightningcss-dark,var(--color-text))",
+            "--color-border-tooltip": "var(--color-text-tooltip)",
+            "--color-background-tooltip-shortcut": "var(--color-text-tooltip)",
+            "--color-background-tooltip-classic": "var(--app-color-background-tooltip-classic,var(--white))",
+            "--color-text-tooltip-classic": "var(--app-color-text-tooltip-classic,var(--black))",
+            "--color-border-tooltip-classic": "var(--app-color-border-tooltip-classic,var(--color-text-tooltip-classic))",
+            "--color-text-tooltip-shortcut": "var(--color-text-tooltip)",
+            "--color-text-tooltip-secondary": "var(--color-text-tooltip)",
+            "--color-text-tooltip-tertiary": "var(--color-text-tooltip)",
+            "--color-text-tooltip-info": "var(--color-text-tooltip)",
+            "--color-text-tooltip-danger": "var(--color-text-tooltip)",
+            "--color-text-tooltip-warning": "var(--color-text-tooltip)",
+            "--color-text-tooltip-success": "var(--color-text-tooltip)",
+            "--color-text-tooltip-description": "var(--color-text-tooltip-secondary)",
+            "--color-background-user-message-compact": "var(--lightningcss-light,var(--gray-fixed-75))var(--lightningcss-dark,var(--gray-fixed-600))",
+            "--color-background-message-reaction": "var(--lightningcss-light,var(--gray-75))var(--lightningcss-dark,var(--gray-350))",
+            "--color-text-on-chat-accent": "var(--white)",
+            "--color-text-on-chat-accent-yellow": "#0d0d0d",
+            "--color-text-on-chat-accent-lime": "#0d0d0d",
+            "--color-text-chat-accent-blue": "var(--lightningcss-light,#2451da)var(--lightningcss-dark,#b0c9fe)",
+            "--color-text-chat-accent-green": "var(--lightningcss-light,#055f51)var(--lightningcss-dark,#42dec2)",
+            "--color-text-chat-accent-yellow": "var(--lightningcss-light,#7d3f09)var(--lightningcss-dark,#fee096)",
+            "--color-text-chat-accent-pink": "var(--lightningcss-light,#c31b74)var(--lightningcss-dark,#fbadca)",
+            "--color-text-chat-accent-orange": "var(--lightningcss-light,#ab1616)var(--lightningcss-dark,#fdb9ab)",
+            "--color-text-chat-accent-purple": "var(--lightningcss-light,#7e14d0)var(--lightningcss-dark,#c8a4fb)",
+            "--color-text-chat-accent-slate": "var(--lightningcss-light,#4a6e98)var(--lightningcss-dark,#acc7e8)",
+            "--color-text-chat-accent-lime": "var(--lightningcss-light,#586c11)var(--lightningcss-dark,#d8f590)",
+            "--color-text-chat-accent-cyan": "var(--lightningcss-light,#0b5c7c)var(--lightningcss-dark,#b3e3fc)",
+            "--color-text-chat-accent-magenta": "var(--lightningcss-light,#af1fa7)var(--lightningcss-dark,#fec5f6)",
+            "--color-text-chat-accent-black": "var(--color-text)",
+            "--color-text-chat-accent-red": "var(--color-text-danger)",
+            "--color-background-activity-control": "var(--lightningcss-light,#e8e8e8)var(--lightningcss-dark,var(--gray-fixed-700))",
+            "--color-text-activity-control": "var(--lightningcss-light,var(--gray-fixed-350))var(--lightningcss-dark,var(--gray-fixed-300))",
+            "--color-text-activity-control-active": "var(--white)",
+            "--color-background-activity-control-hover": "var(--lightningcss-light,var(--gray-fixed-300))var(--lightningcss-dark,var(--gray-fixed-450))",
+            "--color-background-activity-stop-hover": "var(--lightningcss-light,var(--gray-fixed-400))var(--lightningcss-dark,var(--gray-fixed-500))",
+            "--color-background-activity-input": "var(--lightningcss-light,var(--gray-fixed-150))var(--lightningcss-dark,var(--color-surface-secondary))",
+            "--color-surface": "var(--app-color-background-surface)",
+            "--color-surface-card": "var(--app-color-background-card,var(--color-surface))",
+            "--color-surface-secondary": "var(--app-color-background-surface-under)",
+            "--color-surface-recovery": "var(--app-color-background-recovery,var(--color-surface-secondary))",
+            "--color-surface-tertiary": "var(--app-color-background-editor-opaque)",
+            "--color-background-home-suggestion-hover": "var(--color-background-primary-ghost-hover)",
+            "--color-border-overlay": "var(--color-border)",
+            "--color-background-composer-surface": "var(--app-color-background-elevated-primary-opaque,var(--color-surface-elevated))",
+            "--color-surface-elevated": "var(--app-color-background-elevated-primary)",
+            "--color-surface-elevated-secondary": "var(--color-background-control-opaque,var(--app-color-background-surface))",
+            "--color-background-artifact-preview": "var(--color-surface)",
+            "--color-background-viewer-control": "var(--lightningcss-light,var(--color-surface-elevated))var(--lightningcss-dark,var(--color-surface-elevated-secondary))",
+            "--color-background-primary-soft": "var(--app-color-background-control)",
+            "--color-background-page-search": "var(--color-surface-elevated-secondary)",
+            "--color-background-primary-soft-alpha": "var(--app-color-text-foreground)",
+            "--color-background-primary-soft-active": "var(--app-color-background-button-secondary)",
+            "--color-background-primary-ghost-hover": "var(--app-color-background-button-secondary-hover)",
+            "--color-background-primary-ghost-focus": "var(--lightningcss-light,var(--color-text))var(--lightningcss-dark,var(--color-background-primary-ghost-hover))",
+            "--color-background-primary-solid": "var(--app-color-text-foreground)",
+            "--color-background-composer-primary": "var(--color-background-primary-solid)",
+            "--color-background-accent-action": "var(--color-background-info-solid)",
+            "--color-background-user-message": "var(--color-text)",
+            "--color-background-other-user-message": "var(--color-text)",
+            "--color-background-secondary-soft": "var(--app-color-background-button-secondary)",
+            "--color-background-segmented-selected": "var(--color-text)",
+            "--color-background-segmented-selected-hover": "var(--color-text)",
+            "--color-background-segmented-form-track": "var(--lightningcss-light,var(--color-surface))var(--lightningcss-dark,var(--color-surface-elevated-secondary))",
+            "--color-background-segmented-form-selected": "var(--lightningcss-light,var(--color-surface))var(--lightningcss-dark,var(--color-surface-elevated-secondary))",
+            "--color-background-callout-surface": "var(--app-color-background-elevated-primary)",
+            "--color-background-secondary-soft-alpha": "var(--color-background-secondary-ghost-hover)",
+            "--color-background-execution-output": "var(--color-surface-secondary)",
+            "--color-background-execution-traceback": "var(--black)",
+            "--color-background-mode-toggle-track": "var(--lightningcss-light,var(--color-surface-secondary))var(--lightningcss-dark,var(--color-background-primary-ghost-hover))",
+            "--color-background-mode-toggle-selected": "var(--color-background-primary-soft)",
+            "--color-background-composer-action-bar": "var(--lightningcss-light,var(--color-surface-secondary))var(--lightningcss-dark,var(--app-color-background-elevated-secondary-opaque,var(--color-surface-elevated-secondary)))",
+            "--color-background-info-surface": "var(--app-color-background-accent-hover)",
+            "--color-background-info-soft": "var(--app-color-text-accent)",
+            "--color-background-text-selection": "var(--color-background-info-soft)",
+            "--color-background-attribution-highlight": "var(--color-background-info-soft)",
+            "--color-background-info-solid": "var(--app-color-accent-blue)",
+            "--color-background-coachmark": "var(--blue-500)",
+            "--color-background-success-surface": "var(--lightningcss-light,var(--green-25))var(--lightningcss-dark,var(--green-950))",
+            "--color-background-success-solid": "var(--green-600)",
+            "--color-background-success-indicator": "var(--lightningcss-light,var(--green-600))var(--lightningcss-dark,var(--green-500))",
+            "--color-background-chatgpt-success-solid": "var(--color-background-success-solid)",
+            "--color-background-danger-surface": "var(--lightningcss-light,var(--red-25))var(--lightningcss-dark,var(--red-950))",
+            "--color-background-danger-solid": "var(--red-500)",
+            "--color-background-warning-surface": "var(--lightningcss-light,var(--orange-25))var(--lightningcss-dark,var(--orange-950))",
+            "--color-background-warning-solid": "var(--app-color-accent-orange)",
+            "--color-background-caution-solid": "var(--app-color-accent-yellow)",
+            "--color-background-discovery-solid": "var(--app-color-accent-purple)",
+            "--color-background-tip-soft": "var(--app-color-background-tip-badge,var(--app-color-text-accent))",
+            "--color-border": "var(--app-color-border,var(--app-color-text-foreground))",
+            "--color-border-mode-toggle-selected": "var(--color-border)",
+            "--color-border-button-outline": "var(--color-border)",
+            "--color-background-button-outline-hover": "var(--color-background-primary-ghost-hover)",
+            "--color-border-subtle": "var(--app-color-border-light,var(--app-color-text-foreground))",
+            "--color-border-strong": "var(--app-color-border-heavy,var(--app-color-text-foreground))",
+            "--color-border-primary-outline": "var(--app-color-border-heavy,var(--color-border-strong))",
+            "--color-border-danger-outline": "var(--app-color-border-error)",
+            "--color-border-warning-outline": "var(--app-color-border-warning)"
+          }
+        },
+        {
+          "selector": ":where(:root,[data-theme])",
+          "declarations": {
+            "--color-text-secondary": "var(--app-color-text-secondary,color-mix(in srgb, var(--app-color-text-foreground) 65%, transparent))",
+            "--color-text-chatgpt-recovery": "var(--lightningcss-light,color-mix(in srgb, var(--gray-1000) calc(100% * 119 / 255), var(--gray-25)))var(--lightningcss-dark,color-mix(in srgb, var(--white) calc(100% * 119 / 255), var(--black)))",
+            "--color-text-mode-toggle-inactive": "color-mix(in oklab, var(--color-text) 80%, transparent)",
+            "--color-background-header-upgrade-hover": "var(--lightningcss-light,color-mix(in srgb, var(--chatgpt-blue-400) 9%, transparent))var(--lightningcss-dark,color-mix(in srgb, var(--chatgpt-blue-100) 20%, transparent))",
+            "--color-border-tooltip": "color-mix(in oklab, var(--color-text-tooltip) 5%, transparent)",
+            "--color-background-tooltip-shortcut": "color-mix(in oklab, var(--color-text-tooltip) 25%, transparent)",
+            "--color-border-tooltip-classic": "var(--app-color-border-tooltip-classic,color-mix(in oklab, var(--color-text-tooltip-classic) 10%, transparent))",
+            "--color-text-tooltip-secondary": "color-mix(in oklab, var(--color-text-tooltip) 90%, transparent)",
+            "--color-text-tooltip-tertiary": "color-mix(in oklab, var(--color-text-tooltip) 80%, transparent)",
+            "--color-text-tooltip-info": "color-mix(in srgb, var(--color-text-tooltip) 70%, var(--color-text-info))",
+            "--color-text-tooltip-danger": "color-mix(in srgb, var(--color-text-tooltip) 70%, var(--color-text-danger))",
+            "--color-text-tooltip-warning": "color-mix(in srgb, var(--color-text-tooltip) 70%, var(--color-text-warning))",
+            "--color-text-tooltip-success": "color-mix(in srgb, var(--color-text-tooltip) 70%, var(--color-text-success))",
+            "--color-background-artifact-preview": "color-mix(in srgb, var(--color-surface) 98%, var(--black))",
+            "--color-background-primary-soft-alpha": "color-mix(in oklab, var(--app-color-text-foreground) 2.5%, transparent)",
+            "--color-background-primary-ghost-focus": "var(--lightningcss-light,color-mix(in oklab, var(--color-text) 12%, transparent))var(--lightningcss-dark,var(--color-background-primary-ghost-hover))",
+            "--color-background-user-message": "color-mix(in oklab, var(--color-text) 5%, transparent)",
+            "--color-background-other-user-message": "color-mix(in oklab, var(--color-text) 10%, transparent)",
+            "--color-background-segmented-selected": "color-mix(in oklab, var(--color-text) 5%, transparent)",
+            "--color-background-segmented-selected-hover": "color-mix(in oklab, var(--color-text) 10%, transparent)",
+            "--color-background-segmented-form-track": "var(--lightningcss-light,color-mix(in srgb, var(--color-surface) 90%, var(--color-text)))var(--lightningcss-dark,color-mix(in srgb, var(--color-surface-elevated-secondary) 65%, var(--color-codex-application-menu)))",
+            "--color-background-segmented-form-selected": "var(--lightningcss-light,var(--color-surface))var(--lightningcss-dark,color-mix(in srgb, var(--color-surface-elevated-secondary) 90%, var(--color-text)))",
+            "--color-background-mode-toggle-selected": "color-mix(in oklab, var(--color-background-primary-soft) 90%, transparent)",
+            "--color-background-info-soft": "color-mix(in srgb, var(--app-color-text-accent) 30%, transparent)",
+            "--color-background-tip-soft": "var(--app-color-background-tip-badge,color-mix(in srgb, var(--app-color-text-accent) 30%, transparent))",
+            "--color-border": "var(--app-color-border,color-mix(in oklab, var(--app-color-text-foreground) 8%, transparent))",
+            "--color-border-subtle": "var(--app-color-border-light,color-mix(in oklab, var(--app-color-text-foreground) 5%, transparent))",
+            "--color-border-strong": "var(--app-color-border-heavy,color-mix(in oklab, var(--app-color-text-foreground) 12%, transparent))"
+          }
+        },
+        {
+          "selector": ":where(:root,[data-theme])",
+          "declarations": {
+            "--color-background-primary-soft-hover": "var(--app-color-background-button-secondary-hover)",
+            "--color-background-secondary-soft-hover": "var(--color-background-primary-soft-hover)",
+            "--color-background-secondary-soft-active": "var(--color-background-primary-soft-active)",
+            "--color-background-secondary-solid": "var(--app-color-background-button-secondary)",
+            "--color-background-secondary-solid-hover": "var(--color-background-primary-soft-hover)",
+            "--color-background-secondary-solid-active": "var(--color-background-primary-soft-active)",
+            "--color-background-secondary-ghost-hover": "var(--color-background-primary-ghost-hover)",
+            "--color-background-secondary-ghost-active": "var(--color-background-primary-ghost-active)",
+            "--color-border-secondary-outline": "var(--color-border-primary-outline)"
+          }
+        },
+        {
+          "selector": ":where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] [data-theme])",
+          "declarations": {
+            "--color-text-toolbar-action": "var(--color-text)"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-type=extension]",
+          "declarations": {
+            "--font-ui-family": "var(--vscode-font-family)",
+            "--font-ui-size": "var(--vscode-font-size)",
+            "--font-ui-weight": "var(--vscode-font-weight)"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-type=extension],:root[data-codex-window-type=extension] :where([data-theme])",
+          "declarations": {
+            "--color-text": "var(--vscode-foreground)",
+            "--color-text-emphasis": "var(--vscode-list-activeSelectionForeground,var(--color-text))",
+            "--color-text-secondary": "var(--app-color-text-secondary,var(--vscode-foreground))",
+            "--color-text-tertiary": "var(--vscode-descriptionForeground)",
+            "--color-text-disabled": "var(--vscode-disabledForeground)",
+            "--color-text-info": "var(--vscode-textLink-foreground)",
+            "--color-text-info-soft": "var(--vscode-charts-blue)",
+            "--color-text-danger": "var(--vscode-errorForeground)",
+            "--color-text-danger-soft": "var(--vscode-charts-red)",
+            "--color-text-warning": "var(--vscode-editorWarning-foreground)",
+            "--color-text-warning-soft": "var(--vscode-charts-orange)",
+            "--color-text-success": "var(--vscode-charts-green)",
+            "--color-text-caution": "var(--vscode-charts-yellow)",
+            "--color-text-discovery": "var(--vscode-charts-purple)",
+            "--color-text-tip": "var(--app-color-text-tip-badge,var(--vscode-charts-blue))",
+            "--color-text-inverse": "var(--vscode-button-foreground)",
+            "--color-text-primary-solid": "var(--app-color-text-primary-solid,var(--vscode-dropdown-background))",
+            "--color-text-secondary-solid": "var(--vscode-badge-foreground)",
+            "--color-text-info-solid": "var(--app-color-text-on-accent,var(--vscode-button-foreground))",
+            "--color-text-warning-solid": "var(--vscode-button-foreground)",
+            "--color-surface-secondary": "var(--vscode-sideBar-background)",
+            "--color-surface-tertiary": "var(--vscode-editor-background)",
+            "--color-surface-elevated": "var(--vscode-menu-background)",
+            "--color-surface-elevated-secondary": "var(--vscode-dropdown-background)",
+            "--color-background-primary-soft": "var(--vscode-input-background)",
+            "--color-background-primary-soft-alpha": "var(--vscode-foreground)",
+            "--color-background-primary-soft-active": "var(--vscode-list-activeSelectionBackground)",
+            "--color-background-primary-ghost-hover": "var(--vscode-list-hoverBackground)",
+            "--color-background-primary-solid": "var(--vscode-foreground)",
+            "--color-background-secondary-soft": "var(--vscode-badge-background)",
+            "--color-background-callout-surface": "var(--vscode-editorWidget-background)",
+            "--color-background-secondary-soft-alpha": "var(--vscode-textCodeBlock-background)",
+            "--color-background-info-surface": "var(--vscode-editor-findMatchBackground)",
+            "--color-background-info-soft": "var(--vscode-editor-selectionBackground)",
+            "--color-background-info-solid": "var(--vscode-charts-blue)",
+            "--color-background-warning-solid": "var(--vscode-charts-orange)",
+            "--color-background-caution-solid": "var(--vscode-charts-yellow)",
+            "--color-background-discovery-solid": "var(--vscode-charts-purple)",
+            "--color-background-tip-soft": "var(--app-color-background-tip-badge,var(--vscode-editor-selectionBackground))",
+            "--color-border": "var(--app-color-border,var(--vscode-foreground))",
+            "--color-border-subtle": "var(--app-color-border-light,var(--vscode-foreground))",
+            "--color-border-strong": "var(--app-color-border-heavy,var(--vscode-foreground))"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-type=extension],:root[data-codex-window-type=extension] :where([data-theme])",
+          "declarations": {
+            "--color-text-secondary": "var(--app-color-text-secondary,color-mix(in srgb, var(--vscode-foreground) 65%, transparent))",
+            "--color-background-primary-soft-alpha": "color-mix(in oklab, var(--vscode-foreground) 2.5%, transparent)",
+            "--color-border": "var(--app-color-border,color-mix(in oklab, var(--vscode-foreground) 8%, transparent))",
+            "--color-border-subtle": "var(--app-color-border-light,color-mix(in oklab, var(--vscode-foreground) 5%, transparent))",
+            "--color-border-strong": "var(--app-color-border-heavy,color-mix(in oklab, var(--vscode-foreground) 12%, transparent))"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-type=extension],:root[data-codex-window-type=extension] :where([data-theme])",
+          "declarations": {
+            "--color-border-primary-outline": "var(--vscode-input-border,var(--color-border-strong))",
+            "--color-border-danger-outline": "var(--vscode-inputValidation-errorBorder)",
+            "--color-border-warning-outline": "var(--vscode-inputValidation-warningBorder)",
+            "--color-background-primary-soft-hover": "var(--vscode-list-hoverBackground)",
+            "--color-background-secondary-solid": "var(--vscode-badge-background)",
+            "--color-surface": "var(--color-surface-tertiary)"
+          }
+        },
+        {
+          "selector": ".sidebar-navigation",
+          "declarations": {
+            "--radius-token-row": "10px"
+          }
+        },
+        {
+          "selector": ".\\[--color-background-control-opaque\\:initial\\]",
+          "declarations": {
+            "--color-background-control-opaque": "initial"
+          }
+        },
+        {
+          "selector": ".\\[--color-background-info-solid\\:var\\(--blue-400\\)\\]",
+          "declarations": {
+            "--color-background-info-solid": "var(--blue-400)"
+          }
+        },
+        {
+          "selector": ".\\[--color-border\\:var\\(--color-border-subtle\\)\\]",
+          "declarations": {
+            "--color-border": "var(--color-border-subtle)"
+          }
+        },
+        {
+          "selector": ".\\[--color-surface-elevated-secondary\\:theme\\(--color-surface-elevated-secondary\\)\\]",
+          "declarations": {
+            "--color-surface-elevated-secondary": "var(--color-surface-elevated-secondary)"
+          }
+        },
+        {
+          "selector": ".\\[--color-surface-elevated-secondary\\:var\\(--app-shell-sidebar-popover-background\\)\\]",
+          "declarations": {
+            "--color-surface-elevated-secondary": "var(--app-shell-sidebar-popover-background)"
+          }
+        },
+        {
+          "selector": ".\\[--color-surface-elevated\\:var\\(--color-surface\\)\\]",
+          "declarations": {
+            "--color-surface-elevated": "var(--color-surface)"
+          }
+        },
+        {
+          "selector": ".\\[--color-surface-tertiary\\:color-mix\\(in_srgb\\,var\\(--color-surface-secondary\\)_92\\%\\,transparent\\)\\]",
+          "declarations": {
+            "--color-surface-tertiary": "var(--color-surface-secondary)"
+          }
+        },
+        {
+          "selector": ".\\[--color-surface-tertiary\\:color-mix\\(in_srgb\\,var\\(--color-surface-secondary\\)_92\\%\\,transparent\\)\\]",
+          "declarations": {
+            "--color-surface-tertiary": "color-mix(in srgb,var(--color-surface-secondary) 92%,transparent)"
+          }
+        },
+        {
+          "selector": ".\\[--color-text-prose\\:var\\(--color-text\\)\\]",
+          "declarations": {
+            "--color-text-prose": "var(--color-text)"
+          }
+        },
+        {
+          "selector": ".\\[--color-text-secondary-ghost\\:var\\(--color-text-tertiary\\)\\]",
+          "declarations": {
+            "--color-text-secondary-ghost": "var(--color-text-tertiary)"
+          }
+        },
+        {
+          "selector": ".\\[--color-text-toolbar-action\\:var\\(--color-text\\)\\]",
+          "declarations": {
+            "--color-text-toolbar-action": "var(--color-text)"
+          }
+        },
+        {
+          "selector": ".\\[--font-content\\:var\\(--font-openai-sans\\)\\]",
+          "declarations": {
+            "--font-content": "var(--font-openai-sans)"
+          }
+        },
+        {
+          "selector": ".\\[--radius-full\\:9999px\\]",
+          "declarations": {
+            "--radius-full": "9999px"
+          }
+        },
+        {
+          "selector": ".\\[--radius-md\\:0\\.5rem\\]",
+          "declarations": {
+            "--radius-md": ".5rem"
+          }
+        },
+        {
+          "selector": ".\\[--radius-sm\\:0\\.375rem\\]",
+          "declarations": {
+            "--radius-sm": ".375rem"
+          }
+        },
+        {
+          "selector": ".\\[--radius-token-row\\:10px\\]",
+          "declarations": {
+            "--radius-token-row": "10px"
+          }
+        },
+        {
+          "selector": ".\\[--radius-token-row\\:var\\(--radius-lg\\)\\]",
+          "declarations": {
+            "--radius-token-row": "var(--radius-lg)"
+          }
+        },
+        {
+          "selector": ".dark\\:\\[--color-background-info-solid\\:var\\(--blue-500\\)\\]:where([data-theme=dark])",
+          "declarations": {
+            "--color-background-info-solid": "var(--blue-500)"
+          }
+        },
+        {
+          "selector": ".dark\\:\\[--color-background-info-solid\\:var\\(--blue-500\\)\\]:where(:not([data-theme]))",
+          "declarations": {
+            "--color-background-info-solid": "var(--blue-500)"
+          }
+        },
+        {
+          "selector": ".browser\\:\\[--radius-token-row\\:10px\\]:where([data-codex-window-type=browser] .browser\\:\\[--radius-token-row\\:10px\\])",
+          "declarations": {
+            "--radius-token-row": "10px"
+          }
+        },
+        {
+          "selector": ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])",
+          "declarations": {
+            "--font-ui-family": "inherit",
+            "--font-ui-weight": "var(--font-weight-normal)",
+            "--color-background-primary-soft-alpha": "var(--app-color-background-elevated-secondary)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=chrome-extension]",
+          "declarations": {
+            "--font-ui-size": "var(--text-base)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--font-ui-size": "var(--text-base)",
+            "--color-background-page-search": "var(--color-surface-elevated)",
+            "--color-background-segmented-selected": "var(--color-text)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--color-background-segmented-selected": "color-mix(in oklab, var(--color-text) 10%, transparent)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--color-background-segmented-selected-hover": "var(--color-text)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--color-background-segmented-selected-hover": "color-mix(in oklab, var(--color-text) 15%, transparent)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--color-text-execution-output": "var(--lightningcss-light,var(--black))var(--lightningcss-dark,var(--white))",
+            "--color-text-execution-output-label": "#b4b4b4",
+            "--color-text-execution-output-error": "var(--red-500)",
+            "--color-background-execution-output": "var(--lightningcss-light,var(--gray-50))var(--lightningcss-dark,var(--black))",
+            "--font-sans-default": "-apple-system-body, ui-sans-serif, -apple-system, system-ui, \"Segoe UI\", \"Helvetica\", \"Apple Color Emoji\", \"Arial\", sans-serif, \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+            "--font-ui-family": "var(--font-sans-default)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=browser]",
+          "declarations": {
+            "--radius-suggestion-menu": "calc(var(--spacing) * 5)",
+            "--radius-button-action": "var(--radius-full)",
+            "--radius-button-toolbar": "var(--radius-full)",
+            "--radius-xs-base": ".125rem",
+            "--radius-sm-base": ".25rem",
+            "--radius-md-base": ".375rem",
+            "--radius-lg-base": ".5rem",
+            "--radius-3xl-base": "1.5rem",
+            "--radius-4xl-base": "2rem"
+          }
+        },
+        {
+          "selector": ":root[data-codex-window-type=browser],:root[data-codex-window-type=browser] [data-theme]",
+          "declarations": {
+            "--composer-radius": "calc(var(--spacing) * 7)"
+          }
+        },
+        {
+          "selector": "[data-codex-window-type=electron]",
+          "declarations": {
+            "--font-ui-weight": "430"
+          }
+        },
+        {
+          "selector": ":is([data-codex-window-type=browser],[data-codex-window-type=chrome-extension],[data-codex-window-type=electron]) body",
+          "declarations": {
+            "--color-background-primary-soft-alpha": "var(--app-color-background-elevated-secondary)",
+            "--font-ui-size": "var(--text-base)"
+          }
+        },
+        {
+          "selector": ":root",
+          "declarations": {
+            "--radius-token-row": "9999px"
+          }
+        },
+        {
+          "selector": ":root",
+          "declarations": {
+            "--radius-md": "calc(var(--radius-md-base) * var(--corner-radius-scale))",
+            "--radius-lg": "calc(var(--radius-lg-base) * var(--corner-radius-scale))",
+            "--radius-xl": "calc(var(--radius-xl-base) * var(--corner-radius-scale))",
+            "--radius-2xl": "calc(var(--radius-2xl-base) * var(--corner-radius-scale))",
+            "--radius-3xl": "calc(var(--radius-3xl-base) * var(--corner-radius-scale))",
+            "--radius-4xl": "calc(var(--radius-4xl-base) * var(--corner-radius-scale))"
+          }
+        }
+      ]
+    }
+  ]
+}

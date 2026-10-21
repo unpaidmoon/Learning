@@ -38,6 +38,8 @@ class HarnessHost:
         thinking: str = "high",
         max_tokens: int = 16384,
         timeout: float = 240,
+        account_enabled: bool = False,
+        home_directory: Path | None = None,
     ) -> None:
         import secrets
 
@@ -45,7 +47,10 @@ class HarnessHost:
         self.boundary_url, self.boundary_token = boundary_url, boundary_token
         self.model, self.thinking = model, thinking
         self.max_tokens, self.timeout = max_tokens, timeout
+        self.account_enabled = account_enabled
         self.workspace, self.home = self.run_dir / "workspace", self.run_dir / "home"
+        if home_directory is not None:
+            self.home = home_directory.resolve()
         self.port, self.control_port = free_port(), free_port()
         self._control_token = secrets.token_urlsafe(32)
         self._token: str | None = None
@@ -88,6 +93,7 @@ class HarnessHost:
             LEARNING_HARNESS_AUDIT_PATH=str(self.run_dir / "private" / "plugin-audit.jsonl"),
             LEARNING_HARNESS_CONTROL_PORT=str(self.control_port),
             LEARNING_HARNESS_CONTROL_TOKEN=self._control_token,
+            LEARNING_HARNESS_ACCOUNT_ENABLED="1" if self.account_enabled else "0",
             PKG_NATIVE_CACHE_PATH=str(
                 self.repository
                 / ".runtime"
@@ -124,6 +130,24 @@ class HarnessHost:
         profile = profile.replace('"__MAX_TOKENS__"', str(self.max_tokens))
         profile = profile.replace('"__TIMEOUT_MS__"', str(int(self.timeout * 1000)))
         effective_profile = json.loads(profile)
+        if self.account_enabled:
+            for item in effective_profile:
+                if item.get("id") in {"account-controller", "deepseek-account", "llm-deepseek-account"}:
+                    item["disabled"] = False
+                if item.get("id") == "deepseek-account":
+                    item["config"] = {
+                        "platformOrigin": "https://platform.deepseek.com",
+                        "desktopPlatform": "win32",
+                        "inferenceOrigin": f"http://127.0.0.1:{urlsplit(self.boundary_url).port}",
+                    }
+                if item.get("id") == "llm-deepseek-account":
+                    item["config"] = {
+                        "baseURL": self.boundary_url,
+                        "reasoningEffort": native_thinking(self.thinking),
+                        "maxTokens": self.max_tokens,
+                        "streamIdleTimeoutMs": int(self.timeout * 1000),
+                        "retryPolicy": {"mode": "normal", "maxRetries": 0},
+                    }
         provider = next(item for item in effective_profile if item["id"] == "llm-deepseek")
         template = provider["config"]["models"][0]
         provider["config"]["models"] = [

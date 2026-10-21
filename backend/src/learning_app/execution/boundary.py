@@ -260,12 +260,18 @@ class MessagesBoundary:
         thinking: str = "high",
         max_tokens: int = 16384,
         timeout: float = 240.0,
+        credential_route: str = "api_key",
+        account_enabled: bool = False,
     ):
         if mode not in {"fixture", "official"}:
             raise ValueError("INVALID_BOUNDARY_MODE")
         if mode == "fixture" and api_key is not None:
             raise ValueError("FIXTURE_MUST_NOT_LOAD_PROVIDER_KEY")
-        if mode == "official" and (not isinstance(api_key, str) or not api_key.strip()):
+        if credential_route not in {"account", "api_key"}:
+            raise ValueError("INVALID_CREDENTIAL_ROUTE")
+        if mode == "official" and credential_route == "api_key" and not account_enabled and (
+            not isinstance(api_key, str) or not api_key.strip()
+        ):
             raise ValueError("OFFICIAL_KEY_REQUIRED")
         if not isinstance(model, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", model):
             raise ValueError("INVALID_MODEL")
@@ -281,6 +287,11 @@ class MessagesBoundary:
         self.mode, self.model, self.thinking = mode, model, thinking
         self.max_tokens, self.timeout = max_tokens, float(timeout)
         self._api_key = api_key
+        self.credential_route = credential_route
+        self.account_enabled = mode == "official" and account_enabled
+        self.account_model_modalities: dict[str, list[str]] = {}
+        self.account_catalog_observed = False
+        self.account_token_rejected = False
         self.local_token = secrets.token_urlsafe(32)
         self.ledger = OutboundLedger(self.run_dir / "boundary-ledger.jsonl")
         self._lock = threading.RLock()
@@ -335,6 +346,10 @@ class MessagesBoundary:
             def do_POST(self) -> None:
                 owner._handle(self)
 
+            def do_GET(self) -> None:
+                if owner._authorize(self):
+                    owner._handle_models(self)
+
             def _unsupported(self) -> None:
                 if owner._authorize(self):
                     path = urlsplit(self.path).path
@@ -343,7 +358,7 @@ class MessagesBoundary:
                     else:
                         owner._reject(self, 403, "UNAPPROVED_ENDPOINT")
 
-            do_GET = do_DELETE = do_PUT = do_PATCH = do_OPTIONS = do_CONNECT = do_HEAD = (
+            do_DELETE = do_PUT = do_PATCH = do_OPTIONS = do_CONNECT = do_HEAD = (
                 _unsupported
             )
 
@@ -388,6 +403,10 @@ class MessagesBoundary:
     @property
     def actual_outbound_attempts(self) -> int:
         return self.ledger.count
+
+    @property
+    def api_key_configured(self) -> bool:
+        return bool(self._api_key)
 
     @property
     def events(self) -> list[dict[str, Any]]:
@@ -598,11 +617,75 @@ class MessagesBoundary:
             self.ledger.append({"event": "local_auth_blocked", "reason": "host_or_origin"})
             self._reject(handler, 403, "LOCAL_HOST_OR_ORIGIN_REJECTED")
             return False
-        if len(tokens) != 1 or not secrets.compare_digest(tokens[0], self.local_token):
+        account_tokens = handler.headers.get_all("x-dsh-auth-token", [])
+        account_authorized = (
+            self.account_enabled
+            and len(account_tokens) == 1
+            and bool(re.fullmatch(r"[\x21-\x7e]{1,8192}", account_tokens[0]))
+            and not tokens
+        )
+        if not account_authorized and (
+            len(tokens) != 1 or not secrets.compare_digest(tokens[0], self.local_token)
+        ):
             self.ledger.append({"event": "local_auth_blocked", "reason": "local_token"})
             self._reject(handler, 401, "LOCAL_TOKEN_REQUIRED")
             return False
         return True
+
+    def _handle_models(self, handler: http.server.BaseHTTPRequestHandler) -> None:
+        """Forward only the official read-only account catalog, without logging its grant."""
+        if handler.path != "/models" or not self.account_enabled:
+            return self._reject(handler, 403, "UNAPPROVED_ENDPOINT")
+        token = handler.headers.get("x-dsh-auth-token")
+        if not token:
+            return self._reject(handler, 401, "ACCOUNT_TOKEN_REQUIRED")
+        upstream = http.client.HTTPSConnection(OFFICIAL_HOST, 443, timeout=15)
+        try:
+            headers = self._account_headers(handler)
+            upstream.request("GET", "/models", headers=headers)
+            response = upstream.getresponse()
+            body = response.read(2_000_001)
+            if len(body) > 2_000_000:
+                return self._reject(handler, 502, "ACCOUNT_CATALOG_TOO_LARGE")
+            if response.status == 200:
+                self.account_token_rejected = False
+                try:
+                    data = json.loads(body).get("data")
+                    if isinstance(data, list):
+                        self.account_model_modalities = {
+                            row["id"]: row.get("input_modalities", ["text"])
+                            for row in data
+                            if isinstance(row, dict) and isinstance(row.get("id"), str)
+                            and isinstance(row.get("input_modalities", ["text"]), list)
+                        }
+                        self.account_catalog_observed = True
+                except (ValueError, AttributeError):
+                    pass
+            elif response.status == 401:
+                self.account_token_rejected = True
+            self.ledger.append({"event": "account_catalog_response", "status": response.status})
+            handler.send_response(response.status)
+            handler.send_header("Content-Type", "application/json")
+            handler.send_header("Content-Length", str(len(body)))
+            handler.send_header("Connection", "close")
+            handler.end_headers()
+            handler.wfile.write(body)
+            handler.close_connection = True
+        except (http.client.HTTPException, OSError):
+            self._reject(handler, 502, "ACCOUNT_CATALOG_UNAVAILABLE")
+        finally:
+            upstream.close()
+
+    @staticmethod
+    def _account_headers(handler: http.server.BaseHTTPRequestHandler) -> dict[str, str]:
+        # Header values live only for the current HTTPS request. They never enter
+        # records, diagnostics, public DTOs or request-body evidence.
+        headers = {"x-dsh-auth-token": handler.headers["x-dsh-auth-token"], "Accept": "application/json"}
+        for name in ("user-agent", "x-dsh-version", "x-dsh-client", "x-dsh-product"):
+            value = handler.headers.get(name)
+            if value is not None and len(value) <= 512:
+                headers[name] = value
+        return headers
 
     def _handle(self, handler: http.server.BaseHTTPRequestHandler) -> None:
         if not self._authorize(handler):
@@ -617,6 +700,9 @@ class MessagesBoundary:
             return self._reject(handler, 404, "INLINE_ATTACHMENTS_ONLY")
         if parsed.path != "/v1/messages":
             return self._reject(handler, 403, "UNAPPROVED_ENDPOINT")
+        account_request = handler.headers.get("x-dsh-auth-token") is not None
+        if self.mode == "official" and account_request != (self.credential_route == "account"):
+            return self._reject(handler, 403, "CREDENTIAL_ROUTE_MISMATCH")
         lengths = handler.headers.get_all("Content-Length", [])
         if len(lengths) != 1 or handler.headers.get_all("Transfer-Encoding", []):
             return self._reject(handler, 400, "EXACT_CONTENT_LENGTH_REQUIRED")
@@ -651,6 +737,7 @@ class MessagesBoundary:
                 "request_id": f"boundary-{uuid.uuid4().hex}",
                 "generation_id": generation_id,
                 "mode": self.mode,
+                "credential_route": self.credential_route if self.mode == "official" else "fixture",
                 "received_ns": time.time_ns(),
                 "body_sha256": _sha256(body),
                 "body_bytes": len(body),
@@ -895,6 +982,9 @@ class MessagesBoundary:
         if not self._configuration_matches(request, row.get("generation_id")):
             self._update(row, status="configuration_blocked")
             return self._reject(handler, 403, "MODEL_CONFIGURATION_MISMATCH")
+        if row.get("credential_route") != "account" and not self._api_key:
+            self._update(row, status="credential_missing")
+            return self._reject(handler, 401, "MODEL_KEY_NOT_CONFIGURED")
         upstream = http.client.HTTPSConnection(OFFICIAL_HOST, 443, timeout=min(15.0, self.timeout))
         upstream.auto_open = 0
         transport_socket: socket.socket | None = None
@@ -937,8 +1027,12 @@ class MessagesBoundary:
                 "Content-Type": "application/json",
                 "Accept": "text/event-stream",
                 "anthropic-version": "2023-06-01",
-                "x-api-key": self._api_key,
             }
+            if row.get("credential_route") == "account":
+                headers.update(self._account_headers(handler))
+                headers["Accept"] = "text/event-stream"
+            else:
+                headers["x-api-key"] = self._api_key
             beta = handler.headers.get("anthropic-beta")
             if beta is not None and len(beta) <= 512 and re.fullmatch(r"[A-Za-z0-9_,. -]+", beta):
                 headers["anthropic-beta"] = beta
@@ -954,6 +1048,8 @@ class MessagesBoundary:
             # redirect, retry, proxy environment, destination or re-open path.
             upstream.request("POST", OFFICIAL_PATH, body=body, headers=headers)
             response = upstream.getresponse()
+            if row.get("credential_route") == "account" and response.status == 401:
+                self.account_token_rejected = True
             self._update(row, upstream_status=response.status, response_headers_ns=time.time_ns())
             self._event("response_headers", row, status=response.status)
             if 300 <= response.status < 400:

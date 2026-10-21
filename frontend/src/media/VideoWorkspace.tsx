@@ -1,10 +1,12 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import type { FormEvent, Ref } from "react";
+import type { FormEvent, Ref, RefObject } from "react";
 import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
-import { captureVideoFrame } from "./capture";
 import type { CaptureSource } from "./capture";
+import { usePlaybackControls } from "./usePlaybackControls";
+import { VideoControls } from "./VideoControls";
+import "./VideoWorkspace.css";
 
 type VideoAsset = Schema<"MediaAssetResponse">;
 export type VideoSource = { asset_id: string; source_version: string; time_ms: number };
@@ -12,24 +14,36 @@ export type VideoWorkspaceHandle = {
   openAsset: (asset: VideoAsset, timeMs?: number) => Promise<void>;
   openSource: (source: VideoSource) => Promise<void>;
   resumeFullscreen: () => Promise<void>;
+  toggleFullscreen: () => Promise<void>;
   savePosition: () => Promise<void>;
+  pauseForCapture: () => VideoSource | undefined;
+  getElement: () => HTMLVideoElement | null;
 };
 
 export function VideoWorkspace({
   courseId,
   connected,
   onLibraryChange,
-  onCapture,
   onOpenChat,
   onImmersiveChange,
+  onAssetChange,
+  workspaceRef,
+  active = true,
+  minimal = false,
+  assetId,
   ref,
 }: {
   courseId: string;
   connected: boolean;
   onLibraryChange: (assets: VideoAsset[]) => void;
-  onCapture: (source: CaptureSource) => void;
+  onCapture?: (source: CaptureSource) => void;
   onOpenChat: () => void;
   onImmersiveChange: (immersive: boolean) => void;
+  onAssetChange?: (asset: VideoAsset | null) => void;
+  workspaceRef?: RefObject<HTMLElement | null>;
+  active?: boolean;
+  minimal?: boolean;
+  assetId?: string;
   ref?: Ref<VideoWorkspaceHandle>;
 }) {
   const [assets, setAssets] = useState<VideoAsset[]>([]);
@@ -49,8 +63,17 @@ export function VideoWorkspace({
   const initialPosition = useRef(0);
   const lastSaved = useRef(-1);
   const saveFailure = useRef<string | null>(null);
-  const openingQuestion = useRef(false);
   const mounted = useRef(true);
+  const fullscreenExitPending = useRef(false);
+  const activeRef = useRef(active);
+  const resumeOnActive = useRef(false);
+  const pendingPlay = useRef(true);
+  const sessions = useRef(new Map<string, { playing: boolean; position: number }>());
+  const callbacks = useRef({ onLibraryChange, onImmersiveChange, onAssetChange });
+
+  useEffect(() => {
+    callbacks.current = { onLibraryChange, onImmersiveChange, onAssetChange };
+  }, [onLibraryChange, onImmersiveChange, onAssetChange]);
 
   const refresh = async () => {
     const values = await api.read<VideoAsset[]>(`/courses/${courseId}/videos`);
@@ -97,6 +120,7 @@ export function VideoWorkspace({
   const saveQuietly = () => void savePosition().catch(() => {});
 
   const play = async () => {
+    if (!activeRef.current) return;
     try {
       await video.current?.play();
       setPlayBlocked(false);
@@ -107,6 +131,15 @@ export function VideoWorkspace({
 
   const openAsset = async (selected: VideoAsset, timeMs?: number) => {
     const epoch = ++openEpoch.current;
+    const previous = current.current;
+    const player = video.current;
+    if (previous && player) {
+      sessions.current.set(`${previous.asset_id}:${previous.source_version}`, {
+        playing: resumeOnActive.current || !player.paused,
+        position: Math.round(player.currentTime * 1000),
+      });
+      player.pause();
+    }
     try {
       await savePosition();
       if (!mounted.current || epoch !== openEpoch.current) return;
@@ -117,13 +150,17 @@ export function VideoWorkspace({
       setError("");
       setPlayBlocked(false);
       setPositionStatus("");
-      initialPosition.current = timeMs ?? opened.position_ms;
+      const session = sessions.current.get(`${opened.asset_id}:${opened.source_version}`);
+      resumeOnActive.current = false;
+      initialPosition.current = timeMs ?? session?.position ?? opened.position_ms;
+      pendingPlay.current = timeMs !== undefined || (session?.playing ?? true);
       positionRevision.current = opened.position_revision;
       lastSaved.current = -1;
       current.current = opened;
+      callbacks.current.onAssetChange?.(opened);
       if (asset?.asset_id === opened.asset_id && asset.source_version === opened.source_version) {
         if (video.current) video.current.currentTime = initialPosition.current / 1_000;
-        await play();
+        if (pendingPlay.current) await play();
       }
       setAsset(opened);
     } catch (reason) {
@@ -143,18 +180,56 @@ export function VideoWorkspace({
     await openAsset(selected, source.time_ms);
   };
 
-  const resumeFullscreen = async () => {
-    openingQuestion.current = false;
+  const enterFullscreen = async () => {
     try {
-      await stage.current?.requestFullscreen();
-      onImmersiveChange(true);
+      const root = workspaceRef?.current || stage.current;
+      if (root && document.fullscreenElement !== root) await root.requestFullscreen();
+      callbacks.current.onImmersiveChange(true);
     } catch {
-      setError("浏览器未允许全屏，请点击视频全屏重试（FULLSCREEN_DENIED）");
+      setError("浏览器未允许全屏，请双击视频画面重试（FULLSCREEN_DENIED）");
     }
+  };
+
+  const toggleFullscreen = async () => {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await enterFullscreen();
+  };
+
+  const resumeFullscreen = async () => {
+    await enterFullscreen();
     await play();
   };
 
-  useImperativeHandle(ref, () => ({ openAsset, openSource, resumeFullscreen, savePosition }));
+  const pauseForCapture = () => {
+    const player = video.current;
+    const selected = current.current;
+    if (!player || !selected) return undefined;
+    player.pause();
+    saveQuietly();
+    return {
+      asset_id: selected.asset_id,
+      source_version: selected.source_version,
+      time_ms: Math.max(0, Math.round(player.currentTime * 1000)),
+    };
+  };
+
+  useImperativeHandle(ref, () => ({
+    openAsset,
+    openSource,
+    resumeFullscreen,
+    toggleFullscreen,
+    savePosition,
+    pauseForCapture,
+    getElement: () => video.current,
+  }));
+
+  const playback = usePlaybackControls({
+    video,
+    stage,
+    active,
+    identity: asset ? `${asset.asset_id}:${asset.source_version}` : undefined,
+    toggleFullscreen,
+  });
 
   useEffect(() => {
     mounted.current = true;
@@ -164,7 +239,7 @@ export function VideoWorkspace({
       .then((values) => {
         if (!disposed) {
           setAssets(values);
-          onLibraryChange(values);
+          callbacks.current.onLibraryChange(values);
         }
       })
       .catch((reason) => {
@@ -180,6 +255,9 @@ export function VideoWorkspace({
     return () => {
       disposed = true;
       mounted.current = false;
+      // The latest imperative player, rather than the initial empty ref, must stop on course exit.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      video.current?.pause();
       saveQuietly();
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", hidden);
@@ -190,11 +268,85 @@ export function VideoWorkspace({
   }, [courseId]);
 
   useEffect(() => {
-    const change = () =>
-      onImmersiveChange(Boolean(document.fullscreenElement) || openingQuestion.current);
+    if (!assetId || current.current?.asset_id === assetId) return;
+    let disposed = false;
+    void Promise.resolve().then(async () => {
+      if (disposed) return;
+      try {
+        let selected = assets.find((item) => item.asset_id === assetId);
+        if (!selected) {
+          // Opening a newly imported file may create its media identity after the first listing.
+          const values = await api.read<VideoAsset[]>(`/courses/${courseId}/videos`);
+          if (disposed) return;
+          setAssets(values);
+          callbacks.current.onLibraryChange(values);
+          selected = values.find((item) => item.asset_id === assetId);
+        }
+        if (!disposed && selected) await openAsset(selected);
+        else if (!disposed) setError("该视频不在当前课程目录中（SOURCE_UNAVAILABLE）");
+      } catch (reason) {
+        if (!disposed) setError(errorMessage(reason));
+      }
+    });
+    return () => {
+      disposed = true;
+    };
+    // Only the selected source identity may open a resource automatically.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetId, courseId]);
+
+  useEffect(() => {
+    activeRef.current = active;
+    const player = video.current;
+    if (!player) return;
+    if (!active) {
+      resumeOnActive.current = !player.paused;
+      player.pause();
+      saveQuietly();
+    } else if (resumeOnActive.current && (!assetId || current.current?.asset_id === assetId)) {
+      resumeOnActive.current = false;
+      void play();
+    }
+    // A tab transition restores the actual previous playing/paused state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  useEffect(() => {
+    const change = () => callbacks.current.onImmersiveChange(Boolean(document.fullscreenElement));
+    const escape = (event: KeyboardEvent) => {
+      if (
+        event.key !== "Escape" ||
+        event.defaultPrevented ||
+        document.querySelector("[data-workspace-capture-overlay]")
+      )
+        return;
+      const root = workspaceRef?.current || stage.current;
+      if (!root || document.fullscreenElement !== root) return;
+      event.preventDefault();
+      if (fullscreenExitPending.current) return;
+      fullscreenExitPending.current = true;
+      // Explicitly leave this workspace even when the host does not dispatch a native exit.
+      // Editing focus does not change Escape's fullscreen meaning; capture cancellation wins above.
+      void document
+        .exitFullscreen()
+        .then(() => {
+          if (mounted.current)
+            setError((value) => (value.includes("FULLSCREEN_EXIT_FAILED") ? "" : value));
+        })
+        .catch(() => {
+          if (mounted.current) setError("退出全屏未完成，请重试（FULLSCREEN_EXIT_FAILED）");
+        })
+        .finally(() => {
+          fullscreenExitPending.current = false;
+        });
+    };
     document.addEventListener("fullscreenchange", change);
-    return () => document.removeEventListener("fullscreenchange", change);
-  }, [onImmersiveChange]);
+    window.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("fullscreenchange", change);
+      window.removeEventListener("keydown", escape);
+    };
+  }, [workspaceRef]);
 
   const pick = async () => {
     setBusy(true);
@@ -252,65 +404,56 @@ export function VideoWorkspace({
     }
   };
 
-  const openQuestion = async () => {
-    openingQuestion.current = Boolean(document.fullscreenElement);
-    if (document.fullscreenElement) await document.exitFullscreen();
-    onOpenChat();
-  };
-
-  const capture = async () => {
-    if (!video.current || !asset) return;
-    try {
-      const source = captureVideoFrame(video.current, {
-        asset_id: asset.asset_id,
-        source_version: asset.source_version,
-      });
-      saveQuietly();
-      await openQuestion();
-      onCapture(source);
-    } catch {
-      setError("当前画面尚未就绪，请等待视频缓冲后截图（CAPTURE_NOT_READY）");
-    }
-  };
-
   return (
-    <section className="video-workspace" aria-label="视频学习区">
-      <div className="video-heading">
-        <div>
-          <span className="eyebrow">当前课程 · 视频</span>
-          <h2>{asset?.display_name || "从一节课开始"}</h2>
-        </div>
-        <Button variant="outline" disabled={!connected || busy} onClick={() => void pick()}>
-          选择本地视频
-        </Button>
-      </div>
-      <details className="video-path-entry">
-        <summary>用文件路径关联视频</summary>
-        <form onSubmit={(event) => void register(event)}>
-          <input
-            aria-label="视频路径"
-            placeholder="粘贴本机视频的完整路径"
-            value={path}
-            onChange={(event) => setPath(event.target.value)}
-            disabled={!connected || busy}
-          />
-          <Button type="submit" variant="outline" disabled={!path.trim() || !connected || busy}>
-            关联视频
-          </Button>
-        </form>
-      </details>
+    <section
+      className={`video-workspace${minimal ? " video-workspace-minimal" : ""}`}
+      aria-label="视频学习区"
+      hidden={!active}
+    >
+      {!minimal && (
+        <>
+          <div className="video-heading">
+            <div>
+              <span className="eyebrow">当前课程 · 视频</span>
+              <h2>{asset?.display_name || "从一节课开始"}</h2>
+            </div>
+            <Button variant="outline" disabled={!connected || busy} onClick={() => void pick()}>
+              选择本地视频
+            </Button>
+          </div>
+          <details className="video-path-entry">
+            <summary>用文件路径关联视频</summary>
+            <form onSubmit={(event) => void register(event)}>
+              <input
+                aria-label="视频路径"
+                placeholder="粘贴本机视频的完整路径"
+                value={path}
+                onChange={(event) => setPath(event.target.value)}
+                disabled={!connected || busy}
+              />
+              <Button type="submit" variant="outline" disabled={!path.trim() || !connected || busy}>
+                关联视频
+              </Button>
+            </form>
+          </details>
+        </>
+      )}
       {error && (
         <p className="inline-error video-error" role="alert">
           {error}
         </p>
       )}
-      <div className="video-stage" ref={stage}>
+      <div
+        className={`video-stage redesigned-video-stage${playing ? "" : " video-paused"}`}
+        ref={stage}
+        aria-label="视频画面"
+        tabIndex={0}
+      >
         {asset ? (
           <video
             ref={video}
             key={`${asset.asset_id}:${asset.source_version}`}
             aria-label="课程视频"
-            controls
             preload="metadata"
             playsInline
             src={`/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`}
@@ -320,7 +463,7 @@ export function VideoWorkspace({
               video.current.currentTime = Number.isFinite(video.current.duration)
                 ? Math.min(target, Math.max(0, video.current.duration - 0.05))
                 : target;
-              void play();
+              if (pendingPlay.current) void play();
             }}
             onPause={() => {
               setPlaying(false);
@@ -339,81 +482,89 @@ export function VideoWorkspace({
               ▷
             </span>
             <h3>选择视频，接着看</h3>
-            <p>
-              原件保留在原位置。打开后恢复播放进度；只在你主动截图并确认后，选区才会加入提问草稿。
-            </p>
+            <p>从当前课程目录选择视频。打开后恢复播放进度；截图快捷键可框选软件内可见内容。</p>
           </div>
         )}
-        <div className="video-actions">
-          <Button
-            variant="secondary"
-            disabled={!asset}
-            onClick={() => (playing ? video.current?.pause() : void play())}
-          >
-            {playing ? "暂停视频" : "播放视频"}
-          </Button>
-          <Button disabled={!asset} onClick={() => void capture()}>
-            截图提问
-          </Button>
-          <Button variant="secondary" disabled={!asset} onClick={() => void resumeFullscreen()}>
-            视频全屏
-          </Button>
-          <Button
-            className="fullscreen-question"
-            variant="secondary"
-            onClick={() => void openQuestion()}
-          >
-            打开问答
-          </Button>
-        </div>
+        {asset && (
+          <VideoControls
+            playing={playing}
+            {...playback}
+            onFullscreen={toggleFullscreen}
+            onSeek={(seconds) => {
+              if (video.current) video.current.currentTime = seconds;
+            }}
+            onTogglePlay={() => {
+              if (video.current?.paused) void play();
+              else video.current?.pause();
+            }}
+            onMute={() => {
+              if (video.current) video.current.muted = !video.current.muted;
+            }}
+            onVolume={(value) => {
+              if (!video.current) return;
+              video.current.volume = value;
+              video.current.muted = false;
+            }}
+            onRate={(value) => {
+              if (video.current) video.current.playbackRate = value;
+            }}
+          />
+        )}
       </div>
       {playBlocked && (
         <p className="playback-notice" role="status">
-          浏览器已阻止自动播放，点击“播放视频”继续。
+          浏览器已阻止自动播放，单击视频画面继续。
         </p>
       )}
-      <div className="video-footnote">
-        <span>{positionStatus || "播放与问答可以同时进行"}</span>
-        <span>截图会暂停播放</span>
-      </div>
-      <div className="resource-list-heading">
-        <h3>课程视频</h3>
-        <Button
-          variant="ghost"
-          disabled={!connected || busy}
-          onClick={() => void refresh().catch((reason) => setError(errorMessage(reason)))}
-        >
-          刷新目录
-        </Button>
-      </div>
-      {!assets.length && <p className="muted">还未关联视频，可选择原文件或粘贴路径。</p>}
-      <ul className="video-resource-list">
-        {assets.map((item) => (
-          <li key={item.asset_id}>
-            <button
-              className={
-                asset?.asset_id === item.asset_id ? "resource-link selected" : "resource-link"
-              }
-              onClick={() => void openAsset(item)}
+      {!minimal && (
+        <>
+          <div className="video-footnote">
+            <span>{positionStatus || "播放与问答可以同时进行"}</span>
+            <span>截图会暂停播放</span>
+          </div>
+          <div className="resource-list-heading">
+            <h3>课程视频</h3>
+            <Button
+              variant="ghost"
+              disabled={!connected || busy}
+              onClick={() => void refresh().catch((reason) => setError(errorMessage(reason)))}
             >
-              <span aria-hidden="true">▷</span>
-              <span>{item.display_name}</span>
-              <small>
-                {item.availability === "available"
-                  ? "打开"
-                  : item.availability === "missing"
-                    ? "原件缺失"
-                    : "内容已变化"}
-              </small>
-            </button>
-            {item.availability !== "available" && (
-              <Button variant="ghost" disabled={busy} onClick={() => void relocate(item)}>
-                重新定位 {item.display_name}
-              </Button>
-            )}
-          </li>
-        ))}
-      </ul>
+              刷新目录
+            </Button>
+          </div>
+          {!assets.length && <p className="muted">还未关联视频，可选择原文件或粘贴路径。</p>}
+          <ul className="video-resource-list">
+            {assets.map((item) => (
+              <li key={item.asset_id}>
+                <button
+                  className={
+                    asset?.asset_id === item.asset_id ? "resource-link selected" : "resource-link"
+                  }
+                  onClick={() => void openAsset(item)}
+                >
+                  <span aria-hidden="true">▷</span>
+                  <span>{item.display_name}</span>
+                  <small>
+                    {item.availability === "available"
+                      ? "打开"
+                      : item.availability === "missing"
+                        ? "原件缺失"
+                        : "内容已变化"}
+                  </small>
+                </button>
+                {item.availability !== "available" && (
+                  <Button variant="ghost" disabled={busy} onClick={() => void relocate(item)}>
+                    重新定位 {item.display_name}
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+          <button type="button" className="sr-only" onClick={onOpenChat}>
+            打开 AI 对话
+          </button>
+        </>
+      )}
     </section>
   );
 }

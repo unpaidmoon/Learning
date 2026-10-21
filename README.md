@@ -1,60 +1,61 @@
 # AI 辅助学习项目
 
-面向个人学习的 AI 辅助工具，以考研数学一试点。Windows 使用定制界面、自有业务存储和 DeepSeek Harness 执行层；先交付用户主动视频截图、编辑、文字提问、保存与继续追问的试用闭环。
+Windows 个人学习工作台：左侧课程切换与当前课程文件树，中间单资料标签页，右侧 AI。正式 MVP-A 使用 Codex 风格的浅深主题、自有业务数据和固定 DeepSeek Harness；先提供视频、图片、文本、用户主动截图与连续问答。
 
-2026-10-21 后续反馈：用户不认可现 UI 及部分交互，已重新收口官方账号默认登录／可选 API Key、真实课程根目录／单文件标签页，以及全屏问答、软件内快捷键截图、选区引用卡片和播放控制。**设计收口不代表新行为已经实现**；本页下述命令与旧技术结果不构成新设计验收，实际工作包状态见 [MVP 计划](docs/plans/MVP开发计划.md)，完整规则见[需求总结](docs/product/AI辅助学习项目需求总结.md)。当前仍是讨论与文档同步，未在本轮改动应用或用户文件。
+本轮重设计已获明确授权，最终实施与验收状态只在 [MVP 计划](docs/plans/MVP开发计划.md)维护。界面规范见 [前端开发规范](docs/architecture/前端开发规范.md)，接口与输入边界见 [应用契约](docs/architecture/应用契约.md)。历史 MVP-A/V3 证据保留，不能替代本轮验证或用户学习评价。
 
-当前已按明确授权实施 MVP-A：Windows 原地视频播放、主动截图裁剪、文字与图片问答、公式阅读、保存恢复和安全退出。自动技术验证已完成，用户实际学习评价待参与；不能称完整 V3 价值验收或完整首版完成。见[本轮报告](research/reports/v3/MVP-A与V3验收报告-2026-10-21.md)和[人工试用记录](docs/validation/MVP-A试用记录.md)。工作包状态以 [MVP 开发计划](docs/plans/MVP开发计划.md)为准。本轮不含 Office／ASR、知识库、Android、同步或完整安装包。
+## 使用
 
-## 开始试用
-
-现有项目环境及构建就绪后，双击根目录 `启动学习.cmd`。下面是已实际验证过的命令行入口，在仓库根目录执行后，按就绪输出地址手动打开学习页：
+项目环境与生产构建就绪后，双击根目录 `启动学习.cmd`。命令行可在仓库根目录运行以下本轮已成功验证的无浏览器入口，按输出地址打开：
 
 ```powershell
-.\scripts\Start-Learning.ps1 -NoBrowser -Port 18798 -TimeoutSeconds 60
+.\scripts\Start-Learning.ps1 -NoBrowser -Port 18872 -TimeoutSeconds 60
 ```
 
-双击入口启用正式 Harness 并打开学习页；上述 `-NoBrowser` 命令启动同一后台，由你手动打开输出地址。密钥仅由后台读取既有私有配置。选择或新建课程后，主动关联本地视频（原地引用），点击具体视频恢复位置并播放。点击“截图提问”暂停，在编辑器确认选区后直接加入草稿，补充文字并发送；也可粘贴图片、继续追问或重开历史。模型与思考选择作用于后续请求，未支持的配置明确拒绝。
+1. 点击“账号与模型”。默认官方账号；点击登录后在官方网页完成授权，应用接回状态并刷新实际模型目录及额度。已经在本项目登录过可直接使用保存状态。API Key 仅通过用户主动切换启用，来自规定私有配置；账号失败不会自动改用 API Key。
+2. 打开课程文件夹，或为旧课程选择根目录。左侧顶部切换课程，下方浏览全部文件。外部资料导入默认移动，可选复制；冲突由你选择，未知结果先点核对，不重复导入。
+3. 点击文件在中间标签页打开；同一时刻显示一个资料。视频／图片／文本内置支持，PDF／Office 等提供“使用系统默认程序打开”。切离视频自动暂停，切回恢复切走前的播放状态。
+4. `Ctrl+Shift+S` 冻结软件当前可见画面，拖选松开把选区加入草稿；AI 自动展开并聚焦输入。补充问题后自行发送。原始快照留在当前浏览器本机，后台和模型只接收确认选区。
+5. 回答中选中文字或可精确映射的公式范围，再点临时“添加到对话”，形成可移除引用卡片。复杂无法对应源码的范围会明确提示，不补引整式。
+6. 右侧顶部可重开当前课程历史、新建对话或收起 AI。全屏时用 `Ctrl+Shift+A` 或鼠标右侧触边入口唤起当前 AI；关闭后回到纯视频全屏续播。
 
-关闭聊天可返回视频；关闭网页后后台继续。用页面“安全退出”保存并停止所属服务，活动回答会先要求确认。原截图仅在当前浏览器本机保存供重裁，后台和模型只接收确认选区；更换浏览器或清除浏览器数据后，原图重裁缓存可能不可用，已确认附件仍保留。
+播放器：空格／单击播放暂停、双击全屏、ESC 退出全屏、左右短按两秒、长按右方向键临时两倍速、M 静音；全屏视频区域或普通音量控件上滚轮调音量。聊天区保留滚动与输入法操作。
 
-入口的实际无浏览器 smoke 使用 `Start-Learning.ps1 -NoBrowser -NoHarness -Port 18769 -TimeoutSeconds 30`，随后核实例安全停止；它证明启动与清理，不代替真实模型验收。初次安装与构建仍需要下述项目开发环境，这不是无开发环境安装包。
+关闭网页后后台继续回答；页面“安全退出”保存并停止所属实例，活动回答先确认。停止回答只取消当前生成。数据、已提交截图、聊天、旧来源及原始验证证据不自动删除。
 
-## 开发入口
-
-先读 [AGENTS.md](AGENTS.md)和[开发规范](docs/development/开发规范.md)。固定工具、启动停止、配置与环境限制见[开发环境与命令](docs/development/开发环境与命令.md)，Harness 安装与执行策略见 [Harness 说明](harness/README.md)。
-
-以下入口已实际执行过；目录整理后的复核范围见[迁移记录](docs/development/目录整理与迁移记录-2026-10-21.md)。在仓库根目录运行，工具来自项目环境，不修改全局 PATH：
+如需独立重新登录，下面的正式辅助入口也已实际验证成功。它会输出当次真实官方授权链接并等待浏览器完成登录，凭据交给 Harness 保存；正式应用与该辅助入口不要同时使用同一 home：
 
 ```powershell
-.\scripts\bootstrap.ps1 -SkipBrowsers
+.\backend\.venv\Scripts\python.exe scripts/harness/account_login.py --data-dir .runtime/app/data --timeout 1200
+```
+
+本轮技术结果与未覆盖项见 [重设计验证报告](research/reports/redesign/MVP-A重设计验收报告-2026-10-21.md)。合成学习页可看 [浅色预览](output/playwright/redesign-browser-20261021-r4/browser/learning-light.png)／[深色预览](output/playwright/redesign-browser-20261021-r4/browser/learning-dark.png)；画面中的彩色区域为测试资料。
+
+## 开发与验证
+
+先读 [AGENTS.md](AGENTS.md)、[开发规范](docs/development/开发规范.md)及 [前端开发规范](docs/architecture/前端开发规范.md)。使用项目锁定环境，不修改全局 PATH、HOME 或 CODEX_HOME。以下命令已在项目环境实际成功执行；不同源码快照的验证范围仍须分别记录：
+
+```powershell
 & .\.tools\node\node.exe .\.tools\pnpm\bin\pnpm.cjs check
 & .\.tools\node\node.exe .\.tools\pnpm\bin\pnpm.cjs test
 & .\.tools\node\node.exe .\.tools\pnpm\bin\pnpm.cjs build
-& .\backend\.venv\Scripts\python.exe scripts/app.py dev
-# 构建后同源运行：
-& .\backend\.venv\Scripts\python.exe scripts/app.py start
 ```
 
-以 `LEARNING_APP_READY` 输出的地址和实例 ID 为准。关闭网页后后台继续；Ctrl+C 或下面的实例命令停止并清理所属服务：
+本轮完整合成浏览器实际成功命令（使用现有固定 Chromium 与 ffmpeg，不调用互联网模型）：
+
+```powershell
+& .\backend\.venv\Scripts\python.exe tests/e2e/test_redesign.py --run-id redesign-browser-20261021-r4 --backend-port 18871 --ffmpeg-path "C:\Users\cyb\AppData\Local\Microsoft\WinGet\Links\ffmpeg.exe"
+```
+
+重复验证请使用新的 `--run-id`，保留旧证据；其他机器按现有环境传入 `--browser-path`／`--ffmpeg-path`。独立真实模型复测用 `scripts/validation/Run-RedesignReal.py`，参数与实际六次请求见本轮报告，不与上述 fixture 混称。
+
+启动与环境细则见 [开发环境与命令](docs/development/开发环境与命令.md)，固定制品、官方账号及执行 guard 见 [Harness 说明](harness/README.md)。按就绪输出的实例 ID 请求安全停止：
 
 ```powershell
 & .\backend\.venv\Scripts\python.exe scripts/app.py stop --instance-id <就绪输出中的实例ID>
 ```
 
-默认 `LEARNING_APP_HARNESS_ENABLED=false`，界面如实禁用发送。启用方式见 Harness 说明，模型密钥仅从后台 `.local/secrets/deepseek.env` 私有配置读取。
-
-`test:e2e` 已映射到 `tests/e2e/test_mvp_a.py`；`test:e2e:security` 映射到旧 runner 的安全分组。两个根别名的 `--help` 转发已实际通过。完整浏览器验收使用下面的实际命令；这些 run ID 已保留原证据，复跑请更换 ID：
-
-```powershell
-& .\backend\.venv\Scripts\python.exe tests/e2e/test_mvp_a.py --run-id mvp-a-20261021-r4
-& .\backend\.venv\Scripts\python.exe tests/e2e/test_browser.py --mode security --run-id mvp-a-security-20261021-r2 --backend-port 18850
-& .\backend\.venv\Scripts\python.exe tests/e2e/test_native_video_picker.py --run-id mvp-a-native-picker-20261021-r1
-```
-
-它们使用已有固定 Chromium、合成数据及本地 provider，真实模型调用为 0；浏览器缺失时明确失败。真实模型分组使用独立的 `scripts/validation/Run-V3.py`，有实际出站及 raw usage 证据，不与上述 fixture 混称。浏览器选项与权限验收入口见[验证说明](docs/validation/README.md)。
-
-文档导航可通过 `pnpm docs:check` 单独检查，也已纳入根 `check`；适用范围见[开发规范](docs/development/开发规范.md)。
+默认 `LEARNING_APP_HARNESS_ENABLED=false`；双击统一入口会显式启用 Harness。仅启动业务后台不代表真实模型可用。合成浏览器、真实模型、数学表现和实际学习评价分别记录；本轮不含完整 Office／ASR、知识库用途、Android／同步、自由多窗口或完整安装包。
 
 ## 仓库导航
 

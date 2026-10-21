@@ -7,10 +7,15 @@ import json
 import logging
 from collections import defaultdict
 
+import httpx
 from dotenv import dotenv_values
 
 from learning_app.config import AppConfig
-from learning_app.drafts import submission_source_locators
+from learning_app.drafts import (
+    message_references,
+    submission_reference_conditions,
+    submission_source_locators,
+)
 from learning_app.errors import AppError
 from learning_app.execution.selection import supports_images, validate_selection
 from learning_app.execution.types import (
@@ -42,14 +47,33 @@ class GenerationService:
         self._binding_snapshots: dict[str, str] = {}
         self._attempt_snapshots: dict[str, tuple] = {}
 
+    @property
+    def question_answering_ready(self) -> bool:
+        """Separate an open Host from the selected route's known capability."""
+        if not self.execution_ready or self.execution is None:
+            return False
+        capability = getattr(self.execution, "question_answering_ready", None)
+        if capability is not None:
+            return bool(capability)
+        # Injected local test doubles predate the route-capability seam. An
+        # unknown official execution implementation does not gain readiness.
+        return getattr(self.execution, "mode", "fixture") == "fixture"
+
     async def open(self):
         if self.execution is None and self.config.harness_enabled:
             from learning_app.execution.adapter import ExecutionAdapter
 
             key = dotenv_values(self.config.secret_file).get("DEEPSEEK_API_KEY")
-            if not key:
-                self.execution_error = "MODEL_KEY_NOT_CONFIGURED"
-                return
+            route = self.config.credential_route
+            route_path = self.config.data_dir / "credential-route.json"
+            if route_path.is_file():
+                try:
+                    stored = json.loads(route_path.read_text("utf-8"))
+                    if isinstance(stored, dict) and stored.get("route") in {"account", "api_key"}:
+                        route = stored["route"]
+                except (OSError, ValueError):
+                    self.execution_error = "CREDENTIAL_ROUTE_STORAGE_INVALID"
+                    return
             self.execution = ExecutionAdapter(
                 self.config.project_root,
                 self.config.data_dir / "execution",
@@ -59,6 +83,7 @@ class GenerationService:
                 thinking=self.config.thinking,
                 max_tokens=self.config.max_output_tokens,
                 timeout=self.config.model_timeout_seconds,
+                credential_route=route,
             )
         if self.execution is None:
             return
@@ -66,6 +91,16 @@ class GenerationService:
             if self.owns_execution:
                 await self.execution.open()
             self.execution_ready = True
+            if (
+                getattr(self.execution, "mode", "fixture") == "official"
+                and getattr(self.execution, "credential_route", "api_key") == "account"
+            ):
+                try:
+                    await self.execution.refresh_account_models()
+                except (ExecutionError, httpx.HTTPError, OSError, TimeoutError):
+                    # Account availability is independent of video, files and
+                    # business persistence. Never fall back to another credential.
+                    pass
         except (ExecutionError, OSError, TimeoutError) as exc:
             self.execution_error = (
                 exc.code if isinstance(exc, ExecutionError) else "EXECUTION_START_FAILED"
@@ -106,10 +141,6 @@ class GenerationService:
     async def submit(self, value: dict) -> dict:
         if not self.execution_ready:
             raise AppError("EXECUTION_UNAVAILABLE", "Harness尚未连接，未提交问题", 503)
-        try:
-            validate_selection(self.config.model, value["model"], value["thinking"])
-        except ExecutionError as exc:
-            raise AppError(exc.code, "当前执行层不支持所选模型或思考强度，请更改选择", 422) from exc
         if not value["text"].strip() and not value.get("attachment_ids"):
             raise AppError("INPUT_EMPTY", "请输入问题或确认图片", 422)
         async with self.locks[value["chat_id"]]:
@@ -120,9 +151,24 @@ class GenerationService:
                 if exc.code != "SUBMISSION_NOT_FOUND":
                     raise
                 existing_submission = False
+            if not existing_submission:
+                try:
+                    validator = getattr(self.execution, "validate_choice", None)
+                    if validator is None:
+                        validate_selection(self.config.model, value["model"], value["thinking"])
+                    else:
+                        await validator(value["model"], value["thinking"])
+                except ExecutionError as exc:
+                    message = {
+                        "ACCOUNT_SIGN_IN_REQUIRED": "请先在账号与模型中登录 DeepSeek 官方账号",
+                        "ACCOUNT_CATALOG_UNAVAILABLE": "账号模型目录暂不可用，请在账号与模型中刷新后重试",
+                        "MODEL_KEY_NOT_CONFIGURED": "所选 API Key 方式尚未配置，请检查本机私有配置",
+                    }.get(exc.code, "当前执行层不支持所选模型或思考强度，请更改选择")
+                    raise AppError(exc.code, message, 422) from exc
             # Capability changes in later turns cannot invalidate an earlier
             # receipt. publish_submission still checks its full immutable hash.
-            if not existing_submission and not supports_images(value["model"]):
+            image_support = getattr(self.execution, "supports_model_images", supports_images)
+            if not existing_submission and not image_support(value["model"]):
                 history = self.repository.get_chat(value["chat_id"])["messages"]
                 if value.get("attachment_ids") or any(m.get("attachment_ids") for m in history):
                     raise AppError(
@@ -130,6 +176,9 @@ class GenerationService:
                         "所选模型仅支持文字；当前图片及题图历史已保留，请选择支持图片的模型或新建文字对话",
                         422,
                     )
+            conditions = list(value.get("conditions", ())) + submission_reference_conditions(
+                self.repository, value["chat_id"], value.get("references", ())
+            )
             source_locators = submission_source_locators(
                 self.repository, value["chat_id"], value.get("attachment_ids", ())
             )
@@ -138,7 +187,7 @@ class GenerationService:
                 value["text"],
                 value["submission_id"],
                 attachment_ids=value.get("attachment_ids", ()),
-                conditions=value.get("conditions", ()),
+                conditions=conditions,
                 corrections=value.get("corrections", ()),
                 source_locators=source_locators,
                 model=value["model"],
@@ -470,6 +519,7 @@ class GenerationService:
         value["generations"] = [self.generation_view(item["generation_id"]) for item in generations]
         indexed = {item["generation_id"]: item for item in value["generations"]}
         for message in value.get("messages", []):
+            message["references"] = message_references(message.get("conditions", ()))
             generation = indexed.get(message.get("generation_id"))
             if generation:
                 message["reasoning"] = generation.get("reasoning", "")
