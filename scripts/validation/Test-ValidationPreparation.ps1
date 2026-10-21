@@ -34,12 +34,12 @@ $prepPlans = @(
     'V7-资产迁移与Windows运行执行方案.md'
 )
 $prepRequired = @(
-    'docs/验证/README.md',
-    'docs/验证/执行准备清单.md',
-    'docs/验证/样本清单.md',
-    'docs/验证/记录模板/run-record.template.json',
-    'docs/验证/记录模板/case-result.template.json'
-) + @($prepPlans | ForEach-Object { 'docs/验证/' + $_ })
+    'docs/validation/README.md',
+    'docs/validation/执行准备清单.md',
+    'docs/validation/样本清单.md',
+    'docs/validation/templates/run-record.template.json',
+    'docs/validation/templates/case-result.template.json'
+) + @($prepPlans | ForEach-Object { 'docs/validation/' + $_ })
 
 foreach ($prepRelative in $prepRequired) {
     if (-not (Test-Path -LiteralPath (Join-Path $prepRoot $prepRelative) -PathType Leaf)) {
@@ -50,10 +50,10 @@ foreach ($prepRelative in $prepRequired) {
 if ($prepErrors.Count -eq 0) {
     try {
         $prepRunTemplate = Get-Content -LiteralPath (
-            Join-Path $prepRoot 'docs/验证/记录模板/run-record.template.json'
+            Join-Path $prepRoot 'docs/validation/templates/run-record.template.json'
         ) -Raw | ConvertFrom-Json
         $prepCaseTemplate = Get-Content -LiteralPath (
-            Join-Path $prepRoot 'docs/验证/记录模板/case-result.template.json'
+            Join-Path $prepRoot 'docs/validation/templates/case-result.template.json'
         ) -Raw | ConvertFrom-Json
         if ($prepRunTemplate.execution_status -ne 'not_started') {
             $prepErrors.Add('Run template must not claim execution.')

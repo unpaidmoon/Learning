@@ -94,9 +94,6 @@ research/probes/v1-harness/profile/*
 !research/probes/v1-harness/profile/package.json
 !research/probes/v1-harness/profile/cordis.patch.json
 !research/probes/v1-harness/profile/v1-plugin.mjs
-!research/probes/v1-harness/results/
-research/probes/v1-harness/results/*
-!research/probes/v1-harness/results/V1-2026-10-21.json
 !research/probes/v1-harness/patches/
 research/probes/v1-harness/patches/*
 !research/probes/v1-harness/patches/B-cancel-observer-and-proxy.diff
@@ -108,3 +105,10 @@ Thumbs.db
 *.tmp
 *.swp
 *.swo
+
+# Reviewed historical V1 coordinators; private run data remains ignored.
+!research/probes/v1-harness/scripts/
+research/probes/v1-harness/scripts/*
+!research/probes/v1-harness/scripts/Run-V1B.py
+!research/probes/v1-harness/scripts/Run-V1BStop.py
+!research/probes/v1-harness/scripts/Run-V1BContinuation.py

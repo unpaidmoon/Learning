@@ -11,12 +11,13 @@
     "dev": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py dev",
     "start": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py start",
     "build": "pnpm --filter @learning/frontend build",
-    "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/export_openapi.py scripts/test_browser.py scripts/harness scripts/validation/Run-V2.py scripts/validation/Run-P0Real.py && pnpm contracts:check",
+    "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/check_docs.py scripts/export_openapi.py tests/e2e/test_browser.py scripts/harness scripts/validation/Run-V2.py scripts/validation/Run-P0Real.py && pnpm contracts:check && pnpm docs:check",
     "test": "pnpm --filter @learning/frontend test && .\\backend\\.venv\\Scripts\\python.exe -m pytest backend/tests --basetemp=.runtime/tests/backend-latest",
     "contracts:generate": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts",
     "contracts:check": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py --check && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts --check",
+    "docs:check": ".\\backend\\.venv\\Scripts\\python.exe scripts/check_docs.py",
     "format:check": "pnpm --filter @learning/frontend exec prettier --check ../package.json ../pnpm-workspace.yaml .",
-    "test:e2e": ".\\backend\\.venv\\Scripts\\python.exe scripts/test_browser.py"
+    "test:e2e": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_browser.py"
   },
   "devDependencies": {
     "@playwright/cli": "0.1.22",

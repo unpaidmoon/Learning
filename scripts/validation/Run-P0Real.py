@@ -348,7 +348,7 @@ async def run(args):
         )
         save(directory / "run-record.json", result)
         if args.export:
-            save(ROOT / "research/results/P0-application-real-2026-10-21.json", result)
+            save(ROOT / "research/reports/p0/P0-application-real-2026-10-21.json", result)
         print(
             json.dumps(
                 {

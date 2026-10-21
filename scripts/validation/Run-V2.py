@@ -1459,7 +1459,7 @@ def source_hashes() -> dict:
         ROOT / "contracts/history-example.json",
         ROOT / "tests/fixtures/v2/cases.json",
         ROOT / "tests/contracts/v2-evidence-contract.json",
-        ROOT / "scripts/test_browser.py",
+        ROOT / "tests/e2e/test_browser.py",
         ROOT / "backend/tests/test_v2_http_cancel.py",
         ROOT / "pnpm-lock.yaml",
         *sorted((ROOT / "frontend/src").rglob("*.ts")),
@@ -1634,7 +1634,7 @@ async def run(args) -> int:
     )
     write_json(run_dir / "run-record.json", result)
     if args.export:
-        write_json(ROOT / "research/results/V2-2026-10-21.json", result)
+        write_json(ROOT / "research/reports/v2/V2-2026-10-21.json", result)
     return (
         0
         if all(r["status"] == "passed" for r in result["cases"] if r["id"] in selected)

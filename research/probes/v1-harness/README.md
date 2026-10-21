@@ -1,6 +1,8 @@
 # V1 Harness 隔离验证器
 
-仅用于 P0-00／V1，不能作为正式应用入口。固定 Harness `0.2.1rc2` wheel、源码 `687f282e8625c6b8d11ff58211a90524be2e4317`；结果见[验证报告](../../V1-Harness最小路线验证报告-2026-10-21.md)。
+仅用于 P0-00／V1，不能作为正式应用入口。固定 Harness `0.2.1rc2` wheel、源码 `687f282e8625c6b8d11ff58211a90524be2e4317`；结果见[验证报告](../../reports/v1/V1-Harness最小路线验证报告-2026-10-21.md)。
+
+2026-10-21 目录整理：三个历史协调器现位于本目录 `scripts/`，仅调整仓库根路径计算；本轮只验证其帮助入口，未重跑真实批次。被 `source_digests` 覆盖的 probe 组件及原结果 JSON 保持原字节，历史命令与冻结门槛仍按原记录解释，路径对应见[迁移记录](../../../docs/development/目录整理与迁移记录-2026-10-21.md)。
 
 `runner.py` 管理本次 Windows Job、内部 Peer、follow/page/取消及阶段门槛；`fixture.py` 提供无互联网转发的A fixture、持久计数、历史有限额负例和B官方目标代理；`context_cases.py`运行压缩、offload和辅助派发诊断；`b_cases.py`区分传输、取消、对账与数学判断。`samples.py`只生成已定义合成图，不读取视频／屏幕或伪造手写。
 
@@ -27,9 +29,9 @@ B累计八次真实调用：原六次中B01—04通过、B05首次失败后复�
 
 满足门槛后才解析本项目 `.local/secrets/deepseek.env` 的唯一 `DEEPSEEK_API_KEY` 字段；不执行 dotenv 内容，不查找其他项目凭据。B 固定 `deepseek-flash`、`high`、`max_tokens=8192`，每例从发送前开始观察最多 180 秒，超出后取消并对账。六次总额度存于固定的 `.runtime/validation/v1-b-authorization-2026-10-21`，更换 run-id 不重置额度。用户提供H02真实手写后，B03已实际运行。
 
-真实批次使用 [Run-V1B.py](../../../scripts/validation/Run-V1B.py) 协调器，先执行M01/L02，到B03等待已授权手写清单后继续。该协调器的六场景本地fixture回归退出0，真实批次保留全部输入与事件。第五次模型只有思考、到8192 token上限仍无正文，因此旧观察器未停止；新增思考活动判定并完成红绿测试和固定Host本地回归，再用 [Run-V1BStop.py](../../../scripts/validation/Run-V1BStop.py) 在第六次执行已知终态后的主动复测。完整命令与对应源码hash保存在各运行preflight/patch-provenance中。
+真实批次使用 [Run-V1B.py](scripts/Run-V1B.py) 协调器，先执行M01/L02，到B03等待已授权手写清单后继续。该协调器的六场景本地fixture回归退出0，真实批次保留全部输入与事件。第五次模型只有思考、到8192 token上限仍无正文，因此旧观察器未停止；新增思考活动判定并完成红绿测试和固定Host本地回归，再用 [Run-V1BStop.py](scripts/Run-V1BStop.py) 在第六次执行已知终态后的主动复测。完整命令与对应源码hash保存在各运行preflight/patch-provenance中。
 
-第六次暴露代理解析器并发关闭异常，修为watcher只中断socket、reader独占关闭parser，原20项本地回归通过。随后使用 [Run-V1BContinuation.py](../../../scripts/validation/Run-V1BContinuation.py) 在明确的自主调用授权下，以不设总次数的独立账本补证；当前22项本地回归、真实修复版停止和同会话追问均通过。原六次记录仍保留，真实正文阶段取消尚未另测。
+第六次暴露代理解析器并发关闭异常，修为watcher只中断socket、reader独占关闭parser，原20项本地回归通过。随后使用 [Run-V1BContinuation.py](scripts/Run-V1BContinuation.py) 在明确的自主调用授权下，以不设总次数的独立账本补证；当前22项本地回归、真实修复版停止和同会话追问均通过。原六次记录仍保留，真实正文阶段取消尚未另测。
 
 项目级授权覆盖今后已获准开发、验证和修复中的真实调用，不设人为次数／费用额度，不逐批确认。当前V1仍选deepseek-flash/high、8192输出／180秒观察；这些按任务技术需要可自主调整，不是项目统一预算限制。新任务阶段、模型选择、资料范围和执行未知先对账仍按用户既有决定。
 
