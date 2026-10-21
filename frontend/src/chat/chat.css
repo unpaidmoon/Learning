@@ -1,0 +1,102 @@
+.markdown-answer {
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+  min-width: 0;
+}
+.markdown-answer p {
+  margin: 0.35em 0 0.9em;
+}
+.markdown-answer h1,
+.markdown-answer h2,
+.markdown-answer h3 {
+  font-size: 1.12em;
+  margin: 1.2em 0 0.55em;
+}
+.markdown-answer ul,
+.markdown-answer ol {
+  padding-left: 1.6em;
+}
+.markdown-answer pre {
+  white-space: pre;
+  overflow: auto;
+  background: var(--muted);
+  padding: 12px;
+  border-radius: 8px;
+}
+.markdown-answer code {
+  font-size: 0.9em;
+}
+.markdown-answer table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.markdown-answer td,
+.markdown-answer th {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+}
+.markdown-answer .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 10px;
+  margin: 0.7em 0;
+}
+.markdown-answer .katex {
+  font-size: 1.08em;
+}
+.markdown-answer a,
+.formula-actions button {
+  color: var(--primary);
+}
+.formula-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 10px;
+}
+.formula-actions button,
+.attachment-source {
+  font-size: 11px;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--background);
+}
+.blocked-image {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.message-attachment {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.draft-save-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.draft-attachments figcaption {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.messages {
+  overscroll-behavior: contain;
+}
+.messages .user .message-body {
+  white-space: pre-wrap;
+}
+.draft-warning {
+  color: #ac7336;
+  font-size: 12px;
+  padding-block: 6px;
+}
+.chat-heading p {
+  overflow-wrap: anywhere;
+}

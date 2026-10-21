@@ -9,7 +9,7 @@ class Capabilities(BaseModel):
     harness: Literal["ready", "not_configured", "unavailable"] = "not_configured"
     question_answering: Literal["ready", "not_configured", "unavailable"] = "not_configured"
     persistence: Literal["ready", "unavailable"] = "unavailable"
-    video: Literal["not_implemented"] = "not_implemented"
+    video: Literal["ready", "unavailable", "not_implemented"] = "not_implemented"
     transcription: Literal["not_implemented"] = "not_implemented"
     knowledge_base: Literal["not_implemented"] = "not_implemented"
 

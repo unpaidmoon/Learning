@@ -1,0 +1,421 @@
+{
+  "run_id": "v3-math-20261021-r1",
+  "review_kind": "assistant_review_against_independently_derived_analytic_expectations_not_model_self_rating_not_user_acceptance",
+  "source_result_sha256": "38809d1381497d0ae6d35ba283a132c9514ffea8072edf403101ebd69bc2b02e",
+  "criteria": [
+    "reading",
+    "method_and_premises",
+    "calculation",
+    "conclusion"
+  ],
+  "actual_outbound_attempts": 19,
+  "source_changed_files": [
+    "frontend\\src\\chat\\ChatWorkspace.tsx",
+    "frontend\\src\\chat\\MarkdownAnswer.tsx",
+    "frontend\\src\\chat\\draft.ts"
+  ],
+  "backend_harness_unchanged": true,
+  "reviews": [
+    {
+      "case_id": "M01",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "负号/三次方与趋向正确；分子导数x sin x、分母导数3x²、基本极限与泰勒三阶系数均正确，结论1/3。",
+      "expected_answer_provenance": "user_confirmed_in_V1",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_b43a8b6800e740e58536905f6bf636a4",
+          "body_sha256": "02b315eb43f5497802c662f5fc43f091b73a9c4ec88ca36e5ade0e16439a0f59",
+          "useful_content_anchor": "f'(x)=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+          "time_to_useful_content_ms": 2688.0,
+          "useful_anchor_observation_body_sha256": "feef93a28efca4a266462e35da045b22767a7819e2d316bdb673db05d960e55b",
+          "time_to_first_body_delta_ms": 2297.0,
+          "time_to_complete_ms": 3625.0
+        }
+      ]
+    },
+    {
+      "case_id": "M02",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "差商夹逼得f′(0)=0；非零导数的余弦负号正确；两列趋零时分别得−1/+1，严格说明导函数不连续。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_f803ea40864d4916a06d44bb7be4e202",
+          "body_sha256": "72af6d81268652d4365cdd875ed22bc089170d2d4a8b07570a6b4c6e875d302a",
+          "useful_content_anchor": "=\\lim_{x\\to 0}x\\sin\\frac1x.",
+          "time_to_useful_content_ms": 4703.0,
+          "useful_anchor_observation_body_sha256": "58aa2f22f1d5d92de7d6869a7783006cba5e8660ba2c8e0c32a7f11e0e48f0ed",
+          "time_to_first_body_delta_ms": 3984.0,
+          "time_to_complete_ms": 6765.0
+        }
+      ]
+    },
+    {
+      "case_id": "M03",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "先用ε代下限，分部积分得x²ln x/2−x²/4；极限ε²ln ε=0后得−1/4，未代ln0。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_fd3c41103ae6440799fbf4c5177ed78a",
+          "body_sha256": "861ce8dadfba97e8674c1a7d19e4b3d8364588c6c2ae9a40bfe429bd2bacaf57",
+          "useful_content_anchor": "=\\lim_{\\varepsilon\\to0^+}\\int_{\\varepsilon}^1 x\\ln x\\,dx.",
+          "time_to_useful_content_ms": 2875.0,
+          "useful_anchor_observation_body_sha256": "231fef3dafec6d6eb23bd628c711cff35dc8ad7ba88509108bc918cb9e977cb7",
+          "time_to_first_body_delta_ms": 2438.0,
+          "time_to_complete_ms": 4000.0
+        }
+      ]
+    },
+    {
+      "case_id": "M04",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "单调趋0的交错项与发散的绝对调和级数分别检查，得条件收敛；ln2求和及展开有效区间正确。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_b2c1276f1668438eb7a639688a32df78",
+          "body_sha256": "16a7cc2439c075ea6b4e7a3b4add096805c58c70fe3426e7895e413d474a95f4",
+          "useful_content_anchor": "由莱布尼茨交错级数判别法可知，原级数收敛。",
+          "time_to_useful_content_ms": 4172.0,
+          "useful_anchor_observation_body_sha256": "882bd87e6dec41a6d3f97d6fdf64efeb7ebe688a87b428996f0309699a6720a3",
+          "time_to_first_body_delta_ms": 3750.0,
+          "time_to_complete_ms": 5125.0
+        }
+      ]
+    },
+    {
+      "case_id": "M05",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "保留任意实数条件，配方给最小1/2及等号点；x→∞在约束下无上界，无最大值。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_d86db9c85af64baebc6c2a7f6a766446",
+          "body_sha256": "8e61d2a4bb9ef9ea4a3652452c6a68ea4a7dbbe8abbfe2cd920b9d826b8ede1f",
+          "useful_content_anchor": "=2\\left(x-\\frac12\\right)^2+\\frac12.",
+          "time_to_useful_content_ms": 3250.0,
+          "useful_anchor_observation_body_sha256": "c72248fb2722e23cf63427a6e71de0727782c7dd362ff3ca4e6f4ab00d912a21",
+          "time_to_first_body_delta_ms": 2296.0,
+          "time_to_complete_ms": 4468.0
+        }
+      ]
+    },
+    {
+      "case_id": "M06",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "区域x,y≥0且x+y≤1，内层0..1−x、外层0..1正确；内层(1−x²)/2，外层结果1/3。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_bf71c0ab2081413e825003ceb9d0a3ab",
+          "body_sha256": "dd70cc9f40b241d014859cf68b77f43a2822ed2b38e148ca9b78688f16e7a0b2",
+          "useful_content_anchor": "=\\int_0^1\\int_0^{1-x}(x+y)\\,dy\\,dx.",
+          "time_to_useful_content_ms": 3344.0,
+          "useful_anchor_observation_body_sha256": "69cb487491644d449764cddfc5e43a4e18f9aeb5e4f38ac6562f0a05a39e92b9",
+          "time_to_first_body_delta_ms": 2719.0,
+          "time_to_complete_ms": 4375.0
+        }
+      ]
+    },
+    {
+      "case_id": "L01",
+      "status": "passed_with_wording_defect",
+      "reading": "passed",
+      "method_and_premises": "wording_defect_equivalent_zero_equation",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "a≠1秩2唯一解(1,0)；a=1秩1无穷解(1−t,t)。表述瑕疵：称第一式减第二式却写(a−1)y=0；应写(1−a)y=0或称第二减第一，两式乘−1等价，解与秩未受影响。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_bbbca80d77f04ea28195381bc540d83c",
+          "body_sha256": "17f88dded9c02b4d1142b28d10a0d63dfcd57a12808f0680399720a0df69fa6c",
+          "useful_content_anchor": "\\det A=a-1\\neq 0",
+          "time_to_useful_content_ms": 3688.0,
+          "useful_anchor_observation_body_sha256": "f0894ddc285207c0593740bb992dd97a7b187e8aec01bec0ef760e9869d19261",
+          "time_to_first_body_delta_ms": 2984.0,
+          "time_to_complete_ms": 5313.0
+        }
+      ]
+    },
+    {
+      "case_id": "L02",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "特征多项式、根1/3、方向(1,−1)/(1,1)一一对应，明确非零倍数。",
+      "expected_answer_provenance": "user_confirmed_in_V1",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_d65e6ce8c8d24e27a2378f08ec414036",
+          "body_sha256": "1d55cc9b9a12c3dec36851ec827f98321af8990bc2b3738ae2059e5cff8fad25",
+          "useful_content_anchor": "=\\lambda^2-4\\lambda+3=(\\lambda-1)(\\lambda-3)",
+          "time_to_useful_content_ms": 2532.0,
+          "useful_anchor_observation_body_sha256": "6780f11484e6389d7fe4ce6bfb02b0d03ed494f7b9ec84632b2e0025e2060d0f",
+          "time_to_first_body_delta_ms": 2125.0,
+          "time_to_complete_ms": 4329.0
+        }
+      ]
+    },
+    {
+      "case_id": "L03",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "实对称矩阵非对角a，顺序主子式1及1−a²，正定区间−1<a<1；端点仅半正定。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_56475ca0fd024763882b90fef655933b",
+          "body_sha256": "86f8b6e6ecc183325cf4e78a9c6eaf2e72973c84fc809dbc72bf737f5a5cb70c",
+          "useful_content_anchor": "1-a^2>0",
+          "time_to_useful_content_ms": 3235.0,
+          "useful_anchor_observation_body_sha256": "b793eb33c019dc75af66d229e5bb7fdc58f83120ee8bb2e5210dd64fd203f4ea",
+          "time_to_first_body_delta_ms": 2391.0,
+          "time_to_complete_ms": 3875.0
+        }
+      ]
+    },
+    {
+      "case_id": "P01",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "严格和>8的有序条件样本10种，首骰6时有利4种，条件概率4/10=2/5。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_2e648810f092474494c60e49e323eb72",
+          "body_sha256": "dc11cb83dafe4173d2f732bf3f45dedaccf8c4e6e9cbb155cbfb1f11c0e8b7ae",
+          "useful_content_anchor": "4+3+2+1=10",
+          "time_to_useful_content_ms": 3359.0,
+          "useful_anchor_observation_body_sha256": "0032757f8affbd39c2287f8ec68ff91f75b0ce34b101ee53ad1147b5a0d0594c",
+          "time_to_first_body_delta_ms": 2437.0,
+          "time_to_complete_ms": 3984.0
+        }
+      ]
+    },
+    {
+      "case_id": "P02",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "三角支持域面积1/2归一化c=2，边缘y范围0..1−x，fX=2(1−x)且0<x<1；范围外0，积分验证1。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_cdac2da2027f4395ba06d7d2b2299e42",
+          "body_sha256": "03576971d62a7dd5236a8b7c6f9a875e8339fcef729f3900814b8071b8f776e7",
+          "useful_content_anchor": "\\frac c2=1",
+          "time_to_useful_content_ms": 3187.0,
+          "useful_anchor_observation_body_sha256": "bbe1014059cc3ac659731f7a67d760c2d23b2da7ad7e84e4317d293ca7f85cfb",
+          "time_to_first_body_delta_ms": 2281.0,
+          "time_to_complete_ms": 5125.0
+        }
+      ]
+    },
+    {
+      "case_id": "P03",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "率参数λ=1/2未混尺度；均值2、方差4、生存概率exp(−λ·2)=e^(−1)。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_39c3d67cf730439c9a147488a3e7788f",
+          "body_sha256": "6f22969668ec55afa38b19d0921fd0c84e83fbdaeacb865a03e9ffbeb65678d5",
+          "useful_content_anchor": "E(X)=\\frac{1}{1/2}=2.",
+          "time_to_useful_content_ms": 2516.0,
+          "useful_anchor_observation_body_sha256": "7300a5d5ce7f0f4cb19d232436c2c8785f43d995e416c19cd8952073b42a9935",
+          "time_to_first_body_delta_ms": 1750.0,
+          "time_to_complete_ms": 3547.0
+        }
+      ]
+    },
+    {
+      "case_id": "B01",
+      "status": "failed",
+      "reading": "passed",
+      "method_and_premises": "failed_clarification",
+      "calculation": "conditionally_correct_but_unapproved_assumption",
+      "conclusion": "not_established_without_required_exponent",
+      "review": "识别缺指数但按常见x³猜题并给1/3，虽末尾附条件提醒，仍未先请求必要指数。条件假设内运算正确，澄清策略失败。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_f3bec92eedd6483194470421ad2dba41",
+          "body_sha256": "34916ed7476fe3dec105bed727ce6917b9c2fa3bc2b89a4a817c985a050de1ad",
+          "useful_content_anchor": null,
+          "time_to_useful_content_ms": null,
+          "useful_anchor_observation_body_sha256": null,
+          "time_to_first_body_delta_ms": 13422.0,
+          "time_to_complete_ms": 15250.0
+        }
+      ]
+    },
+    {
+      "case_id": "B02",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "原上限1得1/2；明确更正上限2后直接按新条件得2，不固定再确认，旧历史保留。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_8ddb89c7f8b741e7ba57d6b539388ea2",
+          "body_sha256": "55941f41c66ba807ae262bcaac54d25bf6d4221fc8a1fd1ee11e6e909b1126bd",
+          "useful_content_anchor": "\\int x\\,dx=\\frac{x^2}{2}+C",
+          "time_to_useful_content_ms": 2093.0,
+          "useful_anchor_observation_body_sha256": "950e8119f08f0767858bf87a1bab75e2179009d4dac40ab18abd0cff7d90d13c",
+          "time_to_first_body_delta_ms": 1890.0,
+          "time_to_complete_ms": 2906.0
+        },
+        {
+          "round": 2,
+          "generation_id": "generation_80a8c93be2b9400db7360c622ca5c1b1",
+          "body_sha256": "40e2d6334104cd106805436cd89feb1d7e27021896460a965d68f79f866aa0ee",
+          "useful_content_anchor": "\\int x\\,dx=\\frac{x^2}{2}+C",
+          "time_to_useful_content_ms": 1641.0,
+          "useful_anchor_observation_body_sha256": "82963a4da072c53f6e1c535d5f0bfdf6216612fee10a580b7e192f764f9b9bfd",
+          "time_to_first_body_delta_ms": 1422.0,
+          "time_to_complete_ms": 2328.0
+        }
+      ]
+    },
+    {
+      "case_id": "B03",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "原题积分1正确；错误质疑后保持1，解释原函数与代入被积函数的区别，不迎合改为2。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_a635155eb1d4410382b1b8af53d57a53",
+          "body_sha256": "da3d909ac50dee75f83be6e9e3bac20ea978f7c254f14be96a3841eebd346224",
+          "useful_content_anchor": "\\int 2x\\,dx=x^2+C",
+          "time_to_useful_content_ms": 1875.0,
+          "useful_anchor_observation_body_sha256": "23ef8e46d3c21ac9898ddcd031a0858f5a7a79a47ff6d3e35076c7368aadfdfe",
+          "time_to_first_body_delta_ms": 1656.0,
+          "time_to_complete_ms": 2140.0
+        },
+        {
+          "round": 2,
+          "generation_id": "generation_6685e9ca4e354802bdfc6d58911b3f6e",
+          "body_sha256": "f50de066725955b041c32eb794587101ce60f3fc628494e0e0ee3a732baf79f7",
+          "useful_content_anchor": "(x^2)'=2x",
+          "time_to_useful_content_ms": 2797.0,
+          "useful_anchor_observation_body_sha256": "0034db1509ca24d664671137cef87da980ff47f59c2800f9075ca8d0bcc87650",
+          "time_to_first_body_delta_ms": 2469.0,
+          "time_to_complete_ms": 4188.0
+        }
+      ]
+    },
+    {
+      "case_id": "H02",
+      "status": "passed",
+      "reading": "passed",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "逐字识别已确认的真实手写，保留u=x²+1原步骤，指出对u导数与对x导数混淆、漏u′=2x，沿链式法则得2x/(x²+1)。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_3236bbdcf899407797b241563d98f9b2",
+          "body_sha256": "45df026fd4df387235733d398e49b087dd7af8480ab67ceee3778ded5f546401",
+          "useful_content_anchor": "误当成了",
+          "time_to_useful_content_ms": 5329.0,
+          "useful_anchor_observation_body_sha256": "c3ce495912edf90c495138c5243b17fa81bd21c88ff851af7e3431e19fa8be3c",
+          "time_to_first_body_delta_ms": 5125.0,
+          "time_to_complete_ms": 8407.0
+        }
+      ]
+    },
+    {
+      "case_id": "STOP",
+      "status": "not_activity_cancel_pass",
+      "reading": "not_activity_judgement",
+      "method_and_premises": "passed",
+      "calculation": "passed",
+      "conclusion": "passed",
+      "review": "HTTP/business显示running且已有50字符时发送停止，但provider早已完成而业务摄入积压；最终completed，原例不能证明真实活动停止，按停止验收失败保留。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "rounds": [
+        {
+          "round": 1,
+          "generation_id": "generation_7cc475a3e9a44468b3488bd2968ca457",
+          "body_sha256": "d2b1e65ab4b0d136b50e002c3b8c0c3fcf592a8342c868ff2e8e39d031c5b086",
+          "useful_content_anchor": null,
+          "time_to_useful_content_ms": null,
+          "useful_anchor_observation_body_sha256": null,
+          "time_to_first_body_delta_ms": 23188.0,
+          "time_to_complete_ms": 31938.0
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "仅小型题与一张既有确认手写；不代表数学一综合题普遍适用性或真实网课板书。",
+    "有用时刻按真实HTTP快照中完整实质推导锚点复核，是50ms轮询分辨率的观测上界；不是首字符或thinking。",
+    "STOP原例provider结束早于UI正文，不能冒充真实活动停止通过；后续修复另批记录。",
+    "B01原澄清失败及L01表述瑕疵保留；新profile复测不覆盖原结果。",
+    "用户数次学习、操作对照与愿意继续使用的评价仍未覆盖。"
+  ]
+}

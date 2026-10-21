@@ -1,0 +1,73 @@
+{
+  "run_id": "mvp-a-native-picker-20261021-r1",
+  "status": "passed",
+  "scope": "actual Windows native picker; synthetic media; own backend HWND only",
+  "real_provider_attempts": 0,
+  "checks": {
+    "real_dialog_concurrent_pick_is_rejected": true,
+    "native_cancel_adds_no_asset": true,
+    "native_select_registers_one_available_synthetic_video": true,
+    "native_relocation_cancel_preserves_missing_source": true,
+    "native_relocation_keeps_identity_version_and_restores_playback": true,
+    "all_window_actions_target_original_owned_backend": true,
+    "application_sources_unchanged": true,
+    "owned_processes_and_port_closed": true
+  },
+  "source_digests_before": {
+    "backend/src/learning_app/media.py": "dfc905d1c705003e6d542b8f142f8362f1b095306f5fa9506399ea2abd58455c",
+    "frontend/src/media/VideoWorkspace.tsx": "282ef9c8f704d60c1768a1f711872bfa75cee089c766ea4e3379cb8332d0e0ab"
+  },
+  "source_digests_after": {
+    "backend/src/learning_app/media.py": "dfc905d1c705003e6d542b8f142f8362f1b095306f5fa9506399ea2abd58455c",
+    "frontend/src/media/VideoWorkspace.tsx": "282ef9c8f704d60c1768a1f711872bfa75cee089c766ea4e3379cb8332d0e0ab"
+  },
+  "asset": {
+    "asset_id": "asset_646ddf4a62254a02a14a4465209079f0",
+    "source_version": "eca9e6abb99379748b357c2b0037ce0dfec625efd7a88d24258c47bc6d7fc711",
+    "size_bytes": 33781
+  },
+  "native_actions": [
+    {
+      "operation": "cancel",
+      "owned_pid": 21484
+    },
+    {
+      "operation": "select",
+      "owned_pid": 21484,
+      "filename_verified": true,
+      "control_class": "Edit",
+      "filename": "synthetic-course.webm"
+    },
+    {
+      "operation": "cancel",
+      "owned_pid": 21484
+    },
+    {
+      "operation": "select",
+      "owned_pid": 21484,
+      "filename_verified": true,
+      "control_class": "Edit",
+      "filename": "synthetic-relocated.webm"
+    }
+  ],
+  "cleanup": {
+    "browser_remaining_pids": [],
+    "application_remaining_pids": [],
+    "backend_port_closed": true,
+    "frontend_port_closed": true
+  },
+  "interaction_method": "fixed Chromium visible-button actions; PID-scoped native Edit WM_SETTEXT and verified readback followed by WM_COMMAND; original backend process handle retained",
+  "excluded": [
+    "global keyboard or mouse",
+    "foreground focus changes",
+    "clipboard",
+    "desktop screenshots",
+    "directory-content reads",
+    "user media",
+    "model requests"
+  ],
+  "limitations": [
+    "Automated native window operation, not a human usability assessment",
+    "Synthetic fixture only"
+  ]
+}

@@ -27,6 +27,7 @@ const answer = (value: unknown, status = 200) =>
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  localStorage.clear();
 });
 
 describe("后台连接", () => {
@@ -90,7 +91,10 @@ describe("后台连接", () => {
             releaseA = resolve;
           });
         }
-        return answer([{ chat_id: "chat-B123", course_id: "course-B" }]);
+        if (url.endsWith("/course-B/chats")) {
+          return answer([{ chat_id: "chat-B123", course_id: "course-B" }]);
+        }
+        return answer([]);
       }),
     );
     render(<App />);
@@ -103,5 +107,30 @@ describe("后台连接", () => {
     });
     expect(screen.getByText("chat-B12")).toBeInTheDocument();
     expect(screen.queryByText("chat-A12")).not.toBeInTheDocument();
+  });
+
+  it("进入课程不自动打开视频或恢复历史，收放聊天不创建对话", async () => {
+    const request = vi.fn((url: string) => {
+      if (url.endsWith("/health")) return answer(health);
+      if (url.endsWith("/session")) return answer({ csrf_token: "test-only" });
+      if (url.endsWith("/courses")) return answer([{ course_id: "course-A", title: "课程 A" }]);
+      if (url.endsWith("/course-A/chats"))
+        return answer([{ chat_id: "history-chat", course_id: "course-A" }]);
+      if (url.endsWith("/course-A/videos")) return answer([]);
+      return answer({});
+    });
+    vi.stubGlobal("fetch", request);
+    render(<App />);
+    await screen.findByText("后台已连接");
+    await userEvent.selectOptions(screen.getByLabelText("选择课程"), "course-A");
+    await screen.findByText("history-");
+    expect(screen.queryByLabelText("课程视频")).not.toBeInTheDocument();
+    expect(request.mock.calls.some(([url]) => url.includes("/chats/history-chat"))).toBe(false);
+    await userEvent.click(screen.getByRole("button", { name: "收起聊天" }));
+    expect(screen.getByRole("button", { name: "展开聊天" })).toBeInTheDocument();
+    expect(request.mock.calls.filter(([url]) => url.endsWith("/course-A/chats"))).toHaveLength(1);
+    await userEvent.click(screen.getByRole("button", { name: "收起课程目录" }));
+    expect(screen.getByLabelText("课程与对话")).not.toBeVisible();
+    expect(screen.getByRole("button", { name: "展开课程目录" })).toBeInTheDocument();
   });
 });

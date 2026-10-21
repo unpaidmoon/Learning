@@ -61,7 +61,7 @@ def test_runtime_reports_real_sqlite_and_conservative_journal(tmp_path):
     assert info["journal_mode"] == "delete"
     assert info["synchronous"] == 2
     assert info["foreign_keys"] == 1
-    assert info["schema_revision"] == "0001_business"
+    assert info["schema_revision"] == "0003_drafts"
 
 
 def test_failed_attachment_write_never_publishes_message_or_model_work(tmp_path):
@@ -501,6 +501,6 @@ def test_migration_recovery_snapshot_preserves_existing_assets_on_failure(tmp_pa
                 is None
             )
     recovered = Repository(root)
-    assert recovered.runtime_info()["schema_revision"] == "0001_business"
+    assert recovered.runtime_info()["schema_revision"] == "0003_drafts"
     with sqlite3.connect(root / "business.sqlite3") as conn:
         assert conn.execute("SELECT value FROM previous_asset").fetchone()[0] == "用户已有数据"

@@ -1,0 +1,312 @@
+{
+  "date": "2026-10-21",
+  "timezone": "Asia/Shanghai",
+  "status": "passed",
+  "scope": "MVP-A synthetic real Chromium and fixed Host local provider fixture; separate from model math and human acceptance",
+  "final_browser": {
+    "run_id": "mvp-a-20261021-r4",
+    "assertions_passed": 45,
+    "assertions_total": 45,
+    "counts": {
+      "local_messages": 6,
+      "real_provider_attempts": 0,
+      "business_attempts": 6,
+      "submissions": 6
+    },
+    "changed_files_during_run": [],
+    "confirmed_image_sha256": "82533cfe0e218797653fa983a58a32343d8c43acd517531d5d7bd5021685487e",
+    "confirmed_dimensions": [
+      320,
+      180
+    ],
+    "original_dimensions": [
+      640,
+      360
+    ],
+    "synthetic_video_sha256": "eca9e6abb99379748b357c2b0037ce0dfec625efd7a88d24258c47bc6d7fc711",
+    "playwright_cli_version": "0.1.22",
+    "browser_executable_sha256": "409805a16d6416087e6b2f778df1cf8f7bbb267d6b99f6b5bb0a618eace234f2",
+    "encoder": {
+      "version": "ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+      "sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+    },
+    "cleanup": {
+      "backend_port_closed": true,
+      "remaining_owned_pids": []
+    },
+    "evidence": {
+      "path": "output/playwright/mvp-a-20261021-r4/result.json",
+      "sha256": "25001a265b1dcb8a22dfa6bb2842254458a2220ee2a23c19206bb68ddbb9008b"
+    },
+    "coverage": [
+      {
+        "name": "learning_UI_replaces_P0_label",
+        "passed": true
+      },
+      {
+        "name": "original_video_registered_without_copy",
+        "passed": true
+      },
+      {
+        "name": "registered_Range_route_is_video_source_no_whole_Blob",
+        "passed": true
+      },
+      {
+        "name": "partial_content_and_unsatisfiable_range",
+        "passed": true
+      },
+      {
+        "name": "seek_and_pause_persist_integer_milliseconds",
+        "passed": true
+      },
+      {
+        "name": "entering_course_does_not_automatically_open_last_material",
+        "passed": true
+      },
+      {
+        "name": "explicit_open_restores_position_and_plays",
+        "passed": true
+      },
+      {
+        "name": "mouse_adjusts_video_chat_width",
+        "passed": true
+      },
+      {
+        "name": "video_enters_native_fullscreen",
+        "passed": true
+      },
+      {
+        "name": "immersive_question_exits_fullscreen_to_existing_chat",
+        "passed": true
+      },
+      {
+        "name": "closing_immersive_chat_restores_fullscreen_and_playback",
+        "passed": true
+      },
+      {
+        "name": "panel_toggle_resize_and_fullscreen_preserve_chat_identity",
+        "passed": true
+      },
+      {
+        "name": "user_capture_pauses_video",
+        "passed": true
+      },
+      {
+        "name": "capture_editor_is_direct_draft_flow",
+        "passed": true
+      },
+      {
+        "name": "capture_confirmation_saves_attachment_without_model_dispatch",
+        "passed": true
+      },
+      {
+        "name": "confirmed_image_contains_only_center_crop_no_outer_frame",
+        "passed": true
+      },
+      {
+        "name": "only_confirmed_crop_is_published_attachment",
+        "passed": true
+      },
+      {
+        "name": "cancel_recrop_preserves_original_text_and_other_attachments",
+        "passed": true
+      },
+      {
+        "name": "IME_composition_Ctrl_Enter_does_not_submit",
+        "passed": true
+      },
+      {
+        "name": "multiple_pasted_images_require_confirmation_without_dispatch",
+        "passed": true
+      },
+      {
+        "name": "multi_image_paste_does_not_replace_text_draft",
+        "passed": true
+      },
+      {
+        "name": "draft_text_and_crop_restore_after_reload",
+        "passed": true
+      },
+      {
+        "name": "second_synthetic_material_registered",
+        "passed": true
+      },
+      {
+        "name": "same_course_material_switch_preserves_existing_chat",
+        "passed": true
+      },
+      {
+        "name": "submitting_question_does_not_pause_parallel_video_playback",
+        "passed": true
+      },
+      {
+        "name": "new_content_does_not_pull_user_away_from_prior_reading",
+        "passed": true
+      },
+      {
+        "name": "actual_Host_outbound_contains_exact_confirmed_crop_only",
+        "passed": true
+      },
+      {
+        "name": "Chinese_markdown_and_mathematics_render_without_page_overflow",
+        "passed": true
+      },
+      {
+        "name": "whole_formula_reference_preserves_LaTeX_in_draft",
+        "passed": true
+      },
+      {
+        "name": "manual_dark_mode_preserves_readable_math_layout",
+        "passed": true
+      },
+      {
+        "name": "stop_test_has_real_active_body_and_transport_gate",
+        "passed": true
+      },
+      {
+        "name": "active_cancel_retains_partial_answer_without_killing_Host",
+        "passed": true
+      },
+      {
+        "name": "same_chat_followup_after_active_stop",
+        "passed": true
+      },
+      {
+        "name": "same_submission_identity_reuses_generation_and_conflicting_body_rejected",
+        "passed": true
+      },
+      {
+        "name": "duplicate_browser_HTTP_submission_dispatches_once",
+        "passed": true
+      },
+      {
+        "name": "lost_browser_receipt_preserves_original_submission_identity",
+        "passed": true
+      },
+      {
+        "name": "refresh_with_unknown_receipt_does_not_resubmit",
+        "passed": true
+      },
+      {
+        "name": "explicit_receipt_reconciliation_finds_original_without_second_dispatch",
+        "passed": true
+      },
+      {
+        "name": "course_switch_does_not_cancel_or_move_old_generation",
+        "passed": true
+      },
+      {
+        "name": "returning_to_course_in_same_use_resumes_original_chat",
+        "passed": true
+      },
+      {
+        "name": "closing_page_keeps_background_then_saved_chat_reopens_complete_answer",
+        "passed": true
+      },
+      {
+        "name": "missing_original_is_explicit_and_never_silently_replaced",
+        "passed": true
+      },
+      {
+        "name": "explicit_relocation_retains_stable_asset_and_verified_version",
+        "passed": true
+      },
+      {
+        "name": "source_overwrite_preserves_old_version_and_reports_mismatch",
+        "passed": true
+      },
+      {
+        "name": "fixture_never_forwarded_to_real_provider",
+        "passed": true
+      }
+    ]
+  },
+  "owned_ui_exit": {
+    "status": "passed",
+    "assertions_passed": 3,
+    "assertions_total": 3,
+    "first_backend_port_closed": true,
+    "second_backend_port_closed": true,
+    "remaining_owned_pids": [],
+    "evidence": {
+      "path": "output/playwright/mvp-a-20261021-r4/exit/result.json",
+      "sha256": "53be0cbe59c28ada61ea1ff7cbf3bbb2e715eee76c4e4c6d66d83e4aaca67b80"
+    }
+  },
+  "security_regression": {
+    "run_id": "mvp-a-security-20261021-r2",
+    "assertions_passed": 18,
+    "assertions_total": 18,
+    "before": {
+      "local_messages": 3,
+      "real_provider_attempts": 0,
+      "business_attempts": 3,
+      "submissions": 3
+    },
+    "after": {
+      "local_messages": 3,
+      "real_provider_attempts": 0,
+      "business_attempts": 3,
+      "submissions": 3
+    },
+    "cleanup": {
+      "backend_port_closed": true,
+      "remaining_owned_pids": []
+    },
+    "evidence": {
+      "path": "output/playwright/mvp-a-security-20261021-r2/security/v2-15-result.json",
+      "sha256": "a66dc6b441fd29eaf474b95346e2406e888b4770ec40ecff050219f8745f32ba"
+    }
+  },
+  "retained_history": [
+    {
+      "run_id": "mvp-a-20261021-r1",
+      "status": "failed",
+      "assertions": 1,
+      "failure": "RuntimeError: Playwright CLI失败：run-code，见 D:\\Codex\\Learning\\output\\playwright\\mvp-a-20261021-r1\\browser",
+      "changed_files_during_run": null,
+      "evidence": {
+        "path": "output/playwright/mvp-a-20261021-r1/result.json",
+        "sha256": "3ae05db146954aef1797e119ec620e2192ccaf5e70d72e238bb75cab7ce2c2f5"
+      }
+    },
+    {
+      "run_id": "mvp-a-20261021-r2",
+      "status": "passed",
+      "assertions": 37,
+      "failure": null,
+      "changed_files_during_run": null,
+      "evidence": {
+        "path": "output/playwright/mvp-a-20261021-r2/result.json",
+        "sha256": "9e0a08b9a0760f49479f04a1b2db327d60e1fcc461760682c7ca717429950a65"
+      }
+    },
+    {
+      "run_id": "mvp-a-20261021-r3",
+      "status": "passed",
+      "assertions": 41,
+      "failure": null,
+      "changed_files_during_run": [
+        "harness/profiles/learning.patch.json"
+      ],
+      "evidence": {
+        "path": "output/playwright/mvp-a-20261021-r3/result.json",
+        "sha256": "5d167e009905111ed6342692a1f2d9e913fa637b75e4992cb43e03eba69b13b5"
+      }
+    }
+  ],
+  "historical_failure_explanation": "r1 failed at strict text locator matching both material heading and resource row; original failure retained. r2 functional pass; r3 functional pass with profile change detected. r4 final sources and artifacts unchanged.",
+  "not_covered_here": [
+    "real model mathematical quality and useful-content latency (separate V3 model report)",
+    "user-confirmed real handwriting or real course question images",
+    "operating-system native file-dialog selection and native clipboard integration (manual participation; browser paste events use synthetic DataTransfer)",
+    "repeated real learning and user willingness to continue; no operation-time or learning-gain claim"
+  ],
+  "commands_executed_successfully": [
+    ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_mvp_a.py --run-id mvp-a-20261021-r4",
+    ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_browser.py --mode security --run-id mvp-a-security-20261021-r2 --backend-port 18850",
+    ".\\.tools\\node\\node.exe .\\.tools\\pnpm\\bin\\pnpm.cjs test:e2e --help",
+    ".\\.tools\\node\\node.exe .\\.tools\\pnpm\\bin\\pnpm.cjs test:e2e:security --help"
+  ],
+  "alias_verification": "Root aliases forwarded --help successfully; final full acceptance used the explicit Python commands above."
+}

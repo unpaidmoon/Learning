@@ -16,6 +16,7 @@ import httpx
 
 from learning_app.processes import OwnedProcessGroup
 
+from .selection import model_choices, native_thinking, supports_images
 from .types import ExecutionError
 
 
@@ -116,13 +117,28 @@ class HarnessHost:
             "__BOUNDARY_URL__": self.boundary_url,
             "__PLUGIN_PATH__": (self.repository / "harness/plugins/learning-guard.mjs").as_posix(),
             "__MODEL__": self.model,
-            "__THINKING__": self.thinking,
+            "__THINKING__": native_thinking(self.thinking),
         }
         for source, value in replacements.items():
             profile = profile.replace(source, value)
         profile = profile.replace('"__MAX_TOKENS__"', str(self.max_tokens))
         profile = profile.replace('"__TIMEOUT_MS__"', str(int(self.timeout * 1000)))
-        json.loads(profile)
+        effective_profile = json.loads(profile)
+        provider = next(item for item in effective_profile if item["id"] == "llm-deepseek")
+        template = provider["config"]["models"][0]
+        provider["config"]["models"] = [
+            {
+                **{key: value for key, value in template.items() if key != "systemPromptUpdate"},
+                "id": choice, "name": choice,
+                "inputModalities": ["text", "image"] if supports_images(choice) else ["text"],
+                # The pinned Host cannot represent the newer leading-only
+                # metadata. Do not declare its sole in-history value for pro;
+                # the application system prompt remains fixed for all sessions.
+                **({"systemPromptUpdate": "in-history"} if choice == "deepseek-flash" else {}),
+            }
+            for choice in model_choices(self.model)
+        ]
+        profile = json.dumps(effective_profile, ensure_ascii=False, indent=2)
         profile_path = self.run_dir / "effective.patch.json"
         profile_path.write_text(profile, encoding="utf-8")
         try:

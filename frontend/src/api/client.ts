@@ -25,7 +25,11 @@ export class ApiClient {
     return this.request<T>(path, { signal });
   }
 
-  write<T>(path: string, body?: unknown): Promise<T> {
+  write<T>(
+    path: string,
+    body?: unknown,
+    options?: { keepalive?: boolean; timeoutMs?: number },
+  ): Promise<T> {
     return this.request<T>(path, {
       method: "POST",
       headers: {
@@ -33,6 +37,8 @@ export class ApiClient {
         "X-Learning-CSRF": this.csrf || "",
       },
       body: body === undefined ? undefined : JSON.stringify(body),
+      keepalive: options?.keepalive,
+      signal: options?.timeoutMs ? AbortSignal.timeout(options.timeoutMs) : undefined,
     });
   }
 

@@ -314,6 +314,7 @@ class MessagesBoundary:
         self._records = list(previous.values())
         self._bindings: deque[str] = deque()
         self._bound_generations: set[str] = set()
+        self._generation_selections: dict[str, tuple[str, str]] = {}
         self._scenario: dict[str, Any] = {}
         self._events: list[dict[str, Any]] = []
         self._gates: dict[str, threading.Event] = {}
@@ -405,12 +406,19 @@ class MessagesBoundary:
             self._server_thread.start()
         return self
 
-    def bind(self, generation_id: str) -> None:
+    def bind(
+        self, generation_id: str, *, model: str | None = None, thinking: str | None = None
+    ) -> None:
         if not isinstance(generation_id, str) or not generation_id or len(generation_id) > 256:
             raise ValueError("INVALID_GENERATION_ID")
         with self._lock:
             if self._stopped:
                 raise RuntimeError("BOUNDARY_ALREADY_STOPPED")
+            selection = (model or self.model, thinking or self.thinking)
+            previous = self._generation_selections.get(generation_id)
+            if previous is not None and previous != selection:
+                raise ValueError("GENERATION_SELECTION_IMMUTABLE")
+            self._generation_selections[generation_id] = selection
             self._bindings.append(generation_id)
             self._bound_generations.add(generation_id)
 
@@ -857,17 +865,23 @@ class MessagesBoundary:
             emit({"type": "message_stop"})
             self._update(row, status="completed", terminal_emitted_ns=time.time_ns())
 
-    def _configuration_matches(self, request: dict[str, Any]) -> bool:
-        disabled = self.thinking in {"disabled", "off", "none"}
+    def _configuration_matches(
+        self, request: dict[str, Any], generation_id: str | None = None
+    ) -> bool:
+        with self._lock:
+            model, effort = self._generation_selections.get(
+                generation_id, (self.model, self.thinking)
+            )
+        disabled = effort in {"disabled", "off", "none"}
         thinking = request.get("thinking")
         output = request.get("output_config")
         return (
-            request.get("model") == self.model
+            request.get("model") == model
             and type(request.get("max_tokens")) is int
             and request["max_tokens"] == self.max_tokens
             and isinstance(thinking, dict)
             and thinking.get("type") == ("disabled" if disabled else "enabled")
-            and (disabled or (isinstance(output, dict) and output.get("effort") == self.thinking))
+            and (disabled or (isinstance(output, dict) and output.get("effort") == effort))
         )
 
     def _forward(
@@ -878,7 +892,7 @@ class MessagesBoundary:
         row: dict[str, Any],
         observer: UsageObserver,
     ) -> None:
-        if not self._configuration_matches(request):
+        if not self._configuration_matches(request, row.get("generation_id")):
             self._update(row, status="configuration_blocked")
             return self._reject(handler, 403, "MODEL_CONFIGURATION_MISMATCH")
         upstream = http.client.HTTPSConnection(OFFICIAL_HOST, 443, timeout=min(15.0, self.timeout))

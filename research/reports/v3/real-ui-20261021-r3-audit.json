@@ -1,0 +1,78 @@
+{
+  "id": "real-ui-20261021-r3-post-run-audit",
+  "evidence_ref": "research/reports/v3/real-ui-20261021-r3.json",
+  "historical_result_unchanged": true,
+  "execution_status": "passed",
+  "assertions_passed": 11,
+  "real_attempts_r1": 0,
+  "real_attempts_r2": 2,
+  "real_attempts_r3": 2,
+  "first_answer_rendered_increments": [
+    {
+      "at_ms": 3839,
+      "chars": 150
+    },
+    {
+      "at_ms": 4235,
+      "chars": 358
+    },
+    {
+      "at_ms": 4620,
+      "chars": 606
+    },
+    {
+      "at_ms": 5023,
+      "chars": 866
+    },
+    {
+      "at_ms": 5382,
+      "chars": 1059
+    }
+  ],
+  "second_answer_rendered_increments": [
+    {
+      "at_ms": 2055,
+      "chars": 7
+    },
+    {
+      "at_ms": 2445,
+      "chars": 349
+    },
+    {
+      "at_ms": 2813,
+      "chars": 534
+    }
+  ],
+  "excluded_observation": {
+    "at_ms": 9,
+    "chars": 915,
+    "reason": "Observer saw the previous assistant answer while the new generation was being published. This is stale DOM, not a response delta for the follow-up."
+  },
+  "timing_limits": "Rendered content observations are not human useful-content timing. No 10-second user experience acceptance is inferred.",
+  "synthetic_problem_manual_check": {
+    "equation": "x^2-5x+6=0",
+    "roots": [
+      2,
+      3
+    ],
+    "factorization": "(x-2)(x-3)",
+    "discriminant": 1,
+    "first_answer": "both methods, arithmetic and substitutions correct",
+    "followup": "Vieta sum 5/product 6 and no additional real roots argument correct",
+    "scope": "synthetic image contains expected roots; this validates execution and reading flow, not general mathematics accuracy"
+  },
+  "source_changed_during_run": [
+    "tests/e2e/test_mvp_a.py",
+    "backend/src/learning_app/service.py"
+  ],
+  "effective_profile_sha256": {
+    "data\\execution\\host\\effective.patch.json": "646df2d87b52f53bb0aeed58d883705ef42791ae7a3562d57c95594b0b85293b"
+  },
+  "not_covered": [
+    "real body cancellation",
+    "human learning value",
+    "human useful-content timing",
+    "unapproved real video frames"
+  ],
+  "runner_followup_fix": "Future observations require assistant count greater than the count before sending; original r3 raw observations retained."
+}

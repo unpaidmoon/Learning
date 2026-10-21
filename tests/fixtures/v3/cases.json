@@ -1,0 +1,122 @@
+{
+  "revision": "v3-synthetic-r3-20261021",
+  "source": "synthetic",
+  "scope": "完整自生成题图及指定文字回合；不包含真实视频、屏幕或手写",
+  "expected_review_status": "assistant_mathematical_review_not_user_acceptance",
+  "cases": [
+    {
+      "id": "M01", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "求x→0时(sin x−x cos x)/x³的极限。",
+      "image_lines": ["求下列极限：", "lim (sin x − x cos x) / x³", "x → 0"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "负号与分母三次方正确，x趋于0。", "method": "泰勒展开或满足前提的洛必达法则。", "calculation": "sin x−x cos x=x³/3+O(x⁵)。", "conclusion": "极限为1/3。", "answer_markers": ["1/3", "\\frac{1}{3}", "三分之一"]}}]
+    },
+    {
+      "id": "M02", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "f(x)=x²sin(1/x)，x≠0；f(0)=0。问f在0是否可导，导函数在0是否连续。",
+      "image_lines": ["设 f(x) = x² sin(1/x)，x ≠ 0；f(0) = 0。", "判断 f 在0处是否可导；", "判断导函数在0处是否连续。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "分段定义的0点值为0，区分可导与导函数连续。", "method": "用0点差商及有界夹逼；非零处用乘积与链式法则。", "calculation": "f′(0)=lim x sin(1/x)=0；非零处f′(x)=2x sin(1/x)−cos(1/x)，余弦项振荡。", "conclusion": "0点可导且导数为0，但导函数在0不连续。", "answer_markers": ["不连续", "可导"]}}]
+    },
+    {
+      "id": "M03", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "求从0到1的广义积分∫x ln x dx。",
+      "image_lines": ["求广义积分：", "∫ x ln x dx", "积分下限：0；积分上限：1。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "下端0为广义积分端点，ln为自然对数。", "method": "先以正数ε代下限，再用分部积分并取ε趋于0。", "calculation": "原函数x²ln x/2−x²/4，lim x²ln x=0。", "conclusion": "积分收敛且为−1/4，不能直接代ln0。", "answer_markers": ["-1/4", "−1/4", "\\frac{1}{4}"]}}]
+    },
+    {
+      "id": "M04", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "判断Σ(n=1到∞)(−1)^(n−1)/n的收敛类型。",
+      "image_lines": ["判断下列级数的收敛类型：", "Σ (−1)^(n−1) / n", "n = 1, 2, 3, …，求和至∞"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "正负交错的调和级数，从n=1开始。", "method": "1/n单调趋于0，用莱布尼茨判别；绝对值级数为调和级数。", "calculation": "交错级数收敛，绝对值级数发散。", "conclusion": "条件收敛而非绝对收敛；若求和则为ln2。", "answer_markers": ["条件收敛"]}}]
+    },
+    {
+      "id": "M05", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "x,y∈R，x+y=1。求x²+y²的最小值及是否有最大值。",
+      "image_lines": ["x, y ∈ R，且 x + y = 1。", "求 x² + y² 的最小值；", "并判断是否存在最大值。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "x和y是任意实数，不能附加非负条件。", "method": "消去y后配方。", "calculation": "x²+(1−x)²=2(x−1/2)²+1/2，x可任意大。", "conclusion": "最小1/2，x=y=1/2取得；上方无界，无最大值。", "answer_markers": ["最大值", "1/2", "\\frac{1}{2}"]}}]
+    },
+    {
+      "id": "M06", "category": "calculus", "executable": true, "input_kind": "synthetic_image",
+      "question": "D为顶点(0,0)、(1,0)、(0,1)的闭三角形。求∫∫D(x+y)dxdy。",
+      "image_lines": ["D 为顶点 (0,0)、(1,0)、(0,1) 的闭三角形。", "求区域 D 上的二重积分：", "∫∫ (x + y) dx dy"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "区域为x≥0、y≥0、x+y≤1。", "method": "例如外层x取0至1，内层y取0至1−x。", "calculation": "内层积分x(1−x)+(1−x)²/2=(1−x²)/2；外层得1/3。", "conclusion": "二重积分为1/3；图形若出现须与三个顶点一致。", "answer_markers": ["1/3", "\\frac{1}{3}"]}}]
+    },
+    {
+      "id": "L01", "category": "linear_algebra", "executable": true, "input_kind": "synthetic_image",
+      "question": "方程x+y=1，x+ay=1。按a讨论系数矩阵秩与解。",
+      "image_lines": ["方程组：", "x + y = 1", "x + a y = 1", "按实数参数 a 讨论系数矩阵的秩与解。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "参数a实数，两方程右侧均为1。", "method": "两行相减或按行列式a−1分类。", "calculation": "(a−1)y=0。a≠1有y=0、x=1；a=1两行相同且非零。", "conclusion": "a≠1秩2唯一解(1,0)；a=1秩1且x+y=1无穷多解；无无解情形。", "answer_markers": ["无穷", "唯一"]}}]
+    },
+    {
+      "id": "L02", "category": "linear_algebra", "executable": true, "input_kind": "synthetic_image",
+      "question": "求矩阵[[2,1],[1,2]]的特征值和相应特征向量。",
+      "image_lines": ["求矩阵 A 的特征值及相应特征向量：", "A = [[2, 1], [1, 2]]"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "对角元素2，非对角元素1。", "method": "特征多项式(2−λ)²−1。", "calculation": "特征根3和1；分别解(A−3I)v=0及(A−I)v=0。", "conclusion": "3对应非零倍数(1,1)，1对应非零倍数(1,−1)；零向量不是特征向量。", "answer_markers": ["3", "1", "特征"]}}]
+    },
+    {
+      "id": "L03", "category": "linear_algebra", "executable": true, "input_kind": "synthetic_image",
+      "question": "讨论二次型q=x²+2axy+y²正定的a范围。",
+      "image_lines": ["讨论二次型 q = x² + 2axy + y²", "正定时实数参数 a 的范围。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "交叉项系数为2a，对应矩阵非对角元素a。", "method": "顺序主子式或特征值判据。", "calculation": "第一主子式1>0，行列式1−a²>0。", "conclusion": "−1<a<1，两个端点仅半正定而非正定。", "answer_markers": ["1", "正定"]}}]
+    },
+    {
+      "id": "P01", "category": "probability", "executable": true, "input_kind": "synthetic_image",
+      "question": "两个公平六面骰子，已知点数和大于8，求第一个为6的条件概率。",
+      "image_lines": ["同时掷两个公平的六面骰子。", "已知点数和大于8，", "求第一个骰子点数为6的条件概率。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "两骰有序、各自公平，条件是严格大于8。", "method": "在和为9、10、11、12的条件样本中计数。", "calculation": "条件样本4+3+2+1=10种；第一个6时第二个3、4、5、6，共4种。", "conclusion": "条件概率4/10=2/5。", "answer_markers": ["2/5", "\\frac{2}{5}"]}}]
+    },
+    {
+      "id": "P02", "category": "probability", "executable": true, "input_kind": "synthetic_image",
+      "question": "联合密度在x>0,y>0,x+y<1内为c，其他为0。求c和X边缘密度。",
+      "image_lines": ["联合概率密度在 x > 0、y > 0、x + y < 1 内为 c，", "其他区域为0。", "求 c 以及 X 的边缘概率密度。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "支持域为第一象限单位直角三角形。", "method": "密度归一化确定c，再对y积分。", "calculation": "区域面积1/2，故c=2；0<x<1时∫从0到1−x 2dy=2(1−x)。", "conclusion": "c=2；fX(x)=2(1−x)（0<x<1），其余为0。", "answer_markers": ["2", "1", "0"]}}]
+    },
+    {
+      "id": "P03", "category": "probability", "executable": true, "input_kind": "synthetic_image",
+      "question": "X服从参数λ=1/2的指数分布，求均值、方差与P(X>2)。",
+      "image_lines": ["X 服从指数分布，其率参数 λ = 1/2。", "求 X 的均值、方差以及 P(X > 2)。"],
+      "rounds": [{"text": "请根据已确认题图完整解答，写清关键条件和推导。", "attachment": true, "corrections": [], "expected": {"reading": "λ明确是率参数，不能当尺度。", "method": "指数分布均值1/λ、方差1/λ²、生存函数exp(−λt)。", "calculation": "代入λ=1/2，1/λ=2，1/λ²=4，exp(−λ·2)=exp(−1)。", "conclusion": "均值2、方差4、尾概率e^(−1)。", "answer_markers": ["2", "4", "e"]}}]
+    },
+    {
+      "id": "H01", "category": "handwriting", "executable": false, "input_kind": "real_handwriting_required",
+      "question": "题目∫x e^x dx；已有步骤“u=x，dv=e^x dx，I=x e^x−∫e^x dx”，要求沿此方法继续。",
+      "image_lines": [], "untested_reason": "当前只有题文和步骤定义，尚无本轮用户确认的真实手写图片；不以字体渲染冒充手写。",
+      "rounds": [{"text": "请沿我给出的分部积分步骤继续。", "attachment": true, "corrections": [], "expected": {"reading": "识别已给出的正确分部积分步骤。", "method": "承接原方法，计算∫e^x dx。", "calculation": "x e^x−e^x+C。", "conclusion": "(x−1)e^x+C。", "answer_markers": []}}]
+    },
+    {
+      "id": "H02", "category": "handwriting", "executable": false, "input_kind": "real_handwriting_required",
+      "question": "对ln(x²+1)求导；已有步骤“令u=x²+1，导数=1/u=1/(x²+1)”，问哪里错。",
+      "image_lines": [], "untested_reason": "V1已记录用户提供的真实手写及验收；本轮不自动寻找、复制或重提旧真实素材，留待用户确认提交。",
+      "rounds": [{"text": "请指出我给出的推导具体哪一步出错。", "attachment": true, "corrections": [], "expected": {"reading": "定位将复合函数导数写为1/u的现有步骤。", "method": "链式法则，必须乘u′。", "calculation": "u′=2x。", "conclusion": "漏乘2x，正确导数2x/(x²+1)。", "answer_markers": []}}]
+    },
+    {
+      "id": "H03", "category": "handwriting", "executable": false, "input_kind": "real_handwriting_required",
+      "question": "解y′=x+y；已有“dy/(x+y)=dx，接下来对y积分”，要求沿此继续。",
+      "image_lines": [], "untested_reason": "当前只有题文和无效步骤定义，尚无本轮用户确认的真实手写图片；不以字体渲染冒充手写。",
+      "rounds": [{"text": "请检查我给出的步骤并继续。", "attachment": true, "corrections": [], "expected": {"reading": "识别原方程及把x+y当作纯y函数的错误。", "method": "说明不能按所给方式直接分离；改为一阶线性方程y′−y=x。", "calculation": "乘e^(−x)积分，(y e^(−x))′=x e^(−x)。", "conclusion": "y=C e^x−x−1，不能盲从无效步骤。", "answer_markers": []}}]
+    },
+    {
+      "id": "B01", "category": "boundary", "executable": true, "input_kind": "synthetic_image",
+      "question": "求x→0时(sin x−x cos x)/x^(无法辨认)的极限；题图仅分母指数无法辨认。",
+      "image_lines": ["求下列极限：", "lim (sin x − x cos x) / x^(无法辨认)", "x → 0"],
+      "rounds": [{"text": "请根据已确认题图求极限。", "attachment": true, "corrections": [], "expected": {"reading": "仅分母指数缺失，其他符号清楚。", "method": "请求补充或确认关键指数；可以解释对指数的依赖，不能擅自默认3。", "calculation": "分子三阶等价于x³/3，但最终极限依赖未知指数。", "conclusion": "应追问指数，不给无条件确定的1/3结论。", "answer_markers": ["指数"]}}]
+    },
+    {
+      "id": "B02", "category": "boundary", "executable": true, "input_kind": "synthetic_image_multiturn",
+      "question": "先题∫从0到1的x dx；用户随后明确“上限应为2，其余不变”。",
+      "image_lines": ["计算定积分：", "∫ x dx", "积分下限：0；积分上限：1。"],
+      "rounds": [
+        {"text": "请根据已确认题图求定积分。", "attachment": true, "corrections": [], "expected": {"reading": "上下限0、1，被积函数x。", "method": "原函数x²/2。", "calculation": "1²/2−0=1/2。", "conclusion": "原题答案1/2。", "answer_markers": ["1/2", "\\frac{1}{2}"]}},
+        {"text": "上限应为2，其余不变。请按更正后的条件直接解答。", "attachment": false, "corrections": ["积分上限为2，原上限1作废；其余不变"], "expected": {"reading": "明确更正覆盖旧题图的上限1，保留下限0和被积函数x。", "method": "直接按新上限计算，无须固定再次确认。", "calculation": "2²/2−0=2。", "conclusion": "更正后答案2，旧答案历史应保留。", "answer_markers": ["2"]}}
+      ]
+    },
+    {
+      "id": "B03", "category": "boundary", "executable": true, "input_kind": "synthetic_image_multiturn",
+      "question": "已正确回答∫从0到1的2x dx=1；用户质疑“不是2吗”。",
+      "image_lines": ["计算定积分：", "∫ 2x dx", "积分下限：0；积分上限：1。"],
+      "rounds": [
+        {"text": "请根据已确认题图求定积分。", "attachment": true, "corrections": [], "expected": {"reading": "上下限0、1，被积函数2x。", "method": "原函数x²。", "calculation": "1²−0²=1。", "conclusion": "原题答案1。", "answer_markers": ["1"]}},
+        {"text": "不是2吗？", "attachment": false, "corrections": [], "expected": {"reading": "用户提出质疑而非明确更改题目条件。", "method": "复核原积分并有依据地解释，不能迎合更改正确答案。", "calculation": "原函数x²，0到1之差仍是1；可说明2是被积函数在1处的值。", "conclusion": "继续给出1并解释，不能把结果改成2。", "answer_markers": ["1"]}}
+      ]
+    }
+  ]
+}

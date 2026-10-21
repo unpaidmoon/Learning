@@ -1,0 +1,113 @@
+{
+  "run_id": "mvpa-registered-playback-20261021-r2",
+  "status": "passed",
+  "scope": "authorized registered video playback only; no image or audio inspection",
+  "real_provider_attempts": 0,
+  "captures": {
+    "screenshots": 0,
+    "canvas": 0,
+    "traces": 0,
+    "audio": 0,
+    "frames": 0
+  },
+  "playback": {
+    "observed": {
+      "source": {
+        "asset_id": "asset_2d717290dfd24e14b3724f8cdf587273",
+        "sha256": "48847ee587cdcd36269a31d741cf3ef328f505e6b87fa0079e80fa24ceaf985c",
+        "size_bytes": 510261596
+      },
+      "head": {
+        "status": 200,
+        "length": 510261596
+      },
+      "loaded": {
+        "readyState": 4,
+        "currentTime": 0,
+        "duration": 12300.817188,
+        "videoWidth": 960,
+        "videoHeight": 720,
+        "paused": true
+      },
+      "played": {
+        "readyState": 4,
+        "currentTime": 0.417094,
+        "duration": 12300.817188,
+        "videoWidth": 960,
+        "videoHeight": 720,
+        "paused": true
+      },
+      "seeked": {
+        "readyState": 4,
+        "currentTime": 7380.490312,
+        "duration": 12300.817188,
+        "videoWidth": 960,
+        "videoHeight": 720,
+        "paused": true
+      },
+      "resumed": {
+        "readyState": 4,
+        "currentTime": 7380.711335,
+        "duration": 12300.817188,
+        "videoWidth": 960,
+        "videoHeight": 720,
+        "paused": true
+      },
+      "target": 7380.4903128000005,
+      "saved": {
+        "position_ms": 7380711,
+        "position_revision": 1
+      },
+      "restored": {
+        "position_ms": 7380711,
+        "position_revision": 1
+      }
+    },
+    "ranges": [
+      {
+        "status": 200,
+        "range": null,
+        "contentRange": null,
+        "length": 510261596
+      },
+      {
+        "status": 206,
+        "range": "bytes=0-",
+        "contentRange": "bytes 0-510261595/510261596",
+        "length": 510261596
+      },
+      {
+        "status": 206,
+        "range": "bytes=308051968-",
+        "contentRange": "bytes 308051968-510261595/510261596",
+        "length": 202209628
+      }
+    ]
+  },
+  "checks": {
+    "metadata": true,
+    "played": true,
+    "seeked": true,
+    "resumed": true,
+    "saved_restored": true,
+    "range_206": true,
+    "head_length": true
+  },
+  "cleanup": {
+    "browser_remaining_pids": [],
+    "application_remaining_pids": [],
+    "backend_port_closed": true,
+    "frontend_port_closed": true
+  },
+  "original_failure": {
+    "run_id": "mvpa-registered-playback-20261021-r1",
+    "status": "failed",
+    "reason": "runner did not capture run-code console result; media outcome not counted as passed",
+    "retained": true
+  },
+  "limitations": [
+    "Playback authorization does not authorize frame/image/model inspection",
+    "Muted headless playback; no manual audio or picture quality assessment",
+    "Numeric media DOM and HTTP headers only; no visual artifacts"
+  ]
+}

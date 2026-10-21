@@ -1,0 +1,447 @@
+{
+  "review_kind": "assistant_analytic_review_not_user_acceptance",
+  "total_real_attempts_including_initial_baseline": 32,
+  "runs": [
+    {
+      "run_id": "v3-ambiguity-retetest-20261021-r1",
+      "source_result_sha256": "f8fd95e2c1771cfe409459dc5c6d6c9070f0fd891ca3d0ac900cebf25a624189",
+      "actual_outbound_attempts": 3,
+      "execution_status": "completed",
+      "source_changed_files": [],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_b5c4f0631157404aae040cf03e3f69eb",
+          "body_sha256": "85adc85876391647f0fa0ce0c2417505952f33408723ab21f22d4e8210b8a6ee",
+          "review_status": "passed",
+          "review": "普通完整题仍先给具体方法理由，洛必达和Taylor计算正确、结果1/3。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 3797.0,
+          "time_to_useful_content_ms": 4141.0,
+          "useful_content_anchor": "(\\sin x-x\\cos x)'=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+          "useful_content_observation_body_sha256": "3d63d84885059ae706da87f37c7f19e531c73b6cf190cc6185a249582c9325c5",
+          "time_to_complete_ms": 5063.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        },
+        {
+          "case_id": "B01",
+          "round": 1,
+          "generation_id": "generation_15e4b44315b24e14acaad240bc7f1546",
+          "body_sha256": "4c820631d01b048884ef130185ab645b9741a64dc53444d05316ae3a9a8770c6",
+          "review_status": "passed",
+          "review": "首先请求不可辨指数，解释该指数影响极限；未猜成3/2、未给假设条件下的本题答案。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 2891.0,
+          "time_to_useful_content_ms": 3281.0,
+          "useful_content_anchor": "题图中分母 \\(x\\) 的指数被“无法辨认”遮挡，导致题目不完整；该指数会直接改变极限值。请补充分母是 \\(x^{?}\\) 中的指数（例如 \\(x^2\\)、\\(x^3\\) 等），或提供清晰原式后，我再完整求解。",
+          "useful_content_observation_body_sha256": "4c820631d01b048884ef130185ab645b9741a64dc53444d05316ae3a9a8770c6",
+          "time_to_complete_ms": 3281.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        },
+        {
+          "case_id": "B01ALT",
+          "round": 1,
+          "generation_id": "generation_e184b68f07e941a2ba5f5e60249e7b6e",
+          "body_sha256": "27847ad35600ec5dc195f1957251f8f17a5970df89a19a7795e17af45d387c95",
+          "review_status": "passed",
+          "review": "首先请求不可辨指数，解释该指数影响极限；未猜成3/2、未给假设条件下的本题答案。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 2422.0,
+          "time_to_useful_content_ms": 2688.0,
+          "useful_content_anchor": "题图中分母为 \\(x^{?}\\)，指数缺失，无法确定极限结果。请补充分母 \\(x\\) 的指数（例如 \\(x^2\\)、\\(x^3\\) 或具体表达式）；补充后我再完整求解。",
+          "useful_content_observation_body_sha256": "27847ad35600ec5dc195f1957251f8f17a5970df89a19a7795e17af45d387c95",
+          "time_to_complete_ms": 2688.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-flash-none-20261021-r1",
+      "source_result_sha256": "246cae27dbc2bd331ec7ce790113ef4add70dbcfa3b66914537b871f4cefce83",
+      "actual_outbound_attempts": 1,
+      "execution_status": "completed",
+      "source_changed_files": [],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_81dfb4788aa24ad9bb15b3aaf0e17597",
+          "body_sha256": "8eebff9848ab26f5af97ce4f9eb71825d79bf86d42652980b33683fd51dadf80",
+          "review_status": "passed",
+          "review": "显式none实际出站thinking.disabled，图片hash保留，Taylor三阶相减和洛必达均正确得1/3。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 1188.0,
+          "time_to_useful_content_ms": 2172.0,
+          "useful_content_anchor": "=\\frac13x^3+o(x^3).",
+          "useful_content_observation_body_sha256": "f574177dd5618fb9399b13a8d8c194409f6d81e27d75aa5cc68ae31e8857a07f",
+          "time_to_complete_ms": 2766.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-pro-none-20261021-r1",
+      "source_result_sha256": "1d4023f671d3e6ca3004a50486bf34d965e6331716f82115662ff79d65e718f6",
+      "actual_outbound_attempts": 1,
+      "execution_status": "failed",
+      "source_changed_files": [],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_92ad5019d1444f358e18f98788118cd4",
+          "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "review_status": "configuration_failed",
+          "review": "HTTP400：真实支持ID是deepseek-v4-pro，不是deepseek-pro。实际attempt=1，缺usage保留unknown，不自动重试或降级。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": null,
+          "time_to_useful_content_ms": null,
+          "useful_content_anchor": null,
+          "useful_content_observation_body_sha256": null,
+          "time_to_complete_ms": 343.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "unknown"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-v4pro-none-20261021-r1",
+      "source_result_sha256": "61bac3ee9446fbf29b531a7318ce56207f383285f071a196e68cf605f3113802",
+      "actual_outbound_attempts": 1,
+      "execution_status": "completed",
+      "source_changed_files": [],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+          "body_sha256": "e9ac7ca0bcd61fcd4416c60fde5315130a2c135e2f5631daecb738d4a0428892",
+          "review_status": "vision_metadata_integration_failed",
+          "review": "旧模板误宣称text-only型号可收图；实际请求有精确批准图，但provider拒辨图/Unsupported Image。不是数学推理错误。官方能力核对后正式链已改发布前拒绝图片或保留题图历史切到pro。原拒答留证，不自动drop图或换模型。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 1094.0,
+          "time_to_useful_content_ms": null,
+          "useful_content_anchor": null,
+          "useful_content_observation_body_sha256": null,
+          "time_to_complete_ms": 3547.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-v4pro-high-20261021-r1",
+      "source_result_sha256": "cba68dcc52985638d6ebb0031588c7bf0e6d5fb403919e03c988749b18570ef2",
+      "actual_outbound_attempts": 1,
+      "execution_status": "completed",
+      "source_changed_files": [
+        "backend\\src\\learning_app\\storage\\repository.py"
+      ],
+      "backend_harness_unchanged": false,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_b2a6ea31b40747a68fcf655ac88621db",
+          "body_sha256": "c975a9597e75fd7f2e19de252bdf47e702508854597e4afac38e8334aaed278b",
+          "review_status": "vision_metadata_integration_failed",
+          "review": "旧模板误宣称text-only型号可收图；实际请求有精确批准图，但provider拒辨图/Unsupported Image。不是数学推理错误。官方能力核对后正式链已改发布前拒绝图片或保留题图历史切到pro。原拒答留证，不自动drop图或换模型。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 13750.0,
+          "time_to_useful_content_ms": null,
+          "useful_content_anchor": null,
+          "useful_content_observation_body_sha256": null,
+          "time_to_complete_ms": 16203.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-v4pro-text-none-20261021-r1",
+      "source_result_sha256": "9da76a7da8bf0c95736890cb5a3d2c29363c651d4d6fdf8cc84110e7293efefb",
+      "actual_outbound_attempts": 1,
+      "execution_status": "completed",
+      "source_changed_files": [],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_bd7483d6945943b28eecd719d650b416",
+          "body_sha256": "a2a62d399da162914094a8fdc20bc9477faff9c46fbdd37758aa546e20bf4fc3",
+          "review_status": "mathematics_failed",
+          "review": "纯文字与实际型号配置正确、无图片、最终1/3且洛必达正确；Taylor减法把x⁵项写为+1/30，实际为1/120−1/24=−1/30。依V3错推导即失败，不因结果正确改为通过。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 2453.0,
+          "time_to_useful_content_ms": null,
+          "useful_content_anchor": null,
+          "useful_content_observation_body_sha256": null,
+          "time_to_complete_ms": 7875.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-config-v4pro-text-high-20261021-r1",
+      "source_result_sha256": "ce96bd5bb742376354d6b6bd5d5544d8c50bc1927d6b05141ac7662ef02cba0b",
+      "actual_outbound_attempts": 2,
+      "execution_status": "completed",
+      "source_changed_files": [
+        "frontend\\src\\chat\\ChatWorkspace.tsx"
+      ],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_8795541468c84a97bec2cf8ae8416af0",
+          "body_sha256": "31ded340cf7dff7f304efd2b1e4b24c75997359e6b121820254f59656b3e9783",
+          "review_status": "passed",
+          "review": "独立显式high控制配置，非产品自动更改用户none；原M01的洛必达前提/导数/Taylor至三阶均正确，结果1/3。本次没有声称复现或证实此前错误五阶系数。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 34297.0,
+          "time_to_useful_content_ms": 35859.0,
+          "useful_content_anchor": "(\\sin x-x\\cos x)'=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+          "useful_content_observation_body_sha256": "1c666e0fb71c5b29fa3a4cf0e162a6c129a3101a43b333a22baa9ebe19efc980",
+          "time_to_complete_ms": 38031.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        },
+        {
+          "case_id": "T01",
+          "round": 1,
+          "generation_id": "generation_aa0ed318dec9431aa30571eee79260bc",
+          "body_sha256": "5a80ba3a5576c587c1ea35d10007b7d9de2f946d801f2336e2aeefad752202e5",
+          "review_status": "passed",
+          "review": "不同同类Taylor极限，明确sin x−x=−x³/6+x⁵/120+o(x⁵)，五阶符号和余项处理正确，极限−1/6。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 11297.0,
+          "time_to_useful_content_ms": 13656.0,
+          "useful_content_anchor": "-\\frac{x^3}{6}+\\frac{x^5}{120}+o(x^5).",
+          "useful_content_observation_body_sha256": "b0228656dd5bbf07ca5303ffc2ede55127e2efe79e56025a81a4b9da93a97eca",
+          "time_to_complete_ms": 15875.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        }
+      ]
+    },
+    {
+      "run_id": "v3-stop-retest-20261021-r1",
+      "source_result_sha256": "4f2fbb92e6069ea0ca2004c1b902d4f971f8dbfea6a53a4c7d0a3b2a4c052eeb",
+      "actual_outbound_attempts": 3,
+      "execution_status": "completed",
+      "source_changed_files": [
+        "package.json"
+      ],
+      "backend_harness_unchanged": true,
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      },
+      "cases": [
+        {
+          "case_id": "M01",
+          "round": 1,
+          "generation_id": "generation_3d42f982d8184054b533ea9ce056a6e0",
+          "body_sha256": "e83e9ec082e4b3eec9863e33b15380fcd783e3e6c967e04c165a9c8ef3041083",
+          "review_status": "passed",
+          "review": "批摄入改动后普通题回归：Taylor两项抵消、三阶系数1/3及最终值正确。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 2328.0,
+          "time_to_useful_content_ms": 2875.0,
+          "useful_content_anchor": "=\\frac{x^3}{3}+o(x^3).",
+          "useful_content_observation_body_sha256": "ebd50dd00063d91ca56e66a654dd6715c815e20f5d62390203419238048b16dd",
+          "time_to_complete_ms": 3110.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known"
+        },
+        {
+          "case_id": "STOP",
+          "round": 1,
+          "generation_id": "generation_b8596924dd4142dca6e48c7dc90832a0",
+          "body_sha256": "9a2428bf27ac653eb90f3a761d5c9d2c47951d571ab573195f37b5ee63b47aa0",
+          "review_status": "activity_cancel_passed",
+          "review": "点击时业务running、已显示44字符，实际boundary dispatch已起、无request_finished、raw SSE无message_stop；取消后provider断流、durable cancelled且保留82字符，终态raw usage未结算为unknown。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 8515.0,
+          "time_to_useful_content_ms": null,
+          "useful_content_anchor": null,
+          "useful_content_observation_body_sha256": null,
+          "time_to_complete_ms": 8750.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "unknown",
+          "cancel_observation": {
+            "at_ms": 8594.0,
+            "state_before_cancel": "running",
+            "body_chars_before_cancel": 44,
+            "body_sha256_before_cancel": "1e55689f5ffdb6adf5f22029890535cc18c6b3c61697eec554591920fe725e70",
+            "provider_before_cancel": {
+              "observed_at_ns": 1792563857129363300,
+              "provider_active_before_cancel": true,
+              "requests": [
+                {
+                  "request_id": "boundary-605eb72eea964173af181507f95d7303",
+                  "actual_outbound_started": true,
+                  "request_finished_recorded": false,
+                  "provider_terminal_sse_observed": false,
+                  "raw_sse_bytes_at_observation": 212340,
+                  "raw_sse_sha256_at_observation": "4d5ca55b08dabec52d6715e397a2b371b70f351670ff931efe6fa4e14af8e445"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "case_id": "STOP",
+          "round": 2,
+          "generation_id": "generation_34bc1aba1a7c47d0a180a3f763eccdb0",
+          "body_sha256": "15ff95dd026bb945afa837594980e21076b53a4cd65d94b4f8bbf57f15254eec",
+          "review_status": "passed",
+          "review": "同chat/session/binding/epoch/host实例追问，明确更正分母2x³；原确认题图仍在请求，Taylor及各次洛必达前提、余项和导数均正确得1/6。",
+          "criteria": [
+            "reading",
+            "method_and_premises",
+            "calculation",
+            "conclusion"
+          ],
+          "time_to_first_body_delta_ms": 31829.0,
+          "time_to_useful_content_ms": 32657.0,
+          "useful_content_anchor": "=\\frac{x^3}{3}+o(x^3).",
+          "useful_content_observation_body_sha256": "95d028ac239431878c822b5fb191bb314ee5189dd72231da8cd9d93a4acb39b6",
+          "time_to_complete_ms": 35688.0,
+          "exact_current_chat_images_all_attempts": true,
+          "usage_status": "known",
+          "cancel_observation": null
+        }
+      ],
+      "same_conversation_after_stop": {
+        "binding_id": true,
+        "session_id": true,
+        "epoch": true
+      },
+      "same_host_instance_after_stop": true
+    }
+  ],
+  "limitations": [
+    "首有用时刻为正式HTTP快照中完整实质内容锚点的轮询观测上界，不是首字符，也不是浏览器渲染或用户阅读体验。",
+    "None和high都是独立显式验证配置，产品不自动修改用户选择。",
+    "Pro图像失败来自旧模板错误能力声明；修正能力metadata后图片请求在发布前拒绝，不静默drop。",
+    "Pro-none纯文字Taylor推导错误未由此次high复测证明完全消除，不据小样本宣称模型数学可靠。",
+    "真实网课题图、H01/H03、用户数次学习与操作收益评价未覆盖。"
+  ]
+}

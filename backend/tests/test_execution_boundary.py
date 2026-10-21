@@ -565,6 +565,36 @@ class BoundaryTests(unittest.TestCase):
         constructor.assert_not_called()
         self.assertEqual(boundary.actual_outbound_attempts, 0)
 
+    def test_generation_selection_is_immutable_and_isolates_concurrent_choices(self):
+        boundary = self.boundary(mode="official", api_key="synthetic-key")
+        boundary.bind("course-a", model="deepseek-v4-pro", thinking="none")
+        boundary.bind("course-b", model="deepseek-flash", thinking="low")
+        with self.assertRaisesRegex(ValueError, "GENERATION_SELECTION_IMMUTABLE"):
+            boundary.bind("course-a", model="deepseek-flash", thinking="low")
+        requests = [
+            request_body(generation_id="course-a", model="deepseek-v4-pro",
+                         thinking={"type": "disabled"}, output_config={}),
+            request_body(generation_id="course-b", output_config={"effort": "low"}),
+        ]
+        transports = []
+
+        def factory(*args, **kwargs):
+            transport = ProviderConnection(chunks=[frame({"type": "message_stop"})])
+            transports.append(transport)
+            return transport
+
+        with patch("learning_app.execution.boundary.http.client.HTTPSConnection",
+                   side_effect=factory):
+            for request in reversed(requests):
+                self.assertEqual(RunningRequest(boundary, request).join().status, 200)
+            # The first generation must keep its own disabled-thinking contract.
+            result = RunningRequest(boundary, request_body(
+                generation_id="course-a", model="deepseek-v4-pro",
+                output_config={"effort": "low"})).join()
+            self.assertEqual(result.status, 403)
+        self.assertEqual(len(transports), 2)
+        self.assertEqual(boundary.actual_outbound_attempts, 2)
+
     def test_redirect_is_blocked_without_second_request(self):
         boundary = self.boundary(mode="official", api_key="synthetic-key")
         boundary.bind("redirect")

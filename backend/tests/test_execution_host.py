@@ -161,7 +161,10 @@ async def test_concurrent_conversations_keep_provider_and_stream_ownership(tmp_p
         a = await adapter.prepare("course-A-chat", "submission-A", "generation-A")
         b = await adapter.prepare("course-B-chat", "submission-B", "generation-B")
         adapter.boundary.set_scenario({"text_chunks": ["shared deterministic answer"]})
-        await asyncio.gather(adapter.start(a, "Question A"), adapter.start(b, "Question B"))
+        await asyncio.gather(
+            adapter.start(a, "Question A", model="deepseek-flash", thinking="low"),
+            adapter.start(b, "Question B", model="deepseek-v4-pro", thinking="none"),
+        )
 
         async def collect(binding):
             return [event async for event in adapter.observe(binding)]
@@ -175,6 +178,11 @@ async def test_concurrent_conversations_keep_provider_and_stream_ownership(tmp_p
             "generation-A",
             "generation-B",
         }
+        by_generation = {row["generation_id"]: row for row in adapter.boundary.records}
+        assert by_generation["generation-A"]["model"] == "deepseek-flash"
+        assert by_generation["generation-A"]["output_config"]["effort"] == "low"
+        assert by_generation["generation-B"]["model"] == "deepseek-v4-pro"
+        assert by_generation["generation-B"]["thinking"]["type"] == "disabled"
 
 
 @pytest.mark.host
@@ -201,3 +209,32 @@ async def test_usage_late_settlement_has_distinct_observation_and_stable_settlem
         assert before[0].data["settlement_id"] == after[0].data["settlement_id"]
         repeated = await adapter._usage(binding)
         assert repeated[0].event_id == after[0].event_id
+
+
+@pytest.mark.host
+async def test_session_model_and_thinking_changes_reach_actual_provider_requests(tmp_path):
+    """Pinned Host, actual selectModel and Messages bytes; provider is local fixture."""
+    async with ExecutionAdapter(REPOSITORY, tmp_path / "runtime") as adapter:
+        selections = [("deepseek-flash", "low"), ("deepseek-v4-pro", "none"),
+                      ("deepseek-flash", "max")]
+        session_id = None
+        for index, (model, thinking) in enumerate(selections):
+            adapter.boundary.set_scenario({"text_chunks": [f"answer-{index}"]})
+            binding = await adapter.prepare("select-chat", f"submit-{index}", f"gen-{index}")
+            await adapter.start(binding, "Synthetic question.", model=model, thinking=thinking)
+            events = [event async for event in adapter.observe(binding)]
+            assert any(event.kind == "terminal" and event.status == "completed" for event in events)
+            if session_id is None:
+                session_id = binding.session_id
+            assert binding.session_id == session_id
+            row = adapter.boundary.records[-1]
+            assert row["model"] == model
+            assert row["thinking"]["type"] == ("disabled" if thinking == "none" else "enabled")
+            if thinking != "none":
+                assert row["output_config"]["effort"] == thinking
+            assert adapter.boundary._configuration_matches(
+                json.loads((adapter.boundary.private / f"{row['request_id']}.request.json")
+                           .read_text("utf-8")), binding.generation_id
+            )
+        assert len(adapter.boundary.records) == 3
+        assert adapter.boundary.actual_outbound_attempts == 0

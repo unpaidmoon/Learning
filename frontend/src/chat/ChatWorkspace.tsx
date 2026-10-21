@@ -1,19 +1,95 @@
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import type { FormEvent, Ref } from "react";
 import { ApiError, api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
+import { CaptureEditor } from "../media/CaptureEditor";
+import { CaptureError, readImageFile } from "../media/capture";
+import type { CaptureResult, CaptureSource } from "../media/capture";
+import { loadCapture, saveCapture } from "./captureCache";
+import { saveAllDrafts, useDraft } from "./draft";
+import { MarkdownAnswer } from "./MarkdownAnswer";
 import { generationActive, stateLabel } from "./state";
+import "./chat.css";
 
 const storageKey = (chatId: string) => `learning.pending.${chatId}`;
-
+const acceptedKey = (chatId: string) => `learning.accepted.${chatId}`;
 function readPending(chatId: string): Schema<"SubmissionInput"> | null {
   try {
-    const value = JSON.parse(sessionStorage.getItem(storageKey(chatId)) || "null");
+    const value = JSON.parse(
+      localStorage.getItem(storageKey(chatId)) ||
+        sessionStorage.getItem(storageKey(chatId)) ||
+        "null",
+    );
     return value?.chat_id === chatId && typeof value?.submission_id === "string" ? value : null;
   } catch {
     return null;
   }
+}
+function retainPending(chatId: string, value: Schema<"SubmissionInput"> | null) {
+  for (const storage of [localStorage, sessionStorage]) {
+    if (value) storage.setItem(storageKey(chatId), JSON.stringify(value));
+    else storage.removeItem(storageKey(chatId));
+  }
+}
+export type VideoSource = NonNullable<CaptureSource["source"]>;
+export interface ChatWorkspaceHandle {
+  saveDraft: () => Promise<void>;
+}
+interface Props {
+  chatId: string;
+  connected: boolean;
+  canSubmit: boolean;
+  configuredModel?: string;
+  configuredThinking?: string;
+  incomingCapture?: CaptureSource;
+  onCaptureConsumed?: () => void;
+  onOpenSource?: (source: VideoSource) => void;
+  ref?: Ref<ChatWorkspaceHandle>;
+}
+function MessageAttachment({
+  id,
+  index,
+  onOpenSource,
+}: {
+  id: string;
+  index: number;
+  onOpenSource?: (source: VideoSource) => void;
+}) {
+  const [source, setSource] = useState<Schema<"AttachmentSourceResponse"> | null>(null);
+  useEffect(() => {
+    const abort = new AbortController();
+    void api
+      .read<Schema<"AttachmentSourceResponse">>(`/attachments/${id}/source`, abort.signal)
+      .then(setSource)
+      .catch(() => undefined);
+    return () => abort.abort();
+  }, [id]);
+  return (
+    <div className="message-attachment">
+      <img src={`/api/v1/attachments/${id}`} alt={`已确认提交的图片 ${index + 1}`} loading="lazy" />
+      {source?.origin === "video" &&
+        source.asset_id &&
+        source.source_version &&
+        source.time_ms != null && (
+          <button
+            type="button"
+            className="attachment-source"
+            disabled={!onOpenSource}
+            onClick={() =>
+              onOpenSource?.({
+                asset_id: source.asset_id!,
+                source_version: source.source_version!,
+                time_ms: source.time_ms!,
+              })
+            }
+          >
+            来源 {Math.floor(source.time_ms / 60000)}:
+            {String(Math.floor(source.time_ms / 1000) % 60).padStart(2, "0")}
+          </button>
+        )}
+    </div>
+  );
 }
 
 export function ChatWorkspace({
@@ -22,163 +98,210 @@ export function ChatWorkspace({
   canSubmit,
   configuredModel,
   configuredThinking,
-}: {
-  chatId: string;
-  connected: boolean;
-  canSubmit: boolean;
-  configuredModel?: string;
-  configuredThinking?: string;
-}) {
+  incomingCapture,
+  onCaptureConsumed,
+  onOpenSource,
+  ref,
+}: Props) {
+  const draft = useDraft(chatId);
+  const { controller, value } = draft;
   const [chat, setChat] = useState<Schema<"ChatResponse"> | null>(null);
   const [pending, setPending] = useState(() => readPending(chatId));
-  const [retryAllowed, setRetryAllowed] = useState(false);
-  const [text, setText] = useState(pending?.text || "");
-  const [conditions, setConditions] = useState(pending?.conditions?.join("\n") || "");
-  const [corrections, setCorrections] = useState(pending?.corrections?.join("\n") || "");
-  const [model, setModel] = useState(pending?.model || "deepseek-flash");
-  const [thinking, setThinking] = useState<Schema<"SubmissionInput">["thinking"]>(
-    pending?.thinking || "high",
+  const [knownReceipt, setKnownReceipt] = useState(() =>
+    Boolean(localStorage.getItem(acceptedKey(chatId))),
   );
-  const [attachments, setAttachments] = useState<Schema<"AttachmentResponse">[]>([]);
-  const [candidate, setCandidate] = useState<{ file: File; url: string } | null>(null);
+  const [retryAllowed, setRetryAllowed] = useState(false);
+  const [candidates, setCandidates] = useState<{ source: CaptureSource; replaces?: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [acceptedGeneration, setAcceptedGeneration] = useState("");
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const followBottom = useRef(true);
+  const composing = useRef(false);
+  const candidate = useMemo(
+    () =>
+      candidates[0] || (incomingCapture ? { source: incomingCapture, replaces: undefined } : null),
+    [candidates, incomingCapture],
+  );
+  const model = value.model || configuredModel || "deepseek-flash";
+  const thinking = (value.thinking ||
+    configuredThinking ||
+    "high") as Schema<"SubmissionInput">["thinking"];
+  const editable = draft.ready && !busy && !pending;
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      saveDraft: async () => {
+        if (candidate) throw new Error("还有未确认的图片选区，请确认或取消后退出");
+        await controller.flush();
+        await saveAllDrafts();
+      },
+    }),
+    [candidate, controller],
+  );
   useEffect(() => {
-    const controller = new AbortController();
+    const abort = new AbortController();
     let timer = 0;
     const refresh = async () => {
       try {
-        const value = await api.read<Schema<"ChatResponse">>(`/chats/${chatId}`, controller.signal);
-        if (value.chat_id !== chatId) throw new Error("对话身份不匹配");
-        if (!controller.signal.aborted) {
-          setChat(value);
+        const result = await api.read<Schema<"ChatResponse">>(`/chats/${chatId}`, abort.signal);
+        if (result.chat_id !== chatId) throw new Error("对话身份不匹配");
+        if (!abort.signal.aborted) {
+          setChat(result);
           setAcceptedGeneration((current) =>
-            value.generations?.some((generation) => generation.generation_id === current)
-              ? ""
-              : current,
+            result.generations?.some((entry) => entry.generation_id === current) ? "" : current,
           );
         }
       } catch (reason) {
-        if (!controller.signal.aborted) setError(errorMessage(reason));
+        if (!abort.signal.aborted) setError(errorMessage(reason));
       } finally {
-        if (!controller.signal.aborted) timer = window.setTimeout(() => void refresh(), 500);
+        if (!abort.signal.aborted) timer = window.setTimeout(() => void refresh(), 350);
       }
     };
     void refresh();
     return () => {
-      controller.abort();
+      abort.abort();
       window.clearTimeout(timer);
     };
   }, [chatId]);
-
   useEffect(() => {
-    return () => {
-      if (candidate) URL.revokeObjectURL(candidate.url);
+    const element = messagesRef.current;
+    if (element && followBottom.current) element.scrollTop = element.scrollHeight;
+  }, [chat]);
+  useEffect(() => {
+    const flush = () => void controller.flush().catch(() => undefined);
+    const hide = () => {
+      if (document.visibilityState === "hidden") flush();
     };
-  }, [candidate]);
-
+    const protect = (event: BeforeUnloadEvent) => {
+      if (controller.snapshot().dirty || candidate) {
+        event.preventDefault();
+        flush();
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", protect);
+    document.addEventListener("visibilitychange", hide);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", protect);
+      document.removeEventListener("visibilitychange", hide);
+      flush();
+    };
+  }, [controller, candidate]);
   const generations = chat?.generations || [];
   const locked =
     Boolean(acceptedGeneration) ||
-    generations.some(
-      (generation) => generationActive(generation) || generation.state === "unknown",
-    );
-
-  const send = async (value: Schema<"SubmissionInput">) => {
+    generations.some((entry) => generationActive(entry) || entry.state === "unknown");
+  const consumeCandidate = () => {
+    if (candidates.length) setCandidates((current) => current.slice(1));
+    else onCaptureConsumed?.();
+  };
+  const send = async (submission: Schema<"SubmissionInput">) => {
     setBusy(true);
     setError("");
     setRetryAllowed(false);
     let receiptKnown = false;
     try {
-      // Save the business identity before the first dispatch. Browser refresh never creates a retry.
-      sessionStorage.setItem(storageKey(chatId), JSON.stringify(value));
-      setPending(value);
-      const receipt = await api.write<Schema<"SubmissionResponse">>("/submissions", value);
+      await controller.flush();
+      retainPending(chatId, submission);
+      setPending(submission);
+      const receipt = await api.write<Schema<"SubmissionResponse">>("/submissions", submission);
       receiptKnown = true;
+      localStorage.setItem(acceptedKey(chatId), receipt.generation_id);
+      setKnownReceipt(true);
       setAcceptedGeneration(receipt.generation_id);
-      sessionStorage.removeItem(storageKey(chatId));
+      await controller.clear(submission.submission_id);
+      retainPending(chatId, null);
+      localStorage.removeItem(acceptedKey(chatId));
+      setKnownReceipt(false);
       setPending(null);
-      setText("");
-      setConditions("");
-      setCorrections("");
-      setAttachments([]);
+      followBottom.current = true;
       setChat(await api.read<Schema<"ChatResponse">>(`/chats/${chatId}`));
     } catch (reason) {
-      if (receiptKnown) {
-        setError("提交已接受，最新内容暂时无法读取。请重新连接后查看，不会重复发送。");
-      } else if (
+      if (receiptKnown)
+        setError(
+          "提交已接受；最新记录或草稿清理暂未完成。请重新连接后查看，切勿重复发送已接受内容。",
+        );
+      else if (
         reason instanceof ApiError &&
         reason.status &&
         reason.status >= 400 &&
         reason.status < 500
       ) {
-        // Explicit application rejection is not a lost receipt. Keep the draft editable.
-        sessionStorage.removeItem(storageKey(chatId));
+        retainPending(chatId, null);
         setPending(null);
         setError(errorMessage(reason));
-      } else {
-        setError(`${errorMessage(reason)}。提交状态需核对，请保留当前输入。`);
-      }
+      } else setError(`${errorMessage(reason)}。输入仍保留；提交回执未知时先核对。`);
     } finally {
       setBusy(false);
     }
   };
-
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (!canSubmit || pending || locked || !text.trim() || busy) return;
+    if (
+      !canSubmit ||
+      !connected ||
+      pending ||
+      locked ||
+      busy ||
+      !draft.ready ||
+      candidate ||
+      composing.current ||
+      (!value.text.trim() && !value.attachment_ids.length)
+    )
+      return;
     void send({
       chat_id: chatId,
       submission_id: crypto.randomUUID(),
-      text,
-      attachment_ids: attachments.map((attachment) => attachment.attachment_id),
-      conditions: conditions.split("\n").filter((value) => value.trim()),
-      corrections: corrections.split("\n").filter((value) => value.trim()),
+      text: value.text,
+      attachment_ids: value.attachment_ids,
+      conditions: value.conditions,
+      corrections: value.corrections,
       model,
       thinking,
     });
   };
-
   const lookup = async () => {
     if (!pending) return;
     setBusy(true);
     setError("");
     try {
-      await api.read<Schema<"SubmissionResponse">>(`/submissions/${pending.submission_id}`);
-      sessionStorage.removeItem(storageKey(chatId));
+      const receipt = await api.read<Schema<"SubmissionResponse">>(
+        `/submissions/${pending.submission_id}`,
+      );
+      setAcceptedGeneration(receipt.generation_id);
+      localStorage.setItem(acceptedKey(chatId), receipt.generation_id);
+      setKnownReceipt(true);
+      await controller.clear(pending.submission_id);
+      retainPending(chatId, null);
+      localStorage.removeItem(acceptedKey(chatId));
+      setKnownReceipt(false);
       setPending(null);
-      setText("");
-      setConditions("");
-      setCorrections("");
-      setAttachments([]);
       setChat(await api.read<Schema<"ChatResponse">>(`/chats/${chatId}`));
     } catch (reason) {
       if (reason instanceof ApiError && reason.status === 404) {
         setRetryAllowed(true);
         setError("后台未找到这次提交。可主动重新发送同一次提交，身份保持不变。");
-      } else {
-        setError(errorMessage(reason));
-      }
+      } else setError(errorMessage(reason));
     } finally {
       setBusy(false);
     }
   };
-
   const command = async (generationId: string, action: "cancel" | "reconcile") => {
     setBusy(true);
     setError("");
     try {
-      const value = await api.write<Schema<"GenerationResponse">>(
+      const result = await api.write<Schema<"GenerationResponse">>(
         `/generations/${generationId}/${action}`,
       );
       setChat((current) =>
         current
           ? {
               ...current,
-              generations: (current.generations || []).map((generation) =>
-                generation.generation_id === value.generation_id ? value : generation,
+              generations: (current.generations || []).map((entry) =>
+                entry.generation_id === result.generation_id ? result : entry,
               ),
             }
           : current,
@@ -189,61 +312,129 @@ export function ChatWorkspace({
       setBusy(false);
     }
   };
-
-  const confirmAttachment = async () => {
-    if (!candidate || attachments.length >= 8) return;
+  const addFiles = async (files: File[]) => {
+    if (!editable) return;
+    if (
+      value.attachment_ids.length + candidates.length + (incomingCapture ? 1 : 0) + files.length >
+      8
+    ) {
+      setError("每次最多加入 8 张确认图片");
+      return;
+    }
     setBusy(true);
-    setError("");
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(new Error("无法读取图片"));
-        reader.readAsDataURL(candidate.file);
-      });
-      const value = await api.write<Schema<"AttachmentResponse">>("/attachments", {
-        data_base64: dataUrl.split(",")[1],
-        media_type: candidate.file.type as Schema<"AttachmentInput">["media_type"],
-        confirmed: true,
-      } satisfies Schema<"AttachmentInput">);
-      setAttachments((current) => [...current, value]);
-      setCandidate(null);
+      const sources = await Promise.all(files.map(readImageFile));
+      setCandidates((current) => [...current, ...sources.map((source) => ({ source }))]);
     } catch (reason) {
-      setError(errorMessage(reason));
+      setError(reason instanceof Error ? reason.message : "无法读取所选图片");
     } finally {
       setBusy(false);
     }
   };
-
+  const confirmAttachment = async (result: CaptureResult) => {
+    if (!candidate || !editable) return;
+    const currentIds = controller.snapshot().value.attachment_ids;
+    if (
+      (!candidate.replaces && currentIds.length >= 8) ||
+      (candidate.replaces && !currentIds.includes(candidate.replaces))
+    ) {
+      throw new CaptureError(
+        candidate.replaces ? "ATTACHMENT_REPLACEMENT_STALE" : "ATTACHMENT_LIMIT",
+        candidate.replaces
+          ? "原附件已移除，请取消后重新选择。"
+          : "每次最多加入 8 张确认图片，请取消后移除其他图片。",
+      );
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const attachment = await api.write<Schema<"AttachmentResponse">>("/attachments", {
+        data_base64: result.dataUrl.split(",")[1],
+        media_type: "image/png",
+        confirmed: true,
+      } satisfies Schema<"AttachmentInput">);
+      // The full original is never accepted by these API calls.
+      await api.write<Schema<"AttachmentSourceResponse">>(
+        `/attachments/${attachment.attachment_id}/source`,
+        {
+          chat_id: chatId,
+          origin: result.source.source ? "video" : "image",
+          ...result.source.source,
+          source_width: result.source.width,
+          source_height: result.source.height,
+          crop: result.crop,
+          edit_root_id: result.source.sourceId,
+          parent_attachment_id: candidate.replaces,
+        } satisfies Schema<"AttachmentSourceInput">,
+      );
+      try {
+        await saveCapture(attachment.attachment_id, result);
+      } catch {
+        setError("选区已加入；本机原图编辑缓存不可用，重开后需重新选择原图。已确认选区不受影响。");
+      }
+      controller.update({
+        attachment_ids: candidate.replaces
+          ? value.attachment_ids.map((id) =>
+              id === candidate.replaces ? attachment.attachment_id : id,
+            )
+          : [...value.attachment_ids, attachment.attachment_id],
+      });
+      consumeCandidate();
+    } catch (reason) {
+      setError(errorMessage(reason));
+      throw reason;
+    } finally {
+      setBusy(false);
+    }
+  };
+  const reedit = async (id: string) => {
+    setBusy(true);
+    try {
+      const previous = await loadCapture(id);
+      if (!previous) throw new Error("本机原截图不可用，请主动重新选择原图；不会补取视频画面。");
+      setCandidates((current) => [
+        { source: { ...previous.source, initialCrop: previous.crop }, replaces: id },
+        ...current,
+      ]);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "本机原截图不可用");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <div className="chat-workspace">
       <div className="chat-heading">
         <div>
           <h2>课程对话</h2>
-          <p>文字与确认图片 · 真实执行 · 业务保存</p>
-          {configuredModel && (
-            <p>
-              当前执行配置：{configuredModel} / {configuredThinking}。更改需修改后台配置并重启。
-            </p>
-          )}
+          <p>只在发送后提交文字与确认选区</p>
         </div>
         <small className="muted">{chatId.slice(0, 8)}</small>
       </div>
-      <div className="messages" aria-label="对话内容">
+      <div
+        className="messages"
+        aria-label="对话内容"
+        ref={messagesRef}
+        onScroll={(event) => {
+          const element = event.currentTarget;
+          followBottom.current =
+            element.scrollHeight - element.scrollTop - element.clientHeight < 72;
+        }}
+      >
         {!chat ? (
           <p className="muted" role="status">
             正在读取已保存记录…
           </p>
         ) : !chat.messages?.length ? (
           <div className="conversation-empty">
-            <h3>写下要验证的问题</h3>
-            <p>可以主动选择图片，确认加入后再发送。未发送的图片不会交给 AI。</p>
+            <h3>从当前不懂的地方问起</h3>
+            <p>截图确认后直接进入草稿，也可以输入文字或粘贴多张图片。</p>
           </div>
         ) : (
           chat.messages.map((message) => {
             const generation =
               message.role === "assistant"
-                ? generations.find((value) => value.generation_id === message.generation_id)
+                ? generations.find((entry) => entry.generation_id === message.generation_id)
                 : undefined;
             const body = generation?.body || message.text;
             const reasoning = generation?.reasoning || message.reasoning;
@@ -257,20 +448,34 @@ export function ChatWorkspace({
                       <pre>{reasoning}</pre>
                     </details>
                   )}
-                  <pre className="message-body">{body || "正在等待内容…"}</pre>
+                  {message.role === "assistant" ? (
+                    <MarkdownAnswer
+                      text={body || "正在等待内容…"}
+                      onQuote={
+                        editable
+                          ? (latex) =>
+                              controller.update({
+                                text: `${value.text}${value.text ? "\n\n" : ""}$$\n${latex}\n$$\n`,
+                              })
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    <pre className="message-body">{body}</pre>
+                  )}
                   {Boolean(message.attachment_ids?.length) && (
                     <div className="message-attachments">
                       {message.attachment_ids?.map((id, index) => (
-                        <img
+                        <MessageAttachment
                           key={id}
-                          src={`/api/v1/attachments/${id}`}
-                          alt={`已确认提交的图片 ${index + 1}`}
-                          loading="lazy"
+                          id={id}
+                          index={index}
+                          onOpenSource={onOpenSource}
                         />
                       ))}
                     </div>
                   )}
-                  {generation && message.role === "assistant" && (
+                  {generation && (
                     <div className="generation-footer">
                       <span role="status">{stateLabel(generation.state)}</span>
                       <small>事件水位 {generation.event_watermark}</small>
@@ -314,9 +519,32 @@ export function ChatWorkspace({
             {error}
           </div>
         )}
+        {draft.error && (
+          <div className="draft-warning" role="alert">
+            {draft.error}
+            <Button variant="ghost" onClick={() => void controller.load()}>
+              重新连接草稿
+            </Button>
+            {!draft.ready && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (window.confirm("将使用服务器保存的草稿，替换当前本地草稿。继续吗？"))
+                    void controller.load(true);
+                }}
+              >
+                查看已保存草稿
+              </Button>
+            )}
+          </div>
+        )}
         {pending && (
           <div className="pending-notice" role="status">
-            <span>这次提交的回执尚未确认。先核对，不会自动重发。</span>
+            <span>
+              {knownReceipt
+                ? "这次提交已接受，草稿清理尚待核对。不会重新发送。"
+                : "这次提交的回执尚未确认。先核对，不会自动重发。"}
+            </span>
             <Button variant="outline" disabled={!connected || busy} onClick={() => void lookup()}>
               核对提交
             </Button>
@@ -328,26 +556,43 @@ export function ChatWorkspace({
           </div>
         )}
         {!canSubmit && <p className="muted">问答尚未接通，已保存对话仍可查看。</p>}
-        <form className="composer" onSubmit={submit}>
-          {attachments.length > 0 && (
+        <form
+          className="composer"
+          onSubmit={submit}
+          onPaste={(event) => {
+            const files = Array.from(event.clipboardData.items)
+              .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+              .map((item) => item.getAsFile())
+              .filter((file): file is File => Boolean(file));
+            if (files.length) {
+              event.preventDefault();
+              void addFiles(files);
+            }
+          }}
+        >
+          {value.attachment_ids.length > 0 && (
             <div className="draft-attachments" aria-label="本次确认图片">
-              {attachments.map((attachment, index) => (
-                <figure key={attachment.attachment_id}>
-                  <img
-                    src={`/api/v1/attachments/${attachment.attachment_id}`}
-                    alt={`待发送的确认图片 ${index + 1}`}
-                  />
+              {value.attachment_ids.map((id, index) => (
+                <figure key={id}>
+                  <img src={`/api/v1/attachments/${id}`} alt={`待发送的确认图片 ${index + 1}`} />
                   <figcaption>
                     图片 {index + 1}
                     <button
                       type="button"
-                      disabled={busy || Boolean(pending)}
+                      aria-label={`重新裁剪图片 ${index + 1}`}
+                      disabled={!editable}
+                      onClick={() => void reedit(id)}
+                    >
+                      重裁
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`移除图片 ${index + 1}`}
+                      disabled={!editable}
                       onClick={() =>
-                        setAttachments((current) =>
-                          current.filter(
-                            (value) => value.attachment_id !== attachment.attachment_id,
-                          ),
-                        )
+                        controller.update({
+                          attachment_ids: value.attachment_ids.filter((entry) => entry !== id),
+                        })
                       }
                     >
                       移除
@@ -357,23 +602,6 @@ export function ChatWorkspace({
               ))}
             </div>
           )}
-          {candidate && (
-            <div className="attachment-confirmation">
-              <img src={candidate.url} alt="待确认的所选图片，确认后完整加入本次输入" />
-              <div>
-                <strong>确认这张图片的范围</strong>
-                <p>仅加入当前看到的所选图片。发送问题时才会提交给 AI。</p>
-                <div className="button-row">
-                  <Button type="button" disabled={busy} onClick={() => void confirmAttachment()}>
-                    确认加入
-                  </Button>
-                  <Button type="button" variant="ghost" onClick={() => setCandidate(null)}>
-                    取消
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
           <label className="sr-only" htmlFor="question-input">
             问题或追问
           </label>
@@ -381,9 +609,26 @@ export function ChatWorkspace({
             id="question-input"
             placeholder="输入问题或继续追问…"
             rows={3}
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            disabled={busy || Boolean(pending)}
+            value={value.text}
+            onChange={(event) => controller.update({ text: event.target.value })}
+            disabled={!editable}
+            onCompositionStart={() => {
+              composing.current = true;
+            }}
+            onCompositionEnd={() => {
+              composing.current = false;
+            }}
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" &&
+                (event.ctrlKey || event.metaKey) &&
+                !event.nativeEvent.isComposing &&
+                !composing.current
+              ) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
           />
           <details className="input-context">
             <summary>题目条件与更正（按需填写）</summary>
@@ -392,18 +637,22 @@ export function ChatWorkspace({
                 当前题目条件（每行一项）
                 <textarea
                   rows={2}
-                  value={conditions}
-                  onChange={(event) => setConditions(event.target.value)}
-                  disabled={busy || Boolean(pending)}
+                  value={value.conditions.join("\n")}
+                  onChange={(event) =>
+                    controller.update({ conditions: event.target.value.split("\n") })
+                  }
+                  disabled={!editable}
                 />
               </label>
               <label>
                 对前文的更正（每行一项）
                 <textarea
                   rows={2}
-                  value={corrections}
-                  onChange={(event) => setCorrections(event.target.value)}
-                  disabled={busy || Boolean(pending)}
+                  value={value.corrections.join("\n")}
+                  onChange={(event) =>
+                    controller.update({ corrections: event.target.value.split("\n") })
+                  }
+                  disabled={!editable}
                 />
               </label>
             </div>
@@ -414,20 +663,13 @@ export function ChatWorkspace({
               <input
                 aria-label="选择待确认的图片"
                 type="file"
+                multiple
                 accept="image/png,image/jpeg,image/webp"
-                disabled={busy || Boolean(pending) || attachments.length >= 8}
+                disabled={!editable || value.attachment_ids.length >= 8}
                 onChange={(event) => {
-                  const file = event.target.files?.[0];
+                  const files = Array.from(event.target.files || []);
                   event.target.value = "";
-                  if (!file) return;
-                  if (
-                    !["image/png", "image/jpeg", "image/webp"].includes(file.type) ||
-                    file.size > 10_000_000
-                  ) {
-                    setError("请选择不超过 10MB 的 PNG、JPEG 或 WebP 图片");
-                    return;
-                  }
-                  setCandidate({ file, url: URL.createObjectURL(file) });
+                  void addFiles(files);
                 }}
               />
             </label>
@@ -435,10 +677,18 @@ export function ChatWorkspace({
               模型
               <input
                 aria-label="模型名称"
+                list="learning-models"
                 value={model}
-                onChange={(event) => setModel(event.target.value)}
-                disabled={busy || Boolean(pending)}
+                onChange={(event) => controller.update({ model: event.target.value || null })}
+                disabled={!editable}
               />
+              <datalist id="learning-models">
+                {Array.from(
+                  new Set([configuredModel, "deepseek-flash", "deepseek-v4-pro"].filter(Boolean)),
+                ).map((entry) => (
+                  <option key={entry} value={entry} />
+                ))}
+              </datalist>
             </label>
             <label className="thinking-field">
               思考
@@ -446,13 +696,15 @@ export function ChatWorkspace({
                 aria-label="思考强度"
                 value={thinking}
                 onChange={(event) =>
-                  setThinking(event.target.value as Schema<"SubmissionInput">["thinking"])
+                  controller.update({
+                    thinking: event.target.value as Schema<"SubmissionInput">["thinking"],
+                  })
                 }
-                disabled={busy || Boolean(pending)}
+                disabled={!editable}
               >
-                {["none", "low", "medium", "high", "xhigh", "max"].map((value) => (
-                  <option key={value} value={value}>
-                    {value}
+                {["none", "low", "high", "max"].map((entry) => (
+                  <option key={entry} value={entry}>
+                    {entry === "none" ? "关闭" : entry}
                   </option>
                 ))}
               </select>
@@ -460,12 +712,11 @@ export function ChatWorkspace({
             <Button
               type="submit"
               disabled={
+                !editable ||
                 !canSubmit ||
                 !connected ||
-                busy ||
-                Boolean(pending) ||
                 locked ||
-                !text.trim() ||
+                (!value.text.trim() && !value.attachment_ids.length) ||
                 !model.trim() ||
                 Boolean(candidate)
               }
@@ -473,13 +724,43 @@ export function ChatWorkspace({
               {busy ? "处理中…" : "发送"}
             </Button>
           </div>
+          {model === "deepseek-v4-pro" && (
+            <p className="composer-hint">仅支持文字；包含题图的对话请使用支持图片的模型。</p>
+          )}
         </form>
+        <div className="draft-save-status">
+          <span role="status">
+            {draft.saving
+              ? "正在保存草稿…"
+              : draft.dirty
+                ? "草稿待保存"
+                : draft.ready
+                  ? "草稿已保存"
+                  : "正在核对草稿…"}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!draft.ready || draft.saving || busy}
+            onClick={() => void controller.flush().catch(() => undefined)}
+          >
+            保存草稿
+          </Button>
+        </div>
         <p className="composer-hint">
           {locked
             ? "当前生成尚未结束或结果未知。可停止或核对后继续追问。"
-            : "只发送已确认的图片与输入；切换课程不会停止后台生成。"}
+            : "仅发送确认选区与输入 · Ctrl+Enter 发送 · 切换课程后台继续"}
         </p>
       </div>
+      {candidate && (
+        <CaptureEditor
+          key={candidate.source.sourceId}
+          source={candidate.source}
+          onConfirm={confirmAttachment}
+          onCancel={consumeCandidate}
+        />
+      )}
     </div>
   );
 }

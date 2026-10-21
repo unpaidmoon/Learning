@@ -14,6 +14,7 @@ import httpx
 from .boundary import MessagesBoundary
 from .host import HarnessHost
 from .remote import RemotePeer
+from .selection import native_thinking, supports_images, validate_selection
 from .types import ApprovedAttachment, ExecutionBinding, ExecutionError, NormalizedEvent
 
 TERMINAL_STATUS = {
@@ -102,6 +103,7 @@ class ExecutionAdapter:
         self._attempts: dict[str, str] = {}
         self._chunk_floors: dict[str, int] = {}
         self._open = False
+        self._image_sessions: set[str] = set()
 
     async def open(self) -> ExecutionAdapter:
         self.boundary.start()
@@ -185,9 +187,12 @@ class ExecutionAdapter:
             raise ExecutionError("EXECUTION_NOT_OPEN")
         if binding.generation_id in self._started or binding.status != "prepared":
             raise ExecutionError("GENERATION_ALREADY_DISPATCHED")
-        if (model or self.model) != self.model or (thinking or self.thinking) != self.thinking:
-            # Catalog and boundary must agree; never silently alter user selection.
-            raise ExecutionError("MODEL_SELECTION_REQUIRES_HOST_CONFIGURATION")
+        selected_model, selected_thinking = model or self.model, thinking or self.thinking
+        validate_selection(self.model, selected_model, selected_thinking)
+        if not supports_images(selected_model) and (
+            attachments or binding.session_id in self._image_sessions
+        ):
+            raise ExecutionError("MODEL_IMAGE_UNSUPPORTED")
         # Durable routing marker is part of the submitted text, not an extra
         # network/header protocol. Boundary resolves the latest user marker,
         # including tool continuations, instead of guessing by arrival order.
@@ -224,11 +229,15 @@ class ExecutionAdapter:
             {
                 "sessionId": binding.session_id,
                 "provider": "deepseek-official",
-                "model": model or self.model,
-                "reasoningEffort": thinking or self.thinking,
+                "model": selected_model,
+                "reasoningEffort": native_thinking(selected_thinking),
             },
         )
-        self.boundary.bind(binding.generation_id)
+        self.boundary.bind(
+            binding.generation_id, model=selected_model, thinking=selected_thinking
+        )
+        if attachments:
+            self._image_sessions.add(binding.session_id)
         self._started.add(binding.generation_id)
         binding.status = "dispatching"
         try:
@@ -400,7 +409,9 @@ class ExecutionAdapter:
                 "request_id": record["request_id"],
                 "generation_id": generation_id,
                 "model": record.get("model"),
-                "thinking": record.get("output_config", {}).get("effort"),
+                "thinking": "none"
+                if (record.get("thinking") or {}).get("type") == "disabled"
+                else (record.get("output_config") or {}).get("effort"),
                 "kind": "model",
                 "actual_outbound": record.get("actual_outbound_attempt") is not None,
                 "actual_outbound_attempt": record.get("actual_outbound_attempt"),

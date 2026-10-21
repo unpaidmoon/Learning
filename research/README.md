@@ -9,6 +9,7 @@
 | [reports/v1](reports/v1/) | [V1 隔离最小路线报告](reports/v1/V1-Harness最小路线验证报告-2026-10-21.md)与[脱敏结果](reports/v1/V1-2026-10-21.json) |
 | [reports/p0](reports/p0/) | [P0 正式验收报告](reports/p0/P0-正式工程与执行数据基础验收报告-2026-10-21.md)、[执行组件结果](reports/p0/P0-02-03-2026-10-21.json)、[应用真实结果](reports/p0/P0-application-real-2026-10-21.json)、[最终审计](reports/p0/P0-final-audit-2026-10-21.json) |
 | [reports/v2](reports/v2/) | [V2 持久化与故障窗口报告](reports/v2/V2-P0持久化与故障窗口验证报告-2026-10-21.md)与[脱敏结果](reports/v2/V2-2026-10-21.json) |
+| [reports/v3](reports/v3/) | [MVP-A 与 V3 综合报告](reports/v3/MVP-A与V3验收报告-2026-10-21.md)、[真实模型逐例记录](reports/v3/V3-模型验证逐例记录-2026-10-21.md)、[模型批次汇总](reports/v3/V3-model-summary-2026-10-21.json)、[合成浏览器](reports/v3/V3-MVP-A-browser-2026-10-21.json)；原失败与复测独立保存，实际学习评价待用户参与 |
 | [probes](probes/) | 隔离诊断代码；[V1 probe](probes/v1-harness/README.md)及其历史协调脚本 |
 
 报告与脱敏结果按验证批次相邻存放。私有原始请求、图片、事件和执行 home 留在忽略的运行目录，不随报告入库；原始失败及缺失用量保留，不为归档改写成成功或零。

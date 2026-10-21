@@ -543,10 +543,10 @@ def security_case(root: Path, executable: Path, port: int) -> dict:
         )
         browser.command("click", browser.ref(snapshot, 'button "选择待确认的图片"'))
         browser.command("upload", str(image))
-        browser.wait_text("确认这张图片的范围")
+        browser.wait_text("编辑截图")
         before_confirmation = instance.counts()
         snapshot = browser.snapshot("image-awaiting-user-confirmation")
-        browser.command("click", browser.ref(snapshot, 'button "确认加入"'))
+        browser.command("click", browser.ref(snapshot, 'button "确认选区并加入草稿"'))
         browser.command(
             "run-code",
             "async(page)=>{await page.getByAltText('待发送的确认图片 1').waitFor({state:'visible'});}",

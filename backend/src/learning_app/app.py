@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from learning_app import __version__
 from learning_app.config import AppConfig, load_config
+from learning_app.drafts import install_draft_routes
 from learning_app.dto import (
     AttachmentInput,
     AttachmentResponse,
@@ -25,6 +26,8 @@ from learning_app.dto import (
 )
 from learning_app.errors import AppError
 from learning_app.health import Capabilities, HealthResponse
+from learning_app.media import install_media_routes
+from learning_app.runtime_control import install_runtime_routes
 from learning_app.security import COOKIE_NAME, BrowserSessions, LocalBoundaryMiddleware
 from learning_app.storage import StorageError
 
@@ -132,6 +135,7 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
             configured_thinking=config.thinking,
             capabilities=Capabilities(
                 persistence="ready" if ready else "unavailable",
+                video="ready" if ready else "unavailable",
                 harness=harness,
                 question_answering=harness,
             ),
@@ -202,7 +206,12 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
 
     @app.post("/api/v1/submissions", response_model=SubmissionResponse)
     async def submit(value: SubmissionInput):
-        return await app.state.service.submit(value.model_dump())
+        async with app.state.submission_gate:
+            if app.state.exit_prepared:
+                raise AppError(
+                    "APPLICATION_EXIT_PREPARED", "应用正在安全退出，已保存内容仍保留", 409
+                )
+            return await app.state.service.submit(value.model_dump())
 
     @app.get("/api/v1/submissions/{submission_id}", response_model=SubmissionResponse)
     async def lookup_submission(submission_id: str):
@@ -241,6 +250,10 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
                 await websocket.send_json(app.state.service.generation_view(value["generation_id"]))
         except WebSocketDisconnect:
             pass
+
+    install_media_routes(app)
+    install_draft_routes(app)
+    install_runtime_routes(app)
 
     if config.mode == "start":
         index = config.static_dir / "index.html"

@@ -10,8 +10,15 @@ from collections import defaultdict
 from dotenv import dotenv_values
 
 from learning_app.config import AppConfig
+from learning_app.drafts import submission_source_locators
 from learning_app.errors import AppError
-from learning_app.execution.types import ApprovedAttachment, ExecutionBinding, ExecutionError
+from learning_app.execution.selection import supports_images, validate_selection
+from learning_app.execution.types import (
+    ApprovedAttachment,
+    ExecutionBinding,
+    ExecutionError,
+    NormalizedEvent,
+)
 from learning_app.faults import Faults
 from learning_app.storage import StorageError
 
@@ -99,13 +106,33 @@ class GenerationService:
     async def submit(self, value: dict) -> dict:
         if not self.execution_ready:
             raise AppError("EXECUTION_UNAVAILABLE", "Harness尚未连接，未提交问题", 503)
-        if (value["model"], value["thinking"]) != (self.config.model, self.config.thinking):
-            raise AppError(
-                "MODEL_CONFIGURATION_REQUIRED", "当前宿主配置与所选模型或思考强度不一致", 409
-            )
+        try:
+            validate_selection(self.config.model, value["model"], value["thinking"])
+        except ExecutionError as exc:
+            raise AppError(exc.code, "当前执行层不支持所选模型或思考强度，请更改选择", 422) from exc
         if not value["text"].strip() and not value.get("attachment_ids"):
             raise AppError("INPUT_EMPTY", "请输入问题或确认图片", 422)
         async with self.locks[value["chat_id"]]:
+            try:
+                self.repository.get_submission(value["submission_id"])
+                existing_submission = True
+            except StorageError as exc:
+                if exc.code != "SUBMISSION_NOT_FOUND":
+                    raise
+                existing_submission = False
+            # Capability changes in later turns cannot invalidate an earlier
+            # receipt. publish_submission still checks its full immutable hash.
+            if not existing_submission and not supports_images(value["model"]):
+                history = self.repository.get_chat(value["chat_id"])["messages"]
+                if value.get("attachment_ids") or any(m.get("attachment_ids") for m in history):
+                    raise AppError(
+                        "MODEL_IMAGE_UNSUPPORTED",
+                        "所选模型仅支持文字；当前图片及题图历史已保留，请选择支持图片的模型或新建文字对话",
+                        422,
+                    )
+            source_locators = submission_source_locators(
+                self.repository, value["chat_id"], value.get("attachment_ids", ())
+            )
             result = self.repository.publish_submission(
                 value["chat_id"],
                 value["text"],
@@ -113,6 +140,7 @@ class GenerationService:
                 attachment_ids=value.get("attachment_ids", ()),
                 conditions=value.get("conditions", ()),
                 corrections=value.get("corrections", ()),
+                source_locators=source_locators,
                 model=value["model"],
                 thinking=value["thinking"],
                 max_output_tokens=self.config.max_output_tokens,
@@ -204,54 +232,94 @@ class GenerationService:
         await self._observe(binding)
 
     async def _observe(self, binding: ExecutionBinding):
+        queue: asyncio.Queue[NormalizedEvent | Exception | None] = asyncio.Queue(maxsize=256)
+
+        async def receive():
+            try:
+                watermark = self.repository.get_generation(binding.generation_id)["event_watermark"]
+                async for item in self.execution.observe(binding, after=watermark):
+                    await queue.put(item)
+            except Exception as exc:
+                # Transfer the reader failure to the sole state-writing consumer.
+                await queue.put(exc)
+            else:
+                await queue.put(None)
+
+        reader = asyncio.create_task(receive(), name=f"execution-reader:{binding.generation_id}")
         try:
-            watermark = self.repository.get_generation(binding.generation_id)["event_watermark"]
-            async for event in self.execution.observe(binding, after=watermark):
-                self._ingest(binding, event)
-                # A nonempty asyncio queue has no suspension point. Keep HTTP stop,
-                # Peer lifecycle and browser reads schedulable during buffered bursts.
+            ended = False
+            deferred_error = None
+            while not ended:
+                item = await queue.get()
+                if item is None:
+                    break
+                if isinstance(item, Exception):
+                    raise item
+                batch = [item]
+                # Keep durable visible progress within 25ms while amortizing FULL
+                # SQLite fsync over a bounded token burst. Every event stays intact.
+                deadline = asyncio.get_running_loop().time() + 0.025
+                if item.kind in {"text_delta", "reasoning_delta"}:
+                    while len(batch) < 32:
+                        remaining = deadline - asyncio.get_running_loop().time()
+                        if remaining <= 0:
+                            break
+                        try:
+                            following = await asyncio.wait_for(queue.get(), remaining)
+                        except TimeoutError:
+                            break
+                        if following is None:
+                            ended = True
+                            break
+                        if isinstance(following, Exception):
+                            deferred_error = following
+                            ended = True
+                            break
+                        batch.append(following)
+                        if following.kind not in {"text_delta", "reasoning_delta"}:
+                            break
+                self._ingest_batch(binding, batch)
                 await asyncio.sleep(0)
+            if deferred_error is not None:
+                raise deferred_error
         except (ExecutionError, StorageError, OSError, TimeoutError):
             self.repository.mark_unknown(binding.generation_id, "OBSERVATION_DISCONNECTED")
+        finally:
+            reader.cancel()
+            await asyncio.gather(reader, return_exceptions=True)
 
     def _ingest(self, binding, event):
-        if event.kind == "terminal":
-            self.faults.hit("after_terminal_observed_before_ingest", event.to_dict())
+        self._ingest_batch(binding, [event])
+
+    def _ingest_batch(self, binding: ExecutionBinding, events: list[NormalizedEvent]):
+        for event in events:
+            if event.kind == "terminal":
+                self.faults.hit("after_terminal_observed_before_ingest", event.to_dict())
         self._sync_attempts(binding.generation_id)
         binding_id = self._binding_ids.get(binding.generation_id)
         if binding_id is None:
             binding_id = self.repository.get_generation(binding.generation_id)["binding_id"]
             self._binding_ids[binding.generation_id] = binding_id
-        kind = {
-            "text_delta": "body",
-            "reasoning_delta": "reasoning",
-            "accepted": "receipt",
-            "activity": "activity",
-            "snapshot": "snapshot",
-            "terminal": "terminal",
-            "usage": "usage",
-            "unknown": "unknown",
-        }[event.kind]
-        self.repository.ingest_event(
-            binding.generation_id,
-            binding_id=binding_id,
-            epoch=event.epoch,
-            event_id=event.event_id,
-            seq=event.seq,
-            kind=kind,
-            text=event.text,
-            status=event.status,
-            raw_usage=event.raw_usage,
-            usage_source="provider_boundary",
-            usage_fields=event.usage_presence,
-            settlement_id=event.data.get("settlement_id", event.event_id),
-            data={
-                **event.data,
-                **({"body": event.text} if kind == "snapshot" else {}),
-                "native_seq": event.native_seq,
-                "attempt_id": event.attempt_id,
-            },
-        )
+        rows = []
+        for event in events:
+            kind = {
+                "text_delta": "body", "reasoning_delta": "reasoning", "accepted": "receipt",
+                "activity": "activity", "snapshot": "snapshot", "terminal": "terminal",
+                "usage": "usage", "unknown": "unknown",
+            }[event.kind]
+            rows.append({
+                "generation_id": binding.generation_id, "binding_id": binding_id,
+                "epoch": event.epoch, "event_id": event.event_id, "seq": event.seq,
+                "kind": kind, "text": event.text, "status": event.status,
+                "raw_usage": event.raw_usage, "usage_source": "provider_boundary",
+                "usage_fields": event.usage_presence,
+                "settlement_id": event.data.get("settlement_id", event.event_id),
+                "data": {
+                    **event.data, **({"body": event.text} if kind == "snapshot" else {}),
+                    "native_seq": event.native_seq, "attempt_id": event.attempt_id,
+                },
+            })
+        self.repository.ingest_events(rows)
         self._persist_binding(binding)
 
     def _persist_binding(self, binding):

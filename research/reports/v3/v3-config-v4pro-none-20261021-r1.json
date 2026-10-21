@@ -1,0 +1,1051 @@
+{
+  "run_id": "v3-config-v4pro-none-20261021-r1",
+  "recorded_at_utc": "2026-10-21T06:16:01.382763+00:00",
+  "validation_id": "V3",
+  "execution_status": "completed",
+  "scope": "formal_application_HTTP_SQLite_Harness_real_provider",
+  "model_requested": "deepseek-v4-pro",
+  "thinking_requested": "none",
+  "max_output_tokens": 4096,
+  "model_timeout_seconds": 180.0,
+  "real_request_limit": null,
+  "selected_cases": [
+    "M01"
+  ],
+  "source_digests_before": {
+    "backend\\src\\learning_app\\__init__.py": "8364b7e64e40dc6bb35eb2b082e3bab87458bf0b00cc74b56a446ff8bd94ef75",
+    "backend\\src\\learning_app\\__main__.py": "9883f548792840eece8a19931ea5091a192eb1c92dab7b4d67178862c4128276",
+    "backend\\src\\learning_app\\app.py": "d73943e90d4de635e3e0e7e40dd85edc111cb8d15cb1ca3c704712e3977071f9",
+    "backend\\src\\learning_app\\config.py": "33f8616b44fc70db8be883d7486ee3559da7390523db4d00beff38f637c2b051",
+    "backend\\src\\learning_app\\dev.py": "233d1a7e4cdf47d9e5358508443ba37af1972486b827ebf08fde3f2a703826e5",
+    "backend\\src\\learning_app\\drafts.py": "5c2c9bfdb37a14fe5f751d2da4d56ca953372a92bd28efb0c8a63c16a04be88e",
+    "backend\\src\\learning_app\\dto.py": "2a7ea4b34220ef3dd1249dae66cb32d3f8b76f5dac62581c5e8a78cb1eee4c8e",
+    "backend\\src\\learning_app\\errors.py": "b6823f923102502d867579a72ac808746b5d6f7d2e884dcbd6c0fa1a923eec39",
+    "backend\\src\\learning_app\\execution\\__init__.py": "225e8ac92fb07b7663ec56bc06aa17236d00fd72ecd17aadf54dd7217f4ab195",
+    "backend\\src\\learning_app\\execution\\adapter.py": "8d9eee12b0ad18400f2c52932595532659b3d036041b810bac7b8a7cef7332b3",
+    "backend\\src\\learning_app\\execution\\boundary.py": "127326312a4423746faa42649718452b16be9e7a7004d87fe5ca635a7c885c01",
+    "backend\\src\\learning_app\\execution\\host.py": "ac70799fa1c99f7e3a757f0c46dcb8d2d52ea6d5d97f8707737571c58361e4e9",
+    "backend\\src\\learning_app\\execution\\remote.py": "97410c842de82b1da465dec0d88171a3165f3cbb4c02ff5029631009b279b9e0",
+    "backend\\src\\learning_app\\execution\\selection.py": "2835ac4f2a11cf4ae391d5d557df7ceb5f1a1c6f8397ac02220d3e57ab47efc9",
+    "backend\\src\\learning_app\\execution\\types.py": "36503a2e80c6b519af287a599d1b4c8fa7c0b01db8ebac11396fa6e59bde1b03",
+    "backend\\src\\learning_app\\faults.py": "cf6c8a7e6872cd180326b0029b4ba90df87448c96774147311b5a33cecd519d2",
+    "backend\\src\\learning_app\\health.py": "411b3304d473cbb75a0cfec5f679299a7e03ae99908a4b2536ddb250ee68b68a",
+    "backend\\src\\learning_app\\media.py": "dfc905d1c705003e6d542b8f142f8362f1b095306f5fa9506399ea2abd58455c",
+    "backend\\src\\learning_app\\media_schema.py": "0e3ecab78f3636ea8fc0beef3bea37c1684e263098d73b20a65b56c88789824f",
+    "backend\\src\\learning_app\\processes.py": "9b2b1702531ba5071e0027113a82ef60ed3c54cf316bbd66d9e08d5f90187dc7",
+    "backend\\src\\learning_app\\runtime_control.py": "0028a0ad6758ae8ceb69ec0099595162155ef8e11f2214e8e0eb47f8829a1eff",
+    "backend\\src\\learning_app\\security.py": "1d1fe7f7f14c33bf4177442251ca8d62b33bd19f1e60136f377fe7b5eefed06e",
+    "backend\\src\\learning_app\\service.py": "59aabbe7c999fcc91aa995618decf8b27780337b7e93d1defa9ed9291bc7050e",
+    "backend\\src\\learning_app\\storage\\__init__.py": "d508895f245b571936d77607f9070dc5695f68a75b0d7256f4b77ab6cc7b749a",
+    "backend\\src\\learning_app\\storage\\migrations\\env.py": "d582dc77a026e8c41b6508179564dd44739b612fffd61b67b332318749eb631f",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0001_business.py": "aafa6e33d5a3062c47f4976e3ce91c643b552b09fab4955e9b62b70fb8d855b4",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0002_media.py": "950a73bc4a585bdbc4d17a2a15b8f1d97988c06518fe6b3686f167b766357c2c",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0003_drafts.py": "397225937d3aabb849c6674eb9afffed4b351ecb69a071e6ef6d10bfba74be2a",
+    "backend\\src\\learning_app\\storage\\repository.py": "ee104281d7e1df2a7ffd0391f113c1f5d436ff3cc5551762279fca627d80f593",
+    "backend\\src\\learning_app\\storage\\schema.py": "0801ff08e605132de1020d9490f3ab18e585c0f29c2b8013310b087cb05286d4",
+    "frontend\\src\\App.tsx": "d986de9346d858f79933c47176ed328e41d9c7b8f2896fff772ff32a2782ac07",
+    "frontend\\src\\chat\\ChatWorkspace.tsx": "8afa41a8046f49e631da33b2505422744b3a5c78a1bb041aa134d231b0416ceb",
+    "frontend\\src\\chat\\MarkdownAnswer.tsx": "49c1ade0b88772b1490a8278bfa37c8df8fd07dcf4fb0de17a199ce1a37b3161",
+    "frontend\\src\\components\\ui\\button.tsx": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+    "frontend\\src\\main.tsx": "a6bcae9c4f04d6ff36406b2966379834342b41b08b83ba7bd0334712d6cf87f0",
+    "frontend\\src\\media\\CaptureEditor.tsx": "c70c3a9bb8262862a63e097521085e415b6f8292a9d87ea7a829d500447a7028",
+    "frontend\\src\\media\\VideoWorkspace.tsx": "282ef9c8f704d60c1768a1f711872bfa75cee089c766ea4e3379cb8332d0e0ab",
+    "frontend\\src\\api\\client.ts": "47b139918a2459bc076cfe88e1fe5afe9f61b0d2c918bb0c07d20917d9eca611",
+    "frontend\\src\\chat\\captureCache.ts": "31cf6cfe5b470eee992710a8fefaa898bf03749953af21dead1018eb8ed05155",
+    "frontend\\src\\chat\\draft.ts": "d7f50bcf101e95bb7ffc4b57c80764bdd993642ca1588ea27a94092e7e158373",
+    "frontend\\src\\chat\\state.ts": "da03efab9ff630a1bd350c040aa05610b55f43c6af2cf3e64d38e8dfb07a5a49",
+    "frontend\\src\\lib\\utils.ts": "d1f1e0d62cb8d8d1e04c26e14de842d8a151f75812d81b046c65b5d1fe8e4b27",
+    "frontend\\src\\media\\capture.ts": "5e9c2152dfa9eeb29cf369640ba93f9939972852c87bf66cbce651bf8048fe8f",
+    "frontend\\src\\chat\\chat.css": "fab675e45eefdb9267092b454ccdbb56adca6d6296c02235acbd24d45c7c1426",
+    "frontend\\src\\media\\CaptureEditor.css": "fa39a686badb6fbf038a832d9bdbe627bcaa0c4f335b19c30debd23e2fb57c0c",
+    "frontend\\src\\styles.css": "1acb41f5163d4445c5237f339348f373a46a2d18b1c602e478ce4eb501c6aa3f",
+    "package.json": "07e584247b53bd2672f0bc1357837dcd7c2d274fa3053a78d1207be9e2c70be3",
+    "frontend\\package.json": "ea100eaacd07e8aff38d82d2abe5af621c2aef5d992a5d93a81947677a790184",
+    "backend\\pyproject.toml": "aa84048c77e7819d6b07c63490328927fc12cedb30af0e2f6cec6b43ec323f0c",
+    "scripts\\app.py": "03b597c350f7f65f7a426e0c04d1fc40d739e3659ce078eac7c5e0fbba6b2234",
+    "harness\\runtime.lock.json": "035ec2f210401313f49257d428d75aa60a763b631af22e3d9274269d12099e61",
+    "harness\\profiles\\learning.patch.json": "c49bc39b366b989e5f3424535cccecb1b427257a4a72c796e6579922a043e3da",
+    "harness\\plugins\\learning-guard.mjs": "33a806b9641c2d246094a07ee1b1cecdb851bcf0eb77a1e90e6fbb265c66710b",
+    "pnpm-lock.yaml": "fb8155baa15fabedc9ebefcf687bdf9f413d3454f101a42feb7c5bf94396602e",
+    "backend\\uv.lock": "c15c6aa9e11010b02552ae2f7de2e8d33306a87169c5ac5a699d7f68793c6e89",
+    "tests\\fixtures\\v3\\cases.json": "c1754cccdb20dcdf0d91bc31d10a1032c8aeeaff95556db7508e935a44f2728e",
+    "tests\\fixtures\\v3\\generate_samples.py": "f92bb0648597bddb7870483f6e1825e45475357399dce7f8ac9d35ebb6e88454",
+    "scripts\\validation\\Run-V3.py": "2e4d45d037fea4092accfb94e982796ad39ed85bc176e25fe8eddd7846a6866f"
+  },
+  "fixture_manifest": {
+    "revision": "v3-synthetic-r3-20261021",
+    "source": "synthetic",
+    "cases_sha256": "c1754cccdb20dcdf0d91bc31d10a1032c8aeeaff95556db7508e935a44f2728e",
+    "generator_sha256": "f92bb0648597bddb7870483f6e1825e45475357399dce7f8ac9d35ebb6e88454",
+    "font": {
+      "filename": "msyh.ttc",
+      "sha256": "d79c55e68b1131eea0cc1c47be4f572d964f28c682e143db2ad09c1e4cb07a3f",
+      "size_px": 46
+    },
+    "expected_review_status": "assistant_mathematical_review_not_user_acceptance",
+    "coordinate_system": "source_pixel_origin_top_left_xyxy_for_bbox",
+    "samples": [
+      {
+        "fixture_id": "V3-M01",
+        "case_id": "M01",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M01.png",
+        "sha256": "e8bc1fa1dfcc520cb956709746efedf2247fe5118c8ed850973de3e22dcea866",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "7715d57756d13e7f0c8c91e3e88e6a5e3cdcde69defef719294bb2b601cc82bb"
+      },
+      {
+        "fixture_id": "V3-M02",
+        "case_id": "M02",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M02.png",
+        "sha256": "cd772c01377dbe5e579a06f23cf4c9587d232953e28e8ba0ed5a5b92c6b87703",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "687f3f4fae49e8c7f5aeb557120daead4dfa599bae65f793129b374051efb6f9"
+      },
+      {
+        "fixture_id": "V3-M03",
+        "case_id": "M03",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M03.png",
+        "sha256": "78e652de9773f000e94d6fb6d569646e03bfeacf0f0f878308f9fec196c48195",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "26c5f4ba903e35a37a1034ab73189c7892556f420398dba6ba6609b17c11bfe9"
+      },
+      {
+        "fixture_id": "V3-M04",
+        "case_id": "M04",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M04.png",
+        "sha256": "11430fb2b3a621ddfa3bfd568594b3fce44deee10df5b743c08441bf24c1c3c3",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "39e7302a5eb51480152bb8987a7dad88df5d07bcdb09b374abe3b9c1fda39b52"
+      },
+      {
+        "fixture_id": "V3-M05",
+        "case_id": "M05",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M05.png",
+        "sha256": "ac70d76797f6dbb0ab36f97ef392c1e93d3e5f471ac563889a88fddf7c1b1809",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "6f5971c872be72d99a381b93fd066c31740107f48112da0203dc8b5882e2cd8e"
+      },
+      {
+        "fixture_id": "V3-M06",
+        "case_id": "M06",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "M06.png",
+        "sha256": "ccf2a833989772947166a25ab05ab479c0683c1411e4544dfdde7070fb01fd0d",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "6e66656142f591e613fa79ff2cd615e8316a9d429e0e22286c28fb87ff1dc5a3"
+      },
+      {
+        "fixture_id": "V3-L01",
+        "case_id": "L01",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "L01.png",
+        "sha256": "f03dd55ca0d021c9c9347daf1c5e8387513471778d4f4cd803a6445493460880",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "4f0548d3b8ef3ab49fcd7c9f43f42bd7402895370be82e541797779b5f12cdbc"
+      },
+      {
+        "fixture_id": "V3-L02",
+        "case_id": "L02",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "L02.png",
+        "sha256": "ea1cc75da892542d648e0d5e2a04e99b1e28a5e4541ac2aec120a8998170c8e9",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "3bfaa9fdb0b92c9038eb326990a92c8f7a9dc53e39f3024a124999f18fbd05d9"
+      },
+      {
+        "fixture_id": "V3-L03",
+        "case_id": "L03",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "L03.png",
+        "sha256": "a251305af07fecee87b2e2ed4f4e5e10b4a853298a4a094777ed477a05c59d14",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "82edb70afcb229153c9d13eb47920124b3c7193bc3872f5dd3d7b406bde85d56"
+      },
+      {
+        "fixture_id": "V3-P01",
+        "case_id": "P01",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "P01.png",
+        "sha256": "7b2ac5dae176372c089354780c83232504b015e6d8434cadc5b814c252ef54ca",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "19e91d251fe7f2095f776e9c1f8d61f29df0564c53d38b81afb239e8945029b1"
+      },
+      {
+        "fixture_id": "V3-P02",
+        "case_id": "P02",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "P02.png",
+        "sha256": "a10b077a0518dac7f4590c879d4a9a92df435b248012ea653dda6b74c6875169",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "01b8a3fa26faf9c8ea752cc08336871633bbc1775482e9458b0f64acc88598a0"
+      },
+      {
+        "fixture_id": "V3-P03",
+        "case_id": "P03",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "P03.png",
+        "sha256": "3aaf45a24f8948dbe13aae026a216f39e06531bf696c7a8b8200177ab9c375db",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "cefc1e6367c30831cbfd5f7d5fac6d735fd4d608694c2d5d428066bf9f0032ce"
+      },
+      {
+        "fixture_id": "V3-B01",
+        "case_id": "B01",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "B01.png",
+        "sha256": "2584deedbe911270bbfa6af17b05b4cd02896bb9d5b79dbdc99f6a358758b506",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "a790a81442e4968e0c3f3ec9b56a03a295d99c8ea4ee1d59197c84079a57d06a",
+        "unreadable_exponent_bbox_xyxy": [
+          560,
+          251,
+          703,
+          296
+        ],
+        "unreadable_scope": "denominator_exponent_only_no_hidden_correct_exponent"
+      },
+      {
+        "fixture_id": "V3-B02",
+        "case_id": "B02",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "B02.png",
+        "sha256": "d4f7f7dfd09b7267cf98b0a861928bcd61a7a3e7bc6f7f540293fdb9bb2d5ad8",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "acc125c78f338709382c0d4c6f2e82caaecd278dbe2153f561ceb2eec47354da"
+      },
+      {
+        "fixture_id": "V3-B03",
+        "case_id": "B03",
+        "revision": "v3-synthetic-r3-20261021",
+        "source": "synthetic_generated_from_cases_json",
+        "media_type": "image/png",
+        "file": "B03.png",
+        "sha256": "5e4c1b4898bc360ac61cd986a4b42c62c46892cc7bced225ab6f4aee0727d7ec",
+        "width": 1440,
+        "height": 900,
+        "allowed_scope": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "allowed_operations": [
+          "local_view",
+          "formal_application_confirmed_attachment",
+          "real_model_input"
+        ],
+        "question_sha256": "abafaa0822a6b7c61b1989f67a9628113d0ef6ead174abcdbfde56c99cc1cf96"
+      }
+    ],
+    "not_generated": [
+      {
+        "case_id": "H01",
+        "reason": "当前只有题文和步骤定义，尚无本轮用户确认的真实手写图片；不以字体渲染冒充手写。"
+      },
+      {
+        "case_id": "H02",
+        "reason": "V1已记录用户提供的真实手写及验收；本轮不自动寻找、复制或重提旧真实素材，留待用户确认提交。"
+      },
+      {
+        "case_id": "H03",
+        "reason": "当前只有题文和无效步骤定义，尚无本轮用户确认的真实手写图片；不以字体渲染冒充手写。"
+      }
+    ]
+  },
+  "reused_approved_inputs": [],
+  "alternate_synthetic_inputs": [],
+  "cases": [
+    {
+      "case_id": "M01",
+      "chat_id": "chat_bdfcfbc792874343ae2e99459d1c4890",
+      "source": "synthetic_printed_math_not_real_video_or_handwriting",
+      "question": "求x→0时(sin x−x cos x)/x³的极限。",
+      "mathematics_status": "pending_review",
+      "rounds": [
+        {
+          "round": 1,
+          "submission_id": "v3-M01-1",
+          "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+          "input": {
+            "text": "请根据已确认题图完整解答，写清关键条件和推导。",
+            "attachment": true,
+            "corrections": [],
+            "expected": {
+              "reading": "负号与分母三次方正确，x趋于0。",
+              "method": "泰勒展开或满足前提的洛必达法则。",
+              "calculation": "sin x−x cos x=x³/3+O(x⁵)。",
+              "conclusion": "极限为1/3。",
+              "answer_markers": [
+                "1/3",
+                "\\frac{1}{3}",
+                "三分之一"
+              ]
+            }
+          },
+          "state": "completed",
+          "body": "抱歉，我目前无法识别你提供的题图内容，因此不能确认题目中的关键条件和具体所求。\n\n请把题目中的**文字、公式、图形条件**直接打出来，例如：\n\n- 已知角、边长、坐标、函数表达式\n- 要求解的量（角度、长度、面积、范围、最值等）\n- 图中特殊位置关系，如垂直、平行、相切、共线等\n\n你补充后，我会按“先给方法及理由，再连续完整推导”的方式解答。",
+          "body_sha256": "e9ac7ca0bcd61fcd4416c60fde5315130a2c135e2f5631daecb738d4a0428892",
+          "reasoning_chars": 0,
+          "usage": {
+            "status": "known",
+            "raw": {
+              "source": "provider_sse_before_harness_projection",
+              "raw": [
+                {
+                  "event": "message_start",
+                  "usage": {
+                    "input_tokens": 494,
+                    "cache_creation_input_tokens": 0,
+                    "cache_read_input_tokens": 0,
+                    "output_tokens": 0,
+                    "service_tier": "standard"
+                  }
+                },
+                {
+                  "event": "message_delta",
+                  "usage": {
+                    "input_tokens": 494,
+                    "cache_creation_input_tokens": 0,
+                    "cache_read_input_tokens": 0,
+                    "output_tokens": 110,
+                    "service_tier": "standard"
+                  }
+                }
+              ],
+              "field_presence": {
+                "input_tokens": true,
+                "output_tokens": true,
+                "cache_read_input_tokens": true,
+                "cache_creation_input_tokens": true,
+                "reasoning_tokens": false
+              },
+              "observed_cumulative": {
+                "input_tokens": 494,
+                "output_tokens": 110,
+                "cache_read_input_tokens": 0,
+                "cache_creation_input_tokens": 0,
+                "reasoning_tokens": null
+              },
+              "normalized": {
+                "input_tokens": 494,
+                "output_tokens": 110,
+                "cache_read_input_tokens": 0,
+                "cache_creation_input_tokens": 0,
+                "reasoning_tokens": null
+              },
+              "settled": true,
+              "settlement_count": 1,
+              "message_stop_events": 1,
+              "settlement_identity": "boundary-751dd28e22374d439386433654aff23d",
+              "provider_message_id": "0e5489a8-ea22-4e14-9194-ae83a0684346",
+              "provider_model": "deepseek-v4-pro",
+              "post_terminal_events_ignored": 0
+            },
+            "fields": {
+              "cache_read_input_tokens": true,
+              "cache_creation_input_tokens": true,
+              "input_tokens": true,
+              "reasoning_tokens": false,
+              "output_tokens": true
+            },
+            "input_tokens": 494,
+            "output_tokens": 110
+          },
+          "metrics": {
+            "time_to_first_body_delta_ms": 1094.0,
+            "time_to_useful_content_ms": null,
+            "useful_content_review": "pending_independent_content_review",
+            "time_to_complete_ms": 3547.0,
+            "time_to_final_usage_observation_ms": 3547.0,
+            "distinct_observations": 36,
+            "distinct_nonempty_body_observations": 33,
+            "cancel_requested_during_body": false,
+            "cancel_observation": null
+          },
+          "request_audit": [
+            {
+              "request_id": "boundary-751dd28e22374d439386433654aff23d",
+              "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+              "body_sha256": "e7260bc4bd40c764e43d704450c83d4fd949693bcf7dd9d615152d60d6d4981d",
+              "model": "deepseek-v4-pro",
+              "thinking": {
+                "type": "disabled"
+              },
+              "output_config": null,
+              "max_tokens": 4096,
+              "tools": [],
+              "images": [
+                {
+                  "kind": "image",
+                  "source_type": "base64",
+                  "sha256": "e8bc1fa1dfcc520cb956709746efedf2247fe5118c8ed850973de3e22dcea866",
+                  "bytes": 41870,
+                  "mime": "image/png",
+                  "dimensions": [
+                    1440,
+                    900
+                  ]
+                }
+              ],
+              "all_request_images_whitelisted": true,
+              "usage": {
+                "source": "provider_sse_before_harness_projection",
+                "raw": [
+                  {
+                    "event": "message_start",
+                    "usage": {
+                      "input_tokens": 494,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 0,
+                      "service_tier": "standard"
+                    }
+                  },
+                  {
+                    "event": "message_delta",
+                    "usage": {
+                      "input_tokens": 494,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 110,
+                      "service_tier": "standard"
+                    }
+                  }
+                ],
+                "field_presence": {
+                  "input_tokens": true,
+                  "output_tokens": true,
+                  "cache_read_input_tokens": true,
+                  "cache_creation_input_tokens": true,
+                  "reasoning_tokens": false
+                },
+                "observed_cumulative": {
+                  "input_tokens": 494,
+                  "output_tokens": 110,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "normalized": {
+                  "input_tokens": 494,
+                  "output_tokens": 110,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "settled": true,
+                "settlement_count": 1,
+                "message_stop_events": 1,
+                "settlement_identity": "boundary-751dd28e22374d439386433654aff23d",
+                "provider_message_id": "0e5489a8-ea22-4e14-9194-ae83a0684346",
+                "provider_model": "deepseek-v4-pro",
+                "post_terminal_events_ignored": 0
+              },
+              "actual_outbound_attempt": 1,
+              "provider_status": "completed",
+              "private_request_ref": "data\\execution\\boundary\\private\\boundary\\boundary-751dd28e22374d439386433654aff23d.request.json"
+            }
+          ],
+          "outbound_attempts": [
+            {
+              "attempt_id": "boundary-751dd28e22374d439386433654aff23d",
+              "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+              "kind": "model",
+              "request_id": "boundary-751dd28e22374d439386433654aff23d",
+              "model": "deepseek-v4-pro",
+              "thinking": "none",
+              "actual_outbound": true,
+              "created_at": "2026-10-21T06:16:05.211+00:00"
+            }
+          ],
+          "usage_records": [
+            {
+              "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+              "settlement_id": "provider:boundary-751dd28e22374d439386433654aff23d:usage",
+              "source": "provider_boundary",
+              "raw_usage": {
+                "source": "provider_sse_before_harness_projection",
+                "raw": [
+                  {
+                    "event": "message_start",
+                    "usage": {
+                      "input_tokens": 494,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 0,
+                      "service_tier": "standard"
+                    }
+                  },
+                  {
+                    "event": "message_delta",
+                    "usage": {
+                      "input_tokens": 494,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 110,
+                      "service_tier": "standard"
+                    }
+                  }
+                ],
+                "field_presence": {
+                  "input_tokens": true,
+                  "output_tokens": true,
+                  "cache_read_input_tokens": true,
+                  "cache_creation_input_tokens": true,
+                  "reasoning_tokens": false
+                },
+                "observed_cumulative": {
+                  "input_tokens": 494,
+                  "output_tokens": 110,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "normalized": {
+                  "input_tokens": 494,
+                  "output_tokens": 110,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "settled": true,
+                "settlement_count": 1,
+                "message_stop_events": 1,
+                "settlement_identity": "boundary-751dd28e22374d439386433654aff23d",
+                "provider_message_id": "0e5489a8-ea22-4e14-9194-ae83a0684346",
+                "provider_model": "deepseek-v4-pro",
+                "post_terminal_events_ignored": 0
+              },
+              "field_presence": {
+                "input_tokens": true,
+                "output_tokens": true,
+                "cache_read_input_tokens": true,
+                "cache_creation_input_tokens": true,
+                "reasoning_tokens": false
+              },
+              "normalized": {
+                "input_tokens": 494,
+                "output_tokens": 110,
+                "cached_input_tokens": 0,
+                "reasoning_tokens": null
+              },
+              "created_at": "2026-10-21T06:16:07.663+00:00"
+            }
+          ]
+        }
+      ],
+      "attachment_id": "attachment_91ba62b0a62f4fd59b0382257acd1242",
+      "submitted_image_sha256": "e8bc1fa1dfcc520cb956709746efedf2247fe5118c8ed850973de3e22dcea866",
+      "saved_message_count": 2,
+      "execution_status": "completed"
+    }
+  ],
+  "uncovered": [
+    "H01/H02/H03 本轮未提交真实手写；不以打印题替代手写识别",
+    "真实网课题图及用户数次学习评价待用户主动提交与操作",
+    "首次有用内容须结合完整回答核查，不把首字符或thinking当有用内容",
+    "小型合成题不能证明考研数学一综合题普遍适用性或数学准确率"
+  ],
+  "instance_id": "b1243c4cbbae4fba95b1d5dca860d423",
+  "cleanup": {
+    "owned_pids_before": [],
+    "remaining_pids": [],
+    "method": "windows_job",
+    "owned_port_closed": true
+  },
+  "actual_outbound_attempts": 1,
+  "provider_boundary_records": [
+    {
+      "at_ns": 1792563367649079500,
+      "event": "request_finished",
+      "request_id": "boundary-751dd28e22374d439386433654aff23d",
+      "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+      "mode": "official",
+      "received_ns": 1792563364315850100,
+      "body_sha256": "e7260bc4bd40c764e43d704450c83d4fd949693bcf7dd9d615152d60d6d4981d",
+      "body_bytes": 58133,
+      "model": "deepseek-v4-pro",
+      "max_tokens": 4096,
+      "thinking": {
+        "type": "disabled"
+      },
+      "output_config": null,
+      "tools": [],
+      "images": [
+        {
+          "kind": "image",
+          "source_type": "base64",
+          "sha256": "e8bc1fa1dfcc520cb956709746efedf2247fe5118c8ed850973de3e22dcea866",
+          "bytes": 41870,
+          "mime": "image/png",
+          "dimensions": [
+            1440,
+            900
+          ]
+        }
+      ],
+      "actual_outbound_attempt": 1,
+      "status": "completed",
+      "attempt": 1,
+      "target": "https://api.deepseek.com/anthropic/v1/messages",
+      "dispatch_ns": 1792563364387220300,
+      "upstream_status": 200,
+      "response_headers_ns": 1792563364539358600,
+      "usage": {
+        "source": "provider_sse_before_harness_projection",
+        "raw": [
+          {
+            "event": "message_start",
+            "usage": {
+              "input_tokens": 494,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 0,
+              "service_tier": "standard"
+            }
+          },
+          {
+            "event": "message_delta",
+            "usage": {
+              "input_tokens": 494,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 110,
+              "service_tier": "standard"
+            }
+          }
+        ],
+        "field_presence": {
+          "input_tokens": true,
+          "output_tokens": true,
+          "cache_read_input_tokens": true,
+          "cache_creation_input_tokens": true,
+          "reasoning_tokens": false
+        },
+        "observed_cumulative": {
+          "input_tokens": 494,
+          "output_tokens": 110,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "reasoning_tokens": null
+        },
+        "normalized": {
+          "input_tokens": 494,
+          "output_tokens": 110,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "reasoning_tokens": null
+        },
+        "settled": true,
+        "settlement_count": 1,
+        "message_stop_events": 1,
+        "settlement_identity": "boundary-751dd28e22374d439386433654aff23d",
+        "provider_message_id": "0e5489a8-ea22-4e14-9194-ae83a0684346",
+        "provider_model": "deepseek-v4-pro",
+        "post_terminal_events_ignored": 0
+      },
+      "delta_emitted_ns": [
+        1792563365195636700,
+        1792563365341968900,
+        1792563365368744000,
+        1792563365368744000,
+        1792563365368744000,
+        1792563365414196200,
+        1792563365414196200,
+        1792563365414196200,
+        1792563365445395800,
+        1792563365445395800,
+        1792563365445395800,
+        1792563365445395800,
+        1792563365484309600,
+        1792563365484309600,
+        1792563365524156200,
+        1792563365563040300,
+        1792563365627604300,
+        1792563365627604300,
+        1792563365627604300,
+        1792563365635892700,
+        1792563365635892700,
+        1792563365666438400,
+        1792563365666438400,
+        1792563365666438400,
+        1792563365715932200,
+        1792563365758635700,
+        1792563365758635700,
+        1792563365758635700,
+        1792563365852211500,
+        1792563365852211500,
+        1792563365852211500,
+        1792563365852211500,
+        1792563365874504400,
+        1792563365906285200,
+        1792563365945720000,
+        1792563365977588500,
+        1792563366024909200,
+        1792563366024909200,
+        1792563366024909200,
+        1792563366024909200,
+        1792563366059761500,
+        1792563366059761500,
+        1792563366059761500,
+        1792563366059761500,
+        1792563366093318100,
+        1792563366093318100,
+        1792563366130630000,
+        1792563366130630000,
+        1792563366165016100,
+        1792563366165016100,
+        1792563366203177100,
+        1792563366243089500,
+        1792563366243089500,
+        1792563366243089500,
+        1792563366243089500,
+        1792563366273321700,
+        1792563366324319300,
+        1792563366369208700,
+        1792563366398454300,
+        1792563366435316000,
+        1792563366435316000,
+        1792563366435316000,
+        1792563366435316000,
+        1792563366485076200,
+        1792563366485076200,
+        1792563366515244900,
+        1792563366515244900,
+        1792563366515244900,
+        1792563366515244900,
+        1792563366515244900,
+        1792563366556891900,
+        1792563366556891900,
+        1792563366556891900,
+        1792563366600907800,
+        1792563366634418500,
+        1792563366682770200,
+        1792563366706469600,
+        1792563366706469600,
+        1792563366741508900,
+        1792563366773298800,
+        1792563366773298800,
+        1792563366773298800,
+        1792563366773298800,
+        1792563366816672000,
+        1792563366816672000,
+        1792563366816672000,
+        1792563366816672000,
+        1792563366853180900,
+        1792563366853180900,
+        1792563366853180900,
+        1792563366884848400,
+        1792563366884848400,
+        1792563366884848400,
+        1792563366946310900,
+        1792563366946310900,
+        1792563366946310900,
+        1792563366962340200,
+        1792563366962340200,
+        1792563367001680500,
+        1792563367039723100,
+        1792563367039723100,
+        1792563367039723100,
+        1792563367080003400,
+        1792563367080003400,
+        1792563367134242700,
+        1792563367134242700,
+        1792563367594826100,
+        1792563367594826100,
+        1792563367594826100,
+        1792563367647078300
+      ],
+      "finished_ns": 1792563367649079500
+    }
+  ],
+  "source_digests_after": {
+    "backend\\src\\learning_app\\__init__.py": "8364b7e64e40dc6bb35eb2b082e3bab87458bf0b00cc74b56a446ff8bd94ef75",
+    "backend\\src\\learning_app\\__main__.py": "9883f548792840eece8a19931ea5091a192eb1c92dab7b4d67178862c4128276",
+    "backend\\src\\learning_app\\app.py": "d73943e90d4de635e3e0e7e40dd85edc111cb8d15cb1ca3c704712e3977071f9",
+    "backend\\src\\learning_app\\config.py": "33f8616b44fc70db8be883d7486ee3559da7390523db4d00beff38f637c2b051",
+    "backend\\src\\learning_app\\dev.py": "233d1a7e4cdf47d9e5358508443ba37af1972486b827ebf08fde3f2a703826e5",
+    "backend\\src\\learning_app\\drafts.py": "5c2c9bfdb37a14fe5f751d2da4d56ca953372a92bd28efb0c8a63c16a04be88e",
+    "backend\\src\\learning_app\\dto.py": "2a7ea4b34220ef3dd1249dae66cb32d3f8b76f5dac62581c5e8a78cb1eee4c8e",
+    "backend\\src\\learning_app\\errors.py": "b6823f923102502d867579a72ac808746b5d6f7d2e884dcbd6c0fa1a923eec39",
+    "backend\\src\\learning_app\\execution\\__init__.py": "225e8ac92fb07b7663ec56bc06aa17236d00fd72ecd17aadf54dd7217f4ab195",
+    "backend\\src\\learning_app\\execution\\adapter.py": "8d9eee12b0ad18400f2c52932595532659b3d036041b810bac7b8a7cef7332b3",
+    "backend\\src\\learning_app\\execution\\boundary.py": "127326312a4423746faa42649718452b16be9e7a7004d87fe5ca635a7c885c01",
+    "backend\\src\\learning_app\\execution\\host.py": "ac70799fa1c99f7e3a757f0c46dcb8d2d52ea6d5d97f8707737571c58361e4e9",
+    "backend\\src\\learning_app\\execution\\remote.py": "97410c842de82b1da465dec0d88171a3165f3cbb4c02ff5029631009b279b9e0",
+    "backend\\src\\learning_app\\execution\\selection.py": "2835ac4f2a11cf4ae391d5d557df7ceb5f1a1c6f8397ac02220d3e57ab47efc9",
+    "backend\\src\\learning_app\\execution\\types.py": "36503a2e80c6b519af287a599d1b4c8fa7c0b01db8ebac11396fa6e59bde1b03",
+    "backend\\src\\learning_app\\faults.py": "cf6c8a7e6872cd180326b0029b4ba90df87448c96774147311b5a33cecd519d2",
+    "backend\\src\\learning_app\\health.py": "411b3304d473cbb75a0cfec5f679299a7e03ae99908a4b2536ddb250ee68b68a",
+    "backend\\src\\learning_app\\media.py": "dfc905d1c705003e6d542b8f142f8362f1b095306f5fa9506399ea2abd58455c",
+    "backend\\src\\learning_app\\media_schema.py": "0e3ecab78f3636ea8fc0beef3bea37c1684e263098d73b20a65b56c88789824f",
+    "backend\\src\\learning_app\\processes.py": "9b2b1702531ba5071e0027113a82ef60ed3c54cf316bbd66d9e08d5f90187dc7",
+    "backend\\src\\learning_app\\runtime_control.py": "0028a0ad6758ae8ceb69ec0099595162155ef8e11f2214e8e0eb47f8829a1eff",
+    "backend\\src\\learning_app\\security.py": "1d1fe7f7f14c33bf4177442251ca8d62b33bd19f1e60136f377fe7b5eefed06e",
+    "backend\\src\\learning_app\\service.py": "59aabbe7c999fcc91aa995618decf8b27780337b7e93d1defa9ed9291bc7050e",
+    "backend\\src\\learning_app\\storage\\__init__.py": "d508895f245b571936d77607f9070dc5695f68a75b0d7256f4b77ab6cc7b749a",
+    "backend\\src\\learning_app\\storage\\migrations\\env.py": "d582dc77a026e8c41b6508179564dd44739b612fffd61b67b332318749eb631f",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0001_business.py": "aafa6e33d5a3062c47f4976e3ce91c643b552b09fab4955e9b62b70fb8d855b4",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0002_media.py": "950a73bc4a585bdbc4d17a2a15b8f1d97988c06518fe6b3686f167b766357c2c",
+    "backend\\src\\learning_app\\storage\\migrations\\versions\\0003_drafts.py": "397225937d3aabb849c6674eb9afffed4b351ecb69a071e6ef6d10bfba74be2a",
+    "backend\\src\\learning_app\\storage\\repository.py": "ee104281d7e1df2a7ffd0391f113c1f5d436ff3cc5551762279fca627d80f593",
+    "backend\\src\\learning_app\\storage\\schema.py": "0801ff08e605132de1020d9490f3ab18e585c0f29c2b8013310b087cb05286d4",
+    "frontend\\src\\App.tsx": "d986de9346d858f79933c47176ed328e41d9c7b8f2896fff772ff32a2782ac07",
+    "frontend\\src\\chat\\ChatWorkspace.tsx": "8afa41a8046f49e631da33b2505422744b3a5c78a1bb041aa134d231b0416ceb",
+    "frontend\\src\\chat\\MarkdownAnswer.tsx": "49c1ade0b88772b1490a8278bfa37c8df8fd07dcf4fb0de17a199ce1a37b3161",
+    "frontend\\src\\components\\ui\\button.tsx": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+    "frontend\\src\\main.tsx": "a6bcae9c4f04d6ff36406b2966379834342b41b08b83ba7bd0334712d6cf87f0",
+    "frontend\\src\\media\\CaptureEditor.tsx": "c70c3a9bb8262862a63e097521085e415b6f8292a9d87ea7a829d500447a7028",
+    "frontend\\src\\media\\VideoWorkspace.tsx": "282ef9c8f704d60c1768a1f711872bfa75cee089c766ea4e3379cb8332d0e0ab",
+    "frontend\\src\\api\\client.ts": "47b139918a2459bc076cfe88e1fe5afe9f61b0d2c918bb0c07d20917d9eca611",
+    "frontend\\src\\chat\\captureCache.ts": "31cf6cfe5b470eee992710a8fefaa898bf03749953af21dead1018eb8ed05155",
+    "frontend\\src\\chat\\draft.ts": "d7f50bcf101e95bb7ffc4b57c80764bdd993642ca1588ea27a94092e7e158373",
+    "frontend\\src\\chat\\state.ts": "da03efab9ff630a1bd350c040aa05610b55f43c6af2cf3e64d38e8dfb07a5a49",
+    "frontend\\src\\lib\\utils.ts": "d1f1e0d62cb8d8d1e04c26e14de842d8a151f75812d81b046c65b5d1fe8e4b27",
+    "frontend\\src\\media\\capture.ts": "5e9c2152dfa9eeb29cf369640ba93f9939972852c87bf66cbce651bf8048fe8f",
+    "frontend\\src\\chat\\chat.css": "fab675e45eefdb9267092b454ccdbb56adca6d6296c02235acbd24d45c7c1426",
+    "frontend\\src\\media\\CaptureEditor.css": "fa39a686badb6fbf038a832d9bdbe627bcaa0c4f335b19c30debd23e2fb57c0c",
+    "frontend\\src\\styles.css": "1acb41f5163d4445c5237f339348f373a46a2d18b1c602e478ce4eb501c6aa3f",
+    "package.json": "07e584247b53bd2672f0bc1357837dcd7c2d274fa3053a78d1207be9e2c70be3",
+    "frontend\\package.json": "ea100eaacd07e8aff38d82d2abe5af621c2aef5d992a5d93a81947677a790184",
+    "backend\\pyproject.toml": "aa84048c77e7819d6b07c63490328927fc12cedb30af0e2f6cec6b43ec323f0c",
+    "scripts\\app.py": "03b597c350f7f65f7a426e0c04d1fc40d739e3659ce078eac7c5e0fbba6b2234",
+    "harness\\runtime.lock.json": "035ec2f210401313f49257d428d75aa60a763b631af22e3d9274269d12099e61",
+    "harness\\profiles\\learning.patch.json": "c49bc39b366b989e5f3424535cccecb1b427257a4a72c796e6579922a043e3da",
+    "harness\\plugins\\learning-guard.mjs": "33a806b9641c2d246094a07ee1b1cecdb851bcf0eb77a1e90e6fbb265c66710b",
+    "pnpm-lock.yaml": "fb8155baa15fabedc9ebefcf687bdf9f413d3454f101a42feb7c5bf94396602e",
+    "backend\\uv.lock": "c15c6aa9e11010b02552ae2f7de2e8d33306a87169c5ac5a699d7f68793c6e89",
+    "tests\\fixtures\\v3\\cases.json": "c1754cccdb20dcdf0d91bc31d10a1032c8aeeaff95556db7508e935a44f2728e",
+    "tests\\fixtures\\v3\\generate_samples.py": "f92bb0648597bddb7870483f6e1825e45475357399dce7f8ac9d35ebb6e88454",
+    "scripts\\validation\\Run-V3.py": "2e4d45d037fea4092accfb94e982796ad39ed85bc176e25fe8eddd7846a6866f"
+  },
+  "sources_unchanged_during_run": true,
+  "sqlite": {
+    "sqlite_version": "3.45.3",
+    "journal_mode": "delete",
+    "synchronous": 2,
+    "foreign_keys": 1,
+    "schema_revision": "0003_drafts",
+    "attachment_publish": "fsync+MoveFileExW_WRITE_THROUGH"
+  },
+  "counts": {
+    "assets": 0,
+    "attachments": 1,
+    "courses": 1,
+    "rejected_events": 0,
+    "chats": 1,
+    "course_assets": 0,
+    "source_versions": 0,
+    "context_snapshots": 1,
+    "execution_bindings": 1,
+    "messages": 2,
+    "input_revisions": 2,
+    "submissions": 1,
+    "generations": 1,
+    "message_attachments": 1,
+    "execution_events": 114,
+    "outbound_attempts": 1,
+    "usage_records": 1
+  }
+}

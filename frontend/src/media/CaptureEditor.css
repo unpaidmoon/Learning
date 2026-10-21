@@ -1,0 +1,126 @@
+.capture-editor {
+  width: min(1080px, calc(100vw - 40px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 20px;
+  overflow: auto;
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 24px 100px #10234a45;
+}
+
+.capture-editor::backdrop {
+  background: #10203980;
+  backdrop-filter: blur(3px);
+}
+
+.capture-heading,
+.capture-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.capture-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.capture-heading p,
+.capture-footer p,
+.capture-toolbar small,
+.capture-coordinates small {
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.capture-heading p {
+  margin-top: 5px;
+}
+
+.capture-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0 10px;
+}
+
+.capture-toolbar small {
+  margin-left: auto;
+}
+
+.capture-viewport {
+  height: min(52dvh, 520px);
+  min-height: 220px;
+  overflow: hidden;
+  background: #172034;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.capture-viewport > img {
+  display: block;
+  max-width: 100%;
+}
+
+.capture-viewport .cropper-view-box {
+  outline-color: #8da5ff;
+}
+
+.capture-viewport .cropper-line,
+.capture-viewport .cropper-point {
+  background-color: #4d6bfe;
+}
+
+.capture-coordinates {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.capture-coordinates label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.capture-coordinates input {
+  width: 82px;
+  padding: 5px 6px;
+}
+
+.capture-coordinates small {
+  margin-left: auto;
+}
+
+.capture-error {
+  margin: 10px 0;
+  color: var(--destructive);
+  font-size: 13px;
+}
+
+.capture-footer {
+  margin-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .capture-editor {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 12px;
+  }
+
+  .capture-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

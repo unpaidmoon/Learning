@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import http.cookiejar
 import json
 import os
 import shutil
@@ -14,7 +15,7 @@ import uuid
 import webbrowser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.request import ProxyHandler, build_opener
+from urllib.request import HTTPCookieProcessor, ProxyHandler, Request, build_opener
 
 from learning_app.config import load_config
 from learning_app.processes import OwnedProcessGroup, ProcessError, require_free_port
@@ -65,16 +66,154 @@ def wait_for_http(
     raise ProcessError("READINESS_TIMEOUT", f"等待服务就绪超时：{url}")
 
 
+def _request_owned_exit(record: dict[str, object], *, confirm_active: bool, timeout: float) -> None:
+    """Use normal app authentication; disk records never authorize a PID kill."""
+    identity = str(record["instance_id"])
+    url = f"http://127.0.0.1:{record['backend_port']}/api/v1"
+    opener = build_opener(ProxyHandler({}), HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    try:
+        with opener.open(f"{url}/health", timeout=timeout) as response:
+            health = json.load(response)
+        if health.get("instance_id") != identity or health.get("ready") is not True:
+            raise ProcessError("INSTANCE_MISMATCH", "端口服务不属于指定实例，未请求停止。")
+        with opener.open(f"{url}/session", timeout=timeout) as response:
+            csrf = json.load(response)["csrf_token"]
+        with opener.open(f"{url}/runtime", timeout=timeout) as response:
+            runtime = json.load(response)
+        if runtime.get("instance_id") != identity:
+            raise ProcessError("INSTANCE_MISMATCH", "后台实例已变化，未请求停止。")
+        if runtime.get("active_generations") and not confirm_active:
+            if not sys.stdin.isatty():
+                raise ProcessError(
+                    "ACTIVE_GENERATIONS_CONFIRMATION_REQUIRED",
+                    "仍有回答正在生成或结果待核对；确认保存并停止后请加 --confirm-active。",
+                )
+            try:
+                answer = input("仍有回答正在生成或结果待核对。保存并请求停止后退出？[y/N] ").strip()
+            except EOFError as exc:
+                # Windows NUL may report isatty=True while having no interactive
+                # input. An absent answer is never consent to stop active work.
+                raise ProcessError(
+                    "ACTIVE_GENERATIONS_CONFIRMATION_REQUIRED",
+                    "无法读取确认；确认保存并停止后请加 --confirm-active。",
+                ) from exc
+            if answer.lower() not in {"y", "yes"}:
+                raise ProcessError("EXIT_CANCELLED", "已取消退出，后台继续。")
+            confirm_active = True
+        request = Request(
+            f"{url}/runtime/exit",
+            data=json.dumps({"instance_id": identity, "confirm_active": confirm_active}).encode(),
+            headers={"Content-Type": "application/json", "X-Learning-CSRF": csrf},
+            method="POST",
+        )
+        with opener.open(request, timeout=timeout) as response:
+            result = json.load(response)
+        if result.get("instance_id") != identity or not result.get("exit_requested"):
+            raise ProcessError("EXIT_NOT_CONFIRMED", "后台未确认本次退出请求，请检查实例状态。")
+    except HTTPError as exc:
+        try:
+            detail = json.load(exc)
+        except (ValueError, OSError):
+            detail = {}
+        raise ProcessError(
+            detail.get("code", "EXIT_NOT_CONFIRMED"),
+            detail.get("message", "后台未确认退出，未终止任何进程。"),
+        ) from exc
+    except (URLError, TimeoutError, ConnectionError) as exc:
+        raise ProcessError(
+            "EXIT_RESULT_UNKNOWN", "无法核对退出结果，请查看实例记录；未重复提交退出。"
+        ) from exc
+
+
+def _launch_background(arguments: argparse.Namespace, config) -> int:
+    """Detach only a dedicated launcher; that launcher owns the service job."""
+    if config.mode != "start":
+        raise ProcessError("INVALID_MODE", "后台启动只用于已构建学习页面。")
+    root = config.project_root
+    if not (config.static_dir / "index.html").is_file():
+        raise ProcessError("BUILD_MISSING", "缺少 frontend/dist/index.html，请先执行构建。")
+    log_dir = config.runtime_dir / "launches" / uuid.uuid4().hex
+    log_dir.mkdir(parents=True, exist_ok=False)
+    command = [
+        sys.executable,
+        str(root / "scripts/app.py"),
+        "start",
+        "--timeout",
+        str(arguments.timeout),
+    ]
+    for option in ("backend_port", "frontend_port"):
+        value = getattr(arguments, option)
+        if value is not None:
+            command.extend([f"--{option.replace('_', '-')}", str(value)])
+    if arguments.open:
+        command.append("--open")
+    if arguments.harness:
+        command.append("--harness")
+    environment = os.environ.copy()
+    environment["PYTHONUNBUFFERED"] = "1"
+    environment["LEARNING_APP_HARNESS_ENABLED"] = str(config.harness_enabled).lower()
+    output_path = log_dir / "launcher.stdout.log"
+    error_path = log_dir / "launcher.stderr.log"
+    with (
+        output_path.open("w", encoding="utf-8") as output,
+        error_path.open("w", encoding="utf-8") as errors,
+    ):
+        options = (
+            {"creationflags": subprocess.CREATE_NO_WINDOW}
+            if os.name == "nt"
+            else {"start_new_session": True}
+        )
+        process = subprocess.Popen(
+            command,
+            cwd=root,
+            env=environment,
+            stdin=subprocess.DEVNULL,
+            stdout=output,
+            stderr=errors,
+            **options,
+        )
+    deadline = time.monotonic() + arguments.timeout * 2 + 5
+    while time.monotonic() < deadline:
+        stdout = output_path.read_text(encoding="utf-8", errors="replace")
+        ready = next(
+            (line for line in stdout.splitlines() if line.startswith("LEARNING_APP_READY ")), None
+        )
+        if ready:
+            print(ready, flush=True)
+            return 0
+        if process.poll() is not None:
+            error = error_path.read_text(encoding="utf-8", errors="replace").strip()
+            raise ProcessError("LAUNCH_FAILED", error or "学习应用未能启动，请检查本次启动日志。")
+        time.sleep(0.1)
+    # The child has its own bounded readiness timeouts. Do not kill a live
+    # launcher merely because this observer timed out and might have missed ready.
+    raise ProcessError(
+        "LAUNCH_RESULT_UNKNOWN", "启动观察超时；请核对本次运行记录后再启动，避免重复实例。"
+    )
+
+
 def run(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="统一启动学习应用开发或构建模式")
-    parser.add_argument("mode", choices=["dev", "start", "stop"])
+    parser.add_argument("mode", choices=["dev", "start", "launch", "stop"])
     parser.add_argument("--host")
     parser.add_argument("--backend-port", type=int)
     parser.add_argument("--frontend-port", type=int)
     parser.add_argument("--timeout", type=float, default=30.0)
     parser.add_argument("--instance-id", help="stop 时指定要停止的本项目实例")
     parser.add_argument("--open", action="store_true", help="就绪后打开浏览器")
+    execution_options = parser.add_mutually_exclusive_group()
+    execution_options.add_argument(
+        "--harness", action="store_true", help="启用既有后台私有配置的真实 Harness"
+    )
+    execution_options.add_argument(
+        "--no-harness", action="store_true", help="本次启动不启用模型执行"
+    )
+    parser.add_argument(
+        "--confirm-active", action="store_true", help="明确确认保存并停止活动或待核对回答后退出"
+    )
     arguments = parser.parse_args(argv)
+    if arguments.timeout <= 0:
+        raise ProcessError("INVALID_TIMEOUT", "等待时限必须大于零。")
     if arguments.mode == "stop":
         config = load_config()
         requested = arguments.instance_id or ""
@@ -90,22 +229,25 @@ def run(argv: list[str] | None = None) -> int:
             "ready",
         }:
             raise ProcessError("INSTANCE_NOT_RUNNING", "该记录不属于活动实例。")
-        # Request shutdown through an instance-bound mailbox, never terminate a
-        # PID from a possibly stale record or scan by executable name.
-        (run_dir / "stop.request").write_text(requested, encoding="ascii")
+        if record.get("status") != "ready":
+            raise ProcessError("INSTANCE_NOT_READY", "实例尚未就绪，请等待就绪或查看本次启动日志。")
+        _request_owned_exit(
+            record, confirm_active=arguments.confirm_active, timeout=arguments.timeout
+        )
         print(f"已请求实例 {requested} 保存并停止。", flush=True)
         return 0
     instance_id = uuid.uuid4().hex
     overrides = {
-        "mode": arguments.mode,
+        "mode": "start" if arguments.mode == "launch" else arguments.mode,
         "host": arguments.host,
         "backend_port": arguments.backend_port,
         "frontend_port": arguments.frontend_port,
         "instance_id": instance_id,
+        "harness_enabled": True if arguments.harness else False if arguments.no_harness else None,
     }
     config = load_config({key: value for key, value in overrides.items() if value is not None})
-    if arguments.timeout <= 0:
-        raise ProcessError("INVALID_TIMEOUT", "就绪等待必须大于零。")
+    if arguments.mode == "launch":
+        return _launch_background(arguments, config)
     require_free_port(config.host, config.backend_port)
     if arguments.mode == "dev":
         if config.frontend_port == config.backend_port:
@@ -149,6 +291,7 @@ def run(argv: list[str] | None = None) -> int:
             "LEARNING_APP_DATA_DIR": str(config.data_dir),
             "LEARNING_APP_RUNTIME_DIR": str(config.runtime_dir),
             "LEARNING_APP_OWNED_STDIN": "1",
+            "LEARNING_APP_HARNESS_ENABLED": str(config.harness_enabled).lower(),
             "PYTHONUNBUFFERED": "1",
         }
     )
@@ -167,6 +310,12 @@ def run(argv: list[str] | None = None) -> int:
     exit_code = 0
 
     def request_interrupt(*_: object) -> None:
+        if record.get("status") == "ready":
+            try:
+                _request_owned_exit(record, confirm_active=False, timeout=arguments.timeout)
+            except ProcessError as exc:
+                print(f"{exc.code}: {exc}", file=sys.stderr, flush=True)
+            return
         raise KeyboardInterrupt
 
     original_handlers = {}

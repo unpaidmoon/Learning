@@ -33,7 +33,7 @@ from . import schema as s
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0001_business"
+SCHEMA_REVISION = "0003_drafts"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -1329,6 +1329,54 @@ class Repository:
         settlement_id: str | None = None,
         data: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        return self.ingest_events([{
+            "generation_id": generation_id, "binding_id": binding_id, "epoch": epoch,
+            "event_id": event_id, "seq": seq, "kind": kind, "text": text,
+            "status": status, "raw_usage": raw_usage, "usage_source": usage_source,
+            "usage_fields": usage_fields, "settlement_id": settlement_id, "data": data,
+        }])[0]
+
+    def ingest_events(self, events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        """Atomically persist a bounded stream burst, retaining every event identity.
+
+        Before-commit fault hooks remain inside the shared transaction. Each
+        accepted event's after-commit hook runs only after the whole batch is
+        durable; a crash before commit replays the original events by identity.
+        """
+        items = list(events)
+        if not items:
+            return []
+        if len(items) > 128:
+            raise StorageError("EVENT_BATCH_TOO_LARGE")
+        with self._lock, self.engine.begin() as conn:
+            results = [self._ingest_event(conn, **item) for item in items]
+        aliases = {"text_delta": "body", "reasoning_delta": "reasoning", "activity": "running"}
+        for item, result in zip(items, results, strict=True):
+            if result["accepted"]:
+                self._hook(
+                    "event_after_commit", generation_id=item["generation_id"],
+                    event_id=item["event_id"], kind=aliases.get(item["kind"], item["kind"]),
+                )
+        return results
+
+    def _ingest_event(
+        self,
+        conn: Connection,
+        generation_id: str,
+        *,
+        binding_id: str,
+        epoch: int,
+        event_id: str,
+        seq: int,
+        kind: str,
+        text: str = "",
+        status: str | None = None,
+        raw_usage: dict[str, Any] | None = None,
+        usage_source: str | None = None,
+        usage_fields: Mapping[str, bool] | None = None,
+        settlement_id: str | None = None,
+        data: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         aliases = {"text_delta": "body", "reasoning_delta": "reasoning", "activity": "running"}
         kind = aliases.get(kind, kind)
         if (
@@ -1356,7 +1404,7 @@ class Repository:
             "usage_source": usage_source,
             "settlement_id": settlement_id,
         }
-        with self._lock, self.engine.begin() as conn:
+        with self._lock:
             generation = _one(
                 conn,
                 s.generations,
@@ -1546,7 +1594,6 @@ class Repository:
                 event_id=event_id,
                 kind=kind,
             )
-        self._hook("event_after_commit", generation_id=generation_id, event_id=event_id, kind=kind)
         return {
             "accepted": True,
             "duplicate": False,

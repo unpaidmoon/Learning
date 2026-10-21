@@ -1,0 +1,1115 @@
+{
+  "document_kind": "V3_model_run_summary",
+  "recorded_at_unix_ns": 1792564398153606600,
+  "scope": "MVP-A V3 authorized model and real-browser provider attempts only; does not replace user learning acceptance",
+  "counts": {
+    "v3_model_runner_attempts": 32,
+    "real_browser_attempts": 4,
+    "total_this_task_real_attempts": 36,
+    "unique_request_ids": 36,
+    "unique_generation_ids": 36,
+    "usage_known_settlements": 34,
+    "usage_unknown_generations": 2,
+    "provider_raw_usage_missing_kept_unknown": true,
+    "hidden_auto_retry_observed": false,
+    "no_real_attempts_for_prepare_or_local_host_fixture": true
+  },
+  "model_runs": [
+    {
+      "run_id": "v3-math-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-math-20261021-r1.json",
+      "result_sha256": "38809d1381497d0ae6d35ba283a132c9514ffea8072edf403101ebd69bc2b02e",
+      "actual_outbound_attempts": 19,
+      "ledger_verified": true,
+      "execution_status": "failed",
+      "model": "deepseek-flash",
+      "thinking": "high",
+      "max_output_tokens": 16384,
+      "timeout_seconds": 300,
+      "source_changed_files": [
+        "frontend\\src\\chat\\ChatWorkspace.tsx",
+        "frontend\\src\\chat\\MarkdownAnswer.tsx",
+        "frontend\\src\\chat\\draft.ts"
+      ],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-ambiguity-retetest-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-ambiguity-retetest-20261021-r1.json",
+      "result_sha256": "f8fd95e2c1771cfe409459dc5c6d6c9070f0fd891ca3d0ac900cebf25a624189",
+      "actual_outbound_attempts": 3,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-flash",
+      "thinking": "high",
+      "max_output_tokens": 16384,
+      "timeout_seconds": 300,
+      "source_changed_files": [],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-flash-none-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-flash-none-20261021-r1.json",
+      "result_sha256": "246cae27dbc2bd331ec7ce790113ef4add70dbcfa3b66914537b871f4cefce83",
+      "actual_outbound_attempts": 1,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-flash",
+      "thinking": "none",
+      "max_output_tokens": 4096,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-pro-none-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-pro-none-20261021-r1.json",
+      "result_sha256": "1d4023f671d3e6ca3004a50486bf34d965e6331716f82115662ff79d65e718f6",
+      "actual_outbound_attempts": 1,
+      "ledger_verified": true,
+      "execution_status": "failed",
+      "model": "deepseek-pro",
+      "thinking": "none",
+      "max_output_tokens": 4096,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-v4pro-none-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-v4pro-none-20261021-r1.json",
+      "result_sha256": "61bac3ee9446fbf29b531a7318ce56207f383285f071a196e68cf605f3113802",
+      "actual_outbound_attempts": 1,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-v4-pro",
+      "thinking": "none",
+      "max_output_tokens": 4096,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-v4pro-high-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-v4pro-high-20261021-r1.json",
+      "result_sha256": "cba68dcc52985638d6ebb0031588c7bf0e6d5fb403919e03c988749b18570ef2",
+      "actual_outbound_attempts": 1,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-v4-pro",
+      "thinking": "high",
+      "max_output_tokens": 8192,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [
+        "backend\\src\\learning_app\\storage\\repository.py"
+      ],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-v4pro-text-none-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-v4pro-text-none-20261021-r1.json",
+      "result_sha256": "9da76a7da8bf0c95736890cb5a3d2c29363c651d4d6fdf8cc84110e7293efefb",
+      "actual_outbound_attempts": 1,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-v4-pro",
+      "thinking": "none",
+      "max_output_tokens": 4096,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-config-v4pro-text-high-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-config-v4pro-text-high-20261021-r1.json",
+      "result_sha256": "ce96bd5bb742376354d6b6bd5d5544d8c50bc1927d6b05141ac7662ef02cba0b",
+      "actual_outbound_attempts": 2,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-v4-pro",
+      "thinking": "high",
+      "max_output_tokens": 8192,
+      "timeout_seconds": 180.0,
+      "source_changed_files": [
+        "frontend\\src\\chat\\ChatWorkspace.tsx"
+      ],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    },
+    {
+      "run_id": "v3-stop-retest-20261021-r1",
+      "result_ref": "research\\reports\\v3\\v3-stop-retest-20261021-r1.json",
+      "result_sha256": "4f2fbb92e6069ea0ca2004c1b902d4f971f8dbfea6a53a4c7d0a3b2a4c052eeb",
+      "actual_outbound_attempts": 3,
+      "ledger_verified": true,
+      "execution_status": "completed",
+      "model": "deepseek-flash",
+      "thinking": "high",
+      "max_output_tokens": 16384,
+      "timeout_seconds": 300,
+      "source_changed_files": [
+        "package.json"
+      ],
+      "cleanup": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job",
+        "owned_port_closed": true
+      }
+    }
+  ],
+  "real_browser_runs": [
+    {
+      "run_id": "real-ui-20261021-r1",
+      "result_ref": "research\\reports\\v3\\real-ui-20261021-r1.json",
+      "result_sha256": "22e604129e5379e304ce58e4713cab5ebbf3ebed902224b7e70bd3d893057e38",
+      "original_execution_status": "failed",
+      "actual_outbound_attempts_verified_from_ledger": 0,
+      "old_summary_count": null,
+      "old_failure": "RuntimeError: Playwright CLI失败：run-code，见 D:\\Codex\\Learning\\output\\playwright\\real-ui-20261021-r1\\browser",
+      "audit_note": "r2原汇总筛错事件名而写0，实际dispatch_started=2；原文件未改。r3迟到旧DOM观察剔除见独立audit。",
+      "source_changed_during_run": [
+        "backend/src/learning_app/execution/selection.py"
+      ],
+      "cleanup": {
+        "remaining_application_pids": [],
+        "remaining_browser_pids": [],
+        "backend_port_closed": true
+      }
+    },
+    {
+      "run_id": "real-ui-20261021-r2",
+      "result_ref": "research\\reports\\v3\\real-ui-20261021-r2.json",
+      "result_sha256": "5671d46c1d6a3c2526f5937c5b1dc8cbca4161e1827a3ef568a5ba655cdfdc58",
+      "original_execution_status": "failed",
+      "actual_outbound_attempts_verified_from_ledger": 2,
+      "old_summary_count": 0,
+      "old_failure": "AssertionError: two_actual_real_attempts_no_hidden_retry",
+      "audit_note": "r2原汇总筛错事件名而写0，实际dispatch_started=2；原文件未改。r3迟到旧DOM观察剔除见独立audit。",
+      "source_changed_during_run": [
+        "tests/e2e/test_mvp_a.py",
+        "backend/src/learning_app/storage/repository.py"
+      ],
+      "cleanup": {
+        "remaining_application_pids": [],
+        "remaining_browser_pids": [],
+        "backend_port_closed": true
+      }
+    },
+    {
+      "run_id": "real-ui-20261021-r3",
+      "result_ref": "research\\reports\\v3\\real-ui-20261021-r3.json",
+      "result_sha256": "5ad98a027cadaa4de1b198cdb6290bb1f09334b94c8b82aa5f375ca05495ea44",
+      "original_execution_status": "passed",
+      "actual_outbound_attempts_verified_from_ledger": 2,
+      "old_summary_count": 2,
+      "old_failure": null,
+      "audit_note": "r2原汇总筛错事件名而写0，实际dispatch_started=2；原文件未改。r3迟到旧DOM观察剔除见独立audit。",
+      "source_changed_during_run": [
+        "tests/e2e/test_mvp_a.py",
+        "backend/src/learning_app/service.py"
+      ],
+      "cleanup": {
+        "remaining_application_pids": [],
+        "remaining_browser_pids": [],
+        "backend_port_closed": true
+      }
+    }
+  ],
+  "case_reviews": [
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M01",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "负号/三次方与趋向正确；分子导数x sin x、分母导数3x²、基本极限与泰勒三阶系数均正确，结论1/3。",
+      "expected_answer_provenance": "user_confirmed_in_V1",
+      "round": 1,
+      "generation_id": "generation_b43a8b6800e740e58536905f6bf636a4",
+      "body_sha256": "02b315eb43f5497802c662f5fc43f091b73a9c4ec88ca36e5ade0e16439a0f59",
+      "useful_content_anchor": "f'(x)=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+      "time_to_useful_content_ms": 2688.0,
+      "useful_anchor_observation_body_sha256": "feef93a28efca4a266462e35da045b22767a7819e2d316bdb673db05d960e55b",
+      "time_to_first_body_delta_ms": 2297.0,
+      "time_to_complete_ms": 3625.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "差商夹逼得f′(0)=0；非零导数的余弦负号正确；两列趋零时分别得−1/+1，严格说明导函数不连续。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_f803ea40864d4916a06d44bb7be4e202",
+      "body_sha256": "72af6d81268652d4365cdd875ed22bc089170d2d4a8b07570a6b4c6e875d302a",
+      "useful_content_anchor": "=\\lim_{x\\to 0}x\\sin\\frac1x.",
+      "time_to_useful_content_ms": 4703.0,
+      "useful_anchor_observation_body_sha256": "58aa2f22f1d5d92de7d6869a7783006cba5e8660ba2c8e0c32a7f11e0e48f0ed",
+      "time_to_first_body_delta_ms": 3984.0,
+      "time_to_complete_ms": 6765.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M03",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "先用ε代下限，分部积分得x²ln x/2−x²/4；极限ε²ln ε=0后得−1/4，未代ln0。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_fd3c41103ae6440799fbf4c5177ed78a",
+      "body_sha256": "861ce8dadfba97e8674c1a7d19e4b3d8364588c6c2ae9a40bfe429bd2bacaf57",
+      "useful_content_anchor": "=\\lim_{\\varepsilon\\to0^+}\\int_{\\varepsilon}^1 x\\ln x\\,dx.",
+      "time_to_useful_content_ms": 2875.0,
+      "useful_anchor_observation_body_sha256": "231fef3dafec6d6eb23bd628c711cff35dc8ad7ba88509108bc918cb9e977cb7",
+      "time_to_first_body_delta_ms": 2438.0,
+      "time_to_complete_ms": 4000.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M04",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "单调趋0的交错项与发散的绝对调和级数分别检查，得条件收敛；ln2求和及展开有效区间正确。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_b2c1276f1668438eb7a639688a32df78",
+      "body_sha256": "16a7cc2439c075ea6b4e7a3b4add096805c58c70fe3426e7895e413d474a95f4",
+      "useful_content_anchor": "由莱布尼茨交错级数判别法可知，原级数收敛。",
+      "time_to_useful_content_ms": 4172.0,
+      "useful_anchor_observation_body_sha256": "882bd87e6dec41a6d3f97d6fdf64efeb7ebe688a87b428996f0309699a6720a3",
+      "time_to_first_body_delta_ms": 3750.0,
+      "time_to_complete_ms": 5125.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M05",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "保留任意实数条件，配方给最小1/2及等号点；x→∞在约束下无上界，无最大值。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_d86db9c85af64baebc6c2a7f6a766446",
+      "body_sha256": "8e61d2a4bb9ef9ea4a3652452c6a68ea4a7dbbe8abbfe2cd920b9d826b8ede1f",
+      "useful_content_anchor": "=2\\left(x-\\frac12\\right)^2+\\frac12.",
+      "time_to_useful_content_ms": 3250.0,
+      "useful_anchor_observation_body_sha256": "c72248fb2722e23cf63427a6e71de0727782c7dd362ff3ca4e6f4ab00d912a21",
+      "time_to_first_body_delta_ms": 2296.0,
+      "time_to_complete_ms": 4468.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "M06",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "区域x,y≥0且x+y≤1，内层0..1−x、外层0..1正确；内层(1−x²)/2，外层结果1/3。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_bf71c0ab2081413e825003ceb9d0a3ab",
+      "body_sha256": "dd70cc9f40b241d014859cf68b77f43a2822ed2b38e148ca9b78688f16e7a0b2",
+      "useful_content_anchor": "=\\int_0^1\\int_0^{1-x}(x+y)\\,dy\\,dx.",
+      "time_to_useful_content_ms": 3344.0,
+      "useful_anchor_observation_body_sha256": "69cb487491644d449764cddfc5e43a4e18f9aeb5e4f38ac6562f0a05a39e92b9",
+      "time_to_first_body_delta_ms": 2719.0,
+      "time_to_complete_ms": 4375.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "L01",
+      "review_status": "passed_with_wording_defect",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "wording_defect_equivalent_zero_equation",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "a≠1秩2唯一解(1,0)；a=1秩1无穷解(1−t,t)。表述瑕疵：称第一式减第二式却写(a−1)y=0；应写(1−a)y=0或称第二减第一，两式乘−1等价，解与秩未受影响。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_bbbca80d77f04ea28195381bc540d83c",
+      "body_sha256": "17f88dded9c02b4d1142b28d10a0d63dfcd57a12808f0680399720a0df69fa6c",
+      "useful_content_anchor": "\\det A=a-1\\neq 0",
+      "time_to_useful_content_ms": 3688.0,
+      "useful_anchor_observation_body_sha256": "f0894ddc285207c0593740bb992dd97a7b187e8aec01bec0ef760e9869d19261",
+      "time_to_first_body_delta_ms": 2984.0,
+      "time_to_complete_ms": 5313.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "L02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "特征多项式、根1/3、方向(1,−1)/(1,1)一一对应，明确非零倍数。",
+      "expected_answer_provenance": "user_confirmed_in_V1",
+      "round": 1,
+      "generation_id": "generation_d65e6ce8c8d24e27a2378f08ec414036",
+      "body_sha256": "1d55cc9b9a12c3dec36851ec827f98321af8990bc2b3738ae2059e5cff8fad25",
+      "useful_content_anchor": "=\\lambda^2-4\\lambda+3=(\\lambda-1)(\\lambda-3)",
+      "time_to_useful_content_ms": 2532.0,
+      "useful_anchor_observation_body_sha256": "6780f11484e6389d7fe4ce6bfb02b0d03ed494f7b9ec84632b2e0025e2060d0f",
+      "time_to_first_body_delta_ms": 2125.0,
+      "time_to_complete_ms": 4329.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "L03",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "实对称矩阵非对角a，顺序主子式1及1−a²，正定区间−1<a<1；端点仅半正定。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_56475ca0fd024763882b90fef655933b",
+      "body_sha256": "86f8b6e6ecc183325cf4e78a9c6eaf2e72973c84fc809dbc72bf737f5a5cb70c",
+      "useful_content_anchor": "1-a^2>0",
+      "time_to_useful_content_ms": 3235.0,
+      "useful_anchor_observation_body_sha256": "b793eb33c019dc75af66d229e5bb7fdc58f83120ee8bb2e5210dd64fd203f4ea",
+      "time_to_first_body_delta_ms": 2391.0,
+      "time_to_complete_ms": 3875.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "P01",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "严格和>8的有序条件样本10种，首骰6时有利4种，条件概率4/10=2/5。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_2e648810f092474494c60e49e323eb72",
+      "body_sha256": "dc11cb83dafe4173d2f732bf3f45dedaccf8c4e6e9cbb155cbfb1f11c0e8b7ae",
+      "useful_content_anchor": "4+3+2+1=10",
+      "time_to_useful_content_ms": 3359.0,
+      "useful_anchor_observation_body_sha256": "0032757f8affbd39c2287f8ec68ff91f75b0ce34b101ee53ad1147b5a0d0594c",
+      "time_to_first_body_delta_ms": 2437.0,
+      "time_to_complete_ms": 3984.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "P02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "三角支持域面积1/2归一化c=2，边缘y范围0..1−x，fX=2(1−x)且0<x<1；范围外0，积分验证1。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_cdac2da2027f4395ba06d7d2b2299e42",
+      "body_sha256": "03576971d62a7dd5236a8b7c6f9a875e8339fcef729f3900814b8071b8f776e7",
+      "useful_content_anchor": "\\frac c2=1",
+      "time_to_useful_content_ms": 3187.0,
+      "useful_anchor_observation_body_sha256": "bbe1014059cc3ac659731f7a67d760c2d23b2da7ad7e84e4317d293ca7f85cfb",
+      "time_to_first_body_delta_ms": 2281.0,
+      "time_to_complete_ms": 5125.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "P03",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "率参数λ=1/2未混尺度；均值2、方差4、生存概率exp(−λ·2)=e^(−1)。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_39c3d67cf730439c9a147488a3e7788f",
+      "body_sha256": "6f22969668ec55afa38b19d0921fd0c84e83fbdaeacb865a03e9ffbeb65678d5",
+      "useful_content_anchor": "E(X)=\\frac{1}{1/2}=2.",
+      "time_to_useful_content_ms": 2516.0,
+      "useful_anchor_observation_body_sha256": "7300a5d5ce7f0f4cb19d232436c2c8785f43d995e416c19cd8952073b42a9935",
+      "time_to_first_body_delta_ms": 1750.0,
+      "time_to_complete_ms": 3547.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "B01",
+      "review_status": "failed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "failed_clarification",
+        "calculation": "conditionally_correct_but_unapproved_assumption",
+        "conclusion": "not_established_without_required_exponent"
+      },
+      "review": "识别缺指数但按常见x³猜题并给1/3，虽末尾附条件提醒，仍未先请求必要指数。条件假设内运算正确，澄清策略失败。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_f3bec92eedd6483194470421ad2dba41",
+      "body_sha256": "34916ed7476fe3dec105bed727ce6917b9c2fa3bc2b89a4a817c985a050de1ad",
+      "useful_content_anchor": null,
+      "time_to_useful_content_ms": null,
+      "useful_anchor_observation_body_sha256": null,
+      "time_to_first_body_delta_ms": 13422.0,
+      "time_to_complete_ms": 15250.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "B02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "原上限1得1/2；明确更正上限2后直接按新条件得2，不固定再确认，旧历史保留。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_8ddb89c7f8b741e7ba57d6b539388ea2",
+      "body_sha256": "55941f41c66ba807ae262bcaac54d25bf6d4221fc8a1fd1ee11e6e909b1126bd",
+      "useful_content_anchor": "\\int x\\,dx=\\frac{x^2}{2}+C",
+      "time_to_useful_content_ms": 2093.0,
+      "useful_anchor_observation_body_sha256": "950e8119f08f0767858bf87a1bab75e2179009d4dac40ab18abd0cff7d90d13c",
+      "time_to_first_body_delta_ms": 1890.0,
+      "time_to_complete_ms": 2906.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "B02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "原上限1得1/2；明确更正上限2后直接按新条件得2，不固定再确认，旧历史保留。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 2,
+      "generation_id": "generation_80a8c93be2b9400db7360c622ca5c1b1",
+      "body_sha256": "40e2d6334104cd106805436cd89feb1d7e27021896460a965d68f79f866aa0ee",
+      "useful_content_anchor": "\\int x\\,dx=\\frac{x^2}{2}+C",
+      "time_to_useful_content_ms": 1641.0,
+      "useful_anchor_observation_body_sha256": "82963a4da072c53f6e1c535d5f0bfdf6216612fee10a580b7e192f764f9b9bfd",
+      "time_to_first_body_delta_ms": 1422.0,
+      "time_to_complete_ms": 2328.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "B03",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "原题积分1正确；错误质疑后保持1，解释原函数与代入被积函数的区别，不迎合改为2。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_a635155eb1d4410382b1b8af53d57a53",
+      "body_sha256": "da3d909ac50dee75f83be6e9e3bac20ea978f7c254f14be96a3841eebd346224",
+      "useful_content_anchor": "\\int 2x\\,dx=x^2+C",
+      "time_to_useful_content_ms": 1875.0,
+      "useful_anchor_observation_body_sha256": "23ef8e46d3c21ac9898ddcd031a0858f5a7a79a47ff6d3e35076c7368aadfdfe",
+      "time_to_first_body_delta_ms": 1656.0,
+      "time_to_complete_ms": 2140.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "B03",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "原题积分1正确；错误质疑后保持1，解释原函数与代入被积函数的区别，不迎合改为2。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 2,
+      "generation_id": "generation_6685e9ca4e354802bdfc6d58911b3f6e",
+      "body_sha256": "f50de066725955b041c32eb794587101ce60f3fc628494e0e0ee3a732baf79f7",
+      "useful_content_anchor": "(x^2)'=2x",
+      "time_to_useful_content_ms": 2797.0,
+      "useful_anchor_observation_body_sha256": "0034db1509ca24d664671137cef87da980ff47f59c2800f9075ca8d0bcc87650",
+      "time_to_first_body_delta_ms": 2469.0,
+      "time_to_complete_ms": 4188.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "H02",
+      "review_status": "passed",
+      "criteria": {
+        "reading": "passed",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "逐字识别已确认的真实手写，保留u=x²+1原步骤，指出对u导数与对x导数混淆、漏u′=2x，沿链式法则得2x/(x²+1)。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_3236bbdcf899407797b241563d98f9b2",
+      "body_sha256": "45df026fd4df387235733d398e49b087dd7af8480ab67ceee3778ded5f546401",
+      "useful_content_anchor": "误当成了",
+      "time_to_useful_content_ms": 5329.0,
+      "useful_anchor_observation_body_sha256": "c3ce495912edf90c495138c5243b17fa81bd21c88ff851af7e3431e19fa8be3c",
+      "time_to_first_body_delta_ms": 5125.0,
+      "time_to_complete_ms": 8407.0
+    },
+    {
+      "run_id": "v3-math-20261021-r1",
+      "case_id": "STOP",
+      "review_status": "not_activity_cancel_pass",
+      "criteria": {
+        "reading": "not_activity_judgement",
+        "method_and_premises": "passed",
+        "calculation": "passed",
+        "conclusion": "passed"
+      },
+      "review": "HTTP/business显示running且已有50字符时发送停止，但provider早已完成而业务摄入积压；最终completed，原例不能证明真实活动停止，按停止验收失败保留。",
+      "expected_answer_provenance": "assistant_checked_analytic_expectations_not_user_acceptance",
+      "round": 1,
+      "generation_id": "generation_7cc475a3e9a44468b3488bd2968ca457",
+      "body_sha256": "d2b1e65ab4b0d136b50e002c3b8c0c3fcf592a8342c868ff2e8e39d031c5b086",
+      "useful_content_anchor": null,
+      "time_to_useful_content_ms": null,
+      "useful_anchor_observation_body_sha256": null,
+      "time_to_first_body_delta_ms": 23188.0,
+      "time_to_complete_ms": 31938.0
+    },
+    {
+      "run_id": "v3-ambiguity-retetest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_b5c4f0631157404aae040cf03e3f69eb",
+      "body_sha256": "85adc85876391647f0fa0ce0c2417505952f33408723ab21f22d4e8210b8a6ee",
+      "review_status": "passed",
+      "review": "普通完整题仍先给具体方法理由，洛必达和Taylor计算正确、结果1/3。",
+      "time_to_first_body_delta_ms": 3797.0,
+      "time_to_useful_content_ms": 4141.0,
+      "useful_content_anchor": "(\\sin x-x\\cos x)'=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+      "useful_content_observation_body_sha256": "3d63d84885059ae706da87f37c7f19e531c73b6cf190cc6185a249582c9325c5",
+      "time_to_complete_ms": 5063.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-ambiguity-retetest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "assistant_analytic_expectations_not_user_acceptance",
+      "case_id": "B01",
+      "round": 1,
+      "generation_id": "generation_15e4b44315b24e14acaad240bc7f1546",
+      "body_sha256": "4c820631d01b048884ef130185ab645b9741a64dc53444d05316ae3a9a8770c6",
+      "review_status": "passed",
+      "review": "首先请求不可辨指数，解释该指数影响极限；未猜成3/2、未给假设条件下的本题答案。",
+      "time_to_first_body_delta_ms": 2891.0,
+      "time_to_useful_content_ms": 3281.0,
+      "useful_content_anchor": "题图中分母 \\(x\\) 的指数被“无法辨认”遮挡，导致题目不完整；该指数会直接改变极限值。请补充分母是 \\(x^{?}\\) 中的指数（例如 \\(x^2\\)、\\(x^3\\) 等），或提供清晰原式后，我再完整求解。",
+      "useful_content_observation_body_sha256": "4c820631d01b048884ef130185ab645b9741a64dc53444d05316ae3a9a8770c6",
+      "time_to_complete_ms": 3281.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-ambiguity-retetest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "assistant_analytic_expectations_not_user_acceptance",
+      "case_id": "B01ALT",
+      "round": 1,
+      "generation_id": "generation_e184b68f07e941a2ba5f5e60249e7b6e",
+      "body_sha256": "27847ad35600ec5dc195f1957251f8f17a5970df89a19a7795e17af45d387c95",
+      "review_status": "passed",
+      "review": "首先请求不可辨指数，解释该指数影响极限；未猜成3/2、未给假设条件下的本题答案。",
+      "time_to_first_body_delta_ms": 2422.0,
+      "time_to_useful_content_ms": 2688.0,
+      "useful_content_anchor": "题图中分母为 \\(x^{?}\\)，指数缺失，无法确定极限结果。请补充分母 \\(x\\) 的指数（例如 \\(x^2\\)、\\(x^3\\) 或具体表达式）；补充后我再完整求解。",
+      "useful_content_observation_body_sha256": "27847ad35600ec5dc195f1957251f8f17a5970df89a19a7795e17af45d387c95",
+      "time_to_complete_ms": 2688.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-flash-none-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_81dfb4788aa24ad9bb15b3aaf0e17597",
+      "body_sha256": "8eebff9848ab26f5af97ce4f9eb71825d79bf86d42652980b33683fd51dadf80",
+      "review_status": "passed",
+      "review": "显式none实际出站thinking.disabled，图片hash保留，Taylor三阶相减和洛必达均正确得1/3。",
+      "time_to_first_body_delta_ms": 1188.0,
+      "time_to_useful_content_ms": 2172.0,
+      "useful_content_anchor": "=\\frac13x^3+o(x^3).",
+      "useful_content_observation_body_sha256": "f574177dd5618fb9399b13a8d8c194409f6d81e27d75aa5cc68ae31e8857a07f",
+      "time_to_complete_ms": 2766.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-pro-none-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_92ad5019d1444f358e18f98788118cd4",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "review_status": "configuration_failed",
+      "review": "HTTP400：真实支持ID是deepseek-v4-pro，不是deepseek-pro。实际attempt=1，缺usage保留unknown，不自动重试或降级。",
+      "time_to_first_body_delta_ms": null,
+      "time_to_useful_content_ms": null,
+      "useful_content_anchor": null,
+      "useful_content_observation_body_sha256": null,
+      "time_to_complete_ms": 343.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "unknown"
+    },
+    {
+      "run_id": "v3-config-v4pro-none-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_4724138925374e3da428a99f52dcbf4d",
+      "body_sha256": "e9ac7ca0bcd61fcd4416c60fde5315130a2c135e2f5631daecb738d4a0428892",
+      "review_status": "vision_metadata_integration_failed",
+      "review": "旧模板误宣称text-only型号可收图；实际请求有精确批准图，但provider拒辨图/Unsupported Image。不是数学推理错误。官方能力核对后正式链已改发布前拒绝图片或保留题图历史切到pro。原拒答留证，不自动drop图或换模型。",
+      "time_to_first_body_delta_ms": 1094.0,
+      "time_to_useful_content_ms": null,
+      "useful_content_anchor": null,
+      "useful_content_observation_body_sha256": null,
+      "time_to_complete_ms": 3547.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-v4pro-high-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_b2a6ea31b40747a68fcf655ac88621db",
+      "body_sha256": "c975a9597e75fd7f2e19de252bdf47e702508854597e4afac38e8334aaed278b",
+      "review_status": "vision_metadata_integration_failed",
+      "review": "旧模板误宣称text-only型号可收图；实际请求有精确批准图，但provider拒辨图/Unsupported Image。不是数学推理错误。官方能力核对后正式链已改发布前拒绝图片或保留题图历史切到pro。原拒答留证，不自动drop图或换模型。",
+      "time_to_first_body_delta_ms": 13750.0,
+      "time_to_useful_content_ms": null,
+      "useful_content_anchor": null,
+      "useful_content_observation_body_sha256": null,
+      "time_to_complete_ms": 16203.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-v4pro-text-none-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_bd7483d6945943b28eecd719d650b416",
+      "body_sha256": "a2a62d399da162914094a8fdc20bc9477faff9c46fbdd37758aa546e20bf4fc3",
+      "review_status": "mathematics_failed",
+      "review": "纯文字与实际型号配置正确、无图片、最终1/3且洛必达正确；Taylor减法把x⁵项写为+1/30，实际为1/120−1/24=−1/30。依V3错推导即失败，不因结果正确改为通过。",
+      "time_to_first_body_delta_ms": 2453.0,
+      "time_to_useful_content_ms": null,
+      "useful_content_anchor": null,
+      "useful_content_observation_body_sha256": null,
+      "time_to_complete_ms": 7875.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-v4pro-text-high-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_8795541468c84a97bec2cf8ae8416af0",
+      "body_sha256": "31ded340cf7dff7f304efd2b1e4b24c75997359e6b121820254f59656b3e9783",
+      "review_status": "passed",
+      "review": "独立显式high控制配置，非产品自动更改用户none；原M01的洛必达前提/导数/Taylor至三阶均正确，结果1/3。本次没有声称复现或证实此前错误五阶系数。",
+      "time_to_first_body_delta_ms": 34297.0,
+      "time_to_useful_content_ms": 35859.0,
+      "useful_content_anchor": "(\\sin x-x\\cos x)'=\\cos x-(\\cos x-x\\sin x)=x\\sin x",
+      "useful_content_observation_body_sha256": "1c666e0fb71c5b29fa3a4cf0e162a6c129a3101a43b333a22baa9ebe19efc980",
+      "time_to_complete_ms": 38031.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-config-v4pro-text-high-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "assistant_analytic_expectations_not_user_acceptance",
+      "case_id": "T01",
+      "round": 1,
+      "generation_id": "generation_aa0ed318dec9431aa30571eee79260bc",
+      "body_sha256": "5a80ba3a5576c587c1ea35d10007b7d9de2f946d801f2336e2aeefad752202e5",
+      "review_status": "passed",
+      "review": "不同同类Taylor极限，明确sin x−x=−x³/6+x⁵/120+o(x⁵)，五阶符号和余项处理正确，极限−1/6。",
+      "time_to_first_body_delta_ms": 11297.0,
+      "time_to_useful_content_ms": 13656.0,
+      "useful_content_anchor": "-\\frac{x^3}{6}+\\frac{x^5}{120}+o(x^5).",
+      "useful_content_observation_body_sha256": "b0228656dd5bbf07ca5303ffc2ede55127e2efe79e56025a81a4b9da93a97eca",
+      "time_to_complete_ms": 15875.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-stop-retest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "user_confirmed_M01_historical_scope",
+      "case_id": "M01",
+      "round": 1,
+      "generation_id": "generation_3d42f982d8184054b533ea9ce056a6e0",
+      "body_sha256": "e83e9ec082e4b3eec9863e33b15380fcd783e3e6c967e04c165a9c8ef3041083",
+      "review_status": "passed",
+      "review": "批摄入改动后普通题回归：Taylor两项抵消、三阶系数1/3及最终值正确。",
+      "time_to_first_body_delta_ms": 2328.0,
+      "time_to_useful_content_ms": 2875.0,
+      "useful_content_anchor": "=\\frac{x^3}{3}+o(x^3).",
+      "useful_content_observation_body_sha256": "ebd50dd00063d91ca56e66a654dd6715c815e20f5d62390203419238048b16dd",
+      "time_to_complete_ms": 3110.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known"
+    },
+    {
+      "run_id": "v3-stop-retest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "assistant_analytic_expectations_not_user_acceptance",
+      "case_id": "STOP",
+      "round": 1,
+      "generation_id": "generation_b8596924dd4142dca6e48c7dc90832a0",
+      "body_sha256": "9a2428bf27ac653eb90f3a761d5c9d2c47951d571ab573195f37b5ee63b47aa0",
+      "review_status": "activity_cancel_passed",
+      "review": "点击时业务running、已显示44字符，实际boundary dispatch已起、无request_finished、raw SSE无message_stop；取消后provider断流、durable cancelled且保留82字符，终态raw usage未结算为unknown。",
+      "time_to_first_body_delta_ms": 8515.0,
+      "time_to_useful_content_ms": null,
+      "useful_content_anchor": null,
+      "useful_content_observation_body_sha256": null,
+      "time_to_complete_ms": 8750.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "unknown",
+      "cancel_observation": {
+        "at_ms": 8594.0,
+        "state_before_cancel": "running",
+        "body_chars_before_cancel": 44,
+        "body_sha256_before_cancel": "1e55689f5ffdb6adf5f22029890535cc18c6b3c61697eec554591920fe725e70",
+        "provider_before_cancel": {
+          "observed_at_ns": 1792563857129363300,
+          "provider_active_before_cancel": true,
+          "requests": [
+            {
+              "request_id": "boundary-605eb72eea964173af181507f95d7303",
+              "actual_outbound_started": true,
+              "request_finished_recorded": false,
+              "provider_terminal_sse_observed": false,
+              "raw_sse_bytes_at_observation": 212340,
+              "raw_sse_sha256_at_observation": "4d5ca55b08dabec52d6715e397a2b371b70f351670ff931efe6fa4e14af8e445"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "run_id": "v3-stop-retest-20261021-r1",
+      "criteria": [
+        "reading",
+        "method_and_premises",
+        "calculation",
+        "conclusion"
+      ],
+      "expected_answer_provenance": "assistant_analytic_expectations_not_user_acceptance",
+      "case_id": "STOP",
+      "round": 2,
+      "generation_id": "generation_34bc1aba1a7c47d0a180a3f763eccdb0",
+      "body_sha256": "15ff95dd026bb945afa837594980e21076b53a4cd65d94b4f8bbf57f15254eec",
+      "review_status": "passed",
+      "review": "同chat/session/binding/epoch/host实例追问，明确更正分母2x³；原确认题图仍在请求，Taylor及各次洛必达前提、余项和导数均正确得1/6。",
+      "time_to_first_body_delta_ms": 31829.0,
+      "time_to_useful_content_ms": 32657.0,
+      "useful_content_anchor": "=\\frac{x^3}{3}+o(x^3).",
+      "useful_content_observation_body_sha256": "95d028ac239431878c822b5fb191bb314ee5189dd72231da8cd9d93a4acb39b6",
+      "time_to_complete_ms": 35688.0,
+      "exact_current_chat_images_all_attempts": true,
+      "usage_status": "known",
+      "cancel_observation": null
+    }
+  ],
+  "real_browser_math_checks": [
+    {
+      "run_id": "real-ui-20261021-r2",
+      "case_id": "quadratic_two_methods",
+      "generation_id": "generation_f9a37ecac8bd4fd28eba99a812843b7a",
+      "body_sha256": "2a422117646b593ecbb601d3f02c2b6612913b9e69245ebb0e8fa9b986d472bf",
+      "status": "assistant_analytic_check_passed",
+      "criteria": {
+        "reading": "equation_x_squared_minus5x_plus6_correct",
+        "method_and_premises": "factorization_quadratic_formula_or_vieta_correct",
+        "calculation": "roots2and3_discriminant1_sum5_product6_correct",
+        "conclusion": "exactly_two_distinct_real_roots2and3"
+      },
+      "expectation_provenance": "assistant_constructed_and_checked_synthetic_fixture_not_user_learning_acceptance",
+      "time_to_useful_content_ms": null,
+      "scope_limitation": "题图印有Expected roots:2,3，仅验证读取/执行/交互，不能算独立数学适用性样本。",
+      "usage_status": "known",
+      "exact_confirmed_crop_only": true
+    },
+    {
+      "run_id": "real-ui-20261021-r2",
+      "case_id": "same_chat_vieta_followup",
+      "generation_id": "generation_f0797801a74c4cfeb54cc5cd8096d91e",
+      "body_sha256": "6d6ef0a4b63e5322a1dba092b98e2254920c8eeb8fb32208d36df04387ce0c31",
+      "status": "assistant_analytic_check_passed",
+      "criteria": {
+        "reading": "equation_x_squared_minus5x_plus6_correct",
+        "method_and_premises": "factorization_quadratic_formula_or_vieta_correct",
+        "calculation": "roots2and3_discriminant1_sum5_product6_correct",
+        "conclusion": "exactly_two_distinct_real_roots2and3"
+      },
+      "expectation_provenance": "assistant_constructed_and_checked_synthetic_fixture_not_user_learning_acceptance",
+      "time_to_useful_content_ms": null,
+      "scope_limitation": "题图印有Expected roots:2,3，仅验证读取/执行/交互，不能算独立数学适用性样本。",
+      "usage_status": "known",
+      "exact_confirmed_crop_only": true
+    },
+    {
+      "run_id": "real-ui-20261021-r3",
+      "case_id": "quadratic_two_methods",
+      "generation_id": "generation_15585baf64f04daabb2ef0d89d124808",
+      "body_sha256": "5df18c0687a6876088c76f6b93058075d4c1af822c7f0ec196ab3f79df9dca23",
+      "status": "assistant_analytic_check_passed",
+      "criteria": {
+        "reading": "equation_x_squared_minus5x_plus6_correct",
+        "method_and_premises": "factorization_quadratic_formula_or_vieta_correct",
+        "calculation": "roots2and3_discriminant1_sum5_product6_correct",
+        "conclusion": "exactly_two_distinct_real_roots2and3"
+      },
+      "expectation_provenance": "assistant_constructed_and_checked_synthetic_fixture_not_user_learning_acceptance",
+      "time_to_useful_content_ms": null,
+      "scope_limitation": "题图印有Expected roots:2,3，仅验证读取/执行/交互，不能算独立数学适用性样本。",
+      "usage_status": "known",
+      "exact_confirmed_crop_only": true
+    },
+    {
+      "run_id": "real-ui-20261021-r3",
+      "case_id": "same_chat_vieta_followup",
+      "generation_id": "generation_fa536840147a4b64a31ef2f750d081f8",
+      "body_sha256": "e9ef6745f980e32ad1e48e39c086a16bbfb92a4f1dedcc4014de2b0bf1a5ea93",
+      "status": "assistant_analytic_check_passed",
+      "criteria": {
+        "reading": "equation_x_squared_minus5x_plus6_correct",
+        "method_and_premises": "factorization_quadratic_formula_or_vieta_correct",
+        "calculation": "roots2and3_discriminant1_sum5_product6_correct",
+        "conclusion": "exactly_two_distinct_real_roots2and3"
+      },
+      "expectation_provenance": "assistant_constructed_and_checked_synthetic_fixture_not_user_learning_acceptance",
+      "time_to_useful_content_ms": null,
+      "scope_limitation": "题图印有Expected roots:2,3，仅验证读取/执行/交互，不能算独立数学适用性样本。",
+      "usage_status": "known",
+      "exact_confirmed_crop_only": true
+    }
+  ],
+  "timing": {
+    "normal_initial_round_count": 17,
+    "normal_initial_useful_content_min_ms": 1641.0,
+    "normal_initial_useful_content_max_ms": 5329.0,
+    "definition": "assistant-reviewed substantive teaching anchors observed by 50ms HTTP polling; not first character/thinking/browser rendering/human reading",
+    "stop_followup_first_body_ms": 31829,
+    "stop_followup_useful_content_ms": 32657,
+    "stop_followup_complete_ms": 35688,
+    "pro_high_text_M01_useful_ms": 35859,
+    "pro_high_text_T01_useful_ms": 13656,
+    "ten_seconds_remains_experience_target_not_universal_pass": true
+  },
+  "failures_preserved": [
+    {
+      "case": "initial_B01",
+      "failure": "guessed_missing_exponent",
+      "targeted_retest": "original_B01_and_alternate_numerator_both_ask_first_after_persona_fix"
+    },
+    {
+      "case": "initial_STOP",
+      "failure": "provider_finished_before_business_body_visible_SQLite_ingestion_backlog",
+      "targeted_retest": "actual_provider_active_body_cancel_and_same_session_correction_followup_passed"
+    },
+    {
+      "case": "deepseek-pro",
+      "failure": "incorrect_model_ID_HTTP400",
+      "followup": "explicit_new_ID_deepseek-v4-pro_not_silent_alias"
+    },
+    {
+      "case": "v4pro_image_none_and_high",
+      "failure": "incorrect_vision_metadata_integration_not_mathematics_error",
+      "followup": "official_metadata_text_only_and_prepublication_rejection_no_image_drop"
+    },
+    {
+      "case": "v4pro_text_none_M01",
+      "failure": "Taylor_fifth_order_coefficient_sign_error_final_limit_correct_but_math_failed",
+      "targeted_retest": "independent_explicit_high_original_M01_and_different_T01_pass; original_none_failure_not_cancelled"
+    },
+    {
+      "case": "L01",
+      "failure": "row_subtraction_direction_wording_mismatch_zero_equations_equivalent",
+      "result": "rank_and_solution_correct_wording_defect_retained"
+    }
+  ],
+  "review_provenance": {
+    "initial_ref": "research/reports/v3/v3-math-20261021-r1-review.json",
+    "targeted_ref": "research/reports/v3/v3-targeted-reviews-20261021.json",
+    "initial_review_sha256": "0cdbc48aadd5a78206a4c1a8d9ccc0096577f33442998819b541a1d94401e874",
+    "targeted_review_sha256": "76e4a3e96c4305c96acf2a69b9c78970186e1d025e2dee9fb3dc1a902c999d19",
+    "expected_answers_not_model_self_rating": true,
+    "user_expected_confirmation_only_historical_M01_L02": true,
+    "new_formula_and_boundary_expectations_are_assistant_analytic_not_user_acceptance": true
+  },
+  "remaining_user_validation": [
+    "真实新网课确认选区",
+    "H01/H03真实手写",
+    "复杂综合证明",
+    "同一使用者完整操作对照",
+    "数次正常学习及是否愿意日常使用评价"
+  ],
+  "final_source_limit": "最终极小去重guard修订另有确定性回归；本汇总不宣称旧模型批次冻结摘要覆盖之后代码，不为此重跑真实全组。",
+  "verdict": "MVP-A可操作试用候选；模型与停止证据按上述范围完成，V3用户学习价值未验收"
+}

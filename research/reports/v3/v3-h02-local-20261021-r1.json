@@ -1,0 +1,28 @@
+{
+  "run_id": "v3-h02-local-20261021-r1",
+  "mode": "fixed_Host_local_provider_fixture",
+  "real_attempts": 0,
+  "completed": true,
+  "request_images": [
+    {
+      "kind": "image",
+      "source_type": "base64",
+      "sha256": "37e7e83aadf641d46d0113a2c74530159ca17be783bea5fe1567eed46ac6c3fb",
+      "bytes": 69486,
+      "mime": "image/jpeg"
+    }
+  ],
+  "image_hash_preserved": true,
+  "passed": true,
+  "cleanup": {
+    "host": {
+      "owned_pids_before": [
+        21564,
+        24048
+      ],
+      "remaining_pids": [],
+      "method": "windows_job",
+      "host_port_closed": true
+    }
+  }
+}

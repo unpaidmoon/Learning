@@ -58,7 +58,7 @@ def test_real_health_and_private_api_capability(tmp_path):
             "harness": "not_configured",
             "question_answering": "not_configured",
             "persistence": "ready",
-            "video": "not_implemented",
+            "video": "ready",
             "transcription": "not_implemented",
             "knowledge_base": "not_implemented",
         }
