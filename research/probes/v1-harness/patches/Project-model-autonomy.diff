@@ -1,0 +1,139 @@
+--- limited-and-fixed/fixture.py
++++ autonomous/fixture.py
+@@ -70,8 +70,11 @@
+ class BudgetLedger:
+     """Append-only fsync ledger; reload reservations so restarting cannot reset it."""
+ 
+-    def __init__(self, path: Path, limit: int):
+-        if not isinstance(limit, int) or not 0 <= limit <= 6:
++    def __init__(self, path: Path, limit: int | None, authorization_ref: str | None = None):
++        if limit is None:
++            if not isinstance(authorization_ref, str) or not authorization_ref.strip():
++                raise ValueError("UNLIMITED_REQUIRES_AUTHORIZATION_REFERENCE")
++        elif type(limit) is not int or not 0 <= limit <= 6:
+             raise ValueError("REAL_ATTEMPT_LIMIT_MUST_BE_0_TO_6")
+         self.path, self.limit = path, limit
+         self.lock = threading.RLock()
+@@ -99,8 +102,11 @@
+                     entry = json.loads(line)
+                     if entry.get("event") == "upstream_reserved":
+                         self.count += 1
+-            if self.count > limit:
++            if limit is not None and self.count > limit:
+                 raise ValueError("EXISTING_ATTEMPTS_EXCEED_LIMIT")
++            if limit is None:
++                self.append({"event": "authorization_scope", "attempt_limit": None,
++                             "authorization_ref": authorization_ref})
+         except BaseException:
+             self.close()
+             raise
+@@ -133,7 +139,7 @@
+ 
+     def reserve(self, request_id: str) -> int:
+         with self.lock:
+-            if self.count >= self.limit:
++            if self.limit is not None and self.count >= self.limit:
+                 self.append({"event": "budget_blocked", "request_id": request_id, "limit": self.limit})
+                 raise RuntimeError("REAL_MODEL_BUDGET_EXHAUSTED")
+             number = self.count + 1
+@@ -215,20 +221,20 @@
+     max_tokens<=8192; it strips all caller authentication and supplies its own.
+     """
+ 
+-    def __init__(self, output_dir: str | Path, mode: str = "A", limit: int = 0,
+-                 key: str | None = None):
++    def __init__(self, output_dir: str | Path, mode: str = "A", limit: int | None = 0,
++                 key: str | None = None, authorization_ref: str | None = None):
+         if mode not in {"A", "B"}:
+             raise ValueError("INVALID_BOUNDARY_MODE")
+         if mode == "A" and (key is not None or limit != 0):
+             raise ValueError("A_MUST_NOT_LOAD_KEY_OR_REAL_BUDGET")
+-        if mode == "B" and (not key or not 1 <= limit <= 6):
++        if mode == "B" and (not key or (limit is not None and not 1 <= limit <= 6)):
+             raise ValueError("B_REQUIRES_EXPLICIT_KEY_AND_LIMIT")
+         self.output_dir = Path(output_dir)
+         self.private = self.output_dir / "private" / "boundary"
+         self.private.mkdir(parents=True, exist_ok=True)
+         self.mode, self.limit, self._key = mode, limit, key
+         self.local_token = secrets.token_urlsafe(32)
+-        self.ledger = BudgetLedger(self.output_dir / "boundary-ledger.jsonl", limit)
++        self.ledger = BudgetLedger(self.output_dir / "boundary-ledger.jsonl", limit, authorization_ref)
+         self._records: list[dict[str, Any]] = []
+         self._file_records: list[dict[str, Any]] = []
+         self._files: dict[str, dict[str, Any]] = {}
+--- limited-and-fixed/test_fixture.py
++++ autonomous/test_fixture.py
+@@ -176,6 +176,29 @@
+             connection.close()
+         self.assertEqual(self.server.actual_outbound_attempts, 0)
+         self.assertEqual(self.server.records, [])
++
++    def test_unlimited_counter_requires_authorization_and_survives_restart(self):
++        path = self.output / "unlimited-counter-test.jsonl"
++        with self.assertRaisesRegex(ValueError, "UNLIMITED_REQUIRES_AUTHORIZATION_REFERENCE"):
++            BudgetLedger(path, None)
++        with self.assertRaisesRegex(ValueError, "A_MUST_NOT_LOAD_KEY_OR_REAL_BUDGET"):
++            BoundaryServer(self.output / "invalid-A-unlimited", mode="A", limit=None,
++                           authorization_ref="fixture user authorization")
++        counter = BudgetLedger(path, None, "fixture user authorizes autonomous V1 calls")
++        try:
++            self.assertEqual([counter.reserve(str(i)) for i in range(8)], list(range(1, 9)))
++            with self.assertRaisesRegex(RuntimeError, "BUDGET_LEDGER_ALREADY_OWNED"):
++                BudgetLedger(path, None, "fixture authorization")
++        finally:
++            counter.close()
++        restored = BudgetLedger(path, None, "fixture authorization remains in force")
++        try:
++            self.assertEqual(restored.count, 8)
++            self.assertEqual(restored.reserve("after-restart"), 9)
++            self.assertEqual(restored.limit, None)
++            self.assertIn('"attempt_limit": null', path.read_text())
++        finally:
++            restored.close()
+ 
+     def test_restart_does_not_overwrite_private_requests(self):
+         connection, response = self.request()
+@@ -368,6 +391,43 @@
+         finally:
+             release.set();raw.close();guarded.stop()
+ 
++    def test_autonomous_B_counts_past_six_and_keeps_model_guard(self):
++        calls = []
++        class Response:
++            status = 200
++            def __init__(self):
++                self.parts = iter([sse({"type":"message_start","message":{"usage":{"input_tokens":1}}}),
++                                   sse({"type":"message_delta","usage":{"output_tokens":1}}),
++                                   sse({"type":"message_stop"}),b""])
++            def getheader(self, key, default): return "text/event-stream"
++            def read1(self, size): return next(self.parts)
++            def close(self): pass
++        class Connection:
++            sock = None
++            def __init__(self, *args, **kwargs): pass
++            def connect(self): pass
++            def request(self, method, path, body, headers): calls.append((method,path))
++            def getresponse(self): return Response()
++            def close(self): pass
++        with self.assertRaisesRegex(ValueError, "UNLIMITED_REQUIRES_AUTHORIZATION_REFERENCE"):
++            BoundaryServer(self.output/'no-autonomous-grant',mode='B',limit=None,key='fixture-dummy')
++        original = self.server
++        guarded = BoundaryServer(self.output/'autonomous-fake-B',mode='B',limit=None,key='fixture-dummy',
++                                 authorization_ref='fixture user grant of autonomous V1 calls').start()
++        self.server=guarded
++        try:
++            with patch('fixture.http.client.HTTPSConnection',Connection):
++                for _ in range(8):
++                    conn,response=self.request();self.assertEqual(response.status,200);response.read();conn.close()
++                conn,response=self.request(body={'model':'unapproved-model','stream':True,'max_tokens':8192,
++                    'thinking':{'type':'enabled'},'output_config':{'effort':'high'},'messages':[]})
++                self.assertEqual(response.status,403);response.read();conn.close()
++            self.assertEqual(len(calls),8)
++            self.assertEqual(guarded.actual_outbound_attempts,8)
++            self.assertTrue(all(path=='/anthropic/v1/messages' for _,path in calls))
++        finally:
++            guarded.stop();self.server=original
++
+ 
+ if __name__ == "__main__":
+     unittest.main()

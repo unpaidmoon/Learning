@@ -1,0 +1,1974 @@
+{
+  "scope": "formal_execution_adapter_official_provider",
+  "model": "deepseek-flash",
+  "thinking": "high",
+  "max_tokens": 16384,
+  "timeout_seconds": 240,
+  "approved_image_sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+  "source_digests": {
+    "backend/src/learning_app/execution/adapter.py": "554d2c101c1ef99379da3abe3b190b433124e91908829f64d803422e7633d901",
+    "backend/src/learning_app/execution/boundary.py": "793dbb59c820ea3db05ed75868a3ed62e2ee35ae1597c37836b49768e0af9ff7",
+    "backend/src/learning_app/execution/host.py": "17ab810aa94d4aed160e3fc2f1ecd4676a679dc1ee27fafaa8fe445d6319e9ca",
+    "backend/src/learning_app/execution/remote.py": "97410c842de82b1da465dec0d88171a3165f3cbb4c02ff5029631009b279b9e0",
+    "backend/src/learning_app/execution/types.py": "36503a2e80c6b519af287a599d1b4c8fa7c0b01db8ebac11396fa6e59bde1b03",
+    "backend/src/learning_app/execution/__init__.py": "225e8ac92fb07b7663ec56bc06aa17236d00fd72ecd17aadf54dd7217f4ab195",
+    "backend/src/learning_app/processes.py": "9b2b1702531ba5071e0027113a82ef60ed3c54cf316bbd66d9e08d5f90187dc7",
+    "harness/profiles/learning.patch.json": "df29a8154370b35e58ec7676821659408763dc7d16a576f9d5de1fa0670b3ff9",
+    "harness/plugins/learning-guard.mjs": "33a806b9641c2d246094a07ee1b1cecdb851bcf0eb77a1e90e6fbb265c66710b",
+    "harness/runtime.lock.json": "035ec2f210401313f49257d428d75aa60a763b631af22e3d9274269d12099e61",
+    "scripts/harness/validate_real.py": "bec76a6b5bb05a47e459458e3c982355fc20bbb54c265f6ee3bbb70691aebcd1"
+  },
+  "cases": [
+    {
+      "case_id": "P0-REAL-BODY-CANCEL",
+      "passed": true,
+      "binding": {
+        "conversation_id": "p0-real-math",
+        "submission_id": "p0-real-submit-1",
+        "generation_id": "p0-real-body-1",
+        "epoch": 1,
+        "session_id": "learning-ab3931ccbddf847694b4ffe6f5a60de3",
+        "request_id": "p0-real-submit-1",
+        "native_floor": 2,
+        "native_turn": 1,
+        "accepted": true,
+        "status": "cancelled"
+      },
+      "text_delta_count": 25,
+      "reasoning_delta_count": 1521,
+      "cancel_after_body": true,
+      "body_characters_before_cancel": 25,
+      "cancel_ack": {
+        "accepted": true
+      },
+      "partial_body_preserved": true,
+      "status": "cancelled",
+      "time_to_first_text_ms": 7140.0,
+      "elapsed_ms": 7281.0,
+      "host_alive": true,
+      "attempts": [
+        {
+          "attempt_id": "boundary-f3a89e49057e4e73aaa3c626fc461f23",
+          "request_id": "boundary-f3a89e49057e4e73aaa3c626fc461f23",
+          "generation_id": "p0-real-body-1",
+          "model": "deepseek-flash",
+          "thinking": "high",
+          "kind": "model",
+          "actual_outbound": true,
+          "actual_outbound_attempt": 1,
+          "status": "upstream_unknown",
+          "received_ns": 1792553135199722000,
+          "finished_ns": 1792553142323806800,
+          "request_sha256": "28336a2f049cf0e751b286fef50593219f52591d8687bfdad48fbea907e938f7"
+        }
+      ],
+      "provider_records": [
+        {
+          "request_id": "boundary-f3a89e49057e4e73aaa3c626fc461f23",
+          "generation_id": "p0-real-body-1",
+          "mode": "official",
+          "received_ns": 1792553135199722000,
+          "body_sha256": "28336a2f049cf0e751b286fef50593219f52591d8687bfdad48fbea907e938f7",
+          "body_bytes": 58876,
+          "model": "deepseek-flash",
+          "max_tokens": 16384,
+          "thinking": {
+            "type": "enabled"
+          },
+          "output_config": {
+            "effort": "high"
+          },
+          "tools": [],
+          "images": [
+            {
+              "kind": "image",
+              "source_type": "base64",
+              "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+              "bytes": 42882,
+              "mime": "image/png",
+              "dimensions": [
+                1400,
+                620
+              ]
+            }
+          ],
+          "actual_outbound_attempt": 1,
+          "status": "upstream_unknown",
+          "dispatch_ns": 1792553135259876300,
+          "upstream_status": 200,
+          "response_headers_ns": 1792553135453510000,
+          "usage": {
+            "source": "provider_sse_before_harness_projection",
+            "raw": [
+              {
+                "event": "message_start",
+                "usage": {
+                  "input_tokens": 905,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "output_tokens": 0,
+                  "service_tier": "standard"
+                }
+              }
+            ],
+            "field_presence": {
+              "input_tokens": true,
+              "output_tokens": true,
+              "cache_read_input_tokens": true,
+              "cache_creation_input_tokens": true,
+              "reasoning_tokens": false
+            },
+            "observed_cumulative": {
+              "input_tokens": 905,
+              "output_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "normalized": {
+              "input_tokens": null,
+              "output_tokens": null,
+              "cache_read_input_tokens": null,
+              "cache_creation_input_tokens": null,
+              "reasoning_tokens": null
+            },
+            "settled": false,
+            "settlement_count": 0,
+            "message_stop_events": 0,
+            "settlement_identity": "boundary-f3a89e49057e4e73aaa3c626fc461f23",
+            "provider_message_id": "bb3dc219-1d53-4b73-a13a-61175eeeb453",
+            "provider_model": "deepseek-flash",
+            "post_terminal_events_ignored": 0
+          },
+          "cancel_observed": true,
+          "timed_out": false,
+          "disconnect_ns": 1792553142322805000,
+          "error_type": "IncompleteRead",
+          "cancel_evidence": "reader_observed_downstream_disconnect",
+          "finished_ns": 1792553142323806800,
+          "provider_delta_events": 1552,
+          "first_provider_delta_ns": 1792553135930189300,
+          "last_provider_delta_ns": 1792553142295011300
+        }
+      ]
+    },
+    {
+      "case_id": "P0-REAL-CONTINUE",
+      "passed": true,
+      "binding": {
+        "conversation_id": "p0-real-math",
+        "submission_id": "p0-real-submit-2",
+        "generation_id": "p0-real-body-2",
+        "epoch": 1,
+        "session_id": "learning-ab3931ccbddf847694b4ffe6f5a60de3",
+        "request_id": "p0-real-submit-2",
+        "native_floor": 16,
+        "native_turn": 2,
+        "accepted": true,
+        "status": "completed"
+      },
+      "text_delta_count": 721,
+      "reasoning_delta_count": 1878,
+      "cancel_after_body": false,
+      "body_characters_before_cancel": 0,
+      "cancel_ack": null,
+      "partial_body_preserved": true,
+      "status": "completed",
+      "time_to_first_text_ms": 8953.0,
+      "elapsed_ms": 11141.0,
+      "host_alive": true,
+      "attempts": [
+        {
+          "attempt_id": "boundary-6b06fcebe87b419291e679b7d50b2aee",
+          "request_id": "boundary-6b06fcebe87b419291e679b7d50b2aee",
+          "generation_id": "p0-real-body-2",
+          "model": "deepseek-flash",
+          "thinking": "high",
+          "kind": "model",
+          "actual_outbound": true,
+          "actual_outbound_attempt": 2,
+          "status": "completed",
+          "received_ns": 1792553142386608000,
+          "finished_ns": 1792553153425404400,
+          "request_sha256": "4003f51e0146ecfe15a085b35f3d3d6e522e74bdd41d8e0dbac7e92f4684274b"
+        }
+      ],
+      "provider_records": [
+        {
+          "request_id": "boundary-6b06fcebe87b419291e679b7d50b2aee",
+          "generation_id": "p0-real-body-2",
+          "mode": "official",
+          "received_ns": 1792553142386608000,
+          "body_sha256": "4003f51e0146ecfe15a085b35f3d3d6e522e74bdd41d8e0dbac7e92f4684274b",
+          "body_bytes": 121085,
+          "model": "deepseek-flash",
+          "max_tokens": 16384,
+          "thinking": {
+            "type": "enabled"
+          },
+          "output_config": {
+            "effort": "high"
+          },
+          "tools": [],
+          "images": [
+            {
+              "kind": "image",
+              "source_type": "base64",
+              "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+              "bytes": 42882,
+              "mime": "image/png",
+              "dimensions": [
+                1400,
+                620
+              ]
+            },
+            {
+              "kind": "image",
+              "source_type": "base64",
+              "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+              "bytes": 42882,
+              "mime": "image/png",
+              "dimensions": [
+                1400,
+                620
+              ]
+            }
+          ],
+          "actual_outbound_attempt": 2,
+          "status": "completed",
+          "dispatch_ns": 1792553142430302800,
+          "upstream_status": 200,
+          "response_headers_ns": 1792553142794994100,
+          "usage": {
+            "source": "provider_sse_before_harness_projection",
+            "raw": [
+              {
+                "event": "message_start",
+                "usage": {
+                  "input_tokens": 773,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 896,
+                  "output_tokens": 0,
+                  "service_tier": "standard"
+                }
+              },
+              {
+                "event": "message_delta",
+                "usage": {
+                  "input_tokens": 773,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 896,
+                  "output_tokens": 2600,
+                  "service_tier": "standard"
+                }
+              }
+            ],
+            "field_presence": {
+              "input_tokens": true,
+              "output_tokens": true,
+              "cache_read_input_tokens": true,
+              "cache_creation_input_tokens": true,
+              "reasoning_tokens": false
+            },
+            "observed_cumulative": {
+              "input_tokens": 773,
+              "output_tokens": 2600,
+              "cache_read_input_tokens": 896,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "normalized": {
+              "input_tokens": 773,
+              "output_tokens": 2600,
+              "cache_read_input_tokens": 896,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "settled": true,
+            "settlement_count": 1,
+            "message_stop_events": 1,
+            "settlement_identity": "boundary-6b06fcebe87b419291e679b7d50b2aee",
+            "provider_message_id": "81ca0b3d-0491-4588-990f-e257f189a787",
+            "provider_model": "deepseek-flash",
+            "post_terminal_events_ignored": 0
+          },
+          "finished_ns": 1792553153425404400,
+          "provider_delta_events": 2599,
+          "first_provider_delta_ns": 1792553143359691700,
+          "last_provider_delta_ns": 1792553153406030700
+        }
+      ]
+    }
+  ],
+  "profile_tools": [],
+  "real_attempts": 2,
+  "cleanup": {
+    "host": {
+      "owned_pids_before": [
+        13136,
+        17488
+      ],
+      "remaining_pids": [],
+      "method": "windows_job",
+      "host_port_closed": true
+    }
+  },
+  "evidence_version": 2,
+  "date": "2026-10-21",
+  "status": "passed",
+  "scope_note": "Formal pinned execution adapter; not full P0, V2, app browser or MVP-A acceptance.",
+  "private_evidence_root": ".runtime/p0-execution-real-fixed-20261021",
+  "profile_evidence": {
+    "tools": [],
+    "system_sections": [
+      {
+        "name": "deployment:persona-prefix",
+        "sha256": "7b983fc23e634cc6d29cc8ab002b3fd2bb1f9fe16e4de479a091a0ce4d8ddf35"
+      },
+      {
+        "name": "deployment:persona-suffix",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "activation": [
+      {
+        "id": "include",
+        "name": "cordis:include",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "tool-plugin-manager",
+        "name": "@deepseek-ai/dsh-plugin-manager/tools",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "plugin-manager",
+        "name": "@deepseek-ai/dsh-plugin-manager",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "timer",
+        "name": "@deepseek-ai/cordis-plugin-timer",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "hmr",
+        "name": "@deepseek-ai/dsh-hmr",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "llm",
+        "name": "@deepseek-ai/dsh-llm",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "deepseek-llm-api-extensions",
+        "name": "@deepseek-ai/dsh-deepseek-llm-api-extensions",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session",
+        "name": "@deepseek-ai/dsh-session",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-log-deepseek",
+        "name": "@deepseek-ai/dsh-session-log-deepseek",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "typert",
+        "name": "@deepseek-ai/dsh-typert-registry",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "typert-loader",
+        "name": "@deepseek-ai/dsh-typert-loader",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "typert-gateway",
+        "name": "@deepseek-ai/dsh-api-gateway",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "remote-access",
+        "name": "@deepseek-ai/dsh-api-remote-access",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-title",
+        "name": "@deepseek-ai/dsh-session-title",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-title-llm",
+        "name": "@deepseek-ai/dsh-session-title-first-prompt-llm",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "user-questions",
+        "name": "@deepseek-ai/dsh-user-questions",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "agent",
+        "name": "@deepseek-ai/dsh-agent",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "plugin-package-inventory-deepseek",
+        "name": "@deepseek-ai/dsh-plugin-package-inventory-deepseek",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "agent-default-model",
+        "name": "@deepseek-ai/dsh-agent-default-model",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "jobs",
+        "name": "@deepseek-ai/dsh-jobs-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "llm-retry",
+        "name": "@deepseek-ai/dsh-llm-retry",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "config-editor",
+        "name": "@deepseek-ai/dsh-config-editor",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "settings",
+        "name": "@deepseek-ai/dsh-settings",
+        "disabled": false,
+        "state": 0
+      },
+      {
+        "id": "authorization",
+        "name": "@deepseek-ai/dsh-authorization",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "deepseek-account",
+        "name": "@deepseek-ai/dsh-deepseek-account-platform",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "credentials",
+        "name": "@deepseek-ai/dsh-credentials-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "llm-pi-ai",
+        "name": "@deepseek-ai/dsh-llm-pi-ai",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "session-persistence-jsonl",
+        "name": "@deepseek-ai/dsh-session-persistence-jsonl",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "attachment-local",
+        "name": "@deepseek-ai/dsh-attachment-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-query-sqlite",
+        "name": "@deepseek-ai/dsh-session-query-sqlite",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "working-directory",
+        "name": "@deepseek-ai/dsh-working-directory",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "tool-working-directory",
+        "name": "@deepseek-ai/dsh-tool-working-directory",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "session-projection",
+        "name": "@deepseek-ai/dsh-session-projection",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "storage",
+        "name": "@deepseek-ai/dsh-storage",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "storage-json",
+        "name": "@deepseek-ai/dsh-storage-json",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "storage-domain",
+        "name": "@deepseek-ai/dsh-storage-domain",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-projection-cache",
+        "name": "@deepseek-ai/dsh-session-projection-cache",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "otel",
+        "name": "@deepseek-ai/dsh-otel",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "session-telemetry-otel",
+        "name": "@deepseek-ai/dsh-session-telemetry-otel",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "subprocess",
+        "name": "@deepseek-ai/dsh-subprocess-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "sandbox",
+        "name": "@deepseek-ai/dsh-sandbox-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "sandbox-policy",
+        "name": "@deepseek-ai/dsh-sandbox-policy",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "bash-sandbox",
+        "name": "@deepseek-ai/dsh-bash-sandbox",
+        "disabled": false,
+        "state": null
+      },
+      {
+        "id": "pwsh-sandbox",
+        "name": "@deepseek-ai/dsh-pwsh-sandbox",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "approval",
+        "name": "@deepseek-ai/dsh-user-approval",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "permission",
+        "name": "@deepseek-ai/dsh-permission-presets",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "shell-env",
+        "name": "@deepseek-ai/dsh-shell-env",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "tool-bash",
+        "name": "@deepseek-ai/dsh-tool-bash",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-pwsh",
+        "name": "@deepseek-ai/dsh-tool-pwsh",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-jobs",
+        "name": "@deepseek-ai/dsh-tool-jobs",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "fs-observation-policy",
+        "name": "@deepseek-ai/dsh-fs-observation-policy",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "tool-fs",
+        "name": "@deepseek-ai/dsh-tool-fs",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-fs-search",
+        "name": "@deepseek-ai/dsh-tool-fs-search",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "agent-instructions",
+        "name": "@deepseek-ai/dsh-agent-instructions",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "skill",
+        "name": "@deepseek-ai/dsh-skill",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "skill-filesystem",
+        "name": "@deepseek-ai/dsh-skill-filesystem",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-skill",
+        "name": "@deepseek-ai/dsh-tool-skill",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "commands",
+        "name": "@deepseek-ai/dsh-commands",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "command-feedback",
+        "name": "@deepseek-ai/dsh-command-feedback",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "goal",
+        "name": "@deepseek-ai/dsh-goal",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "goal-round-driver",
+        "name": "@deepseek-ai/dsh-goal-round-driver",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "command-goal",
+        "name": "@deepseek-ai/dsh-command-goal",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "plan-mode",
+        "name": "@deepseek-ai/dsh-plan-mode",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "token-meter",
+        "name": "@deepseek-ai/dsh-token-meter",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "compaction-basic",
+        "name": "@deepseek-ai/dsh-compaction-basic",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "command-compact",
+        "name": "@deepseek-ai/dsh-command-compact",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "subagent",
+        "name": "@deepseek-ai/dsh-subagent",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "subagent-spawn-in-process",
+        "name": "@deepseek-ai/dsh-subagent-spawn-in-process",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "subagent-fork-in-process",
+        "name": "@deepseek-ai/dsh-subagent-fork-in-process",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-subagent-control",
+        "name": "@deepseek-ai/dsh-tool-subagent-control",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-subagent-list-agents",
+        "name": "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-subagent",
+        "name": "@deepseek-ai/dsh-tool-subagent",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-subagent-fork",
+        "name": "@deepseek-ai/dsh-tool-subagent",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "ptc-runtime",
+        "name": "@deepseek-ai/dsh-ptc-runtime-node",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "workflow-ptc",
+        "name": "@deepseek-ai/dsh-workflow-ptc",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-workflow",
+        "name": "@deepseek-ai/dsh-tool-workflow",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "timeout-policy",
+        "name": "@deepseek-ai/dsh-tool-call-timeout-policy",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "spill-local",
+        "name": "@deepseek-ai/dsh-spill-local",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "spill-policy",
+        "name": "@deepseek-ai/dsh-spill-policy",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-checkpoint-policy",
+        "name": "@deepseek-ai/dsh-session-checkpoint-policy",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "tool-result-pruner",
+        "name": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "image-offload",
+        "name": "@deepseek-ai/dsh-compaction-image-offload",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-todo",
+        "name": "@deepseek-ai/dsh-tool-todo",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-goal",
+        "name": "@deepseek-ai/dsh-tool-goal",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "repeat-tool-reminder",
+        "name": "@deepseek-ai/dsh-repeat-tool-reminder",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "web",
+        "name": "@deepseek-ai/dsh-web",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "web-search-deepseek",
+        "name": "@deepseek-ai/dsh-web-search-deepseek",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "web-deepseek-api",
+        "name": "@deepseek-ai/dsh-web-deepseek-api",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "web-fetch-http",
+        "name": "@deepseek-ai/dsh-web-fetch-http",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tool-web",
+        "name": "@deepseek-ai/dsh-tool-web",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "mcp-resources",
+        "name": "@deepseek-ai/dsh-mcp-resources",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "tools",
+        "name": "@deepseek-ai/dsh-tools",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "system-prompt",
+        "name": "@deepseek-ai/dsh-system-prompt",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "agent-loop",
+        "name": "@deepseek-ai/dsh-agent-loop",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "fs-sandbox",
+        "name": "@deepseek-ai/dsh-fs-sandbox",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "llm-deepseek",
+        "name": "@deepseek-ai/dsh-llm-deepseek-api-key",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "llm-deepseek-account",
+        "name": "@deepseek-ai/dsh-llm-deepseek-account",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "desktop-product-telemetry",
+        "name": "@deepseek-ai/dsh-host-product-telemetry-otel",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "product-analytics",
+        "name": "@deepseek-ai/dsh-client-product-analytics",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "subagent-model-selection-settings",
+        "name": "@deepseek-ai/dsh-tool-subagent/model-selection-settings",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "message-feedback",
+        "name": "@deepseek-ai/dsh-message-feedback",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-log-download",
+        "name": "@deepseek-ai/dsh-session-log-export",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "open-in-app",
+        "name": "@deepseek-ai/dsh-host-open-in-app",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "ui-open-in-app",
+        "name": "@deepseek-ai/dsh-client-ui-open-in-app",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "workspace",
+        "name": "@deepseek-ai/dsh-workspace",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-reference",
+        "name": "@deepseek-ai/dsh-session-reference",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "file-reference-local",
+        "name": "@deepseek-ai/dsh-file-reference-local",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "session-stats",
+        "name": "@deepseek-ai/dsh-session-stats",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-turn-outline",
+        "name": "@deepseek-ai/dsh-session-turn-outline",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "directory-picker",
+        "name": "@deepseek-ai/dsh-host-directory-picker-auto",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "plugin-inventory",
+        "name": "@deepseek-ai/dsh-host-plugin-inventory",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "session-controller",
+        "name": "@deepseek-ai/dsh-api-session-controller",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "job-controller",
+        "name": "@deepseek-ai/dsh-api-job-controller",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "terminal-controller",
+        "name": "@deepseek-ai/dsh-api-terminal-controller",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "workspace-files",
+        "name": "@deepseek-ai/dsh-api-workspace-files",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "schedule",
+        "name": "@deepseek-ai/dsh-schedule",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "ui-settings-account",
+        "name": "@deepseek-ai/dsh-client-ui-settings-account",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "account-controller",
+        "name": "@deepseek-ai/dsh-api-account-controller",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "settings-controller",
+        "name": "@deepseek-ai/dsh-api-settings-controller",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "workspace-controller",
+        "name": "@deepseek-ai/dsh-api-workspace-controller",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "cordis-host-runner",
+        "name": "@deepseek-ai/dsh-cordis-host-runner",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "cordis-inspect-providers",
+        "name": "@deepseek-ai/dsh-tool-cordis/host",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "web-startup",
+        "name": "@deepseek-ai/dsh-web-app/startup",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "webserver",
+        "name": "@deepseek-ai/dsh-host-webserver",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "web-runtime",
+        "name": "@deepseek-ai/dsh-web-app",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "harness-dev-context",
+        "name": "@deepseek-ai/dsh-harness-dev-context",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "client-hmr",
+        "name": "@deepseek-ai/dsh-client-hmr",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "modules",
+        "name": "@deepseek-ai/dsh-client-modules",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "connection",
+        "name": "@deepseek-ai/dsh-client-connection",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "file-upload",
+        "name": "@deepseek-ai/dsh-client-file-upload",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "api-remotes",
+        "name": "@deepseek-ai/dsh-api-remotes",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "cordis-client-runner",
+        "name": "@deepseek-ai/dsh-cordis-client-runner",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-theme",
+        "name": "@deepseek-ai/dsh-client-ui-theme",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "locale",
+        "name": "@deepseek-ai/dsh-client-locale",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "shortcuts",
+        "name": "@deepseek-ai/dsh-client-shortcuts",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-shortcuts",
+        "name": "@deepseek-ai/dsh-client-ui-shortcuts",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-layout",
+        "name": "@deepseek-ai/dsh-client-ui-layout",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-renderer",
+        "name": "@deepseek-ai/dsh-client-ui-renderer",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-session",
+        "name": "@deepseek-ai/dsh-client-ui-session",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "resources",
+        "name": "@deepseek-ai/dsh-client-resources",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-sidebar",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-sidebar-right",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "office-to-pdf",
+        "name": "@deepseek-ai/dsh-office-to-pdf",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "ui-sidebar-documentpreview",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar-documentpreview",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-sidebar-browser",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar-browser",
+        "disabled": false,
+        "state": null
+      },
+      {
+        "id": "ui-sidebar-terminal",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar-terminal",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-sidebar-files",
+        "name": "@deepseek-ai/dsh-client-ui-sidebar-files",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings",
+        "name": "@deepseek-ai/dsh-client-ui-settings",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-general",
+        "name": "@deepseek-ai/dsh-client-ui-settings-general",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-models",
+        "name": "@deepseek-ai/dsh-client-ui-settings-models",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-plugin-manager",
+        "name": "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-plugin-inventory",
+        "name": "@deepseek-ai/dsh-client-ui-settings-plugin-inventory",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-conversation",
+        "name": "@deepseek-ai/dsh-client-ui-conversation",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-approval",
+        "name": "@deepseek-ai/dsh-client-ui-approval",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-chat",
+        "name": "@deepseek-ai/dsh-client-ui-chat",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-brand-official",
+        "name": "@deepseek-ai/dsh-client-ui-brand-official",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-attachment",
+        "name": "@deepseek-ai/dsh-client-ui-attachment",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-tool",
+        "name": "@deepseek-ai/dsh-client-ui-tool",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-cordis",
+        "name": "@deepseek-ai/dsh-client-ui-cordis",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-deliverables",
+        "name": "@deepseek-ai/dsh-client-ui-deliverables",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "workspace-changes",
+        "name": "@deepseek-ai/dsh-workspace-changes",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "ui-workspace",
+        "name": "@deepseek-ai/dsh-client-ui-workspace",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-workflow-run",
+        "name": "@deepseek-ai/dsh-client-ui-workflow-run",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-input-trigger",
+        "name": "@deepseek-ai/dsh-client-ui-input-trigger",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-commands",
+        "name": "@deepseek-ai/dsh-client-ui-commands",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-skill",
+        "name": "@deepseek-ai/dsh-client-ui-skill",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-subagent",
+        "name": "@deepseek-ai/dsh-client-ui-subagent",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-reference",
+        "name": "@deepseek-ai/dsh-client-ui-reference",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-secret-mask",
+        "name": "@deepseek-ai/dsh-client-ui-secret-mask",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-jobs",
+        "name": "@deepseek-ai/dsh-client-ui-jobs",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-schedule",
+        "name": "@deepseek-ai/dsh-client-ui-schedule",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-goal",
+        "name": "@deepseek-ai/dsh-client-ui-goal",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-message-feedback",
+        "name": "@deepseek-ai/dsh-client-ui-message-feedback",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-model-selection",
+        "name": "@deepseek-ai/dsh-client-ui-model-selection",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-deepseek-model-label-1017",
+        "name": "@deepseek-ai/dsh-client-ui-deepseek-model-label-1017",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-permission",
+        "name": "@deepseek-ai/dsh-client-ui-permission-presets",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-agent-preset",
+        "name": "@deepseek-ai/dsh-client-ui-agent-preset",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-session-log",
+        "name": "@deepseek-ai/dsh-client-ui-settings-session-log",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-plugins",
+        "name": "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-shell",
+        "name": "@deepseek-ai/dsh-client-ui-settings-shell",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-agent-loop",
+        "name": "@deepseek-ai/dsh-client-ui-settings-agent-loop",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-subagent",
+        "name": "@deepseek-ai/dsh-client-ui-settings-subagent",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-settings-web-search",
+        "name": "@deepseek-ai/dsh-client-ui-settings-web-search",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-plan",
+        "name": "@deepseek-ai/dsh-client-ui-plan",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-user-questions",
+        "name": "@deepseek-ai/dsh-client-ui-user-questions",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "ui-trajectory",
+        "name": "@deepseek-ai/dsh-client-ui-trajectory",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "agent-preset-registry",
+        "name": "@deepseek-ai/dsh-agent-preset-registry",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "preset-standard",
+        "name": "@deepseek-ai/dsh-agent-preset",
+        "disabled": false,
+        "state": 2
+      },
+      {
+        "id": "preset-ptc",
+        "name": "@deepseek-ai/dsh-agent-preset",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "preset-minimal",
+        "name": "@deepseek-ai/dsh-agent-preset",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "preset-cordis",
+        "name": "@deepseek-ai/dsh-agent-preset",
+        "disabled": true,
+        "state": null
+      },
+      {
+        "id": "learning-guard",
+        "name": "file:///D:/Codex/Learning/harness/plugins/learning-guard.mjs",
+        "disabled": false,
+        "state": 2
+      }
+    ],
+    "request_context_surface": "Official attachment descriptors include the approved image hash and local normalized path; required runtime context includes only this owned workspace. No path/image/coding tools are exposed."
+  },
+  "math_review": {
+    "case": "P0-REAL-CONTINUE",
+    "confirmed_expression": "(sin(x)-x*cos(x))/x^3 as x->0",
+    "l_hopital": "passed: derivative x*sin(x), 1/3",
+    "taylor": "passed: x^3/3-x^5/30+o(x^5), 1/3",
+    "useful_content_time_measured": false
+  },
+  "fixture_validation": {
+    "real_fixed_host_tests": 6,
+    "elapsed_seconds": 21.34,
+    "test_command": "backend/.venv/Scripts/python.exe -m pytest backend/tests/test_execution_host.py -q -x --basetemp=.runtime/test-harness-usage-fix",
+    "provider": "deterministic loopback SSE; zero internet dispatches",
+    "covers": [
+      "real ordered body deltas",
+      "body-phase single-session cancel/partial/save/continue",
+      "lost acceptance receipt reconciles requestId exactly",
+      "Peer disconnect and nextIndex resume without duplicate body",
+      "approved image byte hash in actual Host request; missing image rejects",
+      "concurrent conversation provider and stream identities",
+      "late usage unknown-to-settled observations have separate IDs and one stable settlement"
+    ],
+    "boundary_component_tests": 28,
+    "plugin_component_tests": 2,
+    "installer_integrity_tests": 4
+  },
+  "retained_history": [
+    {
+      "run": ".runtime/p0-execution-real-20261021",
+      "real_attempts": 2,
+      "cases": [
+        {
+          "case_id": "P0-REAL-BODY-CANCEL",
+          "passed": true,
+          "binding": {
+            "conversation_id": "p0-real-math",
+            "submission_id": "p0-real-submit-1",
+            "generation_id": "p0-real-body-1",
+            "epoch": 1,
+            "session_id": "learning-ab3931ccbddf847694b4ffe6f5a60de3",
+            "request_id": "p0-real-submit-1",
+            "native_floor": 2,
+            "native_turn": 1,
+            "accepted": true,
+            "status": "cancelled"
+          },
+          "text_delta_count": 1,
+          "reasoning_delta_count": 509,
+          "cancel_after_body": true,
+          "cancel_ack": {
+            "accepted": true
+          },
+          "partial_body_preserved": true,
+          "status": "cancelled",
+          "time_to_first_text_ms": 3032.0,
+          "elapsed_ms": 3094.0,
+          "host_alive": true,
+          "attempts": [
+            {
+              "attempt_id": "boundary-cb73e12b169e41b59843fbb40016d1fe",
+              "request_id": "boundary-cb73e12b169e41b59843fbb40016d1fe",
+              "generation_id": "p0-real-body-1",
+              "model": "deepseek-flash",
+              "thinking": "high",
+              "kind": "model",
+              "actual_outbound": true,
+              "actual_outbound_attempt": 1,
+              "status": "upstream_unknown",
+              "received_ns": 1792552580792645300,
+              "finished_ns": 1792552583732727100,
+              "request_sha256": "80f7ba4de119b138d7a4664c45ff5828447767de5497762817d3c1f14345e189"
+            }
+          ],
+          "provider_records": [
+            {
+              "request_id": "boundary-cb73e12b169e41b59843fbb40016d1fe",
+              "generation_id": "p0-real-body-1",
+              "mode": "official",
+              "received_ns": 1792552580792645300,
+              "body_sha256": "80f7ba4de119b138d7a4664c45ff5828447767de5497762817d3c1f14345e189",
+              "body_bytes": 58864,
+              "model": "deepseek-flash",
+              "max_tokens": 16384,
+              "thinking": {
+                "type": "enabled"
+              },
+              "output_config": {
+                "effort": "high"
+              },
+              "tools": [],
+              "images": [
+                {
+                  "kind": "image",
+                  "source_type": "base64",
+                  "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+                  "bytes": 42882,
+                  "mime": "image/png",
+                  "dimensions": [
+                    1400,
+                    620
+                  ]
+                }
+              ],
+              "actual_outbound_attempt": 1,
+              "status": "upstream_unknown",
+              "dispatch_ns": 1792552580877909900,
+              "upstream_status": 200,
+              "response_headers_ns": 1792552581019325800,
+              "usage": {
+                "source": "provider_sse_before_harness_projection",
+                "raw": [
+                  {
+                    "event": "message_start",
+                    "usage": {
+                      "input_tokens": 901,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 0,
+                      "service_tier": "standard"
+                    }
+                  }
+                ],
+                "field_presence": {
+                  "input_tokens": true,
+                  "output_tokens": true,
+                  "cache_read_input_tokens": true,
+                  "cache_creation_input_tokens": true,
+                  "reasoning_tokens": false
+                },
+                "observed_cumulative": {
+                  "input_tokens": 901,
+                  "output_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "normalized": {
+                  "input_tokens": null,
+                  "output_tokens": null,
+                  "cache_read_input_tokens": null,
+                  "cache_creation_input_tokens": null,
+                  "reasoning_tokens": null
+                },
+                "settled": false,
+                "settlement_count": 0,
+                "message_stop_events": 0,
+                "settlement_identity": "boundary-cb73e12b169e41b59843fbb40016d1fe",
+                "provider_message_id": "bd39715d-6acb-4229-b4a4-8acd9449d92c",
+                "provider_model": "deepseek-flash",
+                "post_terminal_events_ignored": 0
+              },
+              "cancel_observed": true,
+              "timed_out": false,
+              "disconnect_ns": 1792552583726307900,
+              "error_type": "IncompleteRead",
+              "finished_ns": 1792552583732727100,
+              "provider_delta_events": 513,
+              "first_provider_delta_ns": 1792552581629184900,
+              "last_provider_delta_ns": 1792552583714925600
+            }
+          ]
+        },
+        {
+          "case_id": "P0-REAL-CONTINUE",
+          "passed": true,
+          "binding": {
+            "conversation_id": "p0-real-math",
+            "submission_id": "p0-real-submit-2",
+            "generation_id": "p0-real-body-2",
+            "epoch": 1,
+            "session_id": "learning-ab3931ccbddf847694b4ffe6f5a60de3",
+            "request_id": "p0-real-submit-2",
+            "native_floor": 16,
+            "native_turn": 2,
+            "accepted": true,
+            "status": "completed"
+          },
+          "text_delta_count": 519,
+          "reasoning_delta_count": 2196,
+          "cancel_after_body": false,
+          "cancel_ack": null,
+          "partial_body_preserved": true,
+          "status": "completed",
+          "time_to_first_text_ms": 9812.0,
+          "elapsed_ms": 11375.0,
+          "host_alive": true,
+          "attempts": [
+            {
+              "attempt_id": "boundary-9c9ef6441eca43b09bd2a43f2e1a3899",
+              "request_id": "boundary-9c9ef6441eca43b09bd2a43f2e1a3899",
+              "generation_id": "p0-real-body-2",
+              "model": "deepseek-flash",
+              "thinking": "high",
+              "kind": "model",
+              "actual_outbound": true,
+              "actual_outbound_attempt": 2,
+              "status": "completed",
+              "received_ns": 1792552583810634300,
+              "finished_ns": 1792552595094059700,
+              "request_sha256": "d1cbee3a2f0a5f0702f3337aec0b3ac5272875c7bc68ca0a4120ceeda9e948ec"
+            }
+          ],
+          "provider_records": [
+            {
+              "request_id": "boundary-9c9ef6441eca43b09bd2a43f2e1a3899",
+              "generation_id": "p0-real-body-2",
+              "mode": "official",
+              "received_ns": 1792552583810634300,
+              "body_sha256": "d1cbee3a2f0a5f0702f3337aec0b3ac5272875c7bc68ca0a4120ceeda9e948ec",
+              "body_bytes": 118209,
+              "model": "deepseek-flash",
+              "max_tokens": 16384,
+              "thinking": {
+                "type": "enabled"
+              },
+              "output_config": {
+                "effort": "high"
+              },
+              "tools": [],
+              "images": [
+                {
+                  "kind": "image",
+                  "source_type": "base64",
+                  "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+                  "bytes": 42882,
+                  "mime": "image/png",
+                  "dimensions": [
+                    1400,
+                    620
+                  ]
+                },
+                {
+                  "kind": "image",
+                  "source_type": "base64",
+                  "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+                  "bytes": 42882,
+                  "mime": "image/png",
+                  "dimensions": [
+                    1400,
+                    620
+                  ]
+                }
+              ],
+              "actual_outbound_attempt": 2,
+              "status": "completed",
+              "dispatch_ns": 1792552583881390300,
+              "upstream_status": 200,
+              "response_headers_ns": 1792552584033445700,
+              "usage": {
+                "source": "provider_sse_before_harness_projection",
+                "raw": [
+                  {
+                    "event": "message_start",
+                    "usage": {
+                      "input_tokens": 743,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 896,
+                      "output_tokens": 0,
+                      "service_tier": "standard"
+                    }
+                  },
+                  {
+                    "event": "message_delta",
+                    "usage": {
+                      "input_tokens": 743,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 896,
+                      "output_tokens": 2716,
+                      "service_tier": "standard"
+                    }
+                  }
+                ],
+                "field_presence": {
+                  "input_tokens": true,
+                  "output_tokens": true,
+                  "cache_read_input_tokens": true,
+                  "cache_creation_input_tokens": true,
+                  "reasoning_tokens": false
+                },
+                "observed_cumulative": {
+                  "input_tokens": 743,
+                  "output_tokens": 2716,
+                  "cache_read_input_tokens": 896,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "normalized": {
+                  "input_tokens": 743,
+                  "output_tokens": 2716,
+                  "cache_read_input_tokens": 896,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "settled": true,
+                "settlement_count": 1,
+                "message_stop_events": 1,
+                "settlement_identity": "boundary-9c9ef6441eca43b09bd2a43f2e1a3899",
+                "provider_message_id": "66d63bed-cc6c-4abf-80a7-53fc191c87a2",
+                "provider_model": "deepseek-flash",
+                "post_terminal_events_ignored": 0
+              },
+              "finished_ns": 1792552595094059700,
+              "provider_delta_events": 2715,
+              "first_provider_delta_ns": 1792552584635042800,
+              "last_provider_delta_ns": 1792552595059698800
+            }
+          ]
+        }
+      ],
+      "cleanup": {
+        "host": {
+          "owned_pids_before": [
+            1908,
+            17516
+          ],
+          "remaining_pids": [],
+          "method": "windows_job",
+          "host_port_closed": true
+        }
+      }
+    },
+    {
+      "run": ".runtime/p0-execution-real-final-20261021",
+      "real_attempts": 1,
+      "cases": [
+        {
+          "case_id": "P0-REAL-BODY-CANCEL",
+          "passed": false,
+          "binding": {
+            "conversation_id": "p0-real-math",
+            "submission_id": "p0-real-submit-1",
+            "generation_id": "p0-real-body-1",
+            "epoch": 1,
+            "session_id": "learning-ab3931ccbddf847694b4ffe6f5a60de3",
+            "request_id": "p0-real-submit-1",
+            "native_floor": 2,
+            "native_turn": 1,
+            "accepted": true,
+            "status": "cancelled"
+          },
+          "text_delta_count": 1,
+          "reasoning_delta_count": 533,
+          "cancel_after_body": true,
+          "cancel_ack": {
+            "accepted": true
+          },
+          "partial_body_preserved": true,
+          "status": "cancelled",
+          "time_to_first_text_ms": 3297.0,
+          "elapsed_ms": 3344.0,
+          "host_alive": true,
+          "attempts": [
+            {
+              "attempt_id": "boundary-308f4e31ebb24730a42e9d00ed0b28e6",
+              "request_id": "boundary-308f4e31ebb24730a42e9d00ed0b28e6",
+              "generation_id": "p0-real-body-1",
+              "model": "deepseek-flash",
+              "thinking": "high",
+              "kind": "model",
+              "actual_outbound": true,
+              "actual_outbound_attempt": 1,
+              "status": "upstream_unknown",
+              "received_ns": 1792552864898204100,
+              "finished_ns": 1792552868072601400,
+              "request_sha256": "665547c58b0ea1851838606d2bc0809f8518b1abc968b65f07b2f44a7834a110"
+            }
+          ],
+          "provider_records": [
+            {
+              "request_id": "boundary-308f4e31ebb24730a42e9d00ed0b28e6",
+              "generation_id": "p0-real-body-1",
+              "mode": "official",
+              "received_ns": 1792552864898204100,
+              "body_sha256": "665547c58b0ea1851838606d2bc0809f8518b1abc968b65f07b2f44a7834a110",
+              "body_bytes": 58876,
+              "model": "deepseek-flash",
+              "max_tokens": 16384,
+              "thinking": {
+                "type": "enabled"
+              },
+              "output_config": {
+                "effort": "high"
+              },
+              "tools": [],
+              "images": [
+                {
+                  "kind": "image",
+                  "source_type": "base64",
+                  "sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+                  "bytes": 42882,
+                  "mime": "image/png",
+                  "dimensions": [
+                    1400,
+                    620
+                  ]
+                }
+              ],
+              "actual_outbound_attempt": 1,
+              "status": "upstream_unknown",
+              "dispatch_ns": 1792552864974877600,
+              "upstream_status": 200,
+              "response_headers_ns": 1792552865095101900,
+              "usage": {
+                "source": "provider_sse_before_harness_projection",
+                "raw": [
+                  {
+                    "event": "message_start",
+                    "usage": {
+                      "input_tokens": 903,
+                      "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0,
+                      "output_tokens": 0,
+                      "service_tier": "standard"
+                    }
+                  }
+                ],
+                "field_presence": {
+                  "input_tokens": true,
+                  "output_tokens": true,
+                  "cache_read_input_tokens": true,
+                  "cache_creation_input_tokens": true,
+                  "reasoning_tokens": false
+                },
+                "observed_cumulative": {
+                  "input_tokens": 903,
+                  "output_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "cache_creation_input_tokens": 0,
+                  "reasoning_tokens": null
+                },
+                "normalized": {
+                  "input_tokens": null,
+                  "output_tokens": null,
+                  "cache_read_input_tokens": null,
+                  "cache_creation_input_tokens": null,
+                  "reasoning_tokens": null
+                },
+                "settled": false,
+                "settlement_count": 0,
+                "message_stop_events": 0,
+                "settlement_identity": "boundary-308f4e31ebb24730a42e9d00ed0b28e6",
+                "provider_message_id": "64f21e3f-770f-4bf8-9233-e03337fc02f9",
+                "provider_model": "deepseek-flash",
+                "post_terminal_events_ignored": 0
+              },
+              "error_type": "ConnectionAbortedError",
+              "finished_ns": 1792552868072601400,
+              "provider_delta_events": 546,
+              "first_provider_delta_ns": 1792552865625644000,
+              "last_provider_delta_ns": 1792552868070596800
+            }
+          ]
+        }
+      ],
+      "cleanup": {
+        "host": {
+          "owned_pids_before": [
+            10980,
+            14844
+          ],
+          "remaining_pids": [],
+          "method": "windows_job",
+          "host_port_closed": true
+        }
+      }
+    }
+  ],
+  "real_attempts_across_all_component_runs": 5,
+  "failures_and_fixes": [
+    {
+      "failure": "Final-source body cancel had accepted native cancelled terminal and saved body, but reader write failed before the 25ms watcher; boundary cancel evidence was absent. The run stayed failed.",
+      "fix": "Reader error checks the downstream socket before closing it; only observed disconnect sets cancel evidence. Upstream errors remain unknown.",
+      "regression": "Four deterministic/native HTTP race regressions; original 24 boundary tests retained; final two official calls passed."
+    },
+    {
+      "failure": "A late usage settlement would reuse an earlier unsettled event ID with changed data.",
+      "fix": "Usage observation ID includes canonical observation hash; settlement ID stays provider-request scoped.",
+      "regression": "Actual Host with held final-usage gate proves unknown observation, final observation and stable repeated final ID."
+    }
+  ],
+  "limitations": [
+    "Only one approved synthetic math image and two complete continued answers reviewed across component runs.",
+    "First-body times are diagnostic, not a measured universal 10-second useful-answer target.",
+    "Three cancelled attempts have unknown final usage; known completed output across component runs is 5316 tokens, not total usage or cost.",
+    "V2/application/browser and P0 exit decision belong to separate reports."
+  ]
+}

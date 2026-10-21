@@ -1,0 +1,25 @@
+{
+  "name": "learning-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": "24.14.0",
+    "pnpm": "11.21.0"
+  },
+  "scripts": {
+    "dev": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py dev",
+    "start": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py start",
+    "build": "pnpm --filter @learning/frontend build",
+    "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/export_openapi.py scripts/test_browser.py scripts/harness scripts/validation/Run-V2.py scripts/validation/Run-P0Real.py && pnpm contracts:check",
+    "test": "pnpm --filter @learning/frontend test && .\\backend\\.venv\\Scripts\\python.exe -m pytest backend/tests --basetemp=.runtime/tests/backend-latest",
+    "contracts:generate": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts",
+    "contracts:check": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py --check && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts --check",
+    "format:check": "pnpm --filter @learning/frontend exec prettier --check ../package.json ../pnpm-workspace.yaml .",
+    "test:e2e": ".\\backend\\.venv\\Scripts\\python.exe scripts/test_browser.py"
+  },
+  "devDependencies": {
+    "@playwright/cli": "0.1.22",
+    "openapi-typescript": "7.13.0"
+  }
+}

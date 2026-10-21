@@ -1,0 +1,152 @@
+{
+  "manifest_version": 1,
+  "artifact": {
+    "name": "deepseek-harness-runtime-bin",
+    "version": "0.2.1rc2",
+    "reported_version": "0.2.1-rc.2",
+    "platform": "win32-x64",
+    "wheel": {
+      "filename": "deepseek_harness_runtime_bin-0.2.1rc2-py3-none-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/bc/95/8164c49a5d3430add58db8aeba6546cd05c9ab7ddd2ea3e1acf174448d86/deepseek_harness_runtime_bin-0.2.1rc2-py3-none-win_amd64.whl",
+      "metadata_url": "https://pypi.org/pypi/deepseek-harness-runtime-bin/0.2.1rc2/json",
+      "sha256": "d38c18f5117859feedaaa791a0eea37b8644bc187118e7e6f3afa231a5381cb7",
+      "size_bytes": 83860784
+    },
+    "executable": {
+      "filename": "deepseek-harness-sdk-runtime-win-x64.exe",
+      "sha256": "f9ed01f241df37c50c702d81b6c226d576210b8f3947699735ca90285ea13365",
+      "size_bytes": 273157120
+    },
+    "ripgrep": {
+      "filename": "deepseek-harness-sdk-runtime-win-x64-rg.exe",
+      "sha256": "f9dde63498b3193f098355dbec97af99dc4f6b8fa0df5ed04114a03012c042cb"
+    }
+  },
+  "official_source": {
+    "repository": "https://github.com/deepseek-ai/deepseek-harness",
+    "commit": "687f282e8625c6b8d11ff58211a90524be2e4317",
+    "archive_url": "https://codeload.github.com/deepseek-ai/deepseek-harness/zip/687f282e8625c6b8d11ff58211a90524be2e4317",
+    "sha256": "828bbbebaf507d2b1fc335a608e1c8174e2dd5c5c80ebb64d5146ddc5ecb511f",
+    "size_bytes": 46562322
+  },
+  "licenses": [
+    {
+      "filename": "LICENSE",
+      "sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be"
+    },
+    {
+      "filename": "THIRD_PARTY_NOTICES.md",
+      "sha256": "aeea7aa256ede5349cc7903f56a859d54f10b82a45fba7dcce667eb69916dab0"
+    }
+  ],
+  "dependency_closure": {
+    "kind": "SEA executable embeds Node and closed npm graph; no system Node or Python SDK needed by formal Host",
+    "python_runtime_requires_dist": [],
+    "npm_deploy_root": {
+      "official_path": "python/sdk-runtime/package.json",
+      "local_evidence": "upstream/runtime-closure.package.json",
+      "sha256": "1a091b1c3cc083c4d4477c6e96059e337dbdc29dc9899e7593f750ad610281a1"
+    },
+    "official_pnpm_lock": {
+      "path": "pnpm-lock.yaml",
+      "sha256": "4637cca3b89c4c8d5a147321710e597aa62ec2444a3772ab542be5690893dfe4"
+    },
+    "optional_resources": "Office/authoring/ASR resources are neither required nor downloaded; shipped lightweight skills remain inert because no skill filesystem/provider is active.",
+    "verified_native_resources": [
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/colour/color.cjs",
+        "sha256": "f7c3efcf482624007f2019fffee3e1dec56b8cb893faa9a420b2832805888dce",
+        "size_bytes": 45136
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/colour/index.cjs",
+        "sha256": "e6e93e7fb209420a20fdf2ec676e9c67413be8d5ace99eec64f9468480f0368d",
+        "size_bytes": 49
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/colour/LICENSE.md",
+        "sha256": "e2eaa4603c14cb26f301e88648c12a853fa3f0f5da6d4b0972958c666e7f2ab8",
+        "size_bytes": 4433
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/colour/package.json",
+        "sha256": "bc38c5097693ed53b91c32f35fb0a52569736c7854ba2eb6d080f3252071f75c",
+        "size_bytes": 1515
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/index.cjs",
+        "sha256": "6ecbd583f45e914233410fe83a614e4f5ff1a6875a7eb828b03b7258e8ba6944",
+        "size_bytes": 62
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/package.json",
+        "sha256": "697b3d89590e3b988b51764bd22dfd6f4a1b35cd4eb12c664eca7987e8ee6115",
+        "size_bytes": 888
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/versions.json",
+        "sha256": "e2611d5d854815a8b33c8a3d2ec649511a9596ccf16844e8eae7cf81e79881c4",
+        "size_bytes": 596
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/lib/libvips-42.dll",
+        "sha256": "06dab07cc386748513337a31672b1d5269fbc770a14ff403080575665bf0813f",
+        "size_bytes": 19018240
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/lib/libvips-cpp-8.18.7.dll",
+        "sha256": "25001dbd05305a0a29119ab49933622c70b4a20ea12ef1d5d20ca40181db53bf",
+        "size_bytes": 333312
+      },
+      {
+        "relative_path": "pkg/971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e/@img/sharp-win32-x64/lib/sharp-win32-x64-0.35.5.node",
+        "sha256": "971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e",
+        "size_bytes": 443904
+      },
+      {
+        "relative_path": "pkg/eb0587c804bb76262968bf83028528da4dc2d4322f558845cce205c709e2ba20/@koromix/koffi-win32-x64/index.js",
+        "sha256": "632ab5a01dfc1b519b06275f490d6790100a2f8d71d8f56957091d0fcc5b3e0b",
+        "size_bytes": 206
+      },
+      {
+        "relative_path": "pkg/eb0587c804bb76262968bf83028528da4dc2d4322f558845cce205c709e2ba20/@koromix/koffi-win32-x64/package.json",
+        "sha256": "b38fcff8641d493656ef4153a37fd7389806ae621bb916aca536fd3bbc158690",
+        "size_bytes": 644
+      },
+      {
+        "relative_path": "pkg/eb0587c804bb76262968bf83028528da4dc2d4322f558845cce205c709e2ba20/@koromix/koffi-win32-x64/win32_x64/koffi.node",
+        "sha256": "eb0587c804bb76262968bf83028528da4dc2d4322f558845cce205c709e2ba20",
+        "size_bytes": 1042944
+      }
+    ],
+    "native_resource_evidence": "V1 original fixed wheel SEA extraction hashes; formal extraction must retain the same bytes"
+  },
+  "adaptations": [
+    {
+      "id": "native-snapshot-drive",
+      "implementation": "plugins/learning-guard.mjs",
+      "scope": "Only Windows virtual snapshot *.node paths; normalize drive to C: then delegate original process.dlopen. No upstream file edited."
+    },
+    {
+      "id": "private-boundary-policy",
+      "implementation": "plugins/learning-guard.mjs",
+      "scope": "Pin outbound fetch/http/https/net to configured 127.0.0.1 boundary. Tools have no registrations and a deny-all execution guard."
+    }
+  ],
+  "profile": {
+    "template": "profiles/learning.patch.json",
+    "package": "profiles/package.json",
+    "plugin": "plugins/learning-guard.mjs",
+    "secrets": "Host-owned private environment and private per-instance output only",
+    "automatic_model_retries": 0,
+    "automatic_compaction": false,
+    "image_offload": false,
+    "model_request_count_limit": null,
+    "model_selection": "explicit user configuration; no silent fallback"
+  },
+  "project_sources": {
+    "profiles/learning.patch.json": "df29a8154370b35e58ec7676821659408763dc7d16a576f9d5de1fa0670b3ff9",
+    "profiles/package.json": "302d9af6a90f100fb351028728ec47f2431141ac5a1ee86fda132eeec0a2cbee",
+    "plugins/learning-guard.mjs": "33a806b9641c2d246094a07ee1b1cecdb851bcf0eb77a1e90e6fbb265c66710b"
+  }
+}

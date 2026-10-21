@@ -1,0 +1,17 @@
+# Isolated V1 runner dependency lock; CPython 3.12 / Windows x86-64.
+# Captured from the actual .runtime/validation/v1-env installation on 2026-10-21.
+# Wheel hashes: official PyPI version metadata matched against existing uv cache receipts.
+# This lock was not used for a clean reinstall in this audit.
+--index-url https://pypi.org/simple
+--only-binary :all:
+--require-hashes
+
+anyio==4.15.1 --hash=sha256:6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101
+certifi==2026.10.19 --hash=sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b
+h11==0.16.0 --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
+httpcore==1.0.9 --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55
+httpx==0.28.1 --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
+idna==3.20 --hash=sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c
+pillow==12.2.0 --hash=sha256:7f84204dee22a783350679a0333981df803dac21a0190d706a50475e361c93f5
+typing-extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+websockets==16.0 --hash=sha256:5569417dc80977fc8c2d43a86f78e0a5a22fee17565d78621b6bb264a115d4ea

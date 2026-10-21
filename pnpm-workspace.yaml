@@ -1,0 +1,12 @@
+packages:
+  - frontend
+storeDir: .local/pnpm/store
+cacheDir: .local/pnpm/cache
+saveExact: true
+engineStrict: true
+managePackageManagerVersions: false
+strictPeerDependencies: true
+onlyBuiltDependencies:
+  - "@tailwindcss/oxide"
+  - esbuild
+  - unrs-resolver

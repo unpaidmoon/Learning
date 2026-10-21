@@ -1,0 +1,388 @@
+{
+  "run_id": "p0-application-real-fixed-20261021",
+  "scope": "formal_application_HTTP_SQLite_Host_real_provider",
+  "model": "deepseek-flash",
+  "thinking": "high",
+  "output_tokens": 16384,
+  "timeout_seconds": 300,
+  "approved_image_sha256": "ca17df7fe252dd9dbd37d75c086b24848aaac7dd668adf87c980511c039aaa13",
+  "cases": [
+    {
+      "id": "APP-REAL-CANCEL",
+      "passed": true,
+      "submission_id": "p0-api-real-1",
+      "generation_id": "generation_f2944cc9de804eb186bb93b31f53e822",
+      "body_chars": 690,
+      "reasoning_chars": 4084,
+      "first_body_ms": 12327.99999999952,
+      "usage": {
+        "status": "unknown",
+        "raw": {
+          "source": "provider_sse_before_harness_projection",
+          "raw": [
+            {
+              "event": "message_start",
+              "usage": {
+                "input_tokens": 983,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 0,
+                "output_tokens": 0,
+                "service_tier": "standard"
+              }
+            }
+          ],
+          "field_presence": {
+            "input_tokens": true,
+            "output_tokens": true,
+            "cache_read_input_tokens": true,
+            "cache_creation_input_tokens": true,
+            "reasoning_tokens": false
+          },
+          "observed_cumulative": {
+            "input_tokens": 983,
+            "output_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "reasoning_tokens": null
+          },
+          "normalized": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "cache_read_input_tokens": null,
+            "cache_creation_input_tokens": null,
+            "reasoning_tokens": null
+          },
+          "settled": false,
+          "settlement_count": 0,
+          "message_stop_events": 0,
+          "settlement_identity": "boundary-a2237ab6479340f6a3cec3f84bf8337c",
+          "provider_message_id": "e443ab25-3661-44e8-ad10-6c464993c06c",
+          "provider_model": "deepseek-flash",
+          "post_terminal_events_ignored": 0
+        },
+        "fields": {
+          "input_tokens": true,
+          "reasoning_tokens": false,
+          "output_tokens": true,
+          "cache_creation_input_tokens": true,
+          "cache_read_input_tokens": true
+        },
+        "input_tokens": null,
+        "output_tokens": null
+      }
+    },
+    {
+      "id": "APP-REAL-CORRECTION-FOLLOWUP",
+      "passed": true,
+      "generation_id": "generation_53d3f3a0b0e8433daa9dd72b4d34518a",
+      "math_result": "1/6",
+      "usage": {
+        "status": "known",
+        "raw": {
+          "source": "provider_sse_before_harness_projection",
+          "raw": [
+            {
+              "event": "message_start",
+              "usage": {
+                "input_tokens": 1223,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 896,
+                "output_tokens": 0,
+                "service_tier": "standard"
+              }
+            },
+            {
+              "event": "message_delta",
+              "usage": {
+                "input_tokens": 1223,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 896,
+                "output_tokens": 2008,
+                "service_tier": "standard"
+              }
+            }
+          ],
+          "field_presence": {
+            "input_tokens": true,
+            "output_tokens": true,
+            "cache_read_input_tokens": true,
+            "cache_creation_input_tokens": true,
+            "reasoning_tokens": false
+          },
+          "observed_cumulative": {
+            "input_tokens": 1223,
+            "output_tokens": 2008,
+            "cache_read_input_tokens": 896,
+            "cache_creation_input_tokens": 0,
+            "reasoning_tokens": null
+          },
+          "normalized": {
+            "input_tokens": 1223,
+            "output_tokens": 2008,
+            "cache_read_input_tokens": 896,
+            "cache_creation_input_tokens": 0,
+            "reasoning_tokens": null
+          },
+          "settled": true,
+          "settlement_count": 1,
+          "message_stop_events": 1,
+          "settlement_identity": "boundary-d604ddf03c2c45d6ab295317f99f1621",
+          "provider_message_id": "66f9a0ae-aa36-400f-9cd7-d87202b3b3fe",
+          "provider_model": "deepseek-flash",
+          "post_terminal_events_ignored": 0
+        },
+        "fields": {
+          "input_tokens": true,
+          "reasoning_tokens": false,
+          "output_tokens": true,
+          "cache_creation_input_tokens": true,
+          "cache_read_input_tokens": true
+        },
+        "input_tokens": 1223,
+        "output_tokens": 2008
+      },
+      "chat_id": "chat_e3a3bcfa5ba14d32b6463076b8937c1f"
+    },
+    {
+      "id": "APP-REAL-READONLY-RESTART",
+      "passed": true,
+      "messages": 4,
+      "no_resubmit": true
+    }
+  ],
+  "cleanup_initial": {
+    "owned_pids_before": [],
+    "remaining_pids": [],
+    "method": "windows_job"
+  },
+  "status": "passed",
+  "cleanup_final": {
+    "owned_pids_before": [],
+    "remaining_pids": [],
+    "method": "windows_job"
+  },
+  "sqlite": {
+    "sqlite_version": "3.45.3",
+    "journal_mode": "delete",
+    "synchronous": 2,
+    "foreign_keys": 1,
+    "schema_revision": "0001_business",
+    "attachment_publish": "fsync+MoveFileExW_WRITE_THROUGH"
+  },
+  "counts": {
+    "assets": 0,
+    "attachments": 1,
+    "courses": 1,
+    "rejected_events": 0,
+    "chats": 1,
+    "course_assets": 0,
+    "source_versions": 0,
+    "context_snapshots": 2,
+    "execution_bindings": 1,
+    "messages": 4,
+    "input_revisions": 4,
+    "submissions": 2,
+    "generations": 2,
+    "message_attachments": 1,
+    "execution_events": 4890,
+    "outbound_attempts": 2,
+    "usage_records": 2
+  },
+  "business_evidence": [
+    {
+      "generation_id": "generation_f2944cc9de804eb186bb93b31f53e822",
+      "submission_id": "p0-api-real-1",
+      "chat_id": "chat_e3a3bcfa5ba14d32b6463076b8937c1f",
+      "state": "cancelled",
+      "event_watermark": 2879,
+      "body_sha256": "071df5daea39c60675e503e129d1aaa710c4324be6f4fc7228d283ecba0f3028",
+      "body_chars": 690,
+      "binding": {
+        "binding_id": "binding_2a172a15e8fe4cfbbb31f2903266b7be",
+        "session_id": "learning-a64411bd2724d2365d4337f759d1682a",
+        "epoch": 1,
+        "last_event_watermark": 25,
+        "state": "ready"
+      },
+      "attempts": [
+        {
+          "attempt_id": "boundary-a2237ab6479340f6a3cec3f84bf8337c",
+          "generation_id": "generation_f2944cc9de804eb186bb93b31f53e822",
+          "kind": "model",
+          "request_id": "boundary-a2237ab6479340f6a3cec3f84bf8337c",
+          "model": "deepseek-flash",
+          "thinking": "high",
+          "actual_outbound": true,
+          "created_at": "2026-10-21T03:34:16.725+00:00"
+        }
+      ],
+      "usage_records": [
+        {
+          "generation_id": "generation_f2944cc9de804eb186bb93b31f53e822",
+          "settlement_id": "provider:boundary-a2237ab6479340f6a3cec3f84bf8337c:usage",
+          "source": "provider_boundary",
+          "raw_usage": {
+            "source": "provider_sse_before_harness_projection",
+            "raw": [
+              {
+                "event": "message_start",
+                "usage": {
+                  "input_tokens": 983,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "output_tokens": 0,
+                  "service_tier": "standard"
+                }
+              }
+            ],
+            "field_presence": {
+              "input_tokens": true,
+              "output_tokens": true,
+              "cache_read_input_tokens": true,
+              "cache_creation_input_tokens": true,
+              "reasoning_tokens": false
+            },
+            "observed_cumulative": {
+              "input_tokens": 983,
+              "output_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "normalized": {
+              "input_tokens": null,
+              "output_tokens": null,
+              "cache_read_input_tokens": null,
+              "cache_creation_input_tokens": null,
+              "reasoning_tokens": null
+            },
+            "settled": false,
+            "settlement_count": 0,
+            "message_stop_events": 0,
+            "settlement_identity": "boundary-a2237ab6479340f6a3cec3f84bf8337c",
+            "provider_message_id": "e443ab25-3661-44e8-ad10-6c464993c06c",
+            "provider_model": "deepseek-flash",
+            "post_terminal_events_ignored": 0
+          },
+          "field_presence": {
+            "input_tokens": true,
+            "output_tokens": true,
+            "cache_read_input_tokens": true,
+            "cache_creation_input_tokens": true,
+            "reasoning_tokens": false
+          },
+          "normalized": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "cached_input_tokens": null,
+            "reasoning_tokens": null
+          },
+          "created_at": "2026-10-21T03:34:30.090+00:00"
+        }
+      ]
+    },
+    {
+      "generation_id": "generation_53d3f3a0b0e8433daa9dd72b4d34518a",
+      "submission_id": "p0-api-real-2",
+      "chat_id": "chat_e3a3bcfa5ba14d32b6463076b8937c1f",
+      "state": "completed",
+      "event_watermark": 2011,
+      "body_sha256": "d9ec26125e2b0e40aae9bf05a55b82eddbfba12e1e480a086ea1fb38038f2a2d",
+      "body_chars": 1417,
+      "binding": {
+        "binding_id": "binding_2a172a15e8fe4cfbbb31f2903266b7be",
+        "session_id": "learning-a64411bd2724d2365d4337f759d1682a",
+        "epoch": 1,
+        "last_event_watermark": 25,
+        "state": "ready"
+      },
+      "attempts": [
+        {
+          "attempt_id": "boundary-d604ddf03c2c45d6ab295317f99f1621",
+          "generation_id": "generation_53d3f3a0b0e8433daa9dd72b4d34518a",
+          "kind": "model",
+          "request_id": "boundary-d604ddf03c2c45d6ab295317f99f1621",
+          "model": "deepseek-flash",
+          "thinking": "high",
+          "actual_outbound": true,
+          "created_at": "2026-10-21T03:34:31.093+00:00"
+        }
+      ],
+      "usage_records": [
+        {
+          "generation_id": "generation_53d3f3a0b0e8433daa9dd72b4d34518a",
+          "settlement_id": "provider:boundary-d604ddf03c2c45d6ab295317f99f1621:usage",
+          "source": "provider_boundary",
+          "raw_usage": {
+            "source": "provider_sse_before_harness_projection",
+            "raw": [
+              {
+                "event": "message_start",
+                "usage": {
+                  "input_tokens": 1223,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 896,
+                  "output_tokens": 0,
+                  "service_tier": "standard"
+                }
+              },
+              {
+                "event": "message_delta",
+                "usage": {
+                  "input_tokens": 1223,
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 896,
+                  "output_tokens": 2008,
+                  "service_tier": "standard"
+                }
+              }
+            ],
+            "field_presence": {
+              "input_tokens": true,
+              "output_tokens": true,
+              "cache_read_input_tokens": true,
+              "cache_creation_input_tokens": true,
+              "reasoning_tokens": false
+            },
+            "observed_cumulative": {
+              "input_tokens": 1223,
+              "output_tokens": 2008,
+              "cache_read_input_tokens": 896,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "normalized": {
+              "input_tokens": 1223,
+              "output_tokens": 2008,
+              "cache_read_input_tokens": 896,
+              "cache_creation_input_tokens": 0,
+              "reasoning_tokens": null
+            },
+            "settled": true,
+            "settlement_count": 1,
+            "message_stop_events": 1,
+            "settlement_identity": "boundary-d604ddf03c2c45d6ab295317f99f1621",
+            "provider_message_id": "66f9a0ae-aa36-400f-9cd7-d87202b3b3fe",
+            "provider_model": "deepseek-flash",
+            "post_terminal_events_ignored": 0
+          },
+          "field_presence": {
+            "input_tokens": true,
+            "output_tokens": true,
+            "cache_read_input_tokens": true,
+            "cache_creation_input_tokens": true,
+            "reasoning_tokens": false
+          },
+          "normalized": {
+            "input_tokens": 1223,
+            "output_tokens": 2008,
+            "cached_input_tokens": 896,
+            "reasoning_tokens": null
+          },
+          "created_at": "2026-10-21T03:34:41.678+00:00"
+        }
+      ]
+    }
+  ],
+  "actual_outbound_attempts": 2
+}

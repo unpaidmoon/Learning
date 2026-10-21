@@ -1,0 +1,141 @@
+{
+  "contract_version": "learning-history/1",
+  "fixture_only": true,
+  "purpose": "Business-history ingestion and next-question continuation; no Android or sync implementation.",
+  "chat_id": "chat_c1",
+  "course_id": "course_a",
+  "ingestion_policy": {
+    "dispatch_on_ingest": false,
+    "deduplicate_by": "message_id",
+    "completed_history_is_reference_only": true,
+    "provider_events": [],
+    "usage": null
+  },
+  "source": {
+    "asset_id": "source_math_1",
+    "display_name": "lecture.txt",
+    "versions": [
+      {
+        "source_version": "SOURCE-v1",
+        "fixture_content_utf8": "source-v1: a=1",
+        "sha256": "8c9ff89139a1f78ae1b88ef89f35270c53e8a01b48f62c1d51334791c2a3f64b"
+      },
+      {
+        "source_version": "SOURCE-v2",
+        "fixture_content_utf8": "source-v2: a=2",
+        "sha256": "31c1568346a585d327b83a8804661ea76911dc29476eb32cc2f63a4996c95e94"
+      }
+    ]
+  },
+  "confirmed_attachment": {
+    "attachment_id": "attach_crop_a1",
+    "media_type": "image/png",
+    "byte_length": 69,
+    "sha256": "e878950f8091ec010cf5cc723bdea027a8539cf7147cfea199c2f666232dcd4e",
+    "fixture_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N70a4AAAAAElFTkSuQmCC",
+    "user_confirmed": true,
+    "source_locator": {
+      "asset_id": "source_math_1",
+      "source_version": "SOURCE-v1",
+      "page": 1,
+      "bbox": [0.1, 0.2, 0.5, 0.6]
+    },
+    "locator_is_not_image_bytes": true
+  },
+  "initial_completed_history": [
+    {
+      "message_id": "msg_u1",
+      "role": "user",
+      "parent_ids": [],
+      "revision_id": "rev_u1_v1",
+      "text": "题目初始条件：a=1。请根据已确认题图分析。",
+      "attachment_ids": ["attach_crop_a1"],
+      "conditions": ["a=1"],
+      "source_locators": [{"asset_id": "source_math_1", "source_version": "SOURCE-v1", "page": 1}],
+      "device_id": "device_windows_fixture",
+      "submission_id": "sub_u1",
+      "generation_id": "gen_a1",
+      "status": "completed"
+    },
+    {
+      "message_id": "msg_a1",
+      "role": "assistant",
+      "parent_ids": ["msg_u1"],
+      "in_reply_to": "msg_u1",
+      "revision_id": "rev_a1_v1",
+      "text": "已按初始条件 a=1 完成这次分析。",
+      "device_id": "device_windows_fixture",
+      "submission_id": "sub_u1",
+      "generation_id": "gen_a1",
+      "status": "completed",
+      "usage": null,
+      "provider_event": null
+    }
+  ],
+  "external_completed_history": [
+    {
+      "message_id": "msg_u2",
+      "role": "user",
+      "parent_ids": ["msg_a1"],
+      "revision_id": "rev_u2_v1",
+      "text": "更正：当前题目条件应为 a=2，先前 a=1 作废；题图仍为已确认裁剪。",
+      "attachment_ids": ["attach_crop_a1"],
+      "conditions": ["a=2"],
+      "corrections": ["a=2 replaces a=1"],
+      "source_locators": [{"asset_id": "source_math_1", "source_version": "SOURCE-v1", "page": 1}],
+      "device_id": "device_external_fixture",
+      "submission_id": "sub_u2",
+      "generation_id": "gen_a2",
+      "status": "completed"
+    },
+    {
+      "message_id": "msg_a2",
+      "role": "assistant",
+      "parent_ids": ["msg_u2"],
+      "in_reply_to": "msg_u2",
+      "revision_id": "rev_a2_v1",
+      "text": "已按更正条件 a=2 完成；后续应保留此条件和原确认题图。",
+      "device_id": "device_external_fixture",
+      "submission_id": "sub_u2",
+      "generation_id": "gen_a2",
+      "status": "completed",
+      "usage": null,
+      "provider_event": null
+    }
+  ],
+  "operations": [
+    {"operation": "ingest_completed", "messages_ref": "initial_completed_history"},
+    {"operation": "ingest_completed", "messages_ref": "external_completed_history"},
+    {"operation": "ingest_completed", "messages_ref": "external_completed_history"},
+    {"operation": "submit_new_question", "message_ref": "next_question"}
+  ],
+  "next_question": {
+    "message_id": "msg_u3",
+    "submission_id": "sub_u3",
+    "generation_id": "gen_a3",
+    "revision_id": "rev_u3_v1",
+    "parent_ids": ["msg_a2"],
+    "device_id": "device_windows_fixture",
+    "text": "沿前面的思路继续，使用更正后的条件说明下一步。",
+    "required_attachment_ids": ["attach_crop_a1"],
+    "protected_revision_ids": ["rev_u1_v1", "rev_u2_v1"],
+    "status_before_explicit_submit": "not_submitted"
+  },
+  "expected": {
+    "chat_id_after_continuation": "chat_c1",
+    "completed_history_message_count": 4,
+    "u2_message_count_after_two_ingestions": 1,
+    "a2_message_count_after_two_ingestions": 1,
+    "dispatches_from_history_ingestion": 0,
+    "new_logical_submissions": ["sub_u3"],
+    "history_marked_completed_reference": true,
+    "latest_condition_retained": "a=2",
+    "old_condition_remains_traceable": "a=1",
+    "required_attachment_id": "attach_crop_a1",
+    "old_attachment_source_version": "SOURCE-v1",
+    "missing_required_attachment": "block_only_dependent_submission",
+    "new_crop_replaces_old_submission_attachment": false,
+    "invented_harness_events": 0,
+    "invented_provider_usage": 0
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "contract_version": "learning-v2-evidence/1",
+  "purpose": "Distinguish evidence domains in the P0 persistence/fault validation report.",
+  "required_case_ids": ["V2-01", "V2-02", "V2-03", "V2-04", "V2-05", "V2-06", "V2-07", "V2-08", "V2-09", "V2-10", "V2-11", "V2-12", "V2-13", "V2-14", "V2-15"],
+  "status_values": ["passed", "failed", "not_run", "blocked_by_prerequisite", "unknown"],
+  "evidence_rules": {
+    "business_identity": ["chat_id", "submission_id", "generation_id", "binding_id", "epoch"],
+    "host_identity": ["session_id", "request_id", "native_floor", "native_turn", "native_cursor"],
+    "provider_identity": ["request_id", "generation_id", "body_sha256", "mode"],
+    "observation_sequence_is_native_sequence": false,
+    "local_fixture_requests_are_paid_model_dispatches": false,
+    "missing_usage_is_zero": false,
+    "unknown_execution_can_be_automatically_reprompted": false,
+    "database_fixture_proves_Host_recovery": false,
+    "protocol_fixture_proves_browser_security": false,
+    "completed_history_ingest_dispatches_old_questions": false
+  },
+  "fault_safety": {
+    "data_scope": ".runtime/validation/<new-run-id>/",
+    "worker_directory_must_be_under_validation_root": true,
+    "process_scope": "only subprocesses created by the current runner or its formal owned Host",
+    "trigger": "observed fault hook, actual receipt, actual persisted increment, or provider gate",
+    "arbitrary_sleep_as_fault_trigger": false
+  }
+}

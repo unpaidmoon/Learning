@@ -1,0 +1,35 @@
+[project]
+name = "learning-app"
+version = "0.1.0"
+description = "Windows learning application business service"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.116.1",
+  "uvicorn==0.35.0",
+  "pydantic==2.11.7",
+  "python-dotenv==1.1.1",
+  "httpx==0.28.1",
+  "websockets==16.0",
+  "sqlalchemy==2.0.43",
+  "alembic==1.16.5",
+  "pillow==12.2.0",
+]
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "pytest-asyncio==1.2.0", "ruff==0.13.3"]
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["host: requires fixed local Harness runtime (no cloud)"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

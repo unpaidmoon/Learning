@@ -1,0 +1,85 @@
+{
+  "scope": "P0-01..04 and V2 final read-only audit",
+  "v2_run_id": "v2-final-20261021-r2",
+  "v2_status": "passed",
+  "source_changed_during_run": false,
+  "current_source_hash_mismatches": [],
+  "recorded_ports_checked": [
+    15173,
+    15174,
+    15175,
+    15190,
+    15191,
+    15200,
+    18765,
+    18766,
+    18767,
+    18768,
+    18820,
+    18821,
+    18822,
+    18830,
+    53350,
+    63099,
+    64342
+  ],
+  "listening_on_recorded_ports": [],
+  "real_application_jobs": [
+    {
+      "record": ".runtime/validation/p0-application-real-20261021/run/apps/c7d7150c2a2845feb7624af72c64f598/run.json",
+      "status": "stopped",
+      "remaining_pids": []
+    },
+    {
+      "record": ".runtime/validation/p0-application-real-fixed-20261021/run/apps/8cc7cecd46cb4f0b943390a90a0a1807/run.json",
+      "status": "stopped",
+      "remaining_pids": []
+    },
+    {
+      "record": ".runtime/validation/p0-application-real-fixed-20261021/run/apps/bb9ef66f9f4946a1a6ea306c20baa1a3/run.json",
+      "status": "stopped",
+      "remaining_pids": []
+    },
+    {
+      "record": ".runtime/validation/p0-application-real-retest-20261021/run/apps/2a48423426974dbcacf209f824902ac3/run.json",
+      "status": "stopped",
+      "remaining_pids": []
+    }
+  ],
+  "public_asset_audit": {
+    "reviewable_file_count": 168,
+    "configured_key_checked": true,
+    "findings": [],
+    "frontend_build_files_checked": 3
+  },
+  "browser_sessions": "(no browsers)",
+  "real_model_ledgers": [
+    {
+      "ledger": ".runtime/p0-execution-real-20261021/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 2
+    },
+    {
+      "ledger": ".runtime/p0-execution-real-final-20261021/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 1
+    },
+    {
+      "ledger": ".runtime/p0-execution-real-fixed-20261021/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 2
+    },
+    {
+      "ledger": ".runtime/validation/p0-application-real-20261021/data/execution/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 1
+    },
+    {
+      "ledger": ".runtime/validation/p0-application-real-fixed-20261021/data/execution/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 2
+    },
+    {
+      "ledger": ".runtime/validation/p0-application-real-retest-20261021/data/execution/boundary/boundary-ledger.jsonl",
+      "actual_attempts": 1
+    }
+  ],
+  "actual_real_model_attempts_this_task": 9,
+  "historical_V1_attempts": 8,
+  "project_recorded_real_attempts": 17
+}

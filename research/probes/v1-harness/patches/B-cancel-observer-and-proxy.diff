@@ -1,0 +1,189 @@
+--- A-r3/b_cases.py
++++ B-final/b_cases.py
+@@ -30,6 +30,14 @@
+ def _text_rows(rows):
+     return [row for row in _chunks(rows)
+             if _value(row)["frame"].get("chunk", {}).get("type") == "text-delta"]
++
++
++def _activity_rows(rows):
++    # Thinking is genuine model activity, although it is not useful answer
++    # text. Waiting for a text block can miss an entire max-token generation.
++    return [row for row in _chunks(rows)
++            if _value(row)["frame"].get("chunk", {}).get("type") in {"text-delta", "reasoning-delta"}
++            and _value(row)["frame"]["chunk"].get("text")]
+ 
+ 
+ def _terminals(rows):
+@@ -92,7 +100,7 @@
+             return
+         rows = current()
+         cancellation.update(sent=True, cause=cause, sent_ns=time.time_ns(),
+-                            active_before_cancel=bool(_chunks(rows)) and not _terminals(rows))
++                            active_before_cancel=bool(_activity_rows(rows)) and not _terminals(rows))
+         try:
+             cancellation["rpc"] = await asyncio.wait_for(
+                 peer.rpc("session/cancel", {"sessionId": sid}), CONTROL_TIMEOUT_SECONDS)
+@@ -119,7 +127,7 @@
+ 
+         if not prompt_error:
+             while not _terminals(current()):
+-                if should_cancel and _text_rows(current()):
++                if should_cancel and _activity_rows(current()):
+                     await cancel("requested_active_stop")
+                     break
+                 remaining = deadline - time.monotonic()
+@@ -178,13 +186,16 @@
+     if baseline:
+         preserved += "".join(_text_fields(baseline.get("assistantStream", {})))
+     partial_preserved = bool(answer) and answer in preserved
++    activity = _activity_rows(rows)
++    generated_content = "".join(_value(row)["frame"]["chunk"]["text"] for row in activity)
++    partial_generated_preserved = bool(generated_content) and generated_content in preserved
+     cancel_rpc = cancellation["rpc"]
+     cancel_evidence = {
+         "active_generation_observed_before_cancel": cancellation["active_before_cancel"],
+         "cancel_rpc_accepted": isinstance(cancel_rpc, dict) and cancel_rpc.get("accepted") is True,
+         "provider_boundary_abort_observed": any(row.get("cancel_observed") is True for row in observations),
+         "durable_aborted_terminal": reason_kind == "aborted",
+-        "partial_text_preserved_in_snapshot_or_page": partial_preserved,
++        "partial_generated_content_preserved_in_snapshot_or_page": partial_generated_preserved,
+     }
+     active_cancel_proven = (should_cancel and cancellation["cause"] == "requested_active_stop"
+                             and all(cancel_evidence.values()))
+@@ -227,6 +238,8 @@
+             "observation_limit_seconds": deadline_seconds, "terminal_reason": reason,
+             "transport_complete": terminal_known, "boundary_handlers_finished": handlers_finished,
+             "real_text_delta_before_terminal": live_text, "partial_text_preserved": partial_preserved,
++            "partial_generated_content_preserved": partial_generated_preserved,
++            "activity_kinds": list(dict.fromkeys(_value(row)["frame"]["chunk"]["type"] for row in activity)),
+             "answer": answer, "time_to_first_text_ms": (texts[0]["received_ns"] - started_ns) / 1e6 if texts else None,
+             "elapsed_ms": (time.time_ns() - started_ns) / 1e6,
+             "boundary_requests": observations, "actual_input_and_usage_refs": request_refs,
+--- A-r3/test_b_cases.py
++++ B-final/test_b_cases.py
+@@ -39,7 +39,8 @@
+             "value": {"type": "event", "event": event}}})
+ 
+     def finish(self, reason):
+-        self.event("assistant/message", {"message": {"content": [{"type": "text", "text": "partial formula"}]}}, 12)
++        kind = "reasoning" if self.mode == "reasoning_active" else "text"
++        self.event("assistant/message", {"message": {"content": [{"type": kind, "text": "partial formula"}]}}, 12)
+         self.event("turn/end", {"reason": {"kind": reason}}, 13)
+         self.boundary._records[0].update(status="completed", finished_ns=time.time_ns())
+ 
+@@ -51,7 +52,7 @@
+                                       "actual_outbound_attempt": 1, "usage": {"settled": False}})
+         self.streams["initial"].append({"received_ns": time.time_ns(), "wire": {"value": {
+             "type": "assistant-stream", "frame": {"type": "chunk", "attemptId": "C1:1",
+-            "chunk": {"type": "text-delta", "text": "partial formula"}}}}})
++            "chunk": {"type": "reasoning-delta" if self.mode == "reasoning_active" else "text-delta", "text": "partial formula"}}}}})
+         if self.mode == "receipt_lost":
+             raise ConnectionError("acknowledgement lost")
+         if self.mode in {"normal", "page_failure"}:
+@@ -114,6 +115,16 @@
+         self.assertEqual(row["transport_status"], "unknown")
+         self.assertFalse(row["active_cancel_evidence"]["cancel_rpc_accepted"])
+ 
++    async def test_reasoning_only_generation_is_active_and_preserved(self):
++        row, peer = await self.execute("reasoning_active", True)
++        self.assertEqual(row["cancellation"]["cause"], "requested_active_stop")
++        self.assertTrue(row["active_cancel_proven"])
++        self.assertTrue(row["partial_generated_content_preserved"])
++        self.assertEqual(row["answer"], "")
++        self.assertFalse(row["partial_text_preserved"])
++        self.assertEqual(row["activity_kinds"], ["reasoning-delta"])
++        self.assertEqual(peer.cancel_calls, 1)
++
+     async def test_prompt_timeout_includes_receipt_wait(self):
+         row, peer = await self.execute("slow_receipt", deadline=0.015)
+         self.assertTrue(row["observation_timed_out"])
+--- A-r3/fixture.py
++++ B-final/fixture.py
+@@ -666,9 +666,10 @@
+                     cancelled.set()
+                     self._update(row, cancel_observed=True, disconnect_ns=time.time_ns())
+                     self._close_socket(upstream.sock)
+-                    if response is not None:
+-                        response.close()
+-                    upstream.close()
++                    # Interrupt IO only. HTTPResponse and HTTPConnection own
++                    # mutable chunk-parser state; closing them from here races
++                    # read1() and can clear response.fp mid-parse. The reader's
++                    # finally block exclusively closes those parser objects.
+                     return
+ 
+         watcher = threading.Thread(target=cancel_watcher, daemon=True)
+--- A-r3/test_fixture.py
++++ B-final/test_fixture.py
+@@ -304,6 +304,70 @@
+             guarded.stop()
+             self.server = original
+ 
++    def test_stream_cancel_does_not_close_parser_from_watcher(self):
++        release = threading.Event()
++        wrong_thread_closes = []
++
++        class UpstreamSocket:
++            def settimeout(self, value): pass
++            def shutdown(self, how): release.set()
++            def close(self): release.set()
++
++        class Response:
++            status = 200
++            reader = None
++            sent = False
++            def getheader(self, key, default): return "text/event-stream"
++            def read1(self, size):
++                self.reader = threading.get_ident()
++                if not self.sent:
++                    self.sent = True
++                    return sse({"type": "message_start", "message": {"usage": {"input_tokens": 4}}}) + sse({"type": "content_block_delta", "delta": {"type": "thinking_delta", "thinking": "active"}})
++                release.wait(3)
++                time.sleep(.05)
++                raise OSError("cancelled upstream socket")
++            def close(self):
++                if self.reader is not None and self.reader != threading.get_ident():
++                    wrong_thread_closes.append(threading.get_ident())
++                    raise AttributeError("concurrent HTTPResponse parser close")
++
++        class Connection:
++            def __init__(self, *args, **kwargs):
++                self.sock = UpstreamSocket()
++                self.response = Response()
++            def connect(self): pass
++            def request(self, *args, **kwargs): pass
++            def getresponse(self): return self.response
++            def close(self): self.response.close()
++
++        guarded = BoundaryServer(self.output / "stream-parser-cancel", mode="B", limit=1, key="fixture-dummy").start()
++        url = urlsplit(guarded.url)
++        raw = socket.create_connection((url.hostname, url.port), timeout=3)
++        wire = {"model": "deepseek-flash", "stream": True, "max_tokens": 8192,
++                "thinking": {"type": "enabled"}, "output_config": {"effort": "high"}, "messages": []}
++        body = json.dumps(wire).encode()
++        try:
++            with patch("fixture.http.client.HTTPSConnection", Connection):
++                headers = (f"POST /v1/messages HTTP/1.1\r\nHost: {url.hostname}:{url.port}\r\n"
++                           f"x-api-key: {guarded.local_token}\r\nContent-Length: {len(body)}\r\n"
++                           "Content-Type: application/json\r\n\r\n").encode()
++                raw.sendall(headers + body)
++                received = b""
++                while b"active" not in received:
++                    received += raw.recv(4096)
++                raw.shutdown(socket.SHUT_RDWR)
++                raw.close()
++                deadline = time.monotonic() + 3
++                while time.monotonic() < deadline and not guarded.records[0].get("finished_ns"):
++                    time.sleep(.02)
++                guarded.stop()
++            self.assertEqual(wrong_thread_closes, [])
++            self.assertTrue(guarded.records[0]["cancel_observed"])
++            self.assertEqual(guarded.records[0]["status"], "upstream_unknown")
++            self.assertEqual(guarded.actual_outbound_attempts, 1)
++        finally:
++            release.set();raw.close();guarded.stop()
++
+ 
+ if __name__ == "__main__":
+     unittest.main()

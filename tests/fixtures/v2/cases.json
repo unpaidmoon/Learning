@@ -1,0 +1,23 @@
+{
+  "schema_version": "learning-v2-cases/1",
+  "fixture_only": true,
+  "scope": "P0-01..04 application persistence, execution mapping and fault windows",
+  "real_model_required": false,
+  "cases": [
+    {"id": "V2-01", "fault": "attachment_before_write", "layer": "business-storage-process", "expected": "no_published_message_no_dispatch"},
+    {"id": "V2-02", "fault": "attachment_after_publish_before_metadata", "layer": "business-storage-process", "expected": "orphan_retained_no_dangling_message"},
+    {"id": "V2-03", "fault": "submission_committed_before_dispatch", "layer": "business-service-process", "expected": "one_pending_submission_safe_recovery"},
+    {"id": "V2-04", "fault": "host_prompt_accepted_ack_lost", "layer": "fixed-host-business-service", "expected": "original_execution_reconciled_without_reprompt"},
+    {"id": "V2-05", "fault": "partial_stream_observer_disconnected", "layer": "fixed-host-business-service", "expected": "partial_preserved_original_execution_reconciled"},
+    {"id": "V2-06", "fault": "host_terminal_durable_before_business_commit", "layer": "fixed-host-business-service-process", "expected": "original_terminal_ingested_once"},
+    {"id": "V2-07", "fault": "final_usage_missing", "layer": "business-service-provider-fixture", "expected": "body_completed_usage_unknown_no_redispatch"},
+    {"id": "V2-08", "fault": "duplicate_submission_and_event", "layer": "business-storage-and-service", "expected": "one_generation_idempotent_events_usage"},
+    {"id": "V2-09", "fault": "old_epoch_event_after_binding_rotation", "layer": "business-storage", "expected": "rejected_diagnostic_no_mutation"},
+    {"id": "V2-10", "fault": "course_change_during_generation", "layer": "business-service", "expected": "original_chat_ownership_retained"},
+    {"id": "V2-11", "fault": "source_overwritten_missing_then_relocated", "layer": "business-storage-context", "expected": "immutable_source_version_no_retarget"},
+    {"id": "V2-12", "fault": "completed_history_merged_twice_then_new_question", "layer": "business-service-context", "expected": "old_dispatch_zero_new_context_protected"},
+    {"id": "V2-13", "fault": "required_attachment_missing_and_new_crop", "layer": "business-storage-context", "expected": "dependent_submission_blocked_old_crop_immutable"},
+    {"id": "V2-14", "fault": "active_cancel_disconnect_late_terminal", "layer": "fixed-host-business-service", "expected": "reconciled_terminal_partial_saved_next_question_isolated"},
+    {"id": "V2-15", "fault": "unauthorized_origin_host_ws_asset_path", "layer": "real-http-ws-browser", "expected": "denied_without_asset_read_dispatch_or_exit"}
+  ]
+}

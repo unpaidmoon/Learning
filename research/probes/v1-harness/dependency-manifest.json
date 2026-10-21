@@ -1,0 +1,498 @@
+{
+  "manifest_version": 1,
+  "kind": "isolated_v1_dependency_evidence",
+  "recorded_at_utc": "2026-10-21T00:17:22.799021+00:00",
+  "scope": "V1 runner only; not formal application dependency closure",
+  "environment": {
+    "relative_path": ".runtime/validation/v1-env",
+    "python": "3.12.5",
+    "implementation": "CPython",
+    "platform": "win32",
+    "machine": "AMD64",
+    "include_system_site_packages": false,
+    "uv_version_recorded_in_pyvenv_cfg": "0.12.1",
+    "pip_installed": false,
+    "interpreter_source": "existing local CPython 3.12.5 installation; not downloaded by this audit",
+    "python_executable_sha256": "5aba6ec903f2e0e946459f98dc45c8129d3f22187f5adac00713d733191d3a3f"
+  },
+  "audit_actions": {
+    "downloaded_package_archives": 0,
+    "installed_packages": 0,
+    "read_official_pypi_version_metadata": 9,
+    "read_uv_cache_metadata": true,
+    "loaded_credentials": false
+  },
+  "installation_session_note": {
+    "source": "parent agent installation output; not independently reproduced by this metadata audit",
+    "pillow_download_reported_mib": 6.8,
+    "other_packages_reported_reused_from_cache": true,
+    "exact_network_transfer_bytes": null
+  },
+  "limitations": [
+    "Wheel archive hashes are official PyPI digests matched to uv cache receipt hashes; archive bytes were not downloaded again or independently rehashed.",
+    "Installed files with RECORD hashes were read and verified; the RECORD itself is separately hashed, not signed by this audit.",
+    "The existing Python interpreter and bundled Harness executable are outside these nine runner dependencies.",
+    "A requirements hash lock is provided; a new clean reinstall was not performed by this audit."
+  ],
+  "packages": [
+    {
+      "name": "anyio",
+      "version": "4.15.1",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/anyio/4.15.1/json",
+        "metadata_sha256": "e2ee22fad2fab3e66be503cba9b41945607d3076c9b7aa49b6e2f95ac323efab",
+        "filename": "anyio-4.15.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/12/b8/4bd346e22b28902df4d651910f5242c28d84e4a5c2435ca5c3f797ed7e2e/anyio-4.15.1-py3-none-any.whl",
+        "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+        "size_bytes": 132079,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-09-05T10:42:37.923487Z",
+        "requires_python": ">=3.10",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/anyio/4.15.1-py3-none-any.http",
+        "metadata_sha256": "bc95b023882c13a4a24ec1b020a5e711f493894febab2043247db95e3d227bb2",
+        "pointer_ref": "wheels-v6/pypi/anyio/4.15.1-py3-none-any",
+        "pointer_sha256": "8c2701fb85946ea66de641818676701a38f20769c444c6244f70c6b9a7143fd0",
+        "archive_ref": "archive-v0/v7k0k7L5of1jCwoC",
+        "recorded_wheel_sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+        "recorded_url": "https://files.pythonhosted.org/packages/12/b8/4bd346e22b28902df4d651910f5242c28d84e4a5c2435ca5c3f797ed7e2e/anyio-4.15.1-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/anyio-4.15.1.dist-info",
+        "metadata_sha256": "043aecb571af7189e8a6c528f5d8e32545f1b2cdfaaf761d51e6d5b67ea3ca81",
+        "wheel_metadata_sha256": "61532836a2b3111b7ec23519c09df7c41180c27165fb872a6d8913b566b88ad1",
+        "record_sha256": "61566393fe741ef449f387182a94956cc11dda629cdea4a5823b89f6eb9dc6b3",
+        "record_hashed_file_count": 54,
+        "record_hashed_file_bytes": 534969,
+        "actual_hashed_files_manifest_sha256": "a0884167eb00bbf62e7c32ad3664b43f3063bb47e00fb11a18d6362fbf1bc3a0",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/anyio-4.15.1.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "certifi",
+      "version": "2026.10.19",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/certifi/2026.10.19/json",
+        "metadata_sha256": "5b6ba21c20c09f5e4ca52bf8251de25fafbdb56909c60e3ba44d4f2b6ef5d319",
+        "filename": "certifi-2026.10.19-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl",
+        "sha256": "42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b",
+        "size_bytes": 136464,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-10-20T02:24:15.072385Z",
+        "requires_python": ">=3.7",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/certifi/2026.10.19-py3-none-any.http",
+        "metadata_sha256": "cdf69fbf205d3c156fa33a6200701cc223d2b88ffb82b65174e1dc3b469fd71e",
+        "pointer_ref": "wheels-v6/pypi/certifi/2026.10.19-py3-none-any",
+        "pointer_sha256": "c59cf827794d6952ac09d1fd35bc4562c56bf836bf4fc70e46de032f8b0f00ac",
+        "archive_ref": "archive-v0/ttyMo16vrgcuGdz-",
+        "recorded_wheel_sha256": "42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b",
+        "recorded_url": "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/certifi-2026.10.19.dist-info",
+        "metadata_sha256": "a5c0be3a42daeef0edfaf58e6ea5b7550f3e4e8eb35420f72e902df9bcf00f5c",
+        "wheel_metadata_sha256": "6beb9d2f69b857fe989fc6feb8acd66f5d918d1c70c0ca3aa21605336e2da5a6",
+        "record_sha256": "f4c1c8f6821d02df60a121d954fe0b944d4af8c7bc79d7b45b38eba13adb3284",
+        "record_hashed_file_count": 13,
+        "record_hashed_file_bytes": 246670,
+        "actual_hashed_files_manifest_sha256": "f77403f4e4bc9de707ed6a8cd0c432f730d97f8ce5678a62bf39d03fae9536fd",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/certifi-2026.10.19.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/h11/0.16.0/json",
+        "metadata_sha256": "97f4efb9cc00826f0408076983adc1a1e48e8f2cabf403aaf250f724e081440d",
+        "filename": "h11-0.16.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl",
+        "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+        "size_bytes": 37515,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2025-04-24T03:35:24.344199Z",
+        "requires_python": ">=3.8",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/h11/0.16.0-py3-none-any.http",
+        "metadata_sha256": "eec60300cd369dc20eccd86d3b32eb245764b1274c56e0374b98f1b0e3fca792",
+        "pointer_ref": "wheels-v6/pypi/h11/0.16.0-py3-none-any",
+        "pointer_sha256": "a01edddb6dab12417e6e17b003a63d2a939f9fa17974a623386f5b12410264e5",
+        "archive_ref": "archive-v0/omkBF0sYKjQiYsm-",
+        "recorded_wheel_sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+        "recorded_url": "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/h11-0.16.0.dist-info",
+        "metadata_sha256": "28f326098ac09fcba79b8f180f96087c841fe2456215cb7b872a9c7d5cd19d64",
+        "wheel_metadata_sha256": "0a6c85234931e5c7443132e238d4116c64308c8a11d5a21807b782010e0a3c9d",
+        "record_sha256": "3779e13c17d8e21c769ed9ee8780af123cc3f8656185f5f8d3af258ff5639b3e",
+        "record_hashed_file_count": 18,
+        "record_hashed_file_bytes": 102693,
+        "actual_hashed_files_manifest_sha256": "eb55859e3e9db5a95d314d5a635f085b302c856588b9f87e1c0d4df8e06285d4",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/h11-0.16.0.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/httpcore/1.0.9/json",
+        "metadata_sha256": "e26eca5c3d288fe9e6446af9bcbca1038ba688629d5c8a2886c47d74718d87a2",
+        "filename": "httpcore-1.0.9-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl",
+        "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+        "size_bytes": 78784,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2025-04-24T22:06:20.566605Z",
+        "requires_python": ">=3.8",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/httpcore/1.0.9-py3-none-any.http",
+        "metadata_sha256": "affeaf541a11a400417865cc8e1cbe18cc403d623f1c5590a13823e27e0c0c41",
+        "pointer_ref": "wheels-v6/pypi/httpcore/1.0.9-py3-none-any",
+        "pointer_sha256": "d6bb9f91160e4d6314fa5438bdf098c64f374702d999768f3f34bd1f2ba530f9",
+        "archive_ref": "archive-v0/ZUTqdO0MW_jGvr5b",
+        "recorded_wheel_sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+        "recorded_url": "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/httpcore-1.0.9.dist-info",
+        "metadata_sha256": "fe2d4fda6199128978779e0cf27f3c045c531863fcdd987eacc74f3a18d41c21",
+        "wheel_metadata_sha256": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724",
+        "record_sha256": "67cb4644d84fef1df8c5a0862c57c3380eff058a153bac7a4ba2722779982554",
+        "record_hashed_file_count": 37,
+        "record_hashed_file_bytes": 285071,
+        "actual_hashed_files_manifest_sha256": "8691412a89c2ff8705d5199aeb28dc9c4216ffde5409355a97f6f38984b001a8",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/httpcore-1.0.9.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "direct_requirement": true,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/httpx/0.28.1/json",
+        "metadata_sha256": "293bfab7bf587fcd0825f1bd8eed8e6303285ba14801b15659853827cbe30796",
+        "filename": "httpx-0.28.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl",
+        "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+        "size_bytes": 73517,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2024-12-06T15:37:21.509172Z",
+        "requires_python": ">=3.8",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/httpx/0.28.1-py3-none-any.http",
+        "metadata_sha256": "1cbad4342223b56f54680ff613d7c03852add9a7f1dfc759f37f5ece708f81f1",
+        "pointer_ref": "wheels-v6/pypi/httpx/0.28.1-py3-none-any",
+        "pointer_sha256": "18542e1d9d64fbf5da1983e0c318e8a7a53295c7aac7a61b34ee8f096956daf5",
+        "archive_ref": "archive-v0/TYFOFMJM2CbGgRdr",
+        "recorded_wheel_sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+        "recorded_url": "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/httpx-0.28.1.dist-info",
+        "metadata_sha256": "febb9b0f8f3e80d57c8199c304f35c4336e8581d1d18d7983c92766b82793b25",
+        "wheel_metadata_sha256": "0b615483066088b6f39d1fa4d1bff9937022ff568048e5c3b2cde5cc252c52e8",
+        "record_sha256": "388aea22cdacf6307f7fff759eaa5c9ae47a41b6807a85dc0eafdd16a89f6760",
+        "record_hashed_file_count": 31,
+        "record_hashed_file_bytes": 339162,
+        "actual_hashed_files_manifest_sha256": "cb04276b54ad033a1229ef9df08b82172e2daea49b9a3797fbccd3bfd84d1de1",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/httpx-0.28.1.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/idna/3.20/json",
+        "metadata_sha256": "e7cbd26e23ce60f6cb3a151d2adf3b1b087bb8f10ac2d9d6db70fdccbf3bb041",
+        "filename": "idna-3.20-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+        "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+        "size_bytes": 69583,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-09-17T14:11:03.168153Z",
+        "requires_python": ">=3.9",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/idna/3.20-py3-none-any.http",
+        "metadata_sha256": "f98c430a82c2c6b744911cfe581b889e5b38602f843f99c1a5051a1221d85fd3",
+        "pointer_ref": "wheels-v6/pypi/idna/3.20-py3-none-any",
+        "pointer_sha256": "ac3c02585c5b7422bf8406b213719dc93fbc2ccad4459b30210e8fd25a029ef9",
+        "archive_ref": "archive-v0/O3UC59iOYzpdcnSt",
+        "recorded_wheel_sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+        "recorded_url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/idna-3.20.dist-info",
+        "metadata_sha256": "dbd8c14c1e4ca1e0c9824a6dbc7cbbf78884f38eb52d91148cd3025f671e4b85",
+        "wheel_metadata_sha256": "96a37c8d7b7f425a05386731f644adbd66ebca17c45e8236176cfe614466df9d",
+        "record_sha256": "a93169ee66161a3548601b8dcd602f441e83fe4c33ef67ab89dc9933717babac",
+        "record_hashed_file_count": 18,
+        "record_hashed_file_bytes": 386988,
+        "actual_hashed_files_manifest_sha256": "c4d4eb61083b48584218fd0c66aca10f95b915b1ae6eb188f67a847217e3aae5",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/idna-3.20.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "pillow",
+      "version": "12.2.0",
+      "direct_requirement": true,
+      "installer": "uv",
+      "wheel_tags": [
+        "cp312-cp312-win_amd64"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/pillow/12.2.0/json",
+        "metadata_sha256": "c92adeefcdf3e9543b9d3336060b3600ea8d3a1b434af20b493e1d753c1c5940",
+        "filename": "pillow-12.2.0-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/5d/7b/25a221d2c761c6a8ae21bfa3874988ff2583e19cf8a27bf2fee358df7942/pillow-12.2.0-cp312-cp312-win_amd64.whl",
+        "sha256": "7f84204dee22a783350679a0333981df803dac21a0190d706a50475e361c93f5",
+        "size_bytes": 7084129,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-04-01T14:43:37.213058Z",
+        "requires_python": ">=3.10",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/pillow/12.2.0-cp312-cp312-win_amd64.http",
+        "metadata_sha256": "7125cd386a130565c42f0924e0013f935d71228108e94a21029cd5f8cca51f12",
+        "pointer_ref": "wheels-v6/pypi/pillow/12.2.0-cp312-cp312-win_amd64",
+        "pointer_sha256": "31ac065999422bf09a61a1c1f4e0a7067aa543a53b27296df2ee7e6e38ba12ea",
+        "archive_ref": "archive-v0/a_EjSCyjzmCbHadP",
+        "recorded_wheel_sha256": "7f84204dee22a783350679a0333981df803dac21a0190d706a50475e361c93f5",
+        "recorded_url": "https://files.pythonhosted.org/packages/5d/7b/25a221d2c761c6a8ae21bfa3874988ff2583e19cf8a27bf2fee358df7942/pillow-12.2.0-cp312-cp312-win_amd64.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/pillow-12.2.0.dist-info",
+        "metadata_sha256": "500a4dcf2154f5291661ea4a9025898081d536c3026d506c648c31b68a7a66cc",
+        "wheel_metadata_sha256": "ad1e507ec59c665de6adae409920fb15dd1dcd0c59de51c2a43a3bd0891f0cae",
+        "record_sha256": "e224c54ad497100cfc56fc879d18bdfd38875cd45c42d7b9df6303d42493d334",
+        "record_hashed_file_count": 121,
+        "record_hashed_file_bytes": 14668678,
+        "actual_hashed_files_manifest_sha256": "ab55af06af85e6ef930b7ac754d6ee8106aa4c05bef9a23b8dcb0926a679e649",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/pillow-12.2.0.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "direct_requirement": false,
+      "installer": "uv",
+      "wheel_tags": [
+        "py3-none-any"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/typing-extensions/4.16.0/json",
+        "metadata_sha256": "2140da00d62dde967f52d0be0ae28444f1d6a3fe603f52c83c23988c32122d5a",
+        "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+        "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "size_bytes": 45571,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-07-02T08:40:04.659120Z",
+        "requires_python": ">=3.9",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/typing-extensions/4.16.0-py3-none-any.http",
+        "metadata_sha256": "e8948ada5f5c9a7cf52454eb2a31327326dc9c7127563eb30f5555ae7323eb7b",
+        "pointer_ref": "wheels-v6/pypi/typing-extensions/4.16.0-py3-none-any",
+        "pointer_sha256": "4249feab7f42195e88043e1037de0b34f9491de7f9c8ff7d68e80bef54f841d4",
+        "archive_ref": "archive-v0/fYO2bEDRMO0OdCNy",
+        "recorded_wheel_sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "recorded_url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/typing_extensions-4.16.0.dist-info",
+        "metadata_sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46",
+        "wheel_metadata_sha256": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "record_sha256": "9e07fea845cac76293d927afa7157a14ecba39b318bc8af236b8de530b7656c1",
+        "record_hashed_file_count": 6,
+        "record_hashed_file_bytes": 182342,
+        "actual_hashed_files_manifest_sha256": "2fbc9386de025210a6b674d0f8b6c85e33fc4e01e8ac3d7b5c10bbafa1e89d0b",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/typing_extensions-4.16.0.dist-info/RECORD"
+        ]
+      }
+    },
+    {
+      "name": "websockets",
+      "version": "16.0",
+      "direct_requirement": true,
+      "installer": "uv",
+      "wheel_tags": [
+        "cp312-cp312-win_amd64"
+      ],
+      "official_source": {
+        "metadata_url": "https://pypi.org/pypi/websockets/16.0/json",
+        "metadata_sha256": "c0b53c38aa78f046d3ecf39fa26e974deee97cef748128354f08677dfe335156",
+        "filename": "websockets-16.0-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/c3/f0/f3a17365441ed1c27f850a80b2bc680a0fa9505d733fe152fdf5e98c1c0b/websockets-16.0-cp312-cp312-win_amd64.whl",
+        "sha256": "5569417dc80977fc8c2d43a86f78e0a5a22fee17565d78621b6bb264a115d4ea",
+        "size_bytes": 178693,
+        "packagetype": "bdist_wheel",
+        "upload_time_utc": "2026-01-10T09:22:57.478705Z",
+        "requires_python": ">=3.10",
+        "yanked": false
+      },
+      "uv_cache_evidence": {
+        "metadata_ref": "wheels-v6/pypi/websockets/16.0-cp312-cp312-win_amd64.http",
+        "metadata_sha256": "0a71f3fa218dcca98c8165477a4144f7c4e1f8c5deaafb28b8cdcaa49247e733",
+        "pointer_ref": "wheels-v6/pypi/websockets/16.0-cp312-cp312-win_amd64",
+        "pointer_sha256": "42a84451c90c8553d8bf66f12c94c9ac3a2b56c55c661ecb5f1711dbfaf71702",
+        "archive_ref": "archive-v0/iTbXofFKjTcXLvR9",
+        "recorded_wheel_sha256": "5569417dc80977fc8c2d43a86f78e0a5a22fee17565d78621b6bb264a115d4ea",
+        "recorded_url": "https://files.pythonhosted.org/packages/c3/f0/f3a17365441ed1c27f850a80b2bc680a0fa9505d733fe152fdf5e98c1c0b/websockets-16.0-cp312-cp312-win_amd64.whl",
+        "official_url_and_sha256_match": true,
+        "cached_dist_metadata_matches_installed": {
+          "METADATA": true,
+          "WHEEL": true
+        },
+        "original_archive_bytes_available": false,
+        "archive_wheel_hash_independently_recomputed": false
+      },
+      "installed_distribution": {
+        "relative_dist_info": ".runtime/validation/v1-env/Lib/site-packages/websockets-16.0.dist-info",
+        "metadata_sha256": "918b2fe38207665a087398b54267e77c9d643ce7706410016c9ef6a88b6e3030",
+        "wheel_metadata_sha256": "f143fdc7da6e588d0fd55fddecada831306a7de2cd9b6d424f367f3edaf43575",
+        "record_sha256": "51d9fd610cda5c36ec8807957538a30f1e3cf6e757a46be436a08b54ab695950",
+        "record_hashed_file_count": 60,
+        "record_hashed_file_bytes": 702078,
+        "actual_hashed_files_manifest_sha256": "cc16897a174c30f4a76ffd84b01aee9bd6886ccc0134557038901269f43fc0af",
+        "record_integrity_passed": true,
+        "record_failures": [],
+        "unhashed_record_paths": [
+          "Lib/site-packages/websockets-16.0.dist-info/RECORD"
+        ]
+      }
+    }
+  ]
+}
