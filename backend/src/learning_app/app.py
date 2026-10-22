@@ -13,6 +13,7 @@ from learning_app import __version__
 from learning_app.accounts import install_account_routes
 from learning_app.config import AppConfig, load_config
 from learning_app.course_files import install_course_file_routes
+from learning_app.documents import document_content, install_document_routes
 from learning_app.drafts import install_draft_routes
 from learning_app.dto import (
     AttachmentInput,
@@ -213,6 +214,8 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
     @app.get("/api/v1/attachments/{attachment_id}")
     async def read_attachment(attachment_id: str):
         attachment = app.state.repository.resolve_attachment(attachment_id)
+        if not attachment["media_type"].startswith("image/"):
+            return document_content(app.state.repository, attachment_id)
         return FileResponse(attachment["path"], media_type=attachment["media_type"])
 
     @app.post("/api/v1/submissions", response_model=SubmissionResponse)
@@ -266,6 +269,7 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
     install_course_file_routes(app)
     install_media_routes(app)
     install_draft_routes(app)
+    install_document_routes(app)
     install_runtime_routes(app)
 
     if config.mode == "start":

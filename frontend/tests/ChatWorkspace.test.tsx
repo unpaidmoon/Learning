@@ -1,5 +1,6 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Schema } from "../src/api/client";
 import type { CaptureResult, CaptureSource } from "../src/media/capture";
@@ -124,6 +125,19 @@ function fixture(
         sha256: "fixture-crop-hash",
         confirmed: true,
       });
+    if (url.endsWith("/metadata"))
+      return answer({
+        attachment_id: url.split("/").at(-2),
+        media_type: "image/png",
+        size_bytes: 4,
+        sha256: "fixture-crop-hash",
+        confirmed: true,
+        kind: "image",
+        filename: "图片.png",
+        page_count: null,
+        character_count: null,
+        download_url: url.replace(/\/metadata$/, ""),
+      });
     if (url.endsWith("/source"))
       return options?.method === "POST"
         ? answer(JSON.parse(options.body as string))
@@ -166,6 +180,378 @@ async function ready() {
 }
 
 describe("学习聊天与正式执行边界", () => {
+  it("新空对话初始草稿读取挂起时可立即离开，既不等待读取也不写入空草稿", async () => {
+    let release: (response: Response) => void = () => {};
+    const request = fixture(emptyChat, (url, options) =>
+      url.endsWith("/draft") && options?.method !== "POST"
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : undefined,
+    );
+    const ref = createRef<import("../src/chat/ChatWorkspace").ChatWorkspaceHandle>();
+    render(<ChatWorkspace ref={ref} chatId="chat-one" connected canSubmit />);
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url.endsWith("/chat-one/draft"))).toBe(true),
+    );
+    expect(screen.getByLabelText("问题或追问")).toBeDisabled();
+    try {
+      await expect(ref.current!.saveDraft()).resolves.toBeUndefined();
+      expect(
+        request.mock.calls.filter(
+          ([url, options]) => url.endsWith("/draft") && options?.method === "POST",
+        ),
+      ).toHaveLength(0);
+    } finally {
+      await act(async () => release(new Response(JSON.stringify(blankDraft), { status: 200 })));
+    }
+  });
+
+  it("初始草稿读取挂起但存在本地未保存输入时仍阻止离开，保留内容且不覆盖服务器", async () => {
+    localStorage.setItem(
+      "learning.draft.chat-one",
+      JSON.stringify({
+        revision: 4,
+        dirty: true,
+        value: { ...blankDraft, text: "尚未核对版本的本地输入" },
+      }),
+    );
+    let release: (response: Response) => void = () => {};
+    const request = fixture(emptyChat, (url, options) =>
+      url.endsWith("/draft") && options?.method !== "POST"
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : undefined,
+    );
+    const ref = createRef<import("../src/chat/ChatWorkspace").ChatWorkspaceHandle>();
+    render(<ChatWorkspace ref={ref} chatId="chat-one" connected canSubmit />);
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url.endsWith("/chat-one/draft"))).toBe(true),
+    );
+    try {
+      await expect(ref.current!.saveDraft()).rejects.toThrow("草稿版本未核对");
+      expect(screen.getByLabelText("问题或追问")).toHaveValue("尚未核对版本的本地输入");
+      expect(
+        request.mock.calls.filter(
+          ([url, options]) => url.endsWith("/draft") && options?.method === "POST",
+        ),
+      ).toHaveLength(0);
+    } finally {
+      await act(async () =>
+        release(new Response(JSON.stringify({ ...blankDraft, revision: 5 }), { status: 200 })),
+      );
+    }
+  });
+
+  it("版本冲突的未就绪草稿仍阻止离开，不把本地输入当空稿跳过", async () => {
+    localStorage.setItem(
+      "learning.draft.chat-one",
+      JSON.stringify({
+        revision: 4,
+        dirty: true,
+        value: { ...blankDraft, text: "需要保留的冲突输入" },
+      }),
+    );
+    savedDraft = { ...blankDraft, revision: 5, text: "服务器的新草稿" };
+    const request = fixture(emptyChat);
+    const ref = createRef<import("../src/chat/ChatWorkspace").ChatWorkspaceHandle>();
+    render(<ChatWorkspace ref={ref} chatId="chat-one" connected canSubmit />);
+    await screen.findByText(/草稿有较新的保存版本/);
+    await expect(ref.current!.saveDraft()).rejects.toThrow("草稿版本未核对");
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("需要保留的冲突输入");
+    expect(savedDraft.text).toBe("服务器的新草稿");
+    expect(
+      request.mock.calls.filter(
+        ([url, options]) => url.endsWith("/draft") && options?.method === "POST",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("未就绪空草稿仍保护排队中的确认截图，不借空稿导航分支丢弃附件", async () => {
+    let release: (response: Response) => void = () => {};
+    const request = fixture(emptyChat, (url, options) =>
+      url.endsWith("/draft") && options?.method !== "POST"
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : undefined,
+    );
+    const ref = createRef<import("../src/chat/ChatWorkspace").ChatWorkspaceHandle>();
+    render(
+      <ChatWorkspace
+        ref={ref}
+        chatId="chat-one"
+        connected
+        canSubmit
+        incomingConfirmedCapture={{
+          source: {
+            sourceId: "queued-capture-before-draft-load",
+            dataUrl: "data:image/png;base64,T1JJR0lOQUw=",
+            width: 100,
+            height: 80,
+            origin: "workspace",
+          },
+          crop: { x: 10, y: 5, width: 20, height: 15 },
+          dataUrl: "data:image/png;base64,Q1JPUA==",
+          width: 20,
+          height: 15,
+        }}
+      />,
+    );
+    await waitFor(() =>
+      expect(request.mock.calls.some(([url]) => url.endsWith("/chat-one/draft"))).toBe(true),
+    );
+    try {
+      await expect(ref.current!.saveDraft()).rejects.toThrow("截图尚未加入草稿");
+      expect(
+        request.mock.calls.some(
+          ([url, options]) => options?.method === "POST" && url.endsWith("/attachments"),
+        ),
+      ).toBe(false);
+    } finally {
+      cleanup();
+      await act(async () => release(new Response(JSON.stringify(blankDraft), { status: 200 })));
+    }
+  });
+
+  it("空对话直接显示纯加号附件和输入框，自动保存而不显示欢迎页或底部说明", async () => {
+    fixture(emptyChat);
+    const { container } = render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    expect(screen.getByLabelText("添加附件")).toHaveAttribute("type", "file");
+    expect(screen.queryByText("＋ 选择图片")).not.toBeInTheDocument();
+    expect(screen.queryByText("从当前不懂的地方问起")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存草稿" })).not.toBeInTheDocument();
+    expect(container.querySelector(".draft-save-status")).not.toBeInTheDocument();
+    expect(container.querySelector(".composer-hint")).not.toBeInTheDocument();
+    expect(container.querySelector(".composer-area")?.lastElementChild).toHaveClass("composer");
+    await userEvent.type(screen.getByLabelText("问题或追问"), "自动保存的补充问题");
+    await waitFor(() => expect(savedDraft.text).toBe("自动保存的补充问题"));
+    expect(screen.queryByText("草稿已保存")).not.toBeInTheDocument();
+  });
+
+  it("PDF整份加入草稿卡片，保留原始文件字节且只在发送时提交附件身份", async () => {
+    const metadata = {
+      attachment_id: "document-pdf",
+      filename: "分块矩阵.pdf",
+      media_type: "application/pdf",
+      size_bytes: 16,
+      sha256: "synthetic-pdf-hash",
+      confirmed: true,
+      kind: "pdf",
+      page_count: 3,
+      character_count: null,
+      download_url: "/api/v1/document-attachments/document-pdf/content",
+    };
+    const request = fixture(emptyChat, (url) =>
+      url.endsWith("/document-attachments") ? answer(metadata) : undefined,
+    );
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    const pdf = new File(["%PDF-synthetic-all-pages"], metadata.filename, {
+      type: "application/pdf",
+    });
+    await userEvent.upload(screen.getByLabelText("添加附件"), pdf);
+    await screen.findByText("分块矩阵.pdf");
+    expect(screen.getByText("整份 PDF · 3 页")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "截图编辑" })).not.toBeInTheDocument();
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+    const upload = JSON.parse(
+      request.mock.calls.find(([url]) => url.endsWith("/document-attachments"))![1]!.body as string,
+    );
+    expect(atob(upload.data_base64)).toBe("%PDF-synthetic-all-pages");
+    expect(upload.chat_id).toBe("chat-one");
+    expect(upload.confirmed).toBe(true);
+    await waitFor(() => expect(savedDraft.attachment_ids).toEqual(["document-pdf"]));
+    expect(screen.getByLabelText("问题或追问")).toHaveFocus();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "解释这份PDF");
+    await userEvent.click(screen.getByRole("button", { name: "发送" }));
+    await waitFor(() =>
+      expect(request.mock.calls.filter(([url]) => url === "/api/v1/submissions")).toHaveLength(1),
+    );
+    const submission = JSON.parse(
+      request.mock.calls.find(([url]) => url === "/api/v1/submissions")![1]!.body as string,
+    );
+    expect(submission.attachment_ids).toEqual(["document-pdf"]);
+  });
+
+  it("文档上传失败保留文件并禁发，显式重试沿用同一上传身份", async () => {
+    let attempts = 0;
+    const request = fixture(emptyChat, (url) => {
+      if (!url.endsWith("/document-attachments")) return undefined;
+      attempts += 1;
+      return attempts === 1
+        ? answer({ code: "DOCUMENT_UPLOAD_UNKNOWN", message: "本次附件回执未知" }, 503)
+        : answer({
+            attachment_id: "retried-document",
+            filename: "条件.md",
+            media_type: "text/markdown",
+            size_bytes: 12,
+            sha256: "synthetic-md-hash",
+            confirmed: true,
+            kind: "markdown",
+            page_count: null,
+            character_count: 8,
+            download_url: "/api/v1/document-attachments/retried-document/content",
+          });
+    });
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "保留问题");
+    await userEvent.upload(
+      screen.getByLabelText("添加附件"),
+      new File(["# 已确认条件"], "条件.md", { type: "text/markdown" }),
+    );
+    await screen.findByText(/本次附件回执未知/);
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    fireEvent.keyDown(screen.getByLabelText("问题或追问"), { key: "Enter", ctrlKey: true });
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+    await userEvent.click(screen.getByRole("button", { name: "重试附件" }));
+    await screen.findByText("Markdown");
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("保留问题");
+    const uploads = request.mock.calls
+      .filter(([url]) => url.endsWith("/document-attachments"))
+      .map(([, options]) => JSON.parse(options!.body as string));
+    expect(uploads).toHaveLength(2);
+    expect(uploads[0].upload_id).toBe(uploads[1].upload_id);
+    expect(uploads[0].data_base64).toBe(uploads[1].data_base64);
+    await waitFor(() => expect(savedDraft.attachment_ids).toEqual(["retried-document"]));
+  });
+
+  it("文档超限明确保留失败状态而不截断上传，取消后可发送原问题", async () => {
+    const request = fixture(emptyChat);
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    await userEvent.type(screen.getByLabelText("问题或追问"), "保留文字问题");
+    const oversized = new File(["完整原文"], "超限.txt", { type: "text/plain" });
+    Object.defineProperty(oversized, "size", { value: 1024 * 1024 + 1 });
+    await userEvent.upload(screen.getByLabelText("添加附件"), oversized);
+    await screen.findByText(/DOCUMENT_SIZE_LIMIT/);
+    expect(request.mock.calls.some(([url]) => url.endsWith("/document-attachments"))).toBe(false);
+    expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
+    await userEvent.click(screen.getByRole("button", { name: "取消附件" }));
+    expect(screen.getByRole("button", { name: "发送" })).toBeEnabled();
+    expect(screen.getByLabelText("问题或追问")).toHaveValue("保留文字问题");
+  });
+
+  it("文档上传未完成时阻止切课保存检查，完成后保存原聊天的附件", async () => {
+    let release: (value: Response) => void = () => {};
+    fixture(emptyChat, (url) =>
+      url.endsWith("/document-attachments")
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : undefined,
+    );
+    const ref = createRef<import("../src/chat/ChatWorkspace").ChatWorkspaceHandle>();
+    render(<ChatWorkspace ref={ref} chatId="chat-one" connected canSubmit />);
+    await ready();
+    await userEvent.upload(
+      screen.getByLabelText("添加附件"),
+      new File(["先保留全部内容"], "条件.txt", { type: "text/plain" }),
+    );
+    await screen.findByText("正在加入附件…");
+    await expect(ref.current!.saveDraft()).rejects.toThrow("附件仍在读取或加入草稿");
+    expect(screen.getByRole("button", { name: "处理中…" })).toBeDisabled();
+    release(
+      new Response(
+        JSON.stringify({
+          attachment_id: "awaited-document",
+          filename: "条件.txt",
+          media_type: "text/plain",
+          size_bytes: 24,
+          sha256: "synthetic-txt-hash",
+          confirmed: true,
+          kind: "text",
+          page_count: null,
+          character_count: 8,
+          download_url: "/api/v1/document-attachments/awaited-document/content",
+        }),
+        { status: 200 },
+      ),
+    );
+    await screen.findByText("文本文件");
+    await ref.current!.saveDraft();
+    expect(savedDraft.attachment_ids).toEqual(["awaited-document"]);
+  });
+
+  it("重开带PDF附件的历史消息时按元数据显示文件，不当作图片或重新解析上传", async () => {
+    const request = fixture(
+      {
+        ...emptyChat,
+        messages: [
+          {
+            message_id: "user-document",
+            role: "user",
+            text: "已提交整份资料",
+            reasoning: "",
+            status: "completed",
+            attachment_ids: ["saved-document"],
+          },
+        ],
+      },
+      (url) =>
+        url.endsWith("/saved-document/metadata")
+          ? answer({
+              attachment_id: "saved-document",
+              filename: "已保存.pdf",
+              media_type: "application/pdf",
+              size_bytes: 24,
+              sha256: "synthetic-history-hash",
+              confirmed: true,
+              kind: "pdf",
+              page_count: 7,
+              character_count: null,
+              download_url: "/api/v1/document-attachments/saved-document/content",
+            })
+          : undefined,
+    );
+    const { container } = render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    expect(await screen.findByText("整份 PDF · 7 页")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "已保存.pdf" })).toHaveAttribute(
+      "href",
+      "/api/v1/document-attachments/saved-document/content",
+    );
+    expect(container.querySelector('img[src*="saved-document"]')).not.toBeInTheDocument();
+    expect(request.mock.calls.some(([url]) => url.endsWith("/document-attachments"))).toBe(false);
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+  });
+
+  it("附件元数据读取失败仅显式重读原身份，不重新上传或派发模型", async () => {
+    savedDraft = { ...blankDraft, attachment_ids: ["metadata-retry-document"] };
+    let reads = 0;
+    const request = fixture(emptyChat, (url) => {
+      if (!url.endsWith("/metadata-retry-document/metadata")) return undefined;
+      reads += 1;
+      return reads === 1
+        ? answer({ code: "METADATA_TEMPORARILY_UNAVAILABLE", message: "附件信息暂不可用" }, 503)
+        : answer({
+            attachment_id: "metadata-retry-document",
+            filename: "恢复后的.txt",
+            media_type: "text/plain",
+            size_bytes: 24,
+            sha256: "synthetic-metadata-retry",
+            confirmed: true,
+            kind: "text",
+            page_count: null,
+            character_count: 8,
+            download_url: "/api/v1/document-attachments/metadata-retry-document/content",
+          });
+    });
+    render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
+    await ready();
+    await screen.findByText(/附件信息暂不可用/);
+    expect(reads).toBe(1);
+    await userEvent.click(screen.getByRole("button", { name: "重新读取附件 1" }));
+    expect(await screen.findByText("恢复后的.txt")).toBeInTheDocument();
+    expect(reads).toBe(2);
+    expect(request.mock.calls.some(([url]) => url.endsWith("/document-attachments"))).toBe(false);
+    expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
+    expect(savedDraft.attachment_ids).toEqual(["metadata-retry-document"]);
+  });
+
   it("用户消息保持用户输入；正文活动停止保留部分回答后可以追问", async () => {
     const request = fixture({
       ...chat,
@@ -206,11 +592,11 @@ describe("学习聊天与正式执行边界", () => {
     await ready();
     await userEvent.type(screen.getByLabelText("问题或追问"), "原草稿文字");
     const image = new File(["fixture"], "synthetic.png", { type: "image/png" });
-    await userEvent.upload(screen.getByLabelText("选择待确认的图片"), image);
+    await userEvent.upload(screen.getByLabelText("添加附件"), image);
     await userEvent.click(await screen.findByRole("button", { name: "取消编辑" }));
     expect(screen.getByLabelText("问题或追问")).toHaveValue("原草稿文字");
     expect(request.mock.calls.some(([url]) => url.endsWith("/attachments"))).toBe(false);
-    await userEvent.upload(screen.getByLabelText("选择待确认的图片"), image);
+    await userEvent.upload(screen.getByLabelText("添加附件"), image);
     await userEvent.click(await screen.findByRole("button", { name: "确认选区加入草稿" }));
     expect(await screen.findByAltText("待发送的确认图片 1")).toBeInTheDocument();
     const upload = request.mock.calls.find(([url]) => url.endsWith("/attachments"));
@@ -311,7 +697,6 @@ describe("学习聊天与正式执行边界", () => {
     const first = render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
     await ready();
     await userEvent.type(screen.getByLabelText("问题或追问"), "追加");
-    await userEvent.click(screen.getByRole("button", { name: "保存草稿" }));
     await waitFor(() => expect(savedDraft.text).toBe("初始文字追加"));
     first.unmount();
     vi.resetModules();
@@ -541,7 +926,7 @@ describe("学习聊天与正式执行边界", () => {
     await ready();
     expect(screen.getByLabelText("引用 1")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "发送" })).toBeDisabled();
-    expect(screen.getByText("已加入引用，请补充问题后发送。")).toBeInTheDocument();
+    expect(screen.queryByText("已加入引用，请补充问题后发送。")).not.toBeInTheDocument();
     fireEvent.keyDown(screen.getByLabelText("问题或追问"), { key: "Enter", ctrlKey: true });
     expect(request.mock.calls.some(([url]) => url === "/api/v1/submissions")).toBe(false);
     await userEvent.type(screen.getByLabelText("问题或追问"), "这个符号表示什么？");
@@ -582,7 +967,6 @@ describe("学习聊天与正式执行边界", () => {
       "src",
       "/api/v1/attachments/retained-image",
     );
-    await userEvent.click(screen.getByRole("button", { name: "保存草稿" }));
     await waitFor(() => expect(savedDraft.references).toEqual([]));
   });
   it("官方目录按所选模型提供思考档位，不自动替换不可用选择", async () => {

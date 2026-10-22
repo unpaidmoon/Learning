@@ -77,7 +77,7 @@ class DraftController {
         JSON.stringify({ revision: this.revision, value: this.view.value, dirty: this.view.dirty }),
       );
     } catch {
-      this.emit({ error: "浏览器本地保护不可用，请保持页面打开并保存草稿。" });
+      this.emit({ error: "浏览器本地输入保护不可用，请保持页面打开，避免丢失未保存输入。" });
     }
   }
   async load(useServer = false) {

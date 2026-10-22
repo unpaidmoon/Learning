@@ -33,7 +33,7 @@ from . import schema as s
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0004_course_files"
+SCHEMA_REVISION = "0006_course_visibility"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -201,7 +201,7 @@ class Repository:
         return values
 
     def list_courses(self) -> list[dict[str, Any]]:
-        from learning_app.course_files_schema import course_roots
+        from learning_app.course_files_schema import course_roots, course_visibility
 
         with self.engine.connect() as conn:
             return [
@@ -209,7 +209,11 @@ class Repository:
                 for row in conn.execute(
                     select(s.courses)
                     .outerjoin(course_roots, course_roots.c.course_id == s.courses.c.course_id)
-                    .where(or_(course_roots.c.state.is_(None), course_roots.c.state != "detached"))
+                    .outerjoin(course_visibility, course_visibility.c.course_id == s.courses.c.course_id)
+                    .where(
+                        or_(course_roots.c.state.is_(None), course_roots.c.state != "detached"),
+                        or_(course_visibility.c.hidden.is_(None), course_visibility.c.hidden.is_(False)),
+                    )
                 ).mappings()
             ]
 
@@ -352,30 +356,39 @@ class Repository:
     ) -> dict[str, Any]:
         if not isinstance(data, bytes) or not data or len(data) > 20 * 1024 * 1024:
             raise StorageError("ATTACHMENT_SIZE_INVALID")
-        if media_type not in {"image/png", "image/jpeg", "image/webp"}:
-            raise StorageError("ATTACHMENT_TYPE_UNSUPPORTED")
-        valid = (
-            (media_type == "image/png" and data.startswith(b"\x89PNG\r\n\x1a\n"))
-            or (media_type == "image/jpeg" and data.startswith(b"\xff\xd8\xff"))
-            or (media_type == "image/webp" and data[:4] == b"RIFF" and data[8:12] == b"WEBP")
-        )
-        if not valid:
-            raise StorageError("ATTACHMENT_CONTENT_INVALID")
-        try:
-            with Image.open(io.BytesIO(data)) as image:
-                if image.width * image.height > 40_000_000:
-                    raise StorageError("ATTACHMENT_DIMENSIONS_INVALID")
-                if Image.MIME.get(image.format) != media_type:
-                    raise StorageError("ATTACHMENT_CONTENT_INVALID")
-                image.verify()
-        except (
-            UnidentifiedImageError,
-            OSError,
-            SyntaxError,
-            ValueError,
-            Image.DecompressionBombError,
-        ) as exc:
-            raise StorageError("ATTACHMENT_CONTENT_INVALID") from exc
+        if media_type in {"application/pdf", "text/plain", "text/markdown"}:
+            from learning_app.document_processing import validate_original_bytes
+            from learning_app.errors import AppError
+
+            try:
+                validate_original_bytes(data, media_type)
+            except AppError as exc:
+                raise StorageError(exc.code) from exc
+        else:
+            if media_type not in {"image/png", "image/jpeg", "image/webp"}:
+                raise StorageError("ATTACHMENT_TYPE_UNSUPPORTED")
+            valid = (
+                (media_type == "image/png" and data.startswith(b"\x89PNG\r\n\x1a\n"))
+                or (media_type == "image/jpeg" and data.startswith(b"\xff\xd8\xff"))
+                or (media_type == "image/webp" and data[:4] == b"RIFF" and data[8:12] == b"WEBP")
+            )
+            if not valid:
+                raise StorageError("ATTACHMENT_CONTENT_INVALID")
+            try:
+                with Image.open(io.BytesIO(data)) as image:
+                    if image.width * image.height > 40_000_000:
+                        raise StorageError("ATTACHMENT_DIMENSIONS_INVALID")
+                    if Image.MIME.get(image.format) != media_type:
+                        raise StorageError("ATTACHMENT_CONTENT_INVALID")
+                    image.verify()
+            except (
+                UnidentifiedImageError,
+                OSError,
+                SyntaxError,
+                ValueError,
+                Image.DecompressionBombError,
+            ) as exc:
+                raise StorageError("ATTACHMENT_CONTENT_INVALID") from exc
         attachment_id = _checked_id(attachment_id or _id("attachment"))
         digest = hashlib.sha256(data).hexdigest()
         final = self._object_path(digest)

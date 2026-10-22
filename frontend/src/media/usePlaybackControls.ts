@@ -33,6 +33,7 @@ export function usePlaybackControls({
   const [rate, setRate] = useState(1);
   const callbacks = useRef({ toggleFullscreen });
   const clickTimer = useRef<number | undefined>(undefined);
+  const seekCommand = useRef<(seconds: number) => void>(() => {});
 
   useEffect(() => {
     callbacks.current = { toggleFullscreen };
@@ -136,6 +137,14 @@ export function usePlaybackControls({
       window.clearTimeout(clickTimer.current);
       void callbacks.current.toggleFullscreen();
     };
+    seekCommand.current = (seconds: number) => {
+      if (!Number.isFinite(seconds)) return;
+      const end = Number.isFinite(player.duration) ? player.duration : Number.MAX_SAFE_INTEGER;
+      const target = Math.min(end, Math.max(0, seconds));
+      player.currentTime = target;
+      // Commit the thumb in this same event; delayed timeupdate must not snap it back.
+      setElapsed(target);
+    };
     window.addEventListener("keydown", keydown);
     window.addEventListener("keyup", keyup);
     window.addEventListener("blur", blur);
@@ -148,6 +157,7 @@ export function usePlaybackControls({
     player.addEventListener("volumechange", volumeChange);
     player.addEventListener("ratechange", rateChange);
     return () => {
+      seekCommand.current = () => {};
       releaseRight(false);
       window.clearTimeout(clickTimer.current);
       window.removeEventListener("keydown", keydown);
@@ -164,5 +174,7 @@ export function usePlaybackControls({
     };
   }, [active, identity, stage, video]);
 
-  return { elapsed, duration, volume, muted, rate };
+  const seekTo = (seconds: number) => seekCommand.current(seconds);
+
+  return { elapsed, duration, volume, muted, rate, seekTo };
 }

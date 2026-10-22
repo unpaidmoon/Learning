@@ -29,6 +29,155 @@ function visibleText(element: Element, value: string) {
 }
 
 describe("鼠标真实选区引用", () => {
+  it.each(["sin", "cos", "log", "ln", "lim", "max", "arctan"])(
+    "常见命名算符%s的局部引用保留原命令",
+    (name) => {
+      const source = `得到 $\\${name} x + 1$。`;
+      const view = render(<MarkdownAnswer text={source} />);
+      const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+      const math = root.querySelector(".katex-html")!;
+      const operator = math.querySelector(
+        `[data-selection-start="${source.indexOf(`\\${name}`)}"]`,
+      )!;
+      const first = document.createTreeWalker(operator, NodeFilter.SHOW_TEXT).nextNode() as Text;
+      const result = quoteFromRange(
+        root,
+        rangeBetween(first, 0, visibleText(math, "x"), 1),
+        source,
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.quote?.markdown).toBe(`$\\${name} x$`);
+    },
+  );
+
+  it("只选det中的de仍拒绝，不把未选的t补入引用", () => {
+    const source = String.raw`$\det M + 1$`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const det = visibleText(root.querySelector(".katex-html")!, "det");
+    const result = quoteFromRange(root, rangeBetween(det, 0, det, 2), source);
+    expect(result.quote).toBeUndefined();
+    expect(result.error).toContain("FORMULA_SELECTION_UNMAPPED");
+  });
+
+  it("上下分式内的重复det按原始词法位置映射，不按可见DOM次序猜测", () => {
+    const source = String.raw`$\frac{\det A}{\det B}+1$`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const start = source.lastIndexOf(String.raw`\det`);
+    const op = root.querySelector(`.katex-html [data-selection-start="${start}"]`)!;
+    const det = document.createTreeWalker(op, NodeFilter.SHOW_TEXT).nextNode() as Text;
+    const b = visibleText(root.querySelector(".katex-html")!, "B");
+    const result = quoteFromRange(root, rangeBetween(det, 0, b, 1), source);
+    expect(result.quote?.markdown).toBe(String.raw`$\det B$`);
+    expect(result.quote?.source_start).toBe(start);
+  });
+
+  it("注释中的同名命令不映射成可见算符，标准定界符及UTF16位置保持", () => {
+    const latex = "\\det M % \\det hidden\n + \\det A";
+    const source = `😀结果\\[\n${latex}\n\\]。`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const start = source.lastIndexOf(String.raw`\det`);
+    const op = root.querySelector(`.katex-html [data-selection-start="${start}"]`)!;
+    const det = visibleText(op, "det");
+    const a = visibleText(root.querySelector(".katex-html")!, "A");
+    const result = quoteFromRange(root, rangeBetween(det, 0, a, 1), source);
+    expect(result.quote?.markdown).toBe(String.raw`$\det A$`);
+    expect(result.quote?.source_start).toBe(start);
+    expect(result.quote?.source_end).toBe(start + String.raw`\det A`.length);
+  });
+
+  it("截图中的局部行列式链能从第一个det引用到第三个det而不加入B", () => {
+    const latex = String.raw`\det M = \det A \det B = 3\cdot(-1)=-3.`;
+    const source = `合成 $${latex}$ 后文`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const nodes: Text[] = [];
+    const walker = document.createTreeWalker(
+      root.querySelector(".katex-html")!,
+      NodeFilter.SHOW_TEXT,
+    );
+    let next: Node | null;
+    while ((next = walker.nextNode())) if (next.textContent === "det") nodes.push(next as Text);
+    expect(nodes).toHaveLength(3);
+    const result = quoteFromRange(root, rangeBetween(nodes[0], 0, nodes[2], 3), source);
+    expect(result.error).toBeUndefined();
+    expect(result.quote?.markdown).toBe(String.raw`$\det M = \det A \det$`);
+    expect(source.slice(result.quote!.source_start, result.quote!.source_end)).toBe(
+      String.raw`\det M = \det A \det`,
+    );
+  });
+
+  it("局部选择包含det算符时只引用所选前半等式", () => {
+    const source = String.raw`$\det M = \det A \det B = -3$`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const math = root.querySelector(".katex-html")!;
+    const result = quoteFromRange(
+      root,
+      rangeBetween(visibleText(math, "M"), 0, visibleText(math, "A"), 1),
+      source,
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.quote?.markdown).toBe(String.raw`$M = \det A$`);
+  });
+
+  it("从可见M拖到句点选择完整分块矩阵时保留矩阵结构", () => {
+    const latex = String.raw`M=\begin{pmatrix}O&A\\B&E\end{pmatrix}.`;
+    const source = `分块矩阵 $${latex}$`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const math = root.querySelector(".katex-html")!;
+    const first = visibleText(math, "M");
+    const last = visibleText(math, ".");
+    const whole = document.createRange();
+    whole.selectNodeContents(math);
+    expect(quoteFromRange(root, whole, source).quote?.markdown).toBe(`$${latex}$`);
+    const result = quoteFromRange(root, rangeBetween(first, 0, last, last.length), source);
+    expect(result.error).toBeUndefined();
+    expect(result.quote?.markdown).toBe(`$${latex}$`);
+    expect(result.quote?.source_start).toBe(source.indexOf("M="));
+    expect(result.quote?.source_end).toBe(source.lastIndexOf("$"));
+  });
+
+  it("整条分块矩阵连同公式外句号可按真实可见边界引用", () => {
+    const latex = String.raw`M=\begin{pmatrix}0&A\\B&E\end{pmatrix}`;
+    const source = `令 $${latex}$。`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const first = visibleText(root.querySelector(".katex-html")!, "M");
+    const last = visibleText(root, "。");
+    const result = quoteFromRange(root, rangeBetween(first, 0, last, last.length), source);
+    expect(result.error).toBeUndefined();
+    expect(result.quote?.markdown).toBe(`$${latex}$。`);
+  });
+
+  it("显示公式的真实可见全选定位原始矩阵源码", () => {
+    const latex = String.raw`M=\begin{pmatrix}O&A\\B&E\end{pmatrix}.`;
+    const source = `已知\n\\[\n${latex}\n\\]\n交换两行。`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const math = root.querySelector(".katex-html")!;
+    const first = visibleText(math, "M");
+    const last = visibleText(math, ".");
+    const result = quoteFromRange(root, rangeBetween(first, 0, last, 1), source);
+    expect(result.error).toBeUndefined();
+    expect(result.quote?.markdown).toBe(`$${latex}$`);
+    expect(source.slice(result.quote!.source_start, result.quote!.source_end)).toBe(latex);
+  });
+
+  it("矩阵中只选A仍只引用A，不补矩阵环境或其他单元格", () => {
+    const source = String.raw`矩阵 $M=\begin{pmatrix}O&A\\B&E\end{pmatrix}.$`;
+    const view = render(<MarkdownAnswer text={source} />);
+    const root = view.container.querySelector<HTMLElement>(".markdown-answer")!;
+    const a = visibleText(root.querySelector(".katex-html")!, "A");
+    const result = quoteFromRange(root, rangeBetween(a, 0, a, 1), source);
+    expect(result.quote?.markdown).toBe("$A$");
+    expect(result.quote?.source_start).toBe(source.indexOf("A"));
+    expect(result.quote?.source_end).toBe(source.indexOf("A") + 1);
+  });
+
   it("普通中文选区只浮出入口，点击才引用所选范围且保留UTF-16来源", () => {
     const onQuote = vi.fn();
     const view = render(<MarkdownAnswer text="第一步😀检查条件，再进行计算。" onQuote={onQuote} />);

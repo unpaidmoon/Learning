@@ -1,0 +1,310 @@
+{
+  "date": "2026-10-22",
+  "timezone": "Asia/Shanghai",
+  "status": "technical_verification_passed",
+  "user_experience_acceptance": "not_yet_accepted",
+  "base_commit": "208a7bb1b68fcafb7b196c9a6f0f313b23f915e2",
+  "scope": "Authorized second MVP-A interaction revision; formal frontend/backend. No Office/ASR, knowledge-base use, Android/sync, free multi-window or installer expansion.",
+  "checks": {
+    "root_check": {
+      "passed": true,
+      "includes": [
+        "TypeScript",
+        "ESLint",
+        "Prettier",
+        "Ruff",
+        "OpenAPI generated contract",
+        "Markdown links"
+      ]
+    },
+    "frontend_tests": {
+      "passed": 129,
+      "files": 14
+    },
+    "backend_tests": {
+      "passed": 206,
+      "skipped": 1,
+      "warnings": 3,
+      "skip": "Windows file-symlink privilege requirement"
+    },
+    "harness_guard_tests": {
+      "passed": 3
+    },
+    "build": {
+      "passed": true,
+      "javascript": "index-DglHO9MI.js",
+      "css": "index-Bn5MwfVn.css",
+      "warning": "Main JS chunk exceeds 500 kB; no code-splitting optimization in this pass"
+    },
+    "frozen_uv_sync": {
+      "passed": true,
+      "packages_audited": 33
+    },
+    "final_navigation_check": {
+      "passed": true,
+      "markdown_files": 70,
+      "errors": 0
+    }
+  },
+  "browser": {
+    "report": "browser-verification-20261022.json",
+    "run_id": "workspace-v2-browser-20261022-r1",
+    "passed": 67,
+    "total": 67,
+    "local_messages": 6,
+    "real_model_attempts": 0,
+    "source_digests_match_after": true,
+    "build_pair": {
+      "present": true,
+      "manifest_sha256": "13cea4c8dd94d9cb86bf6b5876be483430cfa5177d1f11cdf24d48fda0b33471",
+      "source_count": 39,
+      "dist_count": 62,
+      "build_newer_than_all_sources": true,
+      "mismatches": [],
+      "matched": true
+    },
+    "independent_video": {
+      "passed": 7,
+      "included_in_full_total": false,
+      "evidence": "output/playwright/workspace-v2-video-20261021-r3/result.json",
+      "current_media_hashes_match": true,
+      "blue_frame_check": "human screenshot review; green pixels and drag frame time automated"
+    },
+    "independent_matrix": {
+      "passed": 7,
+      "included_in_full_total": false,
+      "evidence": "output/playwright/matrix-selection-v2-20261021-r1/result.json"
+    }
+  },
+  "real_model": {
+    "report": "workspace-v2-account-real-20261022-r1.json",
+    "passed": true,
+    "actual_attempts": 3,
+    "route": "account",
+    "model": "deepseek-flash",
+    "thinking": "high",
+    "max_output_tokens": 16384,
+    "timeout_seconds": 300.0,
+    "same_session": true,
+    "cases": [
+      {
+        "case_id": "whole-documents",
+        "passed": true,
+        "state": "completed",
+        "attempts": 1,
+        "usage_status": "known",
+        "cancel_evidence": null
+      },
+      {
+        "case_id": "active-stop",
+        "passed": true,
+        "state": "cancelled",
+        "attempts": 1,
+        "usage_status": "unknown",
+        "cancel_evidence": {
+          "provider_active_before_cancel": true,
+          "body_characters_before_cancel": 49,
+          "host_alive_before_cancel": true
+        }
+      },
+      {
+        "case_id": "after-stop-followup",
+        "passed": true,
+        "state": "completed",
+        "attempts": 1,
+        "usage_status": "known",
+        "cancel_evidence": null
+      }
+    ],
+    "request_images": [
+      {
+        "actual": 2,
+        "unique": 2,
+        "duplicates": 0
+      },
+      {
+        "actual": 4,
+        "unique": 2,
+        "duplicates": 2
+      },
+      {
+        "actual": 6,
+        "unique": 2,
+        "duplicates": 4
+      }
+    ],
+    "only_prepared_pages_transmitted": true,
+    "all_pdf_pages_in_every_request": true,
+    "original_pdf_transmitted": false,
+    "full_text_markers_in_every_request": true,
+    "source_digests_match_after": true,
+    "cleanup": {
+      "method": "windows_job",
+      "remaining_owned_processes": 0,
+      "host_port_closed": true
+    },
+    "reasoning_tokens": "absent; unknown, not zero",
+    "new_api_key_document_real_run": "not_run"
+  },
+  "launch": {
+    "report": "新版运行入口验证-2026-10-22.json",
+    "passed": true,
+    "credential_status": "credential-stored",
+    "balance_status": "unknown",
+    "models": 2,
+    "model_requests": 0,
+    "cleanup": {
+      "status": "stopped",
+      "job": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job"
+      },
+      "backend_port_closed": true,
+      "stop_command": "backend/.venv/Scripts/python.exe scripts/app.py stop --instance-id 8c60a26e70a34022bc40ffdbea25c4cd"
+    }
+  },
+  "old_instance_cleanup": {
+    "instance_id": "a2dac0c1fc4849d793bcc37aa937bd18",
+    "status": "stopped",
+    "active_count_before_stop": 0,
+    "cleanup": {
+      "owned_pids_before": [
+        1852,
+        18412,
+        28816,
+        30772
+      ],
+      "remaining_pids": [],
+      "method": "windows_job"
+    },
+    "port8765_closed": true
+  },
+  "known_limits": [
+    "Existing Host history plus protected business snapshot repeats authorized PDF pages; no durable watermark optimization in this pass.",
+    "Native folder dialog and external CF_HDROP verified through deterministic seams; no user clipboard read.",
+    "Native Windows recycle operation tested on synthetic files, fixed local drives only; no permanent-delete fallback.",
+    "Search only current directory; internal clipboard only same course; browser directory upload merges existing directories while native whole-directory copy suffixes conflicting directory.",
+    "PDF whole-file limits20MiB/32pages/80M pixels/12MiB rendered images; UTF8 text1MiB/200k characters; reject whole overlimit file, never truncate.",
+    "No actual human learning, cross-machine/browser or full accessibility acceptance; no complete installer."
+  ],
+  "reports": {
+    "main": "MVP-A交互修订验收报告-2026-10-22.md",
+    "frontend_standard": "docs/architecture/前端开发规范.md",
+    "contract": "docs/architecture/应用契约.md",
+    "single_status_plan": "docs/plans/MVP开发计划.md"
+  },
+  "production_source_sha256": {
+    "backend/pyproject.toml": "adbe0b7cc463fc7ad4764bd1ed2b954ff20d6c4d1d3434ced72c2bca97387447",
+    "backend/src/learning_app/__init__.py": "8364b7e64e40dc6bb35eb2b082e3bab87458bf0b00cc74b56a446ff8bd94ef75",
+    "backend/src/learning_app/__main__.py": "9883f548792840eece8a19931ea5091a192eb1c92dab7b4d67178862c4128276",
+    "backend/src/learning_app/accounts.py": "c8549c7dd30f3b77ea880b00e0103c07f33c4997062e3d3d4ffa2b80e0d76994",
+    "backend/src/learning_app/app.py": "bf140ed23d11093272e0da7975f59e6cae4ad8f88b779d28aea89dae6eb4ab3a",
+    "backend/src/learning_app/config.py": "d8e617e25de7daabe50a43b5ab891362950abb68d30db7005c3176183eea4f25",
+    "backend/src/learning_app/course_files.py": "f323a23ce1ec1e82cf64f72ff20753d4c6d1c235302f70deabcfc38cb775802b",
+    "backend/src/learning_app/course_files_schema.py": "8e1d4269e54ff97e97aaf387b95947810e14a8837928d7d6d15acb72d97a050a",
+    "backend/src/learning_app/dev.py": "233d1a7e4cdf47d9e5358508443ba37af1972486b827ebf08fde3f2a703826e5",
+    "backend/src/learning_app/document_processing.py": "996378fd189c1e0d0254d6bddcb2761d9133d4d65a4cb6a2386b2730795f5b1f",
+    "backend/src/learning_app/documents.py": "b2ec2bb44edea28b193738b3bf94bf7065ba83a5b93d9e16982f5f2209e79c2f",
+    "backend/src/learning_app/drafts.py": "78bcec31c8606e9e2ed4392ac32c732e6f255742dc8897ed49225a6af4c88f62",
+    "backend/src/learning_app/dto.py": "7e20f9904c93be75f8f391ddfda9b8b35d138266064fede28439bfd73090678f",
+    "backend/src/learning_app/errors.py": "b6823f923102502d867579a72ac808746b5d6f7d2e884dcbd6c0fa1a923eec39",
+    "backend/src/learning_app/execution/__init__.py": "225e8ac92fb07b7663ec56bc06aa17236d00fd72ecd17aadf54dd7217f4ab195",
+    "backend/src/learning_app/execution/adapter.py": "7a8939a594c38446ed2f53e96adefb534f48b03672d4bacaea3ed0091f667fb5",
+    "backend/src/learning_app/execution/boundary.py": "abfee5d82cfbeaf4323f2ba0a678bf8bb78baea30c51bc7f0f376199670d11ad",
+    "backend/src/learning_app/execution/host.py": "b2bb34d51b23cc24efde58d44397655ec32bf999553e37aad09e49b2ba84f7ba",
+    "backend/src/learning_app/execution/remote.py": "21ba560e29d49375b81031bbaa9b6fd24ddd55d1cac68d7f1d3b079808dbe15c",
+    "backend/src/learning_app/execution/selection.py": "0c31c3ecbd39ccfcd3949b0c79f843e13a20e7a35a37b0c6a59bb04dc4e44154",
+    "backend/src/learning_app/execution/types.py": "36503a2e80c6b519af287a599d1b4c8fa7c0b01db8ebac11396fa6e59bde1b03",
+    "backend/src/learning_app/faults.py": "cf6c8a7e6872cd180326b0029b4ba90df87448c96774147311b5a33cecd519d2",
+    "backend/src/learning_app/health.py": "411b3304d473cbb75a0cfec5f679299a7e03ae99908a4b2536ddb250ee68b68a",
+    "backend/src/learning_app/media.py": "37f306e50553324546df71b58d343163a2b3f6ba247023804888c839c1099169",
+    "backend/src/learning_app/media_schema.py": "0e3ecab78f3636ea8fc0beef3bea37c1684e263098d73b20a65b56c88789824f",
+    "backend/src/learning_app/native_files.py": "f85cb58a1424cbaf1b6e1567ed7079a628386eb494811c1dae76139a0172066f",
+    "backend/src/learning_app/processes.py": "9b2b1702531ba5071e0027113a82ef60ed3c54cf316bbd66d9e08d5f90187dc7",
+    "backend/src/learning_app/runtime_control.py": "0028a0ad6758ae8ceb69ec0099595162155ef8e11f2214e8e0eb47f8829a1eff",
+    "backend/src/learning_app/security.py": "1d1fe7f7f14c33bf4177442251ca8d62b33bd19f1e60136f377fe7b5eefed06e",
+    "backend/src/learning_app/service.py": "eb20e6cd83bc3fb0937efc21901ff45b4585621aed48642b30a2913f5b517729",
+    "backend/src/learning_app/storage/__init__.py": "d508895f245b571936d77607f9070dc5695f68a75b0d7256f4b77ab6cc7b749a",
+    "backend/src/learning_app/storage/migrations/env.py": "d582dc77a026e8c41b6508179564dd44739b612fffd61b67b332318749eb631f",
+    "backend/src/learning_app/storage/migrations/versions/0001_business.py": "aafa6e33d5a3062c47f4976e3ce91c643b552b09fab4955e9b62b70fb8d855b4",
+    "backend/src/learning_app/storage/migrations/versions/0002_media.py": "950a73bc4a585bdbc4d17a2a15b8f1d97988c06518fe6b3686f167b766357c2c",
+    "backend/src/learning_app/storage/migrations/versions/0003_drafts.py": "397225937d3aabb849c6674eb9afffed4b351ecb69a071e6ef6d10bfba74be2a",
+    "backend/src/learning_app/storage/migrations/versions/0004_course_files.py": "218c3e829d185ac97116aa6b97f5c19eab57029877b84987769777b7b5e5c079",
+    "backend/src/learning_app/storage/migrations/versions/0005_document_attachments.py": "bc46e2b387271def5df5344eba47f86ee8e029c049fe3ffebd711462b432a44e",
+    "backend/src/learning_app/storage/migrations/versions/0006_course_visibility.py": "71f557bdd6dfa93e978df70594cb87f9b732de21b667e1b7fcf54fff5aa59841",
+    "backend/src/learning_app/storage/repository.py": "37dfccd653d229fea36856a2f9388631e406ee152e8433df3d692c046a5f2c1c",
+    "backend/src/learning_app/storage/schema.py": "0801ff08e605132de1020d9490f3ab18e585c0f29c2b8013310b087cb05286d4",
+    "backend/uv.lock": "64426bfca5d335cb823d530c57dabb56a3beaa93a07b6bd692f084003ef96c02",
+    "contracts/generated/api.ts": "acae2bb5528abba1133d58f6d6c8c85b7bb42c454ad826240a53e5975fd33132",
+    "contracts/history-example.json": "3998592ef42a58da026fbdbb212cdc967fbeb46c51040959fa415e1fea635c3a",
+    "contracts/openapi.json": "6a69a11b21f33eac1b5b26f203aa9494232ae965fab9240560fcf50686aaf33d",
+    "frontend/package.json": "ea100eaacd07e8aff38d82d2abe5af621c2aef5d992a5d93a81947677a790184",
+    "frontend/src/account/account.css": "db90e9d5968c4597e23d8ea11ed511065c711b6a33adb290dfc6955a05b99c71",
+    "frontend/src/account/AccountPanel.tsx": "f61d9747943dd6b1c6ae65606fd75935f8564b4903d7f7967b004074e8b0c9d3",
+    "frontend/src/api/client.ts": "1c3af13c44673dab83e90b48911327d8a7241e4197e1629ec507d8c5dfb2f567",
+    "frontend/src/App.tsx": "0ff2b9e766ac319ed2a8c35e02ccdb3b97e3c3830b43ae59890a4f5ba5a947b4",
+    "frontend/src/chat/AttachmentCard.tsx": "07037af32f3aaa11f3eac8024271e6ff10eba996bf7ba34061271fc60b5e7538",
+    "frontend/src/chat/attachmentMetadata.ts": "c41a83a41a387163b08a4ce1d631ba57a0523db1a5a46d592229381fdd2ba84a",
+    "frontend/src/chat/captureCache.ts": "31cf6cfe5b470eee992710a8fefaa898bf03749953af21dead1018eb8ed05155",
+    "frontend/src/chat/chat.css": "450d45e52f88ab10f0d72e1805a67189b418dfc592ab4c917838691c833564e6",
+    "frontend/src/chat/ChatWorkspace.tsx": "366d4c83f06f82406d6bfbd2ba5ec957c419281f6046d23ce6a76741617301dc",
+    "frontend/src/chat/documentFiles.ts": "993b5cca4688e7bd5d742a4d88373ef757e40be8ec996f6737efe206e9cf1303",
+    "frontend/src/chat/draft.ts": "c8374335e81582ac1e8e7a77bcee25ea940d83422f95fb9688c59877078082dd",
+    "frontend/src/chat/MarkdownAnswer.tsx": "dc78a7fe52f3e798bfbc084f63ddb4b632f2eca7536f5fb541e1dd7d8e791ea1",
+    "frontend/src/chat/selection.ts": "906defd4b4438d3d8c63e1d15d2b341e1a8d076db34de211fcb99f872a05c6fa",
+    "frontend/src/chat/state.ts": "da03efab9ff630a1bd350c040aa05610b55f43c6af2cf3e64d38e8dfb07a5a49",
+    "frontend/src/components/ui/button.tsx": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+    "frontend/src/components/ui/Icon.tsx": "1c243ccb787e13a936325e0af568eaefc2a97baddf0029289cef929b379d4a69",
+    "frontend/src/components/ui/LICENSE": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f",
+    "frontend/src/components/ui/SOURCES.md": "d8ca8a975ae5b05a56e28a0468bfec7a8bba3621df0bd047a64252d0a63cc82d",
+    "frontend/src/lib/utils.ts": "d1f1e0d62cb8d8d1e04c26e14de842d8a151f75812d81b046c65b5d1fe8e4b27",
+    "frontend/src/library/CourseExplorer.tsx": "570d57ff43a7a3a499e41b9a70669449c4adbd9c42dc9d463d7f9a594f7ac673",
+    "frontend/src/library/dropFiles.ts": "b3448b2b36d398d42ced46acf101c3ec0f3b8ad57df884c67c927a41b018c15b",
+    "frontend/src/library/FileManager.tsx": "cb7c1504be14cde7b79a8c8b54d3ab81e1ba7902bd755e4a1408ba84614aeef1",
+    "frontend/src/library/fileOperations.ts": "7fd442b623f368d996e8e76f20d10bba0c6a8f9ae00e3c31a04e87de2c7f4cb2",
+    "frontend/src/library/library.css": "00ac3893919bfb96ec08aa1312d47bb10695f7e75b9877ddef4eb28755b89e93",
+    "frontend/src/library/ResourceViewer.tsx": "a74974e5b3fecfb9497c20dfe30e4f333bc3861649d1ed58db7e33ed26a67a6d",
+    "frontend/src/main.tsx": "a6bcae9c4f04d6ff36406b2966379834342b41b08b83ba7bd0334712d6cf87f0",
+    "frontend/src/media/capture.ts": "7056631ead6edf0723fffc2d99e0b8b5150ff4900ef931bc5da7921eba31294f",
+    "frontend/src/media/CaptureEditor.css": "fa39a686badb6fbf038a832d9bdbe627bcaa0c4f335b19c30debd23e2fb57c0c",
+    "frontend/src/media/CaptureEditor.tsx": "c70c3a9bb8262862a63e097521085e415b6f8292a9d87ea7a829d500447a7028",
+    "frontend/src/media/SeekPreview.css": "af5f2af0df9955ceb96b49c501f3ca1245d7b8d51a8f00858d9df2dc40796010",
+    "frontend/src/media/SeekPreview.tsx": "0a45c8a26a85ae6cc824fca0c4137303ea7ecd233b4b9bbe9cbc0c96a9cfda0c",
+    "frontend/src/media/usePlaybackControls.ts": "4959ecc967a015b0c4bc9a422337e8bd5a12a63daa0186e29b8815d0073358b7",
+    "frontend/src/media/VideoControls.tsx": "6a54cf552c6afa372ecc1d67ad0cfdebf41729a131fa5264a45f6d8a7c25b6af",
+    "frontend/src/media/VideoWorkspace.css": "b42090ba4d77b4d96c328acf894d536b4bd8ced50a816e9fe5818c374c327a7a",
+    "frontend/src/media/VideoWorkspace.tsx": "6e36dbc081b19f6cd39e05c49f438b9e3f2734ff394d6775c650031a25377f56",
+    "frontend/src/media/WorkspaceCapture.css": "d470664f2e072d00d84bd344088950c0b1ecacff795efc4d41143d5cac5d3135",
+    "frontend/src/media/WorkspaceCapture.tsx": "3c1022adf2d6e39b1fff5f04530c4aca41872b9c7962913840c69c67b77b72f0",
+    "frontend/src/media/workspaceSnapshot.ts": "9098571b26ad79751b40b1c3e03991522b22594473506aafa1cf88899a6052a1",
+    "frontend/src/styles.css": "16f767c79d20787576664adc379b4fcbe9b7e104c9591edca487d94a653985bc",
+    "harness/plugins/learning-guard.mjs": "6a9c8831c8c48d17cb895c01f0dc140a9217f046c0a8be939b154306779416e4",
+    "harness/profiles/learning.patch.json": "c49bc39b366b989e5f3424535cccecb1b427257a4a72c796e6579922a043e3da",
+    "harness/profiles/package.json": "302d9af6a90f100fb351028728ec47f2431141ac5a1ee86fda132eeec0a2cbee",
+    "harness/runtime.lock.json": "035ec2f210401313f49257d428d75aa60a763b631af22e3d9274269d12099e61",
+    "package.json": "7a823d6beac81161c7dde3691636e606946f3fc069b9ae3648470ae9384f0788",
+    "pnpm-lock.yaml": "fb8155baa15fabedc9ebefcf687bdf9f413d3454f101a42feb7c5bf94396602e",
+    "scripts/app.py": "03b597c350f7f65f7a426e0c04d1fc40d739e3659ce078eac7c5e0fbba6b2234",
+    "scripts/Start-Learning.ps1": "6745df89bcca29de991ca549fd4dd19b4bb10061b8e95fad5ba2564c1d934ff6"
+  },
+  "cleanup_policy": "Only owned instances/Job processes stopped. User files, chats, recycle-bin contents and earlier evidence retained.",
+  "final_audit": {
+    "production_hashes_match": true,
+    "build_pair_still_matches": true,
+    "owned_validation_ports_closed": {
+      "8765": true,
+      "19170": true,
+      "19171": true,
+      "19172": true,
+      "19173": true,
+      "19174": true,
+      "19175": true
+    },
+    "public_report_json_files_scanned": 6,
+    "forbidden_credential_field_hits": 0,
+    "changed_text_files_scanned": 73,
+    "private_key_or_api_key_literal_hits": 0,
+    "note": "Narrow deterministic field/literal scan plus review; not a general secret detector. Initial helper failed decoding git UTF-8 paths with Windows GBK; explicit UTF-8 rerun completed, without product changes."
+  }
+}

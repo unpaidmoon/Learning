@@ -13,7 +13,22 @@ type IconName =
   | "capture"
   | "chevron"
   | "more"
-  | "video";
+  | "video"
+  | "back"
+  | "forward"
+  | "up"
+  | "refresh"
+  | "grid"
+  | "list"
+  | "copy"
+  | "cut"
+  | "paste"
+  | "rename"
+  | "trash"
+  | "info"
+  | "chevron-down"
+  | "file-text"
+  | "file-pdf";
 const paths: Record<IconName, string> = {
   folder: "M3 7V5a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z",
   file: "M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5Zm0 0v5h5M8 12h8M8 16h6",
@@ -30,6 +45,21 @@ const paths: Record<IconName, string> = {
   chevron: "m9 5 7 7-7 7",
   more: "M5 12h.01M12 12h.01M19 12h.01",
   video: "m10 8 6 4-6 4V8ZM4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z",
+  back: "m14 5-7 7 7 7M7 12h14",
+  forward: "m10 5 7 7-7 7M3 12h14",
+  up: "m5 10 7-7 7 7M12 3v18",
+  refresh: "M20 7V3l-3 3a8 8 0 1 0 3 8M20 3h-5",
+  grid: "M3 3h7v7H3V3Zm11 0h7v7h-7V3ZM3 14h7v7H3v-7Zm11 0h7v7h-7v-7Z",
+  list: "M8 5h13M8 12h13M8 19h13M3 5h.01M3 12h.01M3 19h.01",
+  copy: "M8 8h12v12H8V8ZM16 8V4H4v12h4",
+  cut: "M9 9 20 3M9 15l11 6M4 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z",
+  paste: "M8 5H5v16h14V5h-3M8 3h8v4H8V3Z",
+  rename: "m4 16 11-11 4 4L8 20H4v-4ZM13 7l4 4M14 21h7",
+  trash: "M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7",
+  info: "M12 11v6M12 7h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
+  "chevron-down": "m5 9 7 7 7-7",
+  "file-text": "M14 3H5v18h14V8l-5-5Zm0 0v5h5M8 12h8M8 16h8",
+  "file-pdf": "M14 3H5v18h14V8l-5-5Zm0 0v5h5M8 12h8M8 16h5",
 };
 export function Icon({
   name,

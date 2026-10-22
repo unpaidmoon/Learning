@@ -46,6 +46,48 @@ function renderPlayer() {
 }
 
 describe("原地视频播放器", () => {
+  it("关闭当前视频会使仍在途的打开回调失效，不反弹已经关闭的标签", async () => {
+    let release: (() => void) | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) => {
+        if (url.endsWith("/videos")) return answer([asset]);
+        if (url.endsWith("/open"))
+          return new Promise<Response>((resolve) => {
+            release = () => resolve(new Response(JSON.stringify(asset)));
+          });
+        return answer({});
+      }),
+    );
+    const changed = vi.fn();
+    const ref = createRef<VideoWorkspaceHandle>();
+    render(
+      <VideoWorkspace
+        ref={ref}
+        courseId="course-A"
+        connected
+        minimal
+        onLibraryChange={noop}
+        onOpenChat={noop}
+        onImmersiveChange={noop}
+        onAssetChange={changed}
+      />,
+    );
+    let opening: Promise<void> | undefined;
+    act(() => {
+      opening = ref.current?.openAsset(asset);
+    });
+    await waitFor(() => expect(release).toBeTypeOf("function"));
+    await act(async () => {
+      await ref.current?.closeAsset();
+      release?.();
+      await opening;
+    });
+    expect(screen.queryByLabelText("课程视频")).not.toBeInTheDocument();
+    expect(changed).not.toHaveBeenCalledWith(asset);
+    expect(changed).toHaveBeenCalledWith(null);
+  });
+
   it("新导入视频身份不在初始清单时读取当前课程清单并打开，不重复打开同标签", async () => {
     let listings = 0;
     const request = vi.fn((url: string) => {

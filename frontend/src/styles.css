@@ -29,11 +29,14 @@ body {
   margin: 0;
   min-width: 720px;
 }
-button,
-input,
-select,
-textarea {
-  font: inherit;
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 }
 button {
   cursor: pointer;
@@ -41,12 +44,6 @@ button {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
-}
-button,
-input,
-select,
-textarea {
-  color: inherit;
 }
 input,
 select,
@@ -69,6 +66,11 @@ button:focus-visible,
 select {
   cursor: pointer;
 }
+select option,
+select optgroup {
+  color: var(--foreground, #1a1c1f);
+  background-color: var(--surface-elevated, #fff);
+}
 button {
   -webkit-tap-highlight-color: transparent;
 }
@@ -79,6 +81,7 @@ button svg {
   flex-shrink: 0;
 }
 .app-shell {
+  color-scheme: light;
   --background: #fff;
   --surface: #fff;
   --surface-elevated: #fff;
@@ -228,6 +231,89 @@ button svg {
   display: flex;
   flex: 1;
   min-height: 0;
+}
+.file-manager-pane {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+.chat-title select {
+  font-size: 13px;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  padding: 5px 6px;
+  max-width: 220px;
+}
+.chat-placeholder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 20px 12px;
+}
+.chat-placeholder-space {
+  flex: 1;
+}
+.chat-placeholder-composer {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 12px;
+}
+.chat-placeholder-composer textarea {
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  border: 0;
+  background: transparent;
+}
+.create-course-dialog {
+  width: min(600px, calc(100vw - 40px));
+}
+.course-name-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border-heavy);
+  border-radius: 14px;
+  padding: 8px 16px;
+  margin: 22px 0 18px;
+}
+.course-name-field input {
+  width: 100%;
+  border: 0;
+  padding: 5px 0;
+  background: transparent;
+}
+.course-folder-label {
+  font-size: 13px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+}
+.course-folder-choice {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px solid var(--border-heavy);
+  border-radius: 14px;
+  padding: 22px;
+  color: var(--muted-foreground);
+}
+.chosen-folder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: var(--foreground);
+}
+.create-course-dialog .dialog-actions {
+  margin-top: 26px;
 }
 .sidebar {
   width: 248px;

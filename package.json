@@ -11,15 +11,16 @@
     "dev": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py dev",
     "start": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py start",
     "build": "pnpm --filter @learning/frontend build",
-    "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/check_docs.py scripts/export_openapi.py tests/e2e scripts/harness scripts/validation tests/fixtures/v3 tests/fixtures/mvp_a tests/fixtures/redesign && pnpm contracts:check && pnpm docs:check",
+    "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/check_docs.py scripts/export_openapi.py tests/e2e scripts/harness scripts/validation tests/fixtures/v3 tests/fixtures/mvp_a tests/fixtures/redesign tests/fixtures/workspace_v2 && pnpm contracts:check && pnpm docs:check",
     "test": "pnpm --filter @learning/frontend test && .\\backend\\.venv\\Scripts\\python.exe -m pytest backend/tests --basetemp=.runtime/tests/backend-latest",
     "contracts:generate": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts",
     "contracts:check": ".\\backend\\.venv\\Scripts\\python.exe scripts/export_openapi.py --check && openapi-typescript contracts/openapi.json -o contracts/generated/api.ts --check",
     "docs:check": ".\\backend\\.venv\\Scripts\\python.exe scripts/check_docs.py",
     "format:check": "pnpm --filter @learning/frontend exec prettier --check ../package.json ../pnpm-workspace.yaml .",
-    "test:e2e": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_mvp_a.py",
+    "test:e2e": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_workspace_v2.py --mode full",
     "test:e2e:security": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_browser.py --mode security",
-    "test:e2e:redesign": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_redesign.py"
+    "test:e2e:redesign": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_redesign.py",
+    "test:e2e:workspace": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_workspace_v2.py --mode full"
   },
   "devDependencies": {
     "@playwright/cli": "0.1.22",

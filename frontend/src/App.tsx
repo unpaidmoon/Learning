@@ -11,6 +11,7 @@ import type { CaptureResult, CaptureSource } from "./media/capture";
 import { WorkspaceCapture } from "./media/WorkspaceCapture";
 import { AccountPanel } from "./account/AccountPanel";
 import { CourseExplorer } from "./library/CourseExplorer";
+import { FileManager } from "./library/FileManager";
 import { ResourceViewer } from "./library/ResourceViewer";
 import { Icon } from "./components/ui/Icon";
 
@@ -21,6 +22,8 @@ type StudyTab = {
   video?: Schema<"MediaAssetResponse">;
   timeMs?: number;
 };
+
+const FILES_TAB = "files";
 
 const capabilityNames: Record<keyof Schema<"Capabilities">, string> = {
   harness: "Harness 执行层",
@@ -66,8 +69,15 @@ export function App() {
   const [account, setAccount] = useState<Schema<"AccountResponse"> | null>(null);
   const [courseDialog, setCourseDialog] = useState(false);
   const [folderPath, setFolderPath] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [pickingFolder, setPickingFolder] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(
+    () => localStorage.getItem("learning.sidebar-visible") !== "false",
+  );
+  const [filePath, setFilePath] = useState("");
   const [tabs, setTabs] = useState<StudyTab[]>([]);
-  const [activeTabId, setActiveTabId] = useState("");
+  const [activeTabId, setActiveTabId] = useState(FILES_TAB);
+  const tabsRef = useRef<StudyTab[]>([]);
   const [libraryRevision, setLibraryRevision] = useState(0);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const captureTarget = useRef<{ courseId: string; chatId: string } | null>(null);
@@ -166,12 +176,15 @@ export function App() {
     setChats([]);
     setCapture(undefined);
     setConfirmedCapture(undefined);
+    tabsRef.current = [];
     setTabs([]);
-    setActiveTabId("");
+    setActiveTabId(FILES_TAB);
+    setFilePath("");
     setImmersive(false);
     setError("");
     if (!id) return;
     try {
+      await newChat(id);
       const next = await api.read<Schema<"ChatResponse">[]>(`/courses/${id}/chats`);
       if (epoch === courseEpoch.current) setChats(next);
     } catch (reason) {
@@ -180,12 +193,14 @@ export function App() {
   };
 
   const createCourse = async () => {
+    if (!folderPath || !courseName.trim()) return;
     setBusy(true);
     try {
       const folder = await api.write<Schema<"CourseFolderResponse">>(
         "/courses/folder",
         {
-          ...(folderPath.trim() ? { path: folderPath.trim() } : {}),
+          path: folderPath,
+          title: courseName.trim(),
         },
         { timeoutMs: 120_000 },
       );
@@ -193,11 +208,31 @@ export function App() {
       setCourses(await api.read<Schema<"CourseResponse">[]>("/courses"));
       setCourseDialog(false);
       setFolderPath("");
+      setCourseName("");
       await chooseCourse(folder.course_id);
     } catch (reason) {
       setError(errorMessage(reason));
     } finally {
       setBusy(false);
+    }
+  };
+
+  const pickCourseFolder = async () => {
+    setPickingFolder(true);
+    try {
+      const selection = await api.write<Schema<"CourseFolderPickResponse"> | null>(
+        "/courses/folder/pick",
+        undefined,
+        { timeoutMs: 180_000 },
+      );
+      if (selection) {
+        setFolderPath(selection.path);
+        setCourseName((value) => (value.trim() ? value : selection.name));
+      }
+    } catch (reason) {
+      setError(errorMessage(reason));
+    } finally {
+      setPickingFolder(false);
     }
   };
 
@@ -244,7 +279,7 @@ export function App() {
 
   const openChat = async (source?: CaptureSource) => {
     if (!courseId) return;
-    if (!source) {
+    if (!source && courseChats.current.has(courseId)) {
       setChatVisible(true);
       chatRef.current?.focusInput();
       return;
@@ -254,23 +289,27 @@ export function App() {
       if (selectedCourse.current !== courseId) return;
       setChatVisible(true);
       if (source) setCapture(source);
+      else window.setTimeout(() => chatRef.current?.focusInput(), 0);
     } catch (reason) {
       setError(errorMessage(reason));
     }
   };
 
   const selectChat = async (id: string) => {
+    const targetCourse = courseId;
+    const epoch = courseEpoch.current;
     if (captureTarget.current) {
       setError("截图正在加入原对话，请完成或取消后切换对话（CAPTURE_CONTEXT_LOCKED）");
       return;
     }
     try {
       await chatRef.current?.saveDraft();
+      if (selectedCourse.current !== targetCourse || courseEpoch.current !== epoch) return;
       if (captureTarget.current) {
         setError("截图正在加入原对话，请完成或取消后切换对话（CAPTURE_CONTEXT_LOCKED）");
         return;
       }
-      courseChats.current.set(courseId, id);
+      courseChats.current.set(targetCourse, id);
       setChatId(id);
       setCapture(undefined);
       setChatVisible(true);
@@ -339,14 +378,16 @@ export function App() {
     setLibraryRevision((value) => value + 1);
   };
   const openTab = (tab: StudyTab) => {
-    setTabs((values) =>
-      values.some((value) => value.id === tab.id)
-        ? values.map((value) => (value.id === tab.id ? tab : value))
-        : [...values, tab],
-    );
+    const values = tabsRef.current;
+    const next = values.some((value) => value.id === tab.id)
+      ? values.map((value) => (value.id === tab.id ? tab : value))
+      : [...values, tab];
+    tabsRef.current = next;
+    setTabs(next);
     setActiveTabId(tab.id);
   };
   const openFile = (file: Schema<"CourseFileOpenResponse">) => {
+    if (file.course_id !== selectedCourse.current) return;
     openTab({ id: file.asset_id, title: file.entry.name, file, video: file.video ?? undefined });
   };
   const openVideo = (video: Schema<"MediaAssetResponse">) => {
@@ -356,14 +397,18 @@ export function App() {
     setActiveTabId(tab.id);
   };
   const closeTab = async (id: string) => {
+    const targetCourse = selectedCourse.current;
     try {
       await videoRef.current?.savePosition();
-      const remaining = tabs.filter((tab) => tab.id !== id);
+      if (targetCourse !== selectedCourse.current) return;
+      const closing = tabsRef.current.find((tab) => tab.id === id);
+      const remaining = tabsRef.current.filter((tab) => tab.id !== id);
+      if (closing?.video && !remaining.some((tab) => tab.video))
+        await videoRef.current?.closeAsset();
+      if (targetCourse !== selectedCourse.current) return;
+      tabsRef.current = remaining;
       setTabs(remaining);
-      if (activeTabId === id) {
-        const next = remaining[remaining.length - 1];
-        setActiveTabId(next?.id ?? "");
-      }
+      setActiveTabId((current) => (current === id ? (remaining.at(-1)?.id ?? FILES_TAB) : current));
     } catch (reason) {
       setError(errorMessage(reason));
     }
@@ -442,7 +487,18 @@ export function App() {
     >
       <header className="app-header">
         <div className="brand">
-          <Icon name="panel" />
+          <button
+            className="icon-button"
+            aria-label={sidebarVisible ? "收起课程目录" : "展开课程目录"}
+            aria-expanded={sidebarVisible}
+            title={sidebarVisible ? "收起课程目录" : "展开课程目录"}
+            onClick={() => {
+              setSidebarVisible((value) => !value);
+              localStorage.setItem("learning.sidebar-visible", String(!sidebarVisible));
+            }}
+          >
+            <Icon name="panel" />
+          </button>
           <h1>学习空间</h1>
           <span className="app-divider" />
           <span className="header-course">{selectedCourseValue?.title || "我的课程"}</span>
@@ -494,7 +550,7 @@ export function App() {
         </div>
       )}
       <div className="workspace learning-workspace">
-        <aside className="sidebar" aria-label="课程与文件" hidden={immersive}>
+        <aside className="sidebar" aria-label="课程与文件" hidden={immersive || !sidebarVisible}>
           <div className="course-switcher">
             <span className="sidebar-kicker">课程</span>
             <label className="sr-only" htmlFor="course-select">
@@ -519,17 +575,22 @@ export function App() {
               onClick={() => setCourseDialog(true)}
             >
               <Icon name="plus" size={16} />
-              打开课程文件夹
+              创建课程
             </button>
           </div>
           <div className="sidebar-library">
             {courseId ? (
               <CourseExplorer
-                key={`${courseId}-${libraryRevision}`}
+                key={courseId}
                 courseId={courseId}
                 connected={Boolean(health?.ready) && !exiting}
                 onOpen={openFile}
                 onLegacyVideo={openVideo}
+                revision={libraryRevision}
+                onDirectorySelect={(path) => {
+                  setFilePath(path);
+                  setActiveTabId(FILES_TAB);
+                }}
                 onCourseChanged={() => void refreshCourses()}
                 onDetached={() => {
                   void chooseCourse("");
@@ -582,32 +643,38 @@ export function App() {
           <section className="media-panel main-panel" aria-label="学习资料">
             <div className="resource-toolbar">
               <div className="resource-tabs" role="tablist" aria-label="资料标签页">
-                {tabs.length ? (
-                  tabs.map((tab) => (
-                    <div
-                      className={`resource-tab ${activeTabId === tab.id ? "selected" : ""}`}
-                      key={tab.id}
+                <div className={`resource-tab ${activeTabId === FILES_TAB ? "selected" : ""}`}>
+                  <button
+                    role="tab"
+                    aria-selected={activeTabId === FILES_TAB}
+                    onClick={() => setActiveTabId(FILES_TAB)}
+                  >
+                    <Icon name="folder" size={15} />
+                    <span>文件</span>
+                  </button>
+                </div>
+                {tabs.map((tab) => (
+                  <div
+                    className={`resource-tab ${activeTabId === tab.id ? "selected" : ""}`}
+                    key={tab.id}
+                  >
+                    <button
+                      role="tab"
+                      aria-selected={activeTabId === tab.id}
+                      onClick={() => selectTab(tab)}
                     >
-                      <button
-                        role="tab"
-                        aria-selected={activeTabId === tab.id}
-                        onClick={() => selectTab(tab)}
-                      >
-                        <Icon name={tab.video ? "video" : "file"} size={15} />
-                        <span>{tab.title}</span>
-                      </button>
-                      <button
-                        className="tab-close"
-                        aria-label={`关闭 ${tab.title}`}
-                        onClick={() => void closeTab(tab.id)}
-                      >
-                        <Icon name="close" size={12} />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <span className="tab-placeholder">课程资料</span>
-                )}
+                      <Icon name={tab.video ? "video" : "file"} size={15} />
+                      <span>{tab.title}</span>
+                    </button>
+                    <button
+                      className="tab-close"
+                      aria-label={`关闭 ${tab.title}`}
+                      onClick={() => void closeTab(tab.id)}
+                    >
+                      <Icon name="close" size={12} />
+                    </button>
+                  </div>
+                ))}
               </div>
               {!chatVisible && (
                 <button
@@ -648,29 +715,31 @@ export function App() {
                   file={activeTab.file}
                 />
               )}
-              {!activeTab && (
+              {courseId && (
+                <div className="file-manager-pane" hidden={activeTabId !== FILES_TAB}>
+                  <FileManager
+                    key={courseId}
+                    courseId={courseId}
+                    connected={Boolean(health?.ready) && !exiting}
+                    path={filePath}
+                    onPathChange={setFilePath}
+                    onOpen={openFile}
+                    revision={libraryRevision}
+                    onChanged={() => setLibraryRevision((value) => value + 1)}
+                  />
+                </div>
+              )}
+              {!courseId && (
                 <div className="empty-state">
-                  <span className="empty-mark">
-                    <Icon name="folder" size={36} />
-                  </span>
-                  <h2>{courseId ? "从一份资料开始" : "让学习，有自己的空间"}</h2>
-                  <p>
-                    {courseId
-                      ? "在左侧打开视频或资料。需要时，右侧就是你的学习对话。"
-                      : "打开课程文件夹，把资料、问题和思路放在一起。"}
-                  </p>
-                  <div className="shortcut-hints">
-                    <span>
-                      <kbd>Ctrl</kbd>
-                      <kbd>Shift</kbd>
-                      <kbd>S</kbd>框选截图
-                    </span>
-                    <span>
-                      <kbd>Ctrl</kbd>
-                      <kbd>Shift</kbd>
-                      <kbd>A</kbd>唤起问答
-                    </span>
-                  </div>
+                  <Icon name="folder" size={36} />
+                  <h2>选择课程文件夹</h2>
+                  <Button
+                    variant="outline"
+                    disabled={!health?.ready || exiting}
+                    onClick={() => setCourseDialog(true)}
+                  >
+                    创建课程
+                  </Button>
                 </div>
               )}
             </div>
@@ -714,28 +783,24 @@ export function App() {
             <div className="chat-panel-toolbar">
               <div className="chat-title">
                 <Icon name="chat" size={17} />
-                <span>学习问答</span>
-              </div>
-              <div className="chat-heading-actions">
-                <label className="sr-only" htmlFor="chat-history">
-                  历史对话
-                </label>
                 <select
                   id="chat-history"
-                  aria-label="历史对话"
+                  aria-label="选择对话"
                   value={chatId}
                   disabled={!courseId || busy}
                   onChange={(event) => {
                     if (event.target.value) void selectChat(event.target.value);
                   }}
                 >
-                  <option value="">历史对话</option>
+                  {!chatId && <option value="">新对话</option>}
                   {chats.map((chat, index) => (
                     <option key={chat.chat_id} value={chat.chat_id}>
                       对话 {index + 1}
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="chat-heading-actions">
                 <button
                   className="icon-button"
                   aria-label="新对话"
@@ -794,19 +859,24 @@ export function App() {
                 onOpenSource={(source) => void openSource(source)}
               />
             ) : (
-              <div className="chat-welcome">
-                <span className="chat-welcome-symbol">
-                  <Icon name="chat" size={27} />
-                </span>
-                <h2>一起弄懂这一处</h2>
-                <p>描述你的疑问，或框选一张题图。</p>
-                <Button disabled={!courseId || busy || exiting} onClick={() => void createChat()}>
-                  开始问答
-                  <Icon name="plus" size={15} />
-                </Button>
-                <small>
-                  截图快捷键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>
-                </small>
+              <div className="chat-placeholder">
+                <div className="chat-placeholder-space" />
+                <div className="chat-placeholder-composer">
+                  <textarea
+                    aria-label="输入问题"
+                    placeholder={courseId ? "正在准备对话…" : "选择课程后开始对话"}
+                    disabled
+                  />
+                  {courseId && error && (
+                    <button
+                      className="icon-button"
+                      aria-label="重试准备对话"
+                      onClick={() => void openChat()}
+                    >
+                      <Icon name="refresh" />
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </section>
@@ -852,7 +922,7 @@ export function App() {
       {courseDialog && (
         <div className="dialog-overlay">
           <form
-            className="settings-dialog"
+            className="settings-dialog create-course-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby="course-dialog-title"
@@ -862,30 +932,62 @@ export function App() {
             }}
           >
             <div className="dialog-heading">
-              <h2 id="course-dialog-title">打开课程文件夹</h2>
+              <h2 id="course-dialog-title">创建课程</h2>
               <button
                 type="button"
                 className="icon-button"
-                aria-label="取消打开课程"
+                aria-label="取消创建课程"
+                disabled={busy || pickingFolder}
                 onClick={() => setCourseDialog(false)}
               >
                 <Icon name="close" />
               </button>
             </div>
-            <p className="muted">课程名称与文件夹名称保持一致。已有文件保留在原位置。</p>
-            <label htmlFor="course-folder-path">课程文件夹路径</label>
-            <input
-              id="course-folder-path"
-              value={folderPath}
-              onChange={(event) => setFolderPath(event.target.value)}
-              placeholder="留空后选择本地文件夹"
-            />
+            <label className="course-name-field">
+              <Icon name="folder" size={19} />
+              <input
+                aria-label="课程名称"
+                placeholder="课程名称"
+                maxLength={200}
+                value={courseName}
+                onChange={(event) => setCourseName(event.target.value)}
+                disabled={busy}
+              />
+            </label>
+            <label className="course-folder-label">课程文件夹</label>
+            <div className="course-folder-choice">
+              {folderPath ? (
+                <span className="chosen-folder" title={folderPath}>
+                  <Icon name="folder" />
+                  {folderPath.split(/[\\/]/).filter(Boolean).at(-1)}
+                </span>
+              ) : (
+                <span>在此电脑上选择文件夹</span>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy || pickingFolder}
+                onClick={() => void pickCourseFolder()}
+              >
+                <Icon name="plus" size={15} />
+                {pickingFolder ? "正在选择…" : folderPath ? "更换文件夹" : "选择课程文件夹"}
+              </Button>
+            </div>
             <div className="dialog-actions">
-              <Button type="button" variant="ghost" onClick={() => setCourseDialog(false)}>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={busy || pickingFolder}
+                onClick={() => setCourseDialog(false)}
+              >
                 取消
               </Button>
-              <Button type="submit" disabled={busy}>
-                {busy ? "正在打开…" : folderPath.trim() ? "打开文件夹" : "选择文件夹"}
+              <Button
+                type="submit"
+                disabled={busy || pickingFolder || !folderPath || !courseName.trim()}
+              >
+                {busy ? "正在创建…" : "创建"}
               </Button>
             </div>
           </form>

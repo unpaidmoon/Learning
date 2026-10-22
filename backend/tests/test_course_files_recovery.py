@@ -40,15 +40,14 @@ def test_partial_replace_copy_is_unknown_and_blocks_new_mutation(files, monkeypa
         Path(target).write_bytes(b"partial target")
         raise OSError("CONTROLLED_PARTIAL_COPY_FAILURE")
 
-    monkeypatch.setattr("learning_app.course_files.shutil.copy2", partial_copy)
-    request = CourseImportInput(
-        paths=[str(source)], mode="copy", conflict="replace", operation_id="partial_copy"
-    )
+    monkeypatch.setattr(store, "_copy_file", partial_copy)
+    request = CourseImportInput(paths=[str(source)], operation_id="partial_copy")
     with pytest.raises(AppError):
         store.import_files(course, request)
     status = store.operation(course, "partial_copy")
     assert status["state"] == "needs_review"
-    assert status["result"]["planned_paths"][0]["target"] == str(root / "same.txt")
+    assert status["result"]["planned_paths"][0]["target"] == str(root / "same (2).txt")
+    assert (root / "same.txt").read_text() == "original target"
     assert source.read_text() == "source remains intact"
     with pytest.raises(AppError) as duplicate:
         store.import_files(course, request)
@@ -74,8 +73,8 @@ def test_failure_before_metadata_compensates_new_move(files):
             course, CourseImportInput(paths=[str(source)], operation_id="rollback_move")
         )
     assert source.read_text() == "safe original"
-    assert not (root / source.name).exists()
-    assert store.operation(course, "rollback_move")["state"] == "failed"
+    assert (root / source.name).exists()
+    assert store.operation(course, "rollback_move")["state"] == "needs_review"
 
 
 def test_metadata_committed_before_lost_receipt_keeps_bytes_and_versions(files):
@@ -93,13 +92,17 @@ def test_metadata_committed_before_lost_receipt_keeps_bytes_and_versions(files):
         store.import_files(
             course, CourseImportInput(paths=[str(source)], operation_id="lost_receipt")
         )
-    assert not source.exists()
+    assert source.exists()
     assert (root / source.name).read_text() == "already moved and registered"
     assert store.operation(course, "lost_receipt")["state"] == "needs_review"
     assert (
         repository.resolve_source(old["asset_id"], old["source_version"])["status"] == "available"
     )
-    assert store.list(course)["entries"][0]["asset_id"] == old["asset_id"]
+    assert store.list(course)["entries"][0]["asset_id"] != old["asset_id"]
+    assert (
+        Path(repository.resolve_source(old["asset_id"], old["source_version"])["local_path"])
+        == source
+    )
 
 
 def test_course_rename_receipt_loss_preserves_matching_directory_and_db(files):
@@ -116,8 +119,8 @@ def test_course_rename_receipt_loss_preserves_matching_directory_and_db(files):
         )
     folder = store.folder(course)
     assert folder["root_status"] == "ready"
-    assert folder["title"] == Path(folder["root_path"]).name == "已改名课程"
-    assert not root.exists()
+    assert folder["title"] == "已改名课程"
+    assert Path(folder["root_path"]) == root and root.exists()
     assert store.operation(course, "rename_receipt")["state"] == "needs_review"
 
 
@@ -137,9 +140,7 @@ def test_dangling_link_import_target_never_writes_outside(files):
     with pytest.raises(AppError) as rejected:
         store.import_files(
             course,
-            CourseImportInput(
-                paths=[str(source)], mode="copy", conflict="replace", operation_id="deny_link"
-            ),
+            CourseImportInput(paths=[str(source)], operation_id="deny_link"),
         )
     assert rejected.value.code == "FILE_LINK_DENIED"
     assert source.exists() and not unexpected.exists()
@@ -156,11 +157,11 @@ def test_disk_root_nested_course_and_unbound_detach_are_explicit_errors(files):
         store.bind(None, str(nested))
     assert overlap.value.code == "COURSE_ROOT_OVERLAP"
     legacy = repository.create_course("旧课程")
-    with pytest.raises(AppError) as unbound:
-        store.detach(
-            legacy["course_id"], CourseDetachInput(confirm=True, operation_id="unbound_detach")
-        )
-    assert unbound.value.code == "COURSE_ROOT_REQUIRED"
+    detached = store.detach(
+        legacy["course_id"], CourseDetachInput(confirm=True, operation_id="unbound_detach")
+    )
+    assert detached["root"]["root_status"] == "detached"
+    assert all(item["course_id"] != legacy["course_id"] for item in repository.list_courses())
 
 
 @pytest.mark.skipif(os.name != "nt", reason="Windows directory junction boundary")

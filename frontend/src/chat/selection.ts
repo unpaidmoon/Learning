@@ -27,6 +27,15 @@ interface ParseNode {
   [key: string]: unknown;
 }
 
+interface SourceToken {
+  text: string;
+  loc?: { start: number; end: number };
+}
+interface SourceLexer {
+  settings: unknown;
+  constructor: new (source: string, settings: unknown) => { lex(): SourceToken };
+}
+
 /** Delimiter normalization retains a boundary map back to the original answer. */
 function normalize(text: string) {
   let normalized = "";
@@ -66,6 +75,7 @@ function leafLocations(latex: string) {
     __parse: (value: string, settings: object) => ParseNode[];
   };
   const leaves: { start: number; end: number; argument: boolean }[] = [];
+  const operators = new Map<string, boolean[]>();
   const seen = new Set<object>();
   const visit = (value: unknown, argument = false) => {
     if (!value || typeof value !== "object" || seen.has(value)) return;
@@ -75,6 +85,19 @@ function leafLocations(latex: string) {
       return;
     }
     const node = value as ParseNode;
+    // KaTeX's named operators (det/sin/log/...) omit loc in the parse tree.
+    // Reconcile exact original lexer tokens with these parsed operators rather
+    // than guessing from repeated rendered text or matching raw backslashes.
+    if (
+      node.type === "op" &&
+      node.symbol === false &&
+      typeof node.name === "string" &&
+      /^\\[A-Za-z]+$/.test(node.name)
+    ) {
+      const argumentsForName = operators.get(node.name) ?? [];
+      argumentsForName.push(argument);
+      operators.set(node.name, argumentsForName);
+    }
     if (
       ["mathord", "textord", "atom", "spacing"].includes(node.type ?? "") &&
       typeof node.text === "string" &&
@@ -92,6 +115,38 @@ function leafLocations(latex: string) {
     }
   };
   visit(parser.__parse(latex, { trust: false, maxExpand: 500, maxSize: 20 }));
+  if (operators.size) {
+    // Use the lexer shipped by the pinned KaTeX parser: it handles comments,
+    // escaped control symbols and verbatim tokens without false source spans.
+    // Clone its state; never advance or mutate the original parse-tree lexer.
+    const seed = parser.__parse("x", { trust: false })[0].loc as
+      { lexer?: SourceLexer } | undefined;
+    if (!seed?.lexer) throw new Error("KaTeX source lexer unavailable");
+    const lexer = new seed.lexer.constructor(latex, seed.lexer.settings);
+    const tokens = new Map<string, { start: number; end: number }[]>();
+    for (let count = 0; count <= latex.length; count++) {
+      const token = lexer.lex();
+      if (token.text === "EOF") break;
+      if (!operators.has(token.text) || !token.loc) continue;
+      const start = token.loc.start;
+      // A control-word token's loc can also consume following whitespace.
+      // Its source quote must end at the command, not unselected whitespace.
+      const end = start + token.text.length;
+      if (latex.slice(start, end) !== token.text) continue;
+      const matches = tokens.get(token.text) ?? [];
+      matches.push({ start, end });
+      tokens.set(token.text, matches);
+    }
+    for (const [name, argumentsForName] of operators) {
+      const matches = tokens.get(name) ?? [];
+      // Expansion aliases or ambiguous source remain unsupported; do not map
+      // a visible operator onto an unrelated token with the same spelling.
+      if (matches.length !== argumentsForName.length) continue;
+      matches.forEach((token, index) => {
+        leaves.push({ ...token, argument: argumentsForName[index] });
+      });
+    }
+  }
   return leaves
     .sort((left, right) => left.start - right.start || left.end - right.end)
     .filter((item, index, all) => !index || item.start >= all[index - 1].end);
@@ -232,6 +287,37 @@ function selectedText(range: Range, node: Text) {
   return end > start ? { start, end, value: node.data.slice(start, end) } : null;
 }
 
+function coversNode(range: Range, node: Node) {
+  const bounds = document.createRange();
+  bounds.selectNode(node);
+  return (
+    range.compareBoundaryPoints(Range.START_TO_START, bounds) <= 0 &&
+    range.compareBoundaryPoints(Range.END_TO_END, bounds) >= 0
+  );
+}
+
+/**
+ * Browser mouse selections end at visible glyphs, not KaTeX's invisible struts.
+ * Requiring the wrapper's boundaries rejects an otherwise complete matrix.
+ * Painted structures must also be covered: selecting only x in sqrt(x) cannot
+ * silently acquire the radical, and an omitted fraction bar is not a full frac.
+ */
+function coversVisibleFormula(range: Range, visual: Element) {
+  const visible = textNodes(visual);
+  if (!visible.length) return false;
+  if (
+    !visible.every((node) => {
+      const selected = selectedText(range, node);
+      return selected?.start === 0 && selected.end === node.length;
+    })
+  ) {
+    return false;
+  }
+  return Array.from(
+    visual.querySelectorAll("svg, .frac-line, .sqrt-line, .overline-line, .underline-line"),
+  ).every((node) => coversNode(range, node));
+}
+
 export function quoteFromRange(
   root: HTMLElement,
   range: Range,
@@ -255,8 +341,9 @@ export function quoteFromRange(
       visualRange.selectNodeContents(visual);
       formulas.set(
         formula,
-        range.compareBoundaryPoints(Range.START_TO_START, visualRange) <= 0 &&
-          range.compareBoundaryPoints(Range.END_TO_END, visualRange) >= 0,
+        (range.compareBoundaryPoints(Range.START_TO_START, visualRange) <= 0 &&
+          range.compareBoundaryPoints(Range.END_TO_END, visualRange) >= 0) ||
+          coversVisibleFormula(range, visual),
       );
     }
   }

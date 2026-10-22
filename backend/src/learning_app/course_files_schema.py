@@ -1,6 +1,6 @@
 """Additive course roots and recoverable user-initiated file operations."""
 
-from sqlalchemy import JSON, Column, ForeignKey, MetaData, String, Table, Text
+from sqlalchemy import JSON, Boolean, Column, ForeignKey, MetaData, String, Table, Text
 
 from learning_app.storage import schema as business
 
@@ -36,4 +36,12 @@ course_file_operations = Table(
     Column("error_code", String),
     Column("created_at", String, nullable=False),
     Column("updated_at", String, nullable=False),
+)
+
+
+course_visibility = Table(
+    "course_visibility",
+    metadata,
+    Column("course_id", ForeignKey(business.courses.c.course_id), primary_key=True),
+    Column("hidden", Boolean, nullable=False, default=False),
 )

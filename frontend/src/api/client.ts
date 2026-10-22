@@ -42,6 +42,18 @@ export class ApiClient {
     });
   }
 
+  upload<T>(path: string, file: Blob, options?: { timeoutMs?: number }): Promise<T> {
+    return this.request<T>(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "X-Learning-CSRF": this.csrf || "",
+      },
+      body: file,
+      signal: AbortSignal.timeout(options?.timeoutMs ?? 300_000),
+    });
+  }
+
   private async request<T>(path: string, options: RequestInit): Promise<T> {
     let response: Response;
     try {

@@ -1,0 +1,546 @@
+{
+  "date": "2026-10-22",
+  "status": "passed",
+  "scope": "Frontend theme readability and named-operator partial formula source mapping; synthetic regression only.",
+  "root_causes": [
+    "Unlayered global font/color inheritance overrides layered Button variant foreground utilities; default primary buttons had contrast1 in both themes.",
+    "Native option/optgroup lacked explicit theme background; light native color-scheme unspecified.",
+    "KaTeX0.16.22 named-operator AST lacks loc; original leaf mapping skipped det/sin/log."
+  ],
+  "changes": [
+    "Move font/color reset into @layer base; preserve component variant colors and fonts.",
+    "Explicit themed option/optgroup foreground+background; light/dark native color schemes.",
+    "Reconcile parsed named operators with exact original cloned KaTeX lexer tokens, preserve nonce-bound trust and UTF16 source bounds."
+  ],
+  "red": {
+    "browser_run": "theme-formula-20261022-red",
+    "status": "failed",
+    "checks": {
+      "light_buttons_readable": false,
+      "light_option_foreground_and_surface": false,
+      "light_explicit_native_color_scheme": false,
+      "dark_buttons_readable": false,
+      "dark_option_foreground_and_surface": false,
+      "dark_explicit_native_color_scheme": true,
+      "actual_mouse_partial_det_has_entry": false,
+      "partial_det_exact_markdown_no_B_or_remainder": false
+    },
+    "unit_failed": 2,
+    "symptom": "FORMULA_SELECTION_UNMAPPED for screenshot-equivalent partial det chain"
+  },
+  "component_browser": {
+    "run_id": "theme-formula-20261022-r4",
+    "passed": 11,
+    "checks": {
+      "light_buttons_readable": true,
+      "light_option_foreground_and_surface": true,
+      "light_explicit_native_color_scheme": true,
+      "dark_buttons_readable": true,
+      "dark_option_foreground_and_surface": true,
+      "dark_explicit_native_color_scheme": true,
+      "operator_instrumentation_preserves_formula_width": true,
+      "light_primary_hover_readable": true,
+      "dark_primary_hover_readable": true,
+      "actual_mouse_partial_det_has_entry": true,
+      "partial_det_exact_markdown_no_B_or_remainder": true
+    },
+    "theme_observations": [
+      {
+        "theme": "light",
+        "scheme": "light",
+        "buttons": [
+          {
+            "text": "刷新模型与额度",
+            "disabled": false,
+            "variant": "default",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(26, 28, 31)",
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "outline",
+            "disabled": false,
+            "variant": "outline",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "secondary",
+            "disabled": false,
+            "variant": "secondary",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(243, 243, 243)",
+            "contrast": 15.388873565294361
+          },
+          {
+            "text": "ghost",
+            "disabled": false,
+            "variant": "ghost",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "destructive",
+            "disabled": false,
+            "variant": "destructive",
+            "color": "rgb(186, 38, 35)",
+            "background": "oklab(0.514643 0.163642 0.0850303 / 0.1)",
+            "contrast": 5.25745254305882
+          },
+          {
+            "text": "link",
+            "disabled": false,
+            "variant": "link",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "取消",
+            "disabled": false,
+            "color": "rgb(26, 28, 31)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "创建",
+            "disabled": true,
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(26, 28, 31)",
+            "contrast": 2.857630201586393
+          },
+          {
+            "text": "确认",
+            "disabled": false,
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(26, 28, 31)",
+            "contrast": 17.07581164489872
+          }
+        ],
+        "options": [
+          {
+            "text": "名称",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "类型",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "大小",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "修改时间",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "对话1",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "对话2",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          },
+          {
+            "text": "对话3",
+            "color": "rgb(26, 28, 31)",
+            "background": "rgb(255, 255, 255)",
+            "explicitSurface": true,
+            "contrast": 17.07581164489872
+          }
+        ]
+      },
+      {
+        "theme": "dark",
+        "scheme": "dark",
+        "buttons": [
+          {
+            "text": "刷新模型与额度",
+            "disabled": false,
+            "variant": "default",
+            "color": "rgb(24, 24, 24)",
+            "background": "rgb(255, 255, 255)",
+            "contrast": 17.756264715186326
+          },
+          {
+            "text": "outline",
+            "disabled": false,
+            "variant": "outline",
+            "color": "rgb(255, 255, 255)",
+            "background": "oklab(0.999994 0.0000455678 0.0000200868 / 0.0258824)",
+            "contrast": 16.607140405299052
+          },
+          {
+            "text": "secondary",
+            "disabled": false,
+            "variant": "secondary",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(48, 48, 48)",
+            "contrast": 13.19811185826915
+          },
+          {
+            "text": "ghost",
+            "disabled": false,
+            "variant": "ghost",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 17.756264715186326
+          },
+          {
+            "text": "destructive",
+            "disabled": false,
+            "variant": "destructive",
+            "color": "rgb(250, 119, 114)",
+            "background": "oklab(0.721953 0.147344 0.066035 / 0.2)",
+            "contrast": 4.8552193175758145
+          },
+          {
+            "text": "link",
+            "disabled": false,
+            "variant": "link",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 17.756264715186326
+          },
+          {
+            "text": "取消",
+            "disabled": false,
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "创建",
+            "disabled": true,
+            "color": "rgb(24, 24, 24)",
+            "background": "rgb(255, 255, 255)",
+            "contrast": 4.57639913424346
+          },
+          {
+            "text": "确认",
+            "disabled": false,
+            "color": "rgb(24, 24, 24)",
+            "background": "rgb(255, 255, 255)",
+            "contrast": 17.756264715186326
+          }
+        ],
+        "options": [
+          {
+            "text": "名称",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "类型",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "大小",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "修改时间",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "对话1",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "对话2",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          },
+          {
+            "text": "对话3",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(35, 35, 35)",
+            "explicitSurface": true,
+            "contrast": 15.716827493476563
+          }
+        ]
+      }
+    ],
+    "hover_observations": {
+      "light": {
+        "text": "刷新模型与额度",
+        "disabled": false,
+        "variant": "default",
+        "color": "rgb(255, 255, 255)",
+        "background": "oklab(0.22559 -0.00131416 -0.00642684 / 0.8)",
+        "contrast": 9.050352147070837
+      },
+      "dark": {
+        "text": "刷新模型与额度",
+        "disabled": false,
+        "variant": "default",
+        "color": "rgb(24, 24, 24)",
+        "background": "oklab(0.999994 0.0000455677 0.0000200868 / 0.8)",
+        "contrast": 11.604572700920462
+      }
+    },
+    "operator_layout": {
+      "original": 513.078125,
+      "mapped": 513.078125,
+      "delta": 0
+    },
+    "actual_mouse_selection": {
+      "selected": "detM=detAdet",
+      "entry": true,
+      "quotes": []
+    },
+    "quote": {
+      "text": "detM=detAdet",
+      "markdown": "$\\det M = \\det A \\det$",
+      "source_start": 6,
+      "source_end": 26
+    },
+    "source_digests": {
+      "frontend/src/styles.css": "2a7aa6d2dc3d7177f80d862da196d86d2acdaac3002de7b30d874d353fe0c062",
+      "frontend/src/components/ui/button.tsx": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+      "frontend/src/chat/MarkdownAnswer.tsx": "dc78a7fe52f3e798bfbc084f63ddb4b632f2eca7536f5fb541e1dd7d8e791ea1",
+      "frontend/src/chat/selection.ts": "1911919325522ed29875fc1ffc86e8a87cb51cf3ea22ffe04ba10c148c5b5114"
+    },
+    "source_digests_match_after": true,
+    "cleanup": {
+      "browser": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job"
+      },
+      "vite": {
+        "owned_pids_before": [
+          18956,
+          22984
+        ],
+        "remaining_pids": [],
+        "method": "windows_job"
+      },
+      "port_closed": true
+    }
+  },
+  "production_built_app_browser": {
+    "run_id": "theme-formula-app-20261022-r2",
+    "passed": 8,
+    "checks": {
+      "light_real_create_disabled_label": true,
+      "light_real_create_enabled_label": true,
+      "light_real_rename_label": true,
+      "light_real_account_refresh_label": true,
+      "dark_real_create_disabled_label": true,
+      "dark_real_create_enabled_label": true,
+      "dark_real_rename_label": true,
+      "dark_real_account_refresh_label": true
+    },
+    "observations": {
+      "light_create_empty": {
+        "text": "确定",
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(26, 28, 31)",
+        "disabled": true,
+        "readable": true
+      },
+      "light_create_ready": {
+        "text": "确定",
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(26, 28, 31)",
+        "disabled": false,
+        "readable": true
+      },
+      "light_rename": {
+        "text": "确定",
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(26, 28, 31)",
+        "disabled": false,
+        "readable": true
+      },
+      "light_account_refresh": {
+        "text": "刷新模型与额度",
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(26, 28, 31)",
+        "disabled": false,
+        "readable": true
+      },
+      "dark_create_empty": {
+        "text": "确定",
+        "color": "rgb(24, 24, 24)",
+        "background": "rgb(255, 255, 255)",
+        "disabled": true,
+        "readable": true
+      },
+      "dark_create_ready": {
+        "text": "确定",
+        "color": "rgb(24, 24, 24)",
+        "background": "rgb(255, 255, 255)",
+        "disabled": false,
+        "readable": true
+      },
+      "dark_rename": {
+        "text": "确定",
+        "color": "rgb(24, 24, 24)",
+        "background": "rgb(255, 255, 255)",
+        "disabled": false,
+        "readable": true
+      },
+      "dark_account_refresh": {
+        "text": "刷新模型与额度",
+        "color": "rgb(24, 24, 24)",
+        "background": "rgb(255, 255, 255)",
+        "disabled": false,
+        "readable": true
+      }
+    },
+    "account_state": "GET DTO mocked for visual signed-in state only; no real login/refresh/sign-out performed",
+    "business_api": "real isolated local backend and synthetic course; NoHarness",
+    "cleanup": {
+      "browser": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job"
+      },
+      "application": {
+        "exit_code": 0,
+        "record": {
+          "instance_id": "d40f65da48954acbb076dee47bed649d",
+          "launcher_pid": 21184,
+          "mode": "start",
+          "status": "stopped",
+          "backend_port": 19178,
+          "frontend_port": null,
+          "started_at_ns": 1792637954533759300,
+          "owned_pids": [
+            20384,
+            21752
+          ],
+          "backend_pid": 21752,
+          "ready_at_ns": 1792637955632705500,
+          "url": "http://127.0.0.1:19178",
+          "stop_reason": "instance_request",
+          "cleanup": {
+            "owned_pids_before": [],
+            "remaining_pids": [],
+            "method": "windows_job"
+          },
+          "stopped_at_ns": 1792637993277132900
+        },
+        "backend_port_closed": true,
+        "frontend_port_closed": true
+      },
+      "port_closed": true
+    }
+  },
+  "tests": {
+    "selection_subset_passed": 25,
+    "full_frontend_passed": 141,
+    "frontend_files": 14,
+    "root_check": "passed before documentation finalization",
+    "build": "passed",
+    "warning": "Existing Vite main chunk>500kB warning retained",
+    "backend_full_suite_this_patch": "not rerun; no backend implementation change",
+    "real_model_calls": 0,
+    "documentation": {
+      "passed": true,
+      "markdown_files": 72,
+      "errors": 0
+    }
+  },
+  "production": {
+    "new_js": "index-C8QbJnWA.js",
+    "new_css": "index-D9d4_Hwc.css",
+    "served_new_assets": {
+      "javascript": true,
+      "stylesheet": true
+    },
+    "health": {
+      "contract_version": "1",
+      "app_version": "0.1.0",
+      "instance_id": "520789c967f04acfb05bfe85d0a350b7",
+      "ready": true,
+      "configured_model": "deepseek-flash",
+      "configured_thinking": "high",
+      "capabilities": {
+        "harness": "ready",
+        "question_answering": "ready",
+        "persistence": "ready",
+        "video": "ready",
+        "transcription": "not_implemented",
+        "knowledge_base": "not_implemented"
+      }
+    },
+    "backend_restarted_this_patch": false,
+    "user_backend_left_running": true,
+    "reload_instruction": "Ctrl+F5 at http://127.0.0.1:8765"
+  },
+  "build_pair": {
+    "path": ".runtime/validation/theme-formula-build-manifest-20261022.json",
+    "sha256": "9db45a8e389fc208213e765fb31059b976870a783b3d7e6c5b6f20874b2955ac",
+    "source_files": 39,
+    "dist_files": 62
+  },
+  "verification_notes": [
+    "Enabled synthetic button contrast threshold4.5, disabled2.5 are internal regression gates, not full accessibility certification.",
+    "CSS oklab and alpha converted by browser canvas; no screenshots/video read for pixel analysis.",
+    "Full formula width equals uninstrumented KaTeX baseline (delta0); no unselected B or following result included.",
+    "Named token fragments de still reject; no ambiguous macro or cross-structure broadening.",
+    "Component r2 selector ambiguity after adding baseline and app-r1 seeded-course reload driver failures retained; unit fixture DOM splitting/MathML/inline newline issues corrected without product changes.",
+    "Earlier full67 and real-model records unchanged and not reclassified as this patch results."
+  ],
+  "not_covered": [
+    "Other browsers/machines/system high-contrast/native menu variants",
+    "All macros or arbitrary complicated partial formulas",
+    "Real account authorization/balance refresh in this UI-only retest",
+    "Long-term real learning and full accessibility acceptance"
+  ],
+  "artifacts": {
+    "report": "UI颜色与命名算符局部引用修复-2026-10-22.md",
+    "component_screenshots": "theme-formula-20261022-r4",
+    "app_screenshots": "theme-formula-app-20261022-r2"
+  },
+  "final_audit": {
+    "production_source_and_build_hashes_match": true,
+    "owned_test_ports_closed": {
+      "19177": true,
+      "19178": true
+    },
+    "new_report_credential_field_hits": 0,
+    "git_diff_check": "passed",
+    "no_temporary_debug_logging_added": true
+  }
+}

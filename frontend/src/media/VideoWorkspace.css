@@ -55,6 +55,39 @@
   cursor: pointer;
   accent-color: white;
   border: 0;
+  touch-action: none;
+  appearance: none;
+  background: transparent;
+}
+.player-seek-track {
+  position: relative;
+  width: 100%;
+}
+.player-toolbar .player-progress::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 45%);
+}
+.player-toolbar .player-progress::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+}
+.player-toolbar .player-progress::-moz-range-track {
+  height: 4px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 45%);
+}
+.player-toolbar .player-progress::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: white;
 }
 .player-toolbar-row {
   display: flex;

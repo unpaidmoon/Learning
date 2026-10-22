@@ -18,6 +18,7 @@ export type VideoWorkspaceHandle = {
   savePosition: () => Promise<void>;
   pauseForCapture: () => VideoSource | undefined;
   getElement: () => HTMLVideoElement | null;
+  closeAsset: () => Promise<void>;
 };
 
 export function VideoWorkspace({
@@ -130,6 +131,12 @@ export function VideoWorkspace({
   };
 
   const openAsset = async (selected: VideoAsset, timeMs?: number) => {
+    if (
+      current.current?.asset_id === selected.asset_id &&
+      current.current.source_version === selected.source_version &&
+      timeMs === undefined
+    )
+      return;
     const epoch = ++openEpoch.current;
     const previous = current.current;
     const player = video.current;
@@ -213,6 +220,21 @@ export function VideoWorkspace({
     };
   };
 
+  const closeAsset = async () => {
+    const epoch = ++openEpoch.current;
+    video.current?.pause();
+    await savePosition();
+    if (!mounted.current || epoch !== openEpoch.current) return;
+    current.current = null;
+    resumeOnActive.current = false;
+    pendingPlay.current = false;
+    setAsset(null);
+    setPlaying(false);
+    setPlayBlocked(false);
+    setError("");
+    callbacks.current.onAssetChange?.(null);
+  };
+
   useImperativeHandle(ref, () => ({
     openAsset,
     openSource,
@@ -220,6 +242,7 @@ export function VideoWorkspace({
     toggleFullscreen,
     savePosition,
     pauseForCapture,
+    closeAsset,
     getElement: () => video.current,
   }));
 
@@ -454,6 +477,7 @@ export function VideoWorkspace({
             ref={video}
             key={`${asset.asset_id}:${asset.source_version}`}
             aria-label="课程视频"
+            data-primary-video="true"
             preload="metadata"
             playsInline
             src={`/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`}
@@ -487,12 +511,13 @@ export function VideoWorkspace({
         )}
         {asset && (
           <VideoControls
+            key={`${asset.asset_id}:${asset.source_version}`}
             playing={playing}
             {...playback}
+            previewSrc={`/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`}
+            sourceKey={`${asset.asset_id}:${asset.source_version}`}
             onFullscreen={toggleFullscreen}
-            onSeek={(seconds) => {
-              if (video.current) video.current.currentTime = seconds;
-            }}
+            onSeek={playback.seekTo}
             onTogglePlay={() => {
               if (video.current?.paused) void play();
               else video.current?.pause();

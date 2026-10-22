@@ -7,6 +7,7 @@ filesystem tool. A durable operation record precedes every filesystem mutation.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import mimetypes
 import os
@@ -33,8 +34,10 @@ from learning_app.course_files_schema import (
 from learning_app.course_files_schema import (
     course_roots as roots,
 )
+from learning_app.course_files_schema import course_visibility as visibility
 from learning_app.errors import AppError
 from learning_app.media import VIDEO_TYPES, MediaAssetResponse, MediaStore, _read_locked
+from learning_app.native_files import pick_paths, read_clipboard_paths, recycle_path
 from learning_app.storage import Repository
 from learning_app.storage import schema as business
 
@@ -52,6 +55,7 @@ class CourseFileInput(BaseModel):
 
 class CourseFolderInput(CourseFileInput):
     path: str | None = Field(default=None, max_length=32760)
+    title: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class CourseMutationInput(CourseFileInput):
@@ -63,10 +67,25 @@ class CoursePathInput(CourseFileInput):
 
 
 class CourseImportInput(CourseMutationInput):
-    paths: list[str] | None = Field(default=None, max_length=100)
+    paths: list[str] | None = Field(default=None, max_length=1024)
     destination: str = Field(default="", max_length=32760)
-    mode: Literal["move", "copy"] = "move"
-    conflict: Conflict = "ask"
+    mode: Literal["copy"] = "copy"
+    conflict: Literal["keep_both"] = "keep_both"
+
+
+class CourseTransferInput(CourseMutationInput):
+    paths: list[str] = Field(min_length=1, max_length=1024)
+    destination: str = Field(default="", max_length=32760)
+    mode: Literal["copy", "move"] = "copy"
+
+
+class CourseClipboardInput(CourseMutationInput):
+    destination: str = Field(default="", max_length=32760)
+
+
+class CourseFolderPickResponse(BaseModel):
+    path: str
+    name: str
 
 
 class CourseDirectoryInput(CourseMutationInput):
@@ -118,6 +137,12 @@ class CourseFileEntry(BaseModel):
     viewer: Viewer
     asset_id: str | None = None
     source_version: str | None = None
+    modified_at: str | None = None
+    created_at: str | None = None
+
+
+class CourseFilePropertiesResponse(CourseFileEntry):
+    root_path: str
 
 
 class CourseFileListResponse(CourseFolderResponse):
@@ -141,6 +166,7 @@ class CourseImportResponse(BaseModel):
     source_paths: list[str]
     entries: list[CourseFileEntry]
     conflicts: list[str]
+    content_sha256: str | None = None
 
 
 class CourseFileOperationResponse(BaseModel):
@@ -148,6 +174,7 @@ class CourseFileOperationResponse(BaseModel):
     state: Literal["completed", "conflict", "needs_review"]
     entry: CourseFileEntry | None = None
     root: CourseFolderResponse | None = None
+    recycled: bool | None = None
 
 
 class CourseOperationStatusResponse(BaseModel):
@@ -227,25 +254,13 @@ def choose_paths(*, directory: bool) -> list[str]:
     """An explicit native dialog, never opened during startup or model work."""
     if not _PICKER.acquire(blocking=False):
         raise AppError("PICKER_ACTIVE", "文件选择窗口已打开，请先完成选择")
-    root = None
     try:
-        import tkinter
-        from tkinter import filedialog
-
-        root = tkinter.Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        if directory:
-            selected = filedialog.askdirectory(parent=root, title="选择课程根文件夹")
-            return [selected] if selected else []
-        return list(
-            filedialog.askopenfilenames(parent=root, title="选择导入当前课程的文件（默认移动）")
-        )
+        return pick_paths(directory=directory)
+    except AppError:
+        raise
     except Exception as exc:
-        raise AppError("PICKER_UNAVAILABLE", "无法打开选择窗口，请填写完整路径", 503) from exc
+        raise AppError("PICKER_UNAVAILABLE", "无法打开文件夹选择窗口，请稍后重试", 503) from exc
     finally:
-        if root is not None:
-            root.destroy()
         _PICKER.release()
 
 
@@ -253,7 +268,12 @@ class CourseFileStore:
     def __init__(self, repository: Repository):
         self.repository = repository
         self.engine = repository.engine
-        self._lock = repository._lock
+        # Long filesystem copies must not own the repository's event/stop lock.
+        # Stores for the same repository share a dedicated mutation lock.
+        with repository._lock:
+            if not hasattr(repository, "_course_files_lock"):
+                repository._course_files_lock = threading.RLock()
+            self._lock = repository._course_files_lock
         self.media = MediaStore(repository)
 
     def folder(self, course_id: str) -> dict:
@@ -268,6 +288,9 @@ class CourseFileStore:
             root = (
                 conn.execute(select(roots).where(roots.c.course_id == course_id)).mappings().first()
             )
+            hidden = conn.execute(
+                select(visibility.c.hidden).where(visibility.c.course_id == course_id)
+            ).scalar_one_or_none()
             linked = (
                 conn.execute(
                     select(business.source_versions.c.local_path)
@@ -284,7 +307,9 @@ class CourseFileStore:
             raise AppError("COURSE_NOT_FOUND", "课程不存在", 404)
         path = Path(root["local_path"]) if root else None
         status = (
-            "unbound"
+            "detached"
+            if hidden
+            else "unbound"
             if root is None
             else "detached"
             if root["state"] == "detached"
@@ -343,6 +368,7 @@ class CourseFileStore:
                 .mappings()
                 .first()
             )
+        stat = None if blocked else path.stat()
         return {
             "name": path.name,
             "path": relative,
@@ -351,10 +377,18 @@ class CourseFileStore:
             "viewer": "external" if blocked else _viewer(path),
             "asset_id": row["asset_id"] if row else None,
             "source_version": row["source_version"] if row else None,
+            "modified_at": datetime.fromtimestamp(stat.st_mtime, UTC).isoformat() if stat else None,
+            "created_at": datetime.fromtimestamp(stat.st_birthtime, UTC).isoformat()
+            if stat and hasattr(stat, "st_birthtime")
+            else None,
         }
 
-    def bind(self, course_id: str | None, value: str) -> dict:
+    def bind(self, course_id: str | None, value: str, title: str | None = None) -> dict:
         path = _local_path(value, directory=True)
+        if title is not None:
+            title = title.strip()
+            if not title or any(ord(c) < 32 for c in title):
+                raise AppError("COURSE_NAME_INVALID", "请输入有效的课程名称", 422)
         if not path.name or path == Path(path.anchor):
             raise AppError("COURSE_ROOT_INVALID", "请选择磁盘下的课程文件夹，不能选择整个磁盘", 422)
         with self._lock:
@@ -374,6 +408,17 @@ class CourseFileStore:
                             .where(roots.c.course_id == course_id)
                             .values(state="active")
                         )
+                        conn.execute(
+                            update(visibility)
+                            .where(visibility.c.course_id == course_id)
+                            .values(hidden=False)
+                        )
+                        if title is not None:
+                            conn.execute(
+                                update(business.courses)
+                                .where(business.courses.c.course_id == course_id)
+                                .values(title=title)
+                            )
                     return self.folder(course_id)
                 raise AppError("COURSE_ROOT_IN_USE", "此根文件夹已属于另一门课程")
             if any(
@@ -382,7 +427,7 @@ class CourseFileStore:
             ):
                 raise AppError("COURSE_ROOT_OVERLAP", "课程根目录不能相互包含，请选择独立文件夹")
             if course_id is None:
-                course_id = self.repository.create_course(path.name)["course_id"]
+                course_id = self.repository.create_course(title or path.name)["course_id"]
             elif self.folder(course_id)["root_path"] is not None:
                 raise AppError(
                     "COURSE_ROOT_ALREADY_BOUND", "课程已有根目录，请使用重命名或显式资料迁移"
@@ -394,10 +439,16 @@ class CourseFileStore:
                     )
                 )
                 conn.execute(
-                    update(business.courses)
-                    .where(business.courses.c.course_id == course_id)
-                    .values(title=path.name)
+                    update(visibility)
+                    .where(visibility.c.course_id == course_id)
+                    .values(hidden=False)
                 )
+                if title is not None:
+                    conn.execute(
+                        update(business.courses)
+                        .where(business.courses.c.course_id == course_id)
+                        .values(title=title)
+                    )
         return self.folder(course_id)
 
     def list(self, course_id: str, value: str = "") -> dict:
@@ -441,7 +492,7 @@ class CourseFileStore:
             elif kind == "directory":
                 target = source / payload["name"]
             elif kind == "rename_course":
-                target = root.with_name(payload["name"])
+                target = None  # Display alias only, never a filesystem rename.
             else:
                 target = None
             planned = [
@@ -449,8 +500,10 @@ class CourseFileStore:
                     "source": str(source),
                     "target": str(target)
                     if target
-                    else "删除文件"
+                    else "移入 Windows 回收站"
                     if kind == "delete"
+                    else "仅修改课程显示名"
+                    if kind == "rename_course"
                     else "移除课程关联（保留原件）",
                 }
             ]
@@ -721,148 +774,305 @@ class CourseFileStore:
             index += 1
         return candidate
 
-    def import_files(self, course_id: str, value: CourseImportInput) -> dict:
+    def _tree_safe(self, path: Path) -> None:
+        """A copied directory cannot acquire data by following filesystem links."""
+        _local_path(str(path))
+        if path.is_dir():
+            for parent, directories, files in os.walk(path, followlinks=False):
+                for name in directories + files:
+                    item = Path(parent) / name
+                    if _is_link(item):
+                        raise AppError("FILE_LINK_DENIED", "文件夹中含链接，不能复制或移动", 422)
+
+    def _copy_file(self, source: Path, target: Path) -> str:
+        source, target = Path(source), Path(target)
+        _local_path(str(source), directory=False)
+        with _read_locked(source) as original, target.open("xb") as copied:
+            shutil.copyfileobj(original, copied, length=1024 * 1024)
+            copied.flush()
+            os.fsync(copied.fileno())
+        shutil.copystat(source, target, follow_symlinks=False)
+        return str(target)
+
+    def _copy_many(
+        self,
+        course_id: str,
+        sources: list[Path],
+        destination_value: str,
+        operation_id: str | None,
+        *,
+        kind: str,
+        payload: dict,
+        mode: str = "copy",
+    ) -> dict:
         with self._lock:
+            previous = self._prior(course_id, kind, payload, operation_id)
+            if previous is not None:
+                return previous
             root = self._root(course_id)
-            destination = self._path(root, value.destination)
+            destination = self._path(root, destination_value)
             if not destination.is_dir():
-                raise AppError("FILE_DIRECTORY_REQUIRED", "导入目标必须是文件夹", 422)
-            selected = value.paths if value.paths is not None else choose_paths(directory=False)
-            payload = {
-                "paths": [str(Path(path).absolute()) for path in dict.fromkeys(selected)],
-                "destination": value.destination,
-                "mode": value.mode,
-                "conflict": value.conflict,
-            }
-            previous = self._prior(course_id, "import", payload, value.operation_id)
-            if previous is not None:
-                return previous
-            sources = [_local_path(path, directory=False) for path in dict.fromkeys(selected)]
-            payload = {
-                "paths": [str(path) for path in sources],
-                "destination": value.destination,
-                "mode": value.mode,
-                "conflict": value.conflict,
-            }
-            op_id, previous = self._begin(course_id, "import", payload, value.operation_id)
-            if previous is not None:
-                return previous
-            plans: list[tuple[Path, Path]] = []
-            conflicts: list[str] = []
+                raise AppError("FILE_DIRECTORY_REQUIRED", "复制目标必须是文件夹", 422)
+            selected: list[Path] = []
+            for source in sorted(dict.fromkeys(sources), key=lambda item: len(item.parts)):
+                if any(parent.is_dir() and source.is_relative_to(parent) for parent in selected):
+                    continue
+                self._tree_safe(source)
+                if source.is_dir() and destination.is_relative_to(source):
+                    raise AppError("FILE_MOVE_INVALID", "不能将文件夹放入自身或其子目录", 422)
+                selected.append(source)
             reserved: set[Path] = set()
-            for source in sources:
-                if source.is_relative_to(root):
-                    # Already inside this course: retain its real path and bytes.
-                    target = source
-                else:
-                    target = destination / source.name
-                    if _is_link(target):
-                        self._checkpoint(op_id, "failed", error="FILE_LINK_DENIED")
-                        raise AppError("FILE_LINK_DENIED", "不能导入到链接目标", 422)
-                    if target.exists() or target in reserved:
-                        if _is_link(target) or target.is_dir():
-                            self._checkpoint(op_id, "failed", error="FILE_TARGET_INVALID")
-                            raise AppError("FILE_TARGET_INVALID", "同名目标不是可替换的普通文件")
-                        if value.conflict == "ask" or (
-                            value.conflict == "replace" and target in reserved
-                        ):
-                            conflicts.append(target.relative_to(root).as_posix())
-                        elif value.conflict == "skip":
-                            continue
-                        elif value.conflict == "keep_both":
-                            target = self._unique(target, reserved)
+            plans = []
+            for source in selected:
+                target = destination / source.name
+                if mode == "move" and source == target:
+                    plans.append((source, target))
+                    continue
+                # Existing links are refused rather than treated as an available
+                # name; normal conflicts always receive a fresh sibling name.
+                self._path(root, target.relative_to(root).as_posix(), exists=False)
+                if _is_link(target):
+                    raise AppError("FILE_LINK_DENIED", "不能复制到链接目标", 422)
+                target = self._unique(target, reserved)
                 reserved.add(target)
                 plans.append((source, target))
-            if conflicts:
-                return self._finish(
-                    op_id,
-                    {
-                        "operation_id": op_id,
-                        "state": "conflict",
-                        "source_paths": [str(p) for p in sources],
-                        "entries": [],
-                        "conflicts": conflicts,
-                    },
-                )
-            completed: list[tuple[Path, Path, bool]] = []
-            attempted: list[tuple[Path, Path, bool]] = []
-            metadata_started = False
+            op_id, previous = self._begin(course_id, kind, payload, operation_id)
+            if previous is not None:
+                return previous
             self._checkpoint(
                 op_id,
                 "prepared",
                 result={
                     "planned_paths": [
-                        {
-                            "source": str(source),
-                            "target": str(target),
-                            "target_existed": target.exists(),
-                        }
-                        for source, target in plans
+                        {"source": str(source), "target": str(target)} for source, target in plans
                     ]
                 },
             )
+            touched = False
             try:
+                result_entries = []
                 for source, target in plans:
-                    existed = target.exists()
                     if source != target:
                         self._path(root, target.relative_to(root).as_posix(), exists=False)
-                        if _is_link(target):
-                            raise AppError("FILE_LINK_DENIED", "导入目标已经变成链接", 422)
-                        if existed and value.conflict != "replace":
-                            raise AppError("FILE_CONFLICT", "目标文件已出现，请重新检查冲突")
-                        attempted.append((source, target, existed))
-                        if value.mode == "move":
-                            shutil.move(str(source), str(target))
+                        if target.exists() or _is_link(target):
+                            raise AppError("FILE_CONFLICT", "目标在操作期间变化，请先核对", 409)
+                        touched = True
+                        if mode == "move":
+                            source.rename(target)
+                        elif source.is_dir():
+                            shutil.copytree(source, target, copy_function=self._copy_file)
                         else:
-                            shutil.copy2(source, target)
-                        completed.append((source, target, existed))
-                    self.repository._hook(
-                        "course_file_after_filesystem",
-                        operation_id=op_id,
-                        source=str(source),
-                        target=str(target),
-                    )
-                self._checkpoint(op_id, "filesystem_done")
-                metadata_started = True
-                result_entries = []
-                for original, target in plans:
-                    if value.mode == "move" and original != target:
-                        self._relocate_registered(original, target)
-                    self._register(course_id, root, target)
+                            self._copy_file(source, target)
+                        self.repository._hook(
+                            "course_file_after_filesystem",
+                            operation_id=op_id,
+                            source=str(source),
+                            target=str(target),
+                        )
+                        self._checkpoint(op_id, "filesystem_done")
+                        if mode == "move":
+                            self._changed_paths(course_id, source, target, root)
+                    if target.is_file():
+                        self._register(course_id, root, target)
                     result_entries.append(self._entry(course_id, root, target))
                 return self._finish(
                     op_id,
                     {
                         "operation_id": op_id,
                         "state": "completed",
-                        "source_paths": [str(p) for p in sources],
+                        "source_paths": [str(p) for p in selected],
                         "entries": result_entries,
                         "conflicts": [],
                     },
                 )
             except Exception as exc:
-                # Never retry an uncertain or destructive filesystem action. Safe
-                # new targets can be compensated; replacements need explicit review.
-                review = (
-                    metadata_started
-                    or len(attempted) != len(completed)
-                    or any(existed for _, _, existed in attempted)
-                )
-                for source, target, existed in reversed(completed if not metadata_started else []):
-                    if existed:
-                        continue
-                    try:
-                        if value.mode == "move" and target.exists() and not source.exists():
-                            shutil.move(str(target), str(source))
-                        elif value.mode == "copy" and target.exists():
-                            target.unlink()
-                    except OSError:
-                        review = True
                 code = exc.code if isinstance(exc, AppError) else "FILE_OPERATION_FAILED"
-                self._checkpoint(op_id, "needs_review" if review else "failed", error=code)
+                self._checkpoint(op_id, "needs_review" if touched else "failed", error=code)
                 if isinstance(exc, AppError):
                     raise
-                raise AppError(code, "文件操作未完成，已保存操作记录，请先对账") from exc
+                raise AppError(code, "文件操作结果需要核对，未自动重试", 409) from exc
+
+    def import_files(self, course_id: str, value: CourseImportInput) -> dict:
+        if value.mode != "copy" or value.conflict != "keep_both":
+            raise AppError("EXTERNAL_COPY_ONLY", "外部资料只支持复制并自动保留同名文件", 422)
+        selected = value.paths if value.paths is not None else choose_paths(directory=False)
+        payload = {
+            "paths": [str(Path(path).absolute()) for path in dict.fromkeys(selected)],
+            "destination": value.destination,
+            "mode": "copy",
+            "conflict": "keep_both",
+        }
+        previous = self._prior(course_id, "import", payload, value.operation_id)
+        if previous is not None:
+            return previous
+        sources = [_local_path(path) for path in payload["paths"]]
+        return self._copy_many(
+            course_id,
+            sources,
+            value.destination,
+            value.operation_id,
+            kind="import",
+            payload=payload,
+        )
+
+    def transfer(self, course_id: str, value: CourseTransferInput) -> dict:
+        payload = {
+            "paths": list(dict.fromkeys(value.paths)),
+            "destination": value.destination,
+            "mode": value.mode,
+        }
+        previous = self._prior(course_id, "transfer", payload, value.operation_id)
+        if previous is not None:
+            return previous
+        root = self._root(course_id)
+        sources = [self._path(root, path) for path in payload["paths"]]
+        if root in sources:
+            raise AppError("FILE_MOVE_INVALID", "不能复制或移动课程根目录", 422)
+        return self._copy_many(
+            course_id,
+            sources,
+            value.destination,
+            value.operation_id,
+            kind="transfer",
+            payload=payload,
+            mode=value.mode,
+        )
+
+    def clipboard(self, course_id: str, value: CourseClipboardInput) -> dict:
+        return self.import_files(
+            course_id,
+            CourseImportInput(
+                paths=read_clipboard_paths(),
+                destination=value.destination,
+                operation_id=value.operation_id,
+            ),
+        )
+
+    def properties(self, course_id: str, value: str) -> dict:
+        root = self._root(course_id)
+        path = self._path(root, value)
+        return {**self._entry(course_id, root, path), "root_path": str(root)}
+
+    async def upload(
+        self,
+        course_id: str,
+        path_value: str,
+        destination_value: str,
+        operation_id: str,
+        request: Request,
+    ) -> dict:
+        """Stream browser-owned File bytes; no source file path is fabricated."""
+        maximum = 8 * 1024 * 1024 * 1024
+        raw_length = request.headers.get("content-length")
+        try:
+            length = int(raw_length) if raw_length is not None else None
+        except ValueError as exc:
+            raise AppError("FILE_UPLOAD_INVALID", "文件长度格式无效", 422) from exc
+        if length is not None and (length < 0 or length > maximum):
+            raise AppError("FILE_UPLOAD_TOO_LARGE", "单个文件超过 8 GiB 上传上限", 413)
+        root = self._root(course_id)
+        destination = self._path(root, destination_value)
+        if not destination.is_dir():
+            raise AppError("FILE_DIRECTORY_REQUIRED", "复制目标必须是文件夹", 422)
+        proposed = self._path(root, (Path(destination_value) / path_value).as_posix(), exists=False)
+        relative = proposed.relative_to(destination)
+        if not relative.parts:
+            raise AppError("FILE_NAME_INVALID", "请选择文件", 422)
+        for part in relative.parts:
+            _name(part)
+        payload = {"path": path_value, "destination": destination_value, "declared_bytes": length}
+        with self._lock:
+            previous = self._prior(course_id, "upload", payload, operation_id)
+            if previous is None:
+                op_id, _ = self._begin(course_id, "upload", payload, operation_id)
+            else:
+                op_id = operation_id
+        staging = self.repository.root / "file-transfers"
+        staging.mkdir(exist_ok=True)
+        temporary = staging / f"{op_id}-{uuid4().hex}.partial"
+        total, digest = 0, hashlib.sha256()
+        touched = False
+        try:
+            with temporary.open("xb") as output:
+                async for chunk in request.stream():
+                    total += len(chunk)
+                    if total > maximum:
+                        raise AppError("FILE_UPLOAD_TOO_LARGE", "单个文件超过 8 GiB 上传上限", 413)
+                    output.write(chunk)
+                    digest.update(chunk)
+                output.flush()
+                os.fsync(output.fileno())
+            if length is not None and total != length:
+                raise AppError("FILE_UPLOAD_INCOMPLETE", "文件未完整传入，请先核对操作状态", 409)
+            if previous is not None:
+                if previous.get("content_sha256") != digest.hexdigest():
+                    raise AppError("FILE_OPERATION_CONFLICT", "同一操作身份的文件内容发生变化", 409)
+                return previous
+
+            def publish():
+                nonlocal touched
+                with self._lock:
+                    self._path(root, proposed.relative_to(root).as_posix(), exists=False)
+                    parent = proposed.parent
+                    if parent.exists() and not parent.is_dir():
+                        raise AppError("FILE_DIRECTORY_REQUIRED", "目标父路径不是文件夹", 422)
+                    # Every missing parent is rooted/checked above. Never substitute
+                    # a filename containing traversal or an absolute Windows path.
+                    touched = not parent.exists()
+                    parent.mkdir(parents=True, exist_ok=True)
+                    self._path(root, parent.relative_to(root).as_posix())
+                    target = self._unique(proposed, set())
+                    self._checkpoint(
+                        op_id,
+                        "prepared",
+                        result={
+                            "planned_paths": [
+                                {"source": "浏览器用户选取文件", "target": str(target)}
+                            ]
+                        },
+                    )
+                    touched = True
+                    self._copy_file(temporary, target)
+                    self.repository._hook(
+                        "course_file_after_filesystem",
+                        operation_id=op_id,
+                        source="browser-upload",
+                        target=str(target),
+                    )
+                    self._checkpoint(op_id, "filesystem_done")
+                    self._register(course_id, root, target)
+                    return self._finish(
+                        op_id,
+                        {
+                            "operation_id": op_id,
+                            "state": "completed",
+                            "source_paths": [],
+                            "entries": [self._entry(course_id, root, target)],
+                            "conflicts": [],
+                            "content_sha256": digest.hexdigest(),
+                        },
+                    )
+
+            return await asyncio.to_thread(publish)
+        except Exception as exc:
+            if previous is None:
+                self._checkpoint(
+                    op_id,
+                    "needs_review" if touched else "failed",
+                    error=exc.code if isinstance(exc, AppError) else "FILE_UPLOAD_FAILED",
+                )
+            if isinstance(exc, AppError):
+                raise
+            raise AppError("FILE_UPLOAD_FAILED", "文件复制未完成，请先核对操作状态", 409) from exc
+        finally:
+            # This is our private temporary upload, never a course/user original.
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                # A cancelled HTTP observer may leave a still-owned publish
+                # worker reading this file. Preserve it rather than masking the
+                # original result or touching any course file.
+                pass
 
     def directory(self, course_id: str, value: CourseDirectoryInput) -> dict:
         with self._lock:
@@ -1040,124 +1250,71 @@ class CourseFileStore:
             root = self._root(course_id)
             path = self._path(root, value.path)
             if path == root:
-                raise AppError(
-                    "COURSE_ROOT_DELETE_DENIED", "不能通过资料删除操作删除课程根目录", 422
-                )
-            # Recursive user-data deletion is deliberately not offered. Empty
-            # directories can be removed, files require the explicit confirmation.
-            if path.is_dir() and any(path.iterdir()):
-                raise AppError("FILE_DIRECTORY_NOT_EMPTY", "文件夹非空，请逐项确认要删除的文件")
-            op_id, previous = self._begin(
-                course_id,
-                "delete",
-                {"path": value.path, "confirm": value.confirm},
-                value.operation_id,
-            )
+                raise AppError("COURSE_ROOT_DELETE_DENIED", "不能将课程根目录移入回收站", 422)
+            self._tree_safe(path)
+            op_id, previous = self._begin(course_id, "delete", payload, value.operation_id)
             if previous is not None:
                 return previous
             try:
-                path.rmdir() if path.is_dir() else path.unlink()
+                recycle_path(path)
+                self.repository._hook(
+                    "course_file_after_filesystem",
+                    operation_id=op_id,
+                    source=str(path),
+                    target="Windows Recycle Bin",
+                )
                 self._checkpoint(op_id, "filesystem_done")
+                relative = path.relative_to(root).as_posix()
                 with self.engine.begin() as conn:
                     conn.execute(
                         delete(entries).where(
                             entries.c.course_id == course_id,
-                            entries.c.relative_path == value.path.replace("\\", "/"),
+                            (entries.c.relative_path == relative)
+                            | entries.c.relative_path.startswith(relative + "/", autoescape=True),
                         )
                     )
-                return self._finish(op_id, {"operation_id": op_id, "state": "completed"})
-            except Exception as exc:
-                self._checkpoint(
-                    op_id,
-                    "needs_review" if not path.exists() else "failed",
-                    error="FILE_DELETE_FAILED",
+                return self._finish(
+                    op_id, {"operation_id": op_id, "state": "completed", "recycled": True}
                 )
+            except Exception as exc:
+                code = exc.code if isinstance(exc, AppError) else "FILE_RECYCLE_FAILED"
+                self._checkpoint(
+                    op_id, "needs_review" if not path.exists() else "failed", error=code
+                )
+                if isinstance(exc, AppError):
+                    raise
                 raise AppError(
-                    "FILE_DELETE_FAILED", "删除状态需核对；聊天、截图和旧来源记录保持保留"
+                    "FILE_RECYCLE_FAILED", "回收站结果需要核对，未执行永久删除", 409
                 ) from exc
 
     def rename_course(self, course_id: str, value: CourseRenameFolderInput) -> dict:
+        name = value.name.strip()
+        if not name or any(ord(character) < 32 for character in name):
+            raise AppError("COURSE_NAME_INVALID", "请输入有效的课程显示名称", 422)
         with self._lock:
-            root = self._root(course_id)
-            target = root.with_name(_name(value.name))
-            if target != root and target.exists():
-                raise AppError("FILE_CONFLICT", "同名课程文件夹已经存在")
             op_id, previous = self._begin(
-                course_id, "rename_course", {"name": value.name}, value.operation_id
+                course_id, "rename_course", {"name": name}, value.operation_id
             )
             if previous is not None:
                 return previous
-            changed = False
-            metadata_committed = False
             try:
-                if target != root:
-                    root.rename(target)
-                    changed = True
-                self._checkpoint(op_id, "filesystem_done")
                 with self.engine.begin() as conn:
-                    conn.execute(
-                        update(roots)
-                        .where(roots.c.course_id == course_id)
-                        .values(local_path=str(target))
-                    )
                     conn.execute(
                         update(business.courses)
                         .where(business.courses.c.course_id == course_id)
-                        .values(title=target.name)
+                        .values(title=name)
                     )
-                    paths = (
-                        conn.execute(
-                            select(business.source_versions)
-                            .join(
-                                business.course_assets,
-                                business.course_assets.c.asset_id
-                                == business.source_versions.c.asset_id,
-                            )
-                            .where(business.course_assets.c.course_id == course_id)
-                        )
-                        .mappings()
-                        .all()
-                    )
-                    for row in paths:
-                        original = Path(row["local_path"])
-                        if original.is_relative_to(root):
-                            conn.execute(
-                                update(business.source_versions)
-                                .where(
-                                    business.source_versions.c.asset_id == row["asset_id"],
-                                    business.source_versions.c.source_version
-                                    == row["source_version"],
-                                )
-                                .values(local_path=str(target / original.relative_to(root)))
-                            )
-                metadata_committed = True
                 return self._finish(
                     op_id,
                     {"operation_id": op_id, "state": "completed", "root": self.folder(course_id)},
                 )
             except Exception as exc:
-                if metadata_committed:
-                    self._checkpoint(op_id, "needs_review", error="COURSE_RENAME_UNKNOWN")
-                    raise AppError(
-                        "COURSE_RENAME_UNKNOWN", "目录与记录已更新，但完成回执需要核对；请先对账"
-                    ) from exc
-                if changed:
-                    try:
-                        target.rename(root)
-                    except OSError:
-                        self._checkpoint(op_id, "needs_review", error="COURSE_RENAME_UNKNOWN")
-                        raise AppError(
-                            "COURSE_RENAME_UNKNOWN", "课程目录状态需要对账，原聊天身份保持不变"
-                        ) from exc
-                self._checkpoint(op_id, "needs_review", error="COURSE_RENAME_FAILED")
-                raise AppError("COURSE_RENAME_FAILED", "课程改名未完成，请核对目录状态") from exc
+                self._checkpoint(op_id, "needs_review", error="COURSE_RENAME_UNKNOWN")
+                raise AppError("COURSE_RENAME_UNKNOWN", "课程显示名保存结果需要核对", 409) from exc
 
     def detach(self, course_id: str, value: CourseDetachInput) -> dict:
         with self._lock:
-            if self.folder(course_id)["root_path"] is None:
-                raise AppError(
-                    "COURSE_ROOT_REQUIRED", "旧课程请先选择根文件夹，再移除课程关联；不会搬运资料"
-                )
+            self.folder(course_id)  # Existence check; a missing/unbound root is removable.
             op_id, previous = self._begin(
                 course_id, "detach", {"confirm": value.confirm}, value.operation_id
             )
@@ -1167,6 +1324,17 @@ class CourseFileStore:
                 conn.execute(
                     update(roots).where(roots.c.course_id == course_id).values(state="detached")
                 )
+                exists = conn.execute(
+                    select(visibility.c.course_id).where(visibility.c.course_id == course_id)
+                ).first()
+                if exists:
+                    conn.execute(
+                        update(visibility)
+                        .where(visibility.c.course_id == course_id)
+                        .values(hidden=True)
+                    )
+                else:
+                    conn.execute(insert(visibility).values(course_id=course_id, hidden=True))
             return self._finish(
                 op_id, {"operation_id": op_id, "state": "completed", "root": self.folder(course_id)}
             )
@@ -1287,15 +1455,25 @@ def install_course_file_routes(app: FastAPI) -> None:
             app.state.course_files = CourseFileStore(app.state.repository)
         return app.state.course_files
 
+    @app.post("/api/v1/courses/folder/pick", response_model=CourseFolderPickResponse | None)
+    def pick_folder():
+        selected = choose_paths(directory=True)
+        if not selected:
+            return None
+        path = _local_path(selected[0], directory=True)
+        if not path.name or path == Path(path.anchor):
+            raise AppError("COURSE_ROOT_INVALID", "请选择磁盘下的课程文件夹", 422)
+        return {"path": str(path), "name": path.name}
+
     @app.post("/api/v1/courses/folder", response_model=CourseFolderResponse | None)
     def create_folder(value: CourseFolderInput):
         selected = [value.path] if value.path else choose_paths(directory=True)
-        return store().bind(None, selected[0]) if selected else None
+        return store().bind(None, selected[0], value.title) if selected else None
 
     @app.post("/api/v1/courses/{course_id}/root", response_model=CourseFolderResponse | None)
     def bind_folder(course_id: str, value: CourseFolderInput):
         selected = [value.path] if value.path else choose_paths(directory=True)
-        return store().bind(course_id, selected[0]) if selected else None
+        return store().bind(course_id, selected[0], value.title) if selected else None
 
     @app.get("/api/v1/courses/{course_id}/files", response_model=CourseFileListResponse)
     def list_files(course_id: str, path: str = ""):
@@ -1304,6 +1482,26 @@ def install_course_file_routes(app: FastAPI) -> None:
     @app.post("/api/v1/courses/{course_id}/files/import", response_model=CourseImportResponse)
     def import_files(course_id: str, value: CourseImportInput):
         return store().import_files(course_id, value)
+
+    @app.post("/api/v1/courses/{course_id}/files/transfer", response_model=CourseImportResponse)
+    def transfer_files(course_id: str, value: CourseTransferInput):
+        return store().transfer(course_id, value)
+
+    @app.post("/api/v1/courses/{course_id}/files/clipboard", response_model=CourseImportResponse)
+    def paste_clipboard(course_id: str, value: CourseClipboardInput):
+        return store().clipboard(course_id, value)
+
+    @app.post("/api/v1/courses/{course_id}/files/upload", response_model=CourseImportResponse)
+    async def upload_file(
+        course_id: str, path: str, operation_id: str, request: Request, destination: str = ""
+    ):
+        return await store().upload(course_id, path, destination, operation_id, request)
+
+    @app.post(
+        "/api/v1/courses/{course_id}/files/properties", response_model=CourseFilePropertiesResponse
+    )
+    def file_properties(course_id: str, value: CoursePathInput):
+        return store().properties(course_id, value.path)
 
     @app.post(
         "/api/v1/courses/{course_id}/files/directory", response_model=CourseFileOperationResponse

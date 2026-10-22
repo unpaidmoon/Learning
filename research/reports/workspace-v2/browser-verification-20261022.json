@@ -1,0 +1,524 @@
+{
+  "report_date": "2026-10-22",
+  "status": "passed",
+  "kind": "synthetic real-browser verification; separate from real-provider and actual learning experience",
+  "run_id": "workspace-v2-browser-20261022-r1",
+  "mode": "full",
+  "passed_assertions": 67,
+  "assertion_count": 67,
+  "browser_cli_steps": 205,
+  "command": ".\\backend\\.venv\\Scripts\\python.exe tests/e2e/test_workspace_v2.py --mode full --run-id workspace-v2-browser-20261022-r1 --backend-port 19170 --ffmpeg-path C:\\Users\\cyb\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe",
+  "full_result": "output/playwright/workspace-v2-browser-20261022-r1/result.json",
+  "transport_counts": {
+    "local_messages": 6,
+    "real_provider_attempts": 0,
+    "business_attempts": 6,
+    "submissions": 6
+  },
+  "real_model_attempts": 0,
+  "build_pair_before": {
+    "present": true,
+    "manifest_sha256": "13cea4c8dd94d9cb86bf6b5876be483430cfa5177d1f11cdf24d48fda0b33471",
+    "source_count": 39,
+    "dist_count": 62,
+    "build_newer_than_all_sources": true,
+    "mismatches": [],
+    "matched": true
+  },
+  "build_pair_after": {
+    "present": true,
+    "manifest_sha256": "13cea4c8dd94d9cb86bf6b5876be483430cfa5177d1f11cdf24d48fda0b33471",
+    "source_count": 39,
+    "dist_count": 62,
+    "build_newer_than_all_sources": true,
+    "mismatches": [],
+    "matched": true
+  },
+  "source_digests_match_after": true,
+  "native_folder_picker": "deterministic seam; no actual system dialog clicks",
+  "native_clipboard": "deterministic CF_HDROP seam; system clipboard untouched",
+  "recycle_operation": "Formal Windows recycle helper executed on a uniquely generated synthetic file; this full flow verifies source disappearance. A separate native helper test verifies recycle-bin count/bytes growth. No recycle bin content was read or emptied.",
+  "pdf_observation": {
+    "actual_images": 6,
+    "unique_pages": 4,
+    "repeated_pages": 2,
+    "allowed_page_hashes": [
+      "5c9fa8d5653ca04b2fe7beee282e2ad461bc2416392252bd7b29c72d7c42f78e",
+      "7a817e36a680ff4f3781fa066059f1dc20d30d6a46711b389fc86c7e35363586",
+      "80f33cd053c77c1dee5fd493b78300c9cd214a3d043c8db4dabb1e062737cf2a",
+      "a65363f871af9ac7df6bc717d117bb5d54c8fc821915082e1860dedca2ca7f01"
+    ]
+  },
+  "pdf_interpretation": "The request contains both new scanned pages and all previously confirmed text-PDF pages; the set of actual image SHA256 equals the authorized page set exactly. Native durable history plus the protected current snapshot repeats 2 older pages. This pass does not optimize that established full-context resend policy.",
+  "text_attachment_scope": "Actual local outbound request includes complete TXT and Markdown start/end sentinels; PDF is sent as all rendered page images with page markers, not the original binary. Chat attachments do not enter the course file tree automatically.",
+  "matrix_scope": "Actual mouse selection of all visible M and 2x2 block-matrix glyphs through the period produces exact original LaTeX, excludes surrounding prose, renders in the reference card, and survives draft reload.",
+  "unknown_receipt_scope": "Accepted submission response is intentionally aborted after route.fetch; reload/history selection does not resend; explicit reconciliation finds the original generation without any second local dispatch.",
+  "stop_scope": "Active body output is held by a transport gate, cancelled through normal stop, retains its partial answer, and Host remains alive for same-chat follow-up.",
+  "video_component_probe": {
+    "run_id": "workspace-v2-video-20261021-r3",
+    "status": "passed",
+    "passed_assertions": 7,
+    "assertion_count": 7,
+    "result": "output/playwright/workspace-v2-video-20261021-r3/result.json",
+    "production_media_sources_still_match": true,
+    "changed_media_sources": [],
+    "scope": "Distinct red/green/blue timed synthetic frames; hover decodes correct target; main playback continues during drag with no seek; release makes exactly one seek; original pause state is preserved.",
+    "automated_pixel_evidence": "Hover at 60 seconds checks a green decoded pixel. Drag toward 90 seconds automatically waits for decoded frame time above 85 seconds and separately checks uninterrupted primary playback and zero early seeks.",
+    "manual_pixel_evidence": "The saved drag-preview-synthetic.png was visually checked: preview is blue at 1:30 while the primary stays red near 0:06. No automated blue-pixel assertion is claimed."
+  },
+  "isolated_matrix_probe": {
+    "status": "passed",
+    "passed_assertions": 7,
+    "assertion_count": 7,
+    "result": "output/playwright/matrix-selection-v2-20261021-r1/result.json"
+  },
+  "screenshots_reviewed": [
+    "output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-light.png",
+    "output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-dark.png",
+    "output/playwright/workspace-v2-video-20261021-r3/drag-preview-synthetic.png"
+  ],
+  "visual_review": "Both final light/dark screenshots reviewed: current-course tree and icons, fixed File tab, left title/history selector, pure + composer without footer, and full rendered matrix reference are visible without overlapping or clipped controls at 1440x1000.",
+  "assertions": [
+    {
+      "name": "served_build_matches_explicit_production_source_manifest",
+      "passed": true
+    },
+    {
+      "name": "no_course_shows_composer_instead_of_start_question_page",
+      "passed": true
+    },
+    {
+      "name": "account_DTO_stays_available_without_credentials",
+      "passed": true
+    },
+    {
+      "name": "create_course_uses_name_and_folder_picker_without_path_textbox",
+      "passed": true
+    },
+    {
+      "name": "cancelling_native_folder_selection_does_not_create_course",
+      "passed": true
+    },
+    {
+      "name": "choosing_folder_only_prepares_creation_until_explicit_create",
+      "passed": true
+    },
+    {
+      "name": "course_display_name_is_independent_of_existing_disk_folder",
+      "passed": true
+    },
+    {
+      "name": "course_opens_one_current_empty_chat_with_direct_composer",
+      "passed": true
+    },
+    {
+      "name": "chat_has_no_start_page_footer_or_history_placeholder_option",
+      "passed": true
+    },
+    {
+      "name": "permanent_file_tab_is_initially_selected_and_has_no_close_action",
+      "passed": true
+    },
+    {
+      "name": "sidebar_button_hides_whole_course_area_and_releases_space",
+      "passed": true
+    },
+    {
+      "name": "sidebar_toggle_preserves_current_chat",
+      "passed": true
+    },
+    {
+      "name": "icon_file_manager_lists_all_formats_and_folders",
+      "passed": true
+    },
+    {
+      "name": "file_manager_defaults_to_icon_view",
+      "passed": true
+    },
+    {
+      "name": "sidebar_has_no_import_or_new_folder_entry",
+      "passed": true
+    },
+    {
+      "name": "external_copy_keeps_source_and_auto_numbers_collision_without_replacement",
+      "passed": true
+    },
+    {
+      "name": "external_import_endpoint_rejects_move_mode",
+      "passed": true
+    },
+    {
+      "name": "explicit_native_clipboard_paste_copies_and_preserves_source",
+      "passed": true
+    },
+    {
+      "name": "normal_external_copy_displays_no_copy_move_or_collision_dialog",
+      "passed": true
+    },
+    {
+      "name": "browser_DataTransfer_drop_copies_file_bytes_without_touching_external_original",
+      "passed": true
+    },
+    {
+      "name": "internal_copy_and_toolbar_paste_copy_into_current_directory",
+      "passed": true
+    },
+    {
+      "name": "internal_cut_paste_moves_and_auto_preserves_existing_target",
+      "passed": true
+    },
+    {
+      "name": "file_manager_creates_real_directory",
+      "passed": true
+    },
+    {
+      "name": "file_manager_renames_real_file",
+      "passed": true
+    },
+    {
+      "name": "selected_file_properties_show_actual_name_size_and_time",
+      "passed": true
+    },
+    {
+      "name": "file_manager_can_switch_to_list_view",
+      "passed": true
+    },
+    {
+      "name": "filename_search_filters_current_directory",
+      "passed": true
+    },
+    {
+      "name": "folder_navigation_back_forward_and_parent_are_usable",
+      "passed": true
+    },
+    {
+      "name": "explicit_delete_invokes_real_Windows_recycle_operation_on_synthetic_file",
+      "passed": true
+    },
+    {
+      "name": "file_browser_rejects_parent_path_escape",
+      "passed": true
+    },
+    {
+      "name": "course_rename_button_is_hidden_until_pointer_nears_course_name",
+      "passed": true
+    },
+    {
+      "name": "UI_course_rename_changes_only_display_name_not_real_root",
+      "passed": true
+    },
+    {
+      "name": "one_open_video_has_a_separate_closable_tab_beside_permanent_files",
+      "passed": true
+    },
+    {
+      "name": "closing_last_video_returns_icon_file_manager_and_preserves_chat",
+      "passed": true
+    },
+    {
+      "name": "closing_last_file_does_not_create_conversation",
+      "passed": true
+    },
+    {
+      "name": "formal_registered_video_can_preview_locally_without_model_dispatch",
+      "passed": true
+    },
+    {
+      "name": "accepted_whole_chat_document_two-page-text.pdf",
+      "passed": true
+    },
+    {
+      "name": "accepted_whole_chat_document_whole-document.txt",
+      "passed": true
+    },
+    {
+      "name": "accepted_whole_chat_document_whole-document.md",
+      "passed": true
+    },
+    {
+      "name": "PDF_metadata_retains_both_selected_pages",
+      "passed": true
+    },
+    {
+      "name": "chat_document_upload_does_not_import_into_course_folder",
+      "passed": true
+    },
+    {
+      "name": "PDF_over_page_limit_is_rejected_without_silent_truncation",
+      "passed": true
+    },
+    {
+      "name": "invalid_PDF_is_rejected_before_submission",
+      "passed": true
+    },
+    {
+      "name": "whole_documents_publish_through_formal_submission",
+      "passed": true
+    },
+    {
+      "name": "two_distinct_full_PDF_pages_reach_actual_Host_as_two_confirmed_images",
+      "passed": true
+    },
+    {
+      "name": "text_and_Markdown_reach_actual_request_without_head_or_tail_truncation",
+      "passed": true
+    },
+    {
+      "name": "original_PDF_binary_is_not_misrepresented_as_native_provider_document",
+      "passed": true
+    },
+    {
+      "name": "pure_plus_file_input_accepts_entire_PDF_into_draft_without_dispatch",
+      "passed": true
+    },
+    {
+      "name": "plus_has_no_choose_image_text_and_composer_has_no_normal_footer",
+      "passed": true
+    },
+    {
+      "name": "documents_and_question_auto_save_without_save_button",
+      "passed": true
+    },
+    {
+      "name": "UI_uploaded_scanned_PDF_sends_both_new_pages_and_only_previously_confirmed_history_pages",
+      "passed": true
+    },
+    {
+      "name": "whole_visible_block_matrix_selection_has_add_entry_without_unmapped_error",
+      "passed": true
+    },
+    {
+      "name": "ordinary_matrix_selection_does_not_add_to_draft",
+      "passed": true
+    },
+    {
+      "name": "matrix_card_preserves_exact_full_matrix_LaTeX_and_excludes_other_text",
+      "passed": true
+    },
+    {
+      "name": "whole_matrix_reference_card_remains_rendered_mathematics",
+      "passed": true
+    },
+    {
+      "name": "auto_saved_full_matrix_reference_and_question_restore_after_reload",
+      "passed": true
+    },
+    {
+      "name": "stop_test_has_real_active_body_and_transport_gate",
+      "passed": true
+    },
+    {
+      "name": "active_cancel_retains_partial_answer_without_killing_Host",
+      "passed": true
+    },
+    {
+      "name": "same_chat_followup_after_active_stop",
+      "passed": true
+    },
+    {
+      "name": "same_submission_identity_reuses_generation_and_conflicting_body_rejected",
+      "passed": true
+    },
+    {
+      "name": "duplicate_browser_HTTP_submission_dispatches_once",
+      "passed": true
+    },
+    {
+      "name": "lost_receipt_is_an_accepted_real_local_dispatch_with_original_identity",
+      "passed": true
+    },
+    {
+      "name": "workspace_reload_and_history_switch_do_not_resend_unknown_submission",
+      "passed": true
+    },
+    {
+      "name": "explicit_workspace_reconciliation_uses_original_generation_without_resubmit",
+      "passed": true
+    },
+    {
+      "name": "implementation_and_build_unchanged_during_integration",
+      "passed": true
+    },
+    {
+      "name": "source_to_build_pair_manifest_stays_matched_after_whole_suite",
+      "passed": true
+    },
+    {
+      "name": "synthetic_suite_never_dispatched_real_model",
+      "passed": true
+    }
+  ],
+  "prior_failures_preserved": [
+    {
+      "run_id": "workspace-v2-attachments-20261021-r1",
+      "status": "failed",
+      "passed_assertions": 16,
+      "assertion_count": 16,
+      "original_result": "output/playwright/workspace-v2-attachments-20261021-r1/result.json",
+      "failure": {
+        "type": "FileNotFoundError",
+        "message": "[WinError 206] 文件名或扩展名太长。"
+      },
+      "assessment": "Driver limitation: large base64 in Windows command argv; replaced with private Python HTTP client."
+    },
+    {
+      "run_id": "workspace-v2-attachments-20261021-r2",
+      "status": "failed",
+      "passed_assertions": 11,
+      "assertion_count": 11,
+      "original_result": "output/playwright/workspace-v2-attachments-20261021-r2/result.json",
+      "failure": {
+        "type": "AttributeError",
+        "message": "'function' object has no attribute 'cookiejar'"
+      },
+      "assessment": "Driver namespace shadowing; corrected CookieJar import."
+    },
+    {
+      "run_id": "workspace-v2-attachments-20261021-r3",
+      "status": "failed",
+      "passed_assertions": 22,
+      "assertion_count": 23,
+      "original_result": "output/playwright/workspace-v2-attachments-20261021-r3/result.json",
+      "failure": {
+        "type": "AssertionError",
+        "message": "implementation_and_build_unchanged_during_integration"
+      },
+      "assessment": "Functional checks passed; source freeze failed during parallel development, not accepted as final."
+    },
+    {
+      "run_id": "workspace-v2-browser-20261021-r1",
+      "status": "failed",
+      "passed_assertions": 48,
+      "assertion_count": 49,
+      "original_result": "output/playwright/workspace-v2-browser-20261021-r1/result.json",
+      "failure": {
+        "type": "AssertionError",
+        "message": "UI_uploaded_scanned_PDF_sends_all_pages_beside_previously_submitted_text_PDF_history"
+      },
+      "assessment": "Observed 6 image blocks / 4 authorized unique pages; incorrect exact-count assertion replaced by exact authorization-set assertion. The 2 repeated historical pages remain a documented limitation."
+    },
+    {
+      "run_id": "workspace-v2-browser-20261021-r2",
+      "status": "failed",
+      "passed_assertions": 30,
+      "assertion_count": 30,
+      "original_result": "output/playwright/workspace-v2-browser-20261021-r2/result.json",
+      "failure": {
+        "type": "RuntimeError",
+        "message": "Playwright CLI失败：run-code，见 D:\\Codex\\Learning\\output\\playwright\\workspace-v2-browser-20261021-r2\\browser"
+      },
+      "assessment": "Driver window access outside page context; corrected page.evaluate scope."
+    },
+    {
+      "run_id": "workspace-v2-browser-20261021-r3",
+      "status": "failed",
+      "passed_assertions": 49,
+      "assertion_count": 50,
+      "original_result": "output/playwright/workspace-v2-browser-20261021-r3/result.json",
+      "failure": {
+        "type": "AssertionError",
+        "message": "documents_and_question_auto_save_without_save_button"
+      },
+      "assessment": "Actual initial pristine chat history-navigation race. The original selected chat never became active; autosave wrote the correct text and attachment to the still-active new chat. Narrow saveDraft and navigation-epoch fixes and strict actual-ID/POST-response waits preceded the final run."
+    },
+    {
+      "run_id": "workspace-v2-files-20261021-r1",
+      "status": "failed",
+      "passed_assertions": 18,
+      "assertion_count": 19,
+      "original_result": "output/playwright/workspace-v2-files-20261021-r1/result.json",
+      "failure": {
+        "type": "AssertionError",
+        "message": "browser_DataTransfer_drop_copies_file_bytes_without_touching_external_original"
+      },
+      "assessment": "Driver LF expectation differed from the Windows fixture CRLF; drop now constructs exact fixture bytes."
+    },
+    {
+      "run_id": "workspace-v2-files-20261021-r2",
+      "status": "failed",
+      "passed_assertions": 23,
+      "assertion_count": 23,
+      "original_result": "output/playwright/workspace-v2-files-20261021-r2/result.json",
+      "failure": {
+        "type": "RuntimeError",
+        "message": "Playwright CLI失败：run-code，见 D:\\Codex\\Learning\\output\\playwright\\workspace-v2-files-20261021-r2\\browser"
+      },
+      "assessment": "Driver did not reselect renamed entry before properties; corrected the selection sequence."
+    },
+    {
+      "run_id": "workspace-v2-files-20261021-r3",
+      "status": "failed",
+      "passed_assertions": 30,
+      "assertion_count": 31,
+      "original_result": "output/playwright/workspace-v2-files-20261021-r3/result.json",
+      "failure": {
+        "type": "AssertionError",
+        "message": "implementation_and_build_unchanged_during_integration"
+      },
+      "assessment": "Functional checks passed; source freeze failed during parallel development, not accepted as final."
+    },
+    {
+      "run_id": "workspace-v2-video-20261021-r2",
+      "status": "failed",
+      "passed_assertions": 2,
+      "assertion_count": 2,
+      "original_result": "output/playwright/workspace-v2-video-20261021-r2/result.json",
+      "failure": {
+        "type": "RuntimeError",
+        "message": "Playwright CLI失败：run-code，见 D:\\Codex\\Learning\\output\\playwright\\workspace-v2-video-20261021-r2\\browser"
+      },
+      "assessment": "Driver window access outside page context; corrected page.evaluate scope."
+    }
+  ],
+  "pre_result_driver_failures": [
+    {
+      "run_id": "workspace-v2-video-20261021-r1",
+      "assessment": "Driver http namespace collision before server startup; generated fixture preserved; no result JSON."
+    },
+    {
+      "run_id": "workspace-v2-fixture-selfcheck-20261021",
+      "assessment": "Pillow PDF encoder registration failed; replaced by deterministic manual Flate RGB PDF writer; partial generation preserved."
+    }
+  ],
+  "cleanup": {
+    "browser": {
+      "owned_pids_before": [],
+      "remaining_pids": [],
+      "method": "windows_job"
+    },
+    "server": {
+      "group": {
+        "owned_pids_before": [],
+        "remaining_pids": [],
+        "method": "windows_job"
+      },
+      "backend_port_closed": true,
+      "worker": {
+        "host": {
+          "owned_pids_before": [
+            27360,
+            28988
+          ],
+          "remaining_pids": [],
+          "method": "windows_job",
+          "host_port_closed": true
+        }
+      }
+    },
+    "owned_validation_ports_closed": {
+      "19170": true,
+      "19171": true,
+      "19172": true,
+      "19173": true,
+      "19174": true
+    }
+  },
+  "not_covered": [
+    "Actual native folder-picker clicks and Windows clipboard UX use deterministic native seams in this browser run.",
+    "No cloud model request was made by this suite; parent records separately authorized real-model retests after this gate.",
+    "No real course, real video frame, screen capture, user clipboard or actual learning-session evaluation.",
+    "No full Office/ASR, knowledge-base uses, Android/sync, free multi-window, or complete installer expansion.",
+    "No claim of universal arbitrary-complex partial-formula mapping, all keyboard/accessibility paths or multi-monitor capture behavior.",
+    "Repeated confirmed PDF history pages remain; very long native histories can reach the existing actual outbound body-size guard. Requests fail instead of silently dropping pages or changing models."
+  ]
+}

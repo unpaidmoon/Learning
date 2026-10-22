@@ -42,6 +42,8 @@ export function VideoControls({
   volume,
   muted,
   rate,
+  previewSrc,
+  sourceKey,
   onFullscreen,
   onSeek,
   onTogglePlay,
@@ -55,6 +57,8 @@ export function VideoControls({
   volume: number;
   muted: boolean;
   rate: number;
+  previewSrc?: string;
+  sourceKey?: string;
   onFullscreen: () => Promise<void>;
   onSeek: (seconds: number) => void;
   onTogglePlay: () => void;
@@ -62,18 +66,124 @@ export function VideoControls({
   onVolume: (value: number) => void;
   onRate: (value: number) => void;
 }) {
+  const progress = useRef<HTMLInputElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ pointerId: number; value: number } | null>(null);
+  const [scrub, setScrub] = useState<number | null>(null);
+  const [preview, setPreview] = useState<{ time: number; left: number } | null>(null);
+  const maximum = Number.isFinite(duration) && duration > 0 ? duration : 1;
+  const position = Math.min(maximum, Math.max(0, scrub ?? elapsed));
+
+  const clamp = (seconds: number) => Math.min(maximum, Math.max(0, seconds));
+  const previewAt = (time: number, left?: number) => {
+    const box = track.current?.getBoundingClientRect();
+    const width = box?.width || 160;
+    const point = left ?? (clamp(time) / maximum) * width;
+    setPreview({
+      time: clamp(time),
+      left: width < 176 ? width / 2 : Math.max(88, Math.min(width - 88, point)),
+    });
+  };
+  const fromPointer = (clientX: number, fallback: number) => {
+    const box = progress.current?.getBoundingClientRect();
+    if (!box?.width || !Number.isFinite(clientX)) return clamp(fallback);
+    // Chromium's range thumb has a fixed footprint; its centre travels on this
+    // inset track. Pointer state never waits for media seeking or persistence.
+    const inset = Math.min(7, box.width / 2);
+    return clamp(((clientX - box.left - inset) / Math.max(1, box.width - inset * 2)) * maximum);
+  };
+  const move = (event: PointerEvent<HTMLDivElement>) => {
+    const time = fromPointer(event.clientX, drag.current?.value ?? elapsed);
+    if (drag.current) {
+      drag.current.value = time;
+      setScrub(time);
+    }
+    previewAt(time, event.clientX - (track.current?.getBoundingClientRect().left || 0));
+  };
+  const cancel = () => {
+    drag.current = null;
+    setScrub(null);
+    setPreview(null);
+  };
+
+  useEffect(() => {
+    const cancelOnBlur = () => {
+      drag.current = null;
+      setScrub(null);
+      setPreview(null);
+    };
+    window.addEventListener("blur", cancelOnBlur);
+    return () => window.removeEventListener("blur", cancelOnBlur);
+  }, []);
+
   return (
     <div className="player-toolbar" data-player-controls="true" aria-label="视频播放控制">
-      <input
-        className="player-progress"
-        aria-label="视频播放进度"
-        type="range"
-        min={0}
-        max={duration || 1}
-        step={0.1}
-        value={Math.min(elapsed, duration || 1)}
-        onChange={(event) => onSeek(Number(event.target.value))}
-      />
+      <div
+        className="player-seek-track"
+        ref={track}
+        onPointerEnter={move}
+        onPointerMove={move}
+        onPointerLeave={() => {
+          if (!drag.current) setPreview(null);
+        }}
+      >
+        {previewSrc && sourceKey && (
+          <SeekPreview
+            src={previewSrc}
+            sourceKey={sourceKey}
+            visible={preview !== null}
+            time={preview?.time ?? position}
+            left={preview?.left ?? 80}
+          />
+        )}
+        <input
+          ref={progress}
+          className="player-progress"
+          aria-label="视频播放进度"
+          aria-valuetext={formatTime(position)}
+          data-scrubbing={scrub === null ? "false" : "true"}
+          type="range"
+          min={0}
+          max={maximum}
+          step={0.1}
+          disabled={!Number.isFinite(duration) || duration <= 0}
+          value={position}
+          onPointerDown={(event) => {
+            if (event.button > 0) return;
+            const value = fromPointer(event.clientX, Number(event.currentTarget.value));
+            drag.current = { pointerId: event.pointerId, value };
+            setScrub(value);
+            previewAt(value);
+            event.currentTarget.setPointerCapture?.(event.pointerId);
+          }}
+          onChange={(event) => {
+            const value = clamp(Number(event.target.value));
+            if (drag.current) {
+              drag.current.value = value;
+              setScrub(value);
+              previewAt(value);
+            } else onSeek(value);
+          }}
+          onPointerUp={(event) => {
+            const selected = drag.current;
+            if (!selected || selected.pointerId !== event.pointerId) return;
+            drag.current = null;
+            setScrub(null);
+            onSeek(selected.value);
+            event.currentTarget.releasePointerCapture?.(event.pointerId);
+          }}
+          onPointerCancel={cancel}
+          onLostPointerCapture={() => {
+            if (drag.current) cancel();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && drag.current) {
+              event.preventDefault();
+              cancel();
+            }
+          }}
+        />
+      </div>
       <div className="player-toolbar-row">
         <button
           type="button"
@@ -123,3 +233,6 @@ export function VideoControls({
     </div>
   );
 }
+import { useEffect, useRef, useState } from "react";
+import type { PointerEvent } from "react";
+import { SeekPreview } from "./SeekPreview";

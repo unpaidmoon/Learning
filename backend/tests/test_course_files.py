@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from learning_app.app import create_app
 from learning_app.config import AppConfig
@@ -45,7 +47,7 @@ def test_folder_binding_names_and_preserves_legacy(files):
     other = root.parent / "新根目录"
     other.mkdir()
     bound = store.bind(course["course_id"], str(other))
-    assert bound["title"] == "新根目录"
+    assert bound["title"] == "旧课"
     assert bound["root_status"] == "ready"
     assert bound["legacy_asset_count"] == 1
     assert original.read_text("utf-8") == "旧资料不搬运"
@@ -82,6 +84,11 @@ def test_import_default_move_copy_and_idempotency(files, mode):
     repository, store, course, root, outside = files
     original = outside / "题目.txt"
     original.write_text("用户主动选择的合成内容", encoding="utf-8")
+    if mode == "move":
+        with pytest.raises(ValidationError):
+            CourseImportInput(paths=[str(original)], mode=mode, operation_id="import_once")
+        assert original.exists() and not (root / original.name).exists()
+        return
     request = CourseImportInput(paths=[str(original)], mode=mode, operation_id="import_once")
     result = store.import_files(course, request)
     assert result["state"] == "completed"
@@ -95,7 +102,7 @@ def test_import_default_move_copy_and_idempotency(files, mode):
     )
     with pytest.raises(AppError, match="同一操作身份"):
         store.import_files(
-            course, request.model_copy(update={"mode": "copy" if mode == "move" else "move"})
+            course, request.model_copy(update={"destination": "different_directory"})
         )
 
 
@@ -107,6 +114,11 @@ def test_import_conflicts_are_explicit_and_versions_preserved(files, choice):
     old = store.open(course, "同名.txt")
     source = outside / "同名.txt"
     source.write_text("明确选择的新内容", encoding="utf-8")
+    if choice != "keep_both":
+        with pytest.raises(ValidationError):
+            CourseImportInput(paths=[str(source)], conflict=choice, operation_id="conflict_choice")
+        assert target.read_text("utf-8") == "原来的内容" and source.exists()
+        return
     result = store.import_files(
         course,
         CourseImportInput(paths=[str(source)], conflict=choice, operation_id="conflict_choice"),
@@ -141,11 +153,11 @@ def test_move_previously_registered_external_preserves_source(files):
     imported = store.import_files(
         course, CourseImportInput(paths=[str(original)], operation_id="move_legacy")
     )["entries"][0]
-    assert imported["asset_id"] == source["asset_id"]
-    assert imported["source_version"] == source["source_version"]
+    assert imported["asset_id"] != source["asset_id"]
+    assert original.exists()
     resolved = repository.resolve_source(source["asset_id"], source["source_version"])
     assert resolved["status"] == "available"
-    assert Path(resolved["local_path"]) == root / "已有来源.txt"
+    assert Path(resolved["local_path"]) == original
 
 
 def test_rename_move_folder_and_course_preserve_identity(files):
@@ -165,8 +177,8 @@ def test_rename_move_folder_and_course_preserve_identity(files):
         course, CourseRenameFolderInput(name="数学重命名", operation_id="rename_course")
     )
     new_root = Path(renamed_course["root"]["root_path"])
-    assert new_root.name == "数学重命名" and not root.exists()
-    assert renamed_course["root"]["title"] == new_root.name
+    assert new_root == root and root.exists()
+    assert renamed_course["root"]["title"] == "数学重命名"
     source = repository.resolve_source(opened["asset_id"], opened["source_version"])
     assert source["status"] == "available"
     assert Path(source["local_path"]) == new_root / "章节" / "更名.txt"
@@ -199,6 +211,7 @@ def test_detach_keeps_chats_files_and_reattach_identity(files):
     assert store.bind(None, str(root))["course_id"] == course
 
 
+@pytest.mark.skipif(os.name != "nt", reason="actual Windows Recycle Bin")
 def test_delete_requires_confirmation_keeps_source_and_is_idempotent(files):
     repository, store, course, root, _ = files
     (root / "删除.txt").write_text("明确删除合成文件")
@@ -211,9 +224,8 @@ def test_delete_requires_confirmation_keeps_source_and_is_idempotent(files):
     directory = root / "非空"
     directory.mkdir()
     (directory / "保留.txt").write_text("保留")
-    with pytest.raises(AppError) as error:
-        store.delete(course, CourseDeleteInput(path="非空", confirm=True))
-    assert error.value.code == "FILE_DIRECTORY_NOT_EMPTY"
+    result = store.delete(course, CourseDeleteInput(path="非空", confirm=True))
+    assert result["recycled"] is True and not directory.exists()
 
 
 @pytest.mark.parametrize(

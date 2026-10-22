@@ -88,6 +88,24 @@ beforeEach(async () => {
     thinking: null,
   };
   request = vi.fn((url: string, options?: RequestInit) => {
+    if (url.endsWith("/metadata"))
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            attachment_id: url.split("/").at(-2),
+            media_type: "image/png",
+            size_bytes: 4,
+            sha256: "fixture-crop-hash",
+            confirmed: true,
+            kind: "image",
+            filename: "图片.png",
+            page_count: null,
+            character_count: null,
+            download_url: url.replace(/\/metadata$/, ""),
+          }),
+          { status: 200 },
+        ),
+      );
     let body: unknown = {
       chat_id: "error-chat",
       course_id: "synthetic-course",

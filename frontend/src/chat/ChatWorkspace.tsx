@@ -3,10 +3,14 @@ import type { FormEvent, Ref } from "react";
 import { ApiError, api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
+import { Icon } from "../components/ui/Icon";
 import { CaptureEditor } from "../media/CaptureEditor";
 import { CaptureError, readImageFile } from "../media/capture";
 import type { CaptureResult, CaptureSource } from "../media/capture";
 import { loadCapture, saveCapture } from "./captureCache";
+import { AttachmentCard } from "./AttachmentCard";
+import { rememberAttachment } from "./attachmentMetadata";
+import { readDocument } from "./documentFiles";
 import { saveAllDrafts, useDraft } from "./draft";
 import type { DraftReference } from "./draft";
 import { MarkdownAnswer } from "./MarkdownAnswer";
@@ -55,6 +59,12 @@ interface Props {
   onOpenSource?: (source: VideoSource) => void;
   ref?: Ref<ChatWorkspaceHandle>;
 }
+interface DocumentUpload {
+  uploadId: string;
+  file: File;
+  state: "uploading" | "failed";
+  error?: string;
+}
 function MessageAttachment({
   id,
   index,
@@ -75,7 +85,7 @@ function MessageAttachment({
   }, [id]);
   return (
     <div className="message-attachment">
-      <img src={`/api/v1/attachments/${id}`} alt={`已确认提交的图片 ${index + 1}`} loading="lazy" />
+      <AttachmentCard id={id} index={index} />
       {source?.origin === "video" &&
         source.asset_id &&
         source.source_version &&
@@ -141,6 +151,11 @@ export function ChatWorkspace({
   const captureInProgress = useRef(false);
   const captureFailure = useRef(false);
   const [failedIncomingCapture, setFailedIncomingCapture] = useState<CaptureResult | null>(null);
+  const [documentUploads, setDocumentUploads] = useState<DocumentUpload[]>([]);
+  const documentUploadRecords = useRef(new Map<string, DocumentUpload>());
+  const documentUploadTasks = useRef(new Map<string, Promise<void>>());
+  const selectedFilesReading = useRef(false);
+  const imageCandidatesPending = useRef(0);
   const candidate = useMemo(
     () =>
       candidates[0] || (incomingCapture ? { source: incomingCapture, replaces: undefined } : null),
@@ -184,6 +199,11 @@ export function ChatWorkspace({
     () => ({
       focusInput: () => setFocusRequest((current) => current + 1),
       saveDraft: async () => {
+        if (selectedFilesReading.current)
+          throw new Error("附件仍在读取或加入草稿，请等待完成后继续");
+        await Promise.all(documentUploadTasks.current.values());
+        if (documentUploadRecords.current.size)
+          throw new Error("还有附件未加入草稿，请重试或取消该附件后继续");
         await captureTask.current;
         if (
           captureFailure.current ||
@@ -191,8 +211,12 @@ export function ChatWorkspace({
             !receivedCaptureIds.current.has(incomingConfirmedCapture.source.sourceId))
         )
           throw new Error("截图尚未加入草稿，请重新加入或取消后退出");
-        if (candidate) throw new Error("还有未确认的图片选区，请确认或取消后退出");
-        await controller.flush();
+        if (candidate || imageCandidatesPending.current)
+          throw new Error("还有未确认的图片选区，请确认或取消后退出");
+        // A newly mounted, untouched chat has nothing to write before leaving.
+        // Its initial read may still be pending; never invent an empty revision.
+        const currentDraft = controller.snapshot();
+        if (currentDraft.ready || currentDraft.dirty) await controller.flush();
         await saveAllDrafts();
       },
     }),
@@ -238,7 +262,9 @@ export function ChatWorkspace({
         candidate ||
         captureInProgress.current ||
         captureFailure.current ||
-        incomingConfirmedCapture
+        incomingConfirmedCapture ||
+        documentUploadRecords.current.size ||
+        selectedFilesReading.current
       ) {
         event.preventDefault();
         flush();
@@ -259,8 +285,10 @@ export function ChatWorkspace({
     Boolean(acceptedGeneration) ||
     generations.some((entry) => generationActive(entry) || entry.state === "unknown");
   const consumeCandidate = () => {
-    if (candidates.length) setCandidates((current) => current.slice(1));
-    else onCaptureConsumed?.();
+    if (candidates.length) {
+      imageCandidatesPending.current = Math.max(0, imageCandidatesPending.current - 1);
+      setCandidates((current) => current.slice(1));
+    } else onCaptureConsumed?.();
   };
   const send = async (submission: Schema<"SubmissionInput">) => {
     setBusy(true);
@@ -317,6 +345,8 @@ export function ChatWorkspace({
       failedIncomingCapture ||
       captureQueued ||
       candidate ||
+      documentUploadRecords.current.size > 0 ||
+      selectedFilesReading.current ||
       composing.current ||
       (!value.text.trim() && !value.attachment_ids.length)
     )
@@ -382,22 +412,85 @@ export function ChatWorkspace({
       setBusy(false);
     }
   };
+  const uploadDocument = (entry: DocumentUpload) => {
+    const existing = documentUploadTasks.current.get(entry.uploadId);
+    if (existing) return existing;
+    const update = (value: DocumentUpload | null) => {
+      if (value) documentUploadRecords.current.set(entry.uploadId, value);
+      else documentUploadRecords.current.delete(entry.uploadId);
+      setDocumentUploads([...documentUploadRecords.current.values()]);
+    };
+    update({ ...entry, state: "uploading", error: undefined });
+    const task = (async () => {
+      setBusy(true);
+      try {
+        const { data, mediaType } = await readDocument(entry.file);
+        const attachment = await api.write<Schema<"AttachmentMetadataResponse">>(
+          "/document-attachments",
+          {
+            chat_id: chatId,
+            upload_id: entry.uploadId,
+            filename: entry.file.name,
+            media_type: mediaType,
+            data_base64: data,
+            confirmed: true,
+          },
+          { timeoutMs: 120_000 },
+        );
+        rememberAttachment(attachment);
+        const ids = controller.snapshot().value.attachment_ids;
+        controller.update({
+          attachment_ids: ids.includes(attachment.attachment_id)
+            ? ids
+            : [...ids, attachment.attachment_id],
+        });
+        update(null);
+        setFocusRequest((current) => current + 1);
+      } catch (reason) {
+        update({
+          ...entry,
+          state: "failed",
+          error:
+            reason instanceof ApiError
+              ? errorMessage(reason)
+              : reason instanceof Error
+                ? reason.message
+                : errorMessage(reason),
+        });
+      } finally {
+        setBusy(false);
+      }
+    })().finally(() => documentUploadTasks.current.delete(entry.uploadId));
+    documentUploadTasks.current.set(entry.uploadId, task);
+    return task;
+  };
   const addFiles = async (files: File[]) => {
     if (!editable) return;
     if (
-      value.attachment_ids.length + candidates.length + (incomingCapture ? 1 : 0) + files.length >
+      value.attachment_ids.length +
+        candidates.length +
+        documentUploadRecords.current.size +
+        (incomingCapture ? 1 : 0) +
+        files.length >
       8
     ) {
-      setError("每次最多加入 8 张确认图片");
+      setError("每次最多加入 8 个附件");
       return;
     }
+    selectedFilesReading.current = true;
     setBusy(true);
     try {
-      const sources = await Promise.all(files.map(readImageFile));
+      const images = files.filter((file) => file.type.startsWith("image/"));
+      const documents = files.filter((file) => !file.type.startsWith("image/"));
+      const sources = await Promise.all(images.map(readImageFile));
+      imageCandidatesPending.current += sources.length;
       setCandidates((current) => [...current, ...sources.map((source) => ({ source }))]);
+      for (const file of documents)
+        await uploadDocument({ uploadId: crypto.randomUUID(), file, state: "uploading" });
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "无法读取所选图片");
     } finally {
+      selectedFilesReading.current = false;
       setBusy(false);
     }
   };
@@ -504,6 +597,7 @@ export function ChatWorkspace({
     try {
       const previous = await loadCapture(id);
       if (!previous) throw new Error("本机原截图不可用，请主动重新选择原图；不会补取视频画面。");
+      imageCandidatesPending.current += 1;
       setCandidates((current) => [
         { source: { ...previous.source, initialCrop: previous.crop }, replaces: id },
         ...current,
@@ -530,13 +624,8 @@ export function ChatWorkspace({
           <p className="muted" role="status">
             正在读取已保存记录…
           </p>
-        ) : !chat.messages?.length ? (
-          <div className="conversation-empty">
-            <h3>从当前不懂的地方问起</h3>
-            <p>截图确认后直接进入草稿，也可以输入文字或粘贴多张图片。</p>
-          </div>
         ) : (
-          chat.messages.map((message) => {
+          (chat.messages || []).map((message) => {
             const generation =
               message.role === "assistant"
                 ? generations.find((entry) => entry.generation_id === message.generation_id)
@@ -647,6 +736,39 @@ export function ChatWorkspace({
         )}
       </div>
       <div className="composer-area">
+        {documentUploads.map((upload) => (
+          <div
+            className="document-upload-state draft-warning"
+            role={upload.state === "failed" ? "alert" : "status"}
+            key={upload.uploadId}
+          >
+            <span>{upload.file.name}</span>
+            <span>{upload.state === "uploading" ? "正在加入附件…" : upload.error}</span>
+            {upload.state === "failed" && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={!editable}
+                  onClick={() => void uploadDocument(upload)}
+                >
+                  重试附件
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={busy}
+                  onClick={() => {
+                    documentUploadRecords.current.delete(upload.uploadId);
+                    setDocumentUploads([...documentUploadRecords.current.values()]);
+                  }}
+                >
+                  取消附件
+                </Button>
+              </>
+            )}
+          </div>
+        ))}
         {error && (
           <div className="inline-error" role="alert">
             {error}
@@ -713,12 +835,29 @@ export function ChatWorkspace({
           </div>
         )}
         {!canSubmit && <p className="muted">问答尚未接通，已保存对话仍可查看。</p>}
+        {!modelSupported && (
+          <p className="composer-blocked" role="status">
+            {modelChoices?.length
+              ? "当前选择不在可用模型目录中，请手动选择模型。"
+              : "当前接入方式尚未提供可用模型，请检查连接状态。"}
+          </p>
+        )}
+        {modelSupported && !thinkingSupported && (
+          <p className="composer-blocked" role="status">
+            当前模型不支持已选思考强度，请手动重新选择。
+          </p>
+        )}
+        {textOnlyModel && (
+          <p className="composer-blocked" role="status">
+            仅支持文字；包含题图的对话请使用支持图片的模型。
+          </p>
+        )}
         <form
           className="composer"
           onSubmit={submit}
           onPaste={(event) => {
             const files = Array.from(event.clipboardData.items)
-              .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+              .filter((item) => item.kind === "file")
               .map((item) => item.getAsFile())
               .filter((file): file is File => Boolean(file));
             if (files.length) {
@@ -770,34 +909,21 @@ export function ChatWorkspace({
             </div>
           )}
           {value.attachment_ids.length > 0 && (
-            <div className="draft-attachments" aria-label="本次确认图片">
+            <div className="draft-attachments" aria-label="本次附件">
               {value.attachment_ids.map((id, index) => (
-                <figure key={id}>
-                  <img src={`/api/v1/attachments/${id}`} alt={`待发送的确认图片 ${index + 1}`} />
-                  <figcaption>
-                    图片 {index + 1}
-                    <button
-                      type="button"
-                      aria-label={`重新裁剪图片 ${index + 1}`}
-                      disabled={!editable}
-                      onClick={() => void reedit(id)}
-                    >
-                      重裁
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`移除图片 ${index + 1}`}
-                      disabled={!editable}
-                      onClick={() =>
-                        controller.update({
-                          attachment_ids: value.attachment_ids.filter((entry) => entry !== id),
-                        })
-                      }
-                    >
-                      移除
-                    </button>
-                  </figcaption>
-                </figure>
+                <AttachmentCard
+                  key={id}
+                  id={id}
+                  index={index}
+                  draft
+                  disabled={!editable}
+                  onReedit={() => void reedit(id)}
+                  onRemove={() =>
+                    controller.update({
+                      attachment_ids: value.attachment_ids.filter((entry) => entry !== id),
+                    })
+                  }
+                />
               ))}
             </div>
           )}
@@ -858,13 +984,13 @@ export function ChatWorkspace({
             </div>
           </details>
           <div className="composer-toolbar">
-            <label className="file-picker">
-              <span>＋ 选择图片</span>
+            <label className="file-picker" title="添加附件">
+              <Icon name="plus" />
               <input
-                aria-label="选择待确认的图片"
+                aria-label="添加附件"
                 type="file"
                 multiple
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg,image/webp,application/pdf,text/plain,text/markdown,.pdf,.txt,.md,.markdown"
                 disabled={!editable || value.attachment_ids.length >= 8}
                 onChange={(event) => {
                   const files = Array.from(event.target.files || []);
@@ -932,6 +1058,7 @@ export function ChatWorkspace({
                 !thinkingSupported ||
                 Boolean(failedIncomingCapture) ||
                 captureQueued ||
+                documentUploads.length > 0 ||
                 Boolean(candidate)
               }
             >
@@ -939,51 +1066,7 @@ export function ChatWorkspace({
               <span className="sr-only">{busy ? "处理中…" : "发送"}</span>
             </Button>
           </div>
-          {value.references.length > 0 && !value.text.trim() && !value.attachment_ids.length && (
-            <p className="composer-hint" role="status">
-              已加入引用，请补充问题后发送。
-            </p>
-          )}
-          {!modelSupported && (
-            <p className="composer-hint" role="status">
-              {modelChoices?.length
-                ? "当前选择不在可用模型目录中，请手动选择模型。"
-                : "当前接入方式尚未提供可用模型，请检查连接状态。"}
-            </p>
-          )}
-          {modelSupported && !thinkingSupported && (
-            <p className="composer-hint" role="status">
-              当前模型不支持已选思考强度，请手动重新选择。
-            </p>
-          )}
-          {textOnlyModel && (
-            <p className="composer-hint">仅支持文字；包含题图的对话请使用支持图片的模型。</p>
-          )}
         </form>
-        <div className="draft-save-status">
-          <span role="status">
-            {draft.saving
-              ? "正在保存草稿…"
-              : draft.dirty
-                ? "草稿待保存"
-                : draft.ready
-                  ? "草稿已保存"
-                  : "正在核对草稿…"}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={!draft.ready || draft.saving || busy}
-            onClick={() => void controller.flush().catch(() => undefined)}
-          >
-            保存草稿
-          </Button>
-        </div>
-        <p className="composer-hint">
-          {locked
-            ? "当前生成尚未结束或结果未知。可停止或核对后继续追问。"
-            : "仅发送确认选区与输入 · Ctrl+Enter 发送 · 切换课程后台继续"}
-        </p>
       </div>
       {candidate && (
         <CaptureEditor

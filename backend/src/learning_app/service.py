@@ -11,6 +11,7 @@ import httpx
 from dotenv import dotenv_values
 
 from learning_app.config import AppConfig
+from learning_app.documents import expand_document_parts, requires_images, validate_document_scope
 from learning_app.drafts import (
     message_references,
     submission_reference_conditions,
@@ -170,12 +171,33 @@ class GenerationService:
             image_support = getattr(self.execution, "supports_model_images", supports_images)
             if not existing_submission and not image_support(value["model"]):
                 history = self.repository.get_chat(value["chat_id"])["messages"]
-                if value.get("attachment_ids") or any(m.get("attachment_ids") for m in history):
+                relevant_ids = list(value.get("attachment_ids", ())) + [
+                    aid for message in history for aid in message.get("attachment_ids", ())
+                ]
+                if requires_images(self.repository, relevant_ids):
                     raise AppError(
                         "MODEL_IMAGE_UNSUPPORTED",
                         "所选模型仅支持文字；当前图片及题图历史已保留，请选择支持图片的模型或新建文字对话",
                         422,
                     )
+            if not existing_submission:
+                validate_document_scope(
+                    self.repository, value["chat_id"], value.get("attachment_ids", ())
+                )
+                # Check the complete selected/current document set before publishing a
+                # generation, so a size limit never creates a partial provider turn.
+                document_ids = list(value.get("attachment_ids", ()))
+                history = self.repository.get_chat(value["chat_id"])["messages"]
+                document_ids.extend(
+                    aid for message in history for aid in message.get("attachment_ids", ())
+                )
+                unique_documents = list(dict.fromkeys(document_ids))
+                await asyncio.to_thread(
+                    expand_document_parts,
+                    self.repository,
+                    value["chat_id"],
+                    [self.repository.resolve_attachment(aid) for aid in unique_documents],
+                )
             conditions = list(value.get("conditions", ())) + submission_reference_conditions(
                 self.repository, value["chat_id"], value.get("references", ())
             )
@@ -240,6 +262,12 @@ class GenerationService:
                 self._binding_snapshots[generation_id] = json.dumps(
                     binding.to_dict(), sort_keys=True
                 )
+                prepared_images, document_text = await asyncio.to_thread(
+                    expand_document_parts,
+                    self.repository,
+                    generation["chat_id"],
+                    context.get("attachments", []),
+                )
                 attachments = [
                     ApprovedAttachment(
                         attachment_id=item["attachment_id"],
@@ -247,9 +275,11 @@ class GenerationService:
                         sha256=item.get("sha256", item.get("content_hash", "")),
                         media_type=item["media_type"],
                     )
-                    for item in context.get("attachments", [])
+                    for item in prepared_images
                 ]
                 prompt = context.get("prompt", generation.get("text", ""))
+                if document_text:
+                    prompt += "\n\n" + document_text
                 history = context.get("history_context") if rebuild else None
                 if isinstance(history, (list, dict)):
                     history = json.dumps(history, ensure_ascii=False)
@@ -267,7 +297,7 @@ class GenerationService:
                     self.repository.mark_unknown(generation_id, "ACCEPTANCE_UNKNOWN")
                     return
                 self.repository.record_receipt(generation_id, binding.request_id)
-            except (ExecutionError, StorageError, OSError, TimeoutError) as exc:
+            except (ExecutionError, StorageError, AppError, OSError, TimeoutError) as exc:
                 if self.repository.get_generation(generation_id)["state"] == "pending":
                     self.repository.fail_pending(
                         generation_id, getattr(exc, "code", "DISPATCH_NOT_STARTED")

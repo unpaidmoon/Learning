@@ -305,11 +305,14 @@ def read_draft(repository: Repository, chat_id: str) -> dict:
 
 
 def save_draft(repository: Repository, chat_id: str, value: DraftInput) -> dict:
+    from learning_app.documents import validate_document_scope
+
+    validate_document_scope(repository, chat_id, value.attachment_ids)
     # Integrity-check confirmed bytes without placing images in the draft JSON.
     for attachment_id in value.attachment_ids:
         attachment = repository.resolve_attachment(attachment_id)
         if not attachment["confirmed"]:
-            raise AppError("ATTACHMENT_NOT_CONFIRMED", "只能保存已确认的选区图片")
+            raise AppError("ATTACHMENT_NOT_CONFIRMED", "只能保存已确认的附件")
     payload = value.model_dump(exclude={"expected_revision"})
     with repository.engine.begin() as conn:
         chat = _chat(conn, chat_id)

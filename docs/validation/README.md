@@ -1,5 +1,11 @@
 # 最小验证执行入口
 
+2026-10-22 颜色与局部算符补修：实际CSS／Button／MarkdownAnswer浏览器11项、正式构建FileManager／AccountPanel颜色8项、全前端141项（含选区25项）通过。原按钮对比度1和det局部拒绝均先复现；主公式排版宽差0，源码范围不扩大。账号页面只用模拟GET状态呈现控件，不构成真实登录或模型复测。见[新报告](../../research/reports/workspace-v2/UI颜色与命名算符局部引用修复-2026-10-22.md)和[新摘要](../../research/reports/workspace-v2/theme-formula-fix-20261022.json)。旧全量／模型记录保留，不并数或重标。
+
+2026-10-22 创建课程故障补修：实际 `PICKER_UNAVAILABLE` 在项目 Python 和正式 HTTP 已复现，替换 Tk 为系统 `IFileOpenDialog` 后，真实 Windows 目录选择／取消／确认创建10项通过、后台定向40通过／1跳过；接口无漂移。见[补修报告](../../research/reports/workspace-v2/原生课程目录选择修复-2026-10-22.md)与[新摘要](../../research/reports/workspace-v2/native-course-picker-fix-20261022.json)。此批补上目录窗口真实覆盖，外部剪贴板仍为seam；下列第二轮完整数字及当时缺口保持历史含义。
+
+2026-10-22 MVP-A 交互修订技术验证通过：根检查／构建、前端 129、后台 206 通过／1 跳过、guard 3、完整合成浏览器 67；独立视频 7 与矩阵 7 分列。官方账号新整份文档完成／活动正文停止／同会话追问共 3 次实际出站通过，允许历史 PDF 页重复数及取消用量未知如实保留。正式入口就绪后按所属实例安全停止。详见 [新报告](../../research/reports/workspace-v2/MVP-A交互修订验收报告-2026-10-22.md)、[浏览器摘要](../../research/reports/workspace-v2/browser-verification-20261022.json)及[最终摘要](../../research/reports/workspace-v2/MVP-A-workspace-v2-final-20261022.json)。原生文件夹／外部剪贴板用合成 seam，真实 Windows 回收站另有证据；日常学习与视觉评价尚未验收，旧失败和历史证据不改写。
+
 2026-10-21 正式 MVP-A 重设计已完成本轮分层技术验证：根检查／构建、前端74、后台184通过／1跳过、guard3、完整合成浏览器64，以及官方账号／API Key各3次真实模型复测。实际范围、旧失败保留、用量缺失及用户体验未覆盖见 [本轮报告](../../research/reports/redesign/MVP-A重设计验收报告-2026-10-21.md) 和 [最终摘要](../../research/reports/redesign/MVP-A-redesign-final-20261021.json)。这些结果不替代用户审美／学习收益，也不启动 V4～V7 或完整首版。
 
 2026-10-21 MVP-A 新授权与执行增补：用户明确授权的 A-01～A-06 已形成可运行闭环，V3 自动技术验证完成、实际学习评价待参与。完成审计后前端 32／后台 135 项测试、合成浏览器 48／原生窗口 8／安全 18 项、V2 回归 15 例／96 断言通过；真实累计 36 次，失败和复测分开保留。见[综合报告](../../research/reports/v3/MVP-A与V3验收报告-2026-10-21.md)、[最终检查](../../research/reports/v3/MVP-A-final-verification-2026-10-21.json)与[人工试用记录](MVP-A试用记录.md)。不宣称完整 V3 退出，V4～V7 未启动。历史 P0／V2 证据不改写；下列早前“止步 P0／V3 未执行”仅描述当时批次。
