@@ -33,6 +33,97 @@ class BackendDouble:
 
 
 class DesktopRunTests(unittest.TestCase):
+    def test_recovered_backend_uses_last_ready_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            runtime = Path(directory)
+            logs = runtime / "desktop-launches/recovered"
+            logs.mkdir(parents=True)
+            old, current = "a" * 32, "b" * 32
+            (logs / "backend.stdout.log").write_text("\n".join(
+                "LEARNING_APP_READY " + json.dumps({"instance_id": identity})
+                for identity in (old, current)
+            ), "utf-8")
+            record = runtime / "apps" / current / "run.json"
+            record.parent.mkdir(parents=True)
+            record.write_text(json.dumps({"instance_id": current, "status": "ready", "backend_port": 18986}), "utf-8")
+            with (patch("learning_app.dev.wait_for_http") as health,
+                  patch("learning_app.native_files.desktop_picker_owner", return_value=123),
+                  redirect_stdout(io.StringIO())):
+                self.assertTrue(desktop_run.activate_existing(18986, runtime))
+                self.assertEqual(health.call_args.kwargs["instance_id"], current)
+
+    def test_unrelated_occupied_port_selects_another_port_without_killing_owner(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            group = MagicMock()
+            group.spawn.side_effect = OSError("stop after checking selected endpoint")
+            backend = BackendDouble()
+            record = {"instance_id": "c" * 32, "backend_port": 18987}
+
+            def create_backend(command, **kwargs):
+                self.assertEqual(command[command.index("--backend-port") + 1], "18987")
+                path = root / ".runtime/desktop/app/run/apps" / record["instance_id"] / "run.json"
+                path.parent.mkdir(parents=True)
+                path.write_text(json.dumps(record), "utf-8")
+                kwargs["stdout"].write("LEARNING_APP_READY " + json.dumps(record) + "\n")
+                kwargs["stdout"].flush()
+                return backend
+
+            def port_check(_host, port):
+                if port == 18986:
+                    raise ProcessError("PORT_IN_USE", "unrelated service")
+
+            with (patch.object(sys, "argv", ["run.py", "--no-prepare", "--backend-port", "18986"]),
+                  patch.object(desktop_run, "ROOT", root),
+                  patch("learning_app.processes.require_free_port", side_effect=port_check),
+                  patch.object(desktop_run, "find_running_backend", return_value=None),
+                  patch.object(desktop_run, "activate_existing", return_value=False),
+                  patch.object(desktop_run, "available_port", return_value=18987),
+                  patch.object(desktop_run, "verified_executable", return_value=root / "electron.exe"),
+                  patch.object(desktop_run.subprocess, "Popen", side_effect=create_backend),
+                  patch("learning_app.processes.OwnedProcessGroup", return_value=group),
+                  patch("learning_app.dev.wait_for_http"),
+                  patch("learning_app.dev._request_owned_exit") as stop,
+                  redirect_stdout(io.StringIO())):
+                with self.assertRaisesRegex(OSError, "selected endpoint"):
+                    desktop_run.main()
+            self.assertEqual(stop.call_args.args[0]["backend_port"], 18987)
+
+    def test_live_owned_backend_without_window_reopens_without_starting_or_stopping_backend(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / ".runtime/desktop/app/run"
+            owner = runtime / "desktop-launches/original/native-owner.json"
+            record = {"instance_id": "a" * 32, "backend_port": 18986, "status": "ready"}
+            group = MagicMock()
+            desktop = MagicMock(pid=202)
+            desktop.poll.return_value = 0
+            launched = {}
+
+            def open_window(command, **kwargs):
+                launched.update(kwargs["env"])
+                kwargs["stdout"].write("LEARNING_DESKTOP_WINDOW_READY\n")
+                kwargs["stdout"].flush()
+                return desktop
+
+            group.spawn.side_effect = open_window
+            with (patch.object(sys, "argv", ["run.py", "--no-prepare", "--backend-port", "18986"]),
+                  patch.object(desktop_run, "ROOT", root),
+                  patch("learning_app.processes.require_free_port", side_effect=ProcessError("PORT_IN_USE", "fixture")),
+                  patch.object(desktop_run, "activate_existing", return_value=False),
+                  patch.object(desktop_run, "find_running_backend", return_value=(record, owner), create=True),
+                  patch.object(desktop_run, "verified_executable", return_value=root / "electron.exe"),
+                  patch("learning_app.processes.OwnedProcessGroup", return_value=group),
+                  patch("learning_app.dev.wait_for_http"),
+                  patch("learning_app.dev._request_owned_exit") as stop,
+                  patch.object(desktop_run.subprocess, "Popen") as spawn,
+                  redirect_stdout(io.StringIO())):
+                self.assertEqual(desktop_run.main(), 0)
+            spawn.assert_not_called()
+            stop.assert_not_called()
+            self.assertEqual(launched["LEARNING_DESKTOP_OWNER_FILE"], str(owner))
+            self.assertEqual(launched["LEARNING_DESKTOP_OWNS_BACKEND"], "1")
+
     def test_repeat_launch_restores_only_identity_checked_owned_window(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

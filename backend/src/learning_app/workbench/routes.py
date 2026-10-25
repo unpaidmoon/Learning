@@ -95,6 +95,22 @@ def install_workbench_routes(app: FastAPI) -> None:
     install_corpus_routes(app)
     install_book_routes(app)
     install_research_routes(app)
+    # Keep historical read endpoints, but retired learning flows have no new
+    # mutation surface. Shared task/storage APIs remain for retained skills.
+    retired = ("/answers", "/reviews", "/review-preferences", "/essay-rounds", "/path/actions", "/corpus/policy")
+    def retired_operation(**_kwargs):
+        raise AppError("LEARNING_FEATURE_REMOVED", "此专门学习功能已取消，历史内容仍保留", 410)
+
+    for route in app.router.routes:
+        if ("POST" in getattr(route, "methods", set())
+                and "/learning/" in getattr(route, "path", "")
+                and any(part in route.path for part in retired)):
+            # Preserve the historical DTOs for stored-view compatibility, while
+            # making the mutation unconditionally unavailable at execution.
+            route.dependant.call = retired_operation
+            route.endpoint = retired_operation
+            route.deprecated = True
+            route.responses[410] = {"description": "该专门学习功能已取消"}
     prefix = "/api/v1/courses/{course_id}/learning"
 
     def artifacts() -> ArtifactStore:

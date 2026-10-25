@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
+import hashlib
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -14,27 +17,116 @@ from urllib.parse import urlsplit
 
 from bootstrap import ROOT, prepare, verified_executable
 
+from learning_app.errors import AppError
 
-def activate_existing(port: int, run_root: Path | None = None) -> bool:
+
+class StartupGate:
+    """Serialize startup for one data location, not the lifetime of its window."""
+
+    def __init__(self, identity: str):
+        self.handle = None
+        self.acquired = True
+        if os.name == "nt":
+            from ctypes import wintypes
+
+            self.kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+            self.kernel.CreateMutexW.argtypes = [ctypes.c_void_p, wintypes.BOOL, wintypes.LPCWSTR]
+            self.kernel.CreateMutexW.restype = wintypes.HANDLE
+            self.kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+            self.kernel.WaitForSingleObject.restype = wintypes.DWORD
+            self.kernel.ReleaseMutex.argtypes = [wintypes.HANDLE]
+            self.kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+            name = "Local\\LearningDesktopStart-" + hashlib.sha256(identity.encode()).hexdigest()[:24]
+            self.handle = self.kernel.CreateMutexW(None, False, name)
+            if not self.handle:
+                raise OSError("无法建立桌面启动锁")
+            result = self.kernel.WaitForSingleObject(self.handle, 0)
+            self.acquired = result in {0, 0x80}
+            if result not in {0, 0x80, 0x102}:
+                self.close()
+                raise OSError("无法核对桌面启动状态")
+
+    def close(self):
+        if self.handle:
+            if self.acquired:
+                self.kernel.ReleaseMutex(self.handle)
+            self.kernel.CloseHandle(self.handle)
+            self.handle = None
+
+
+def ready_launches(run_root: Path, port: int | None = None):
+    for logs in sorted((run_root / "desktop-launches").glob("*"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            lines = (logs / "backend.stdout.log").read_text("utf-8", errors="replace").splitlines()
+            ready = next(line for line in reversed(lines) if line.startswith("LEARNING_APP_READY "))
+            identity = json.loads(ready.removeprefix("LEARNING_APP_READY "))["instance_id"]
+            if not isinstance(identity, str) or len(identity) != 32 or any(c not in "0123456789abcdef" for c in identity):
+                continue
+            record = json.loads((run_root / "apps" / identity / "run.json").read_text("utf-8"))
+            if (record.get("status") != "ready" or record.get("instance_id", identity) != identity
+                    or (port is not None and record.get("backend_port") != port)):
+                continue
+            yield {**record, "instance_id": identity}, logs / "native-owner.json"
+        except (OSError, ValueError, KeyError, TypeError, StopIteration):
+            continue
+
+
+def data_matches(record: dict, data_dir: Path) -> bool:
+    import httpx
+
+    from learning_app.data_location import ProfileLocation
+    from learning_app.processes import ProcessError
+
+    base = f"http://127.0.0.1:{record['backend_port']}"
+    try:
+        with httpx.Client(base_url=base, timeout=5, trust_env=False) as client:
+            client.get("/api/v1/session").raise_for_status()
+            response = client.get("/api/v1/data")
+            response.raise_for_status()
+            actual = Path(response.json()["data_directory"]).resolve()
+            health = client.get("/api/v1/health").json()
+        if health.get("instance_id") != record["instance_id"]:
+            raise ValueError("instance changed")
+        return actual == ProfileLocation(data_dir).current().resolve()
+    except (httpx.HTTPError, OSError, ValueError, KeyError) as error:
+        raise ProcessError("DESKTOP_EXISTING_CHECK_FAILED", "已发现学习后台，但暂时无法确认资料位置。请稍后重新打开；未另启后台。") from error
+
+
+def find_running_backend(port: int | None, run_root: Path, data_dir: Path):
+    from learning_app.dev import wait_for_http
+    from learning_app.processes import ProcessError
+
+    for record, owner in ready_launches(run_root, port):
+        try:
+            with socket.create_connection(("127.0.0.1", record["backend_port"]), timeout=0.2):
+                pass
+            wait_for_http(f"http://127.0.0.1:{record['backend_port']}/api/v1/health", processes=[], timeout=1, instance_id=record["instance_id"])
+        except (OSError, ProcessError):
+            continue
+        if data_matches(record, data_dir):
+            return record, owner
+    return None
+
+
+def available_port() -> int:
+    with socket.socket() as listener:
+        listener.bind(("127.0.0.1", 0))
+        return listener.getsockname()[1]
+
+
+def activate_existing(port: int, run_root: Path | None = None, *, data_dir: Path | None = None) -> bool:
     """Restore only a live window whose backend identity and HWND are verified."""
     from learning_app.dev import wait_for_http
-    from learning_app.errors import AppError
     from learning_app.native_files import desktop_picker_owner
 
     run_root = run_root or ROOT / ".runtime/desktop/app/run"
-    for logs in (run_root / "desktop-launches").glob("*"):
+    for record, owner in ready_launches(run_root, port):
         try:
-            lines = (logs / "backend.stdout.log").read_text("utf-8").splitlines()
-            ready = next(line for line in lines if line.startswith("LEARNING_APP_READY "))
-            value = json.loads(ready.removeprefix("LEARNING_APP_READY "))
-            identity = value["instance_id"]
-            if not isinstance(identity, str) or len(identity) != 32 or not all(c in "0123456789abcdef" for c in identity):
-                continue
-            record = json.loads((run_root / "apps" / identity / "run.json").read_text("utf-8"))
-            if record.get("status") != "ready" or record.get("backend_port") != port:
-                continue
+            identity = record["instance_id"]
             wait_for_http(f"http://127.0.0.1:{port}/api/v1/health", processes=[], timeout=1, instance_id=identity)
-            if desktop_picker_owner(logs / "native-owner.json"):
+            if data_dir is not None and not data_matches(record, data_dir):
+                continue
+            if desktop_picker_owner(owner):
                 print("LEARNING_DESKTOP_ACTIVATED", flush=True)
                 return True
         except (AppError, OSError, RuntimeError, ValueError, KeyError, StopIteration):
@@ -43,9 +135,6 @@ def activate_existing(port: int, run_root: Path | None = None) -> bool:
 
 
 def main() -> int:
-    from learning_app.dev import _request_owned_exit, wait_for_http
-    from learning_app.processes import OwnedProcessGroup, ProcessError, require_free_port
-
     parser = argparse.ArgumentParser(description="启动沿用 Harness 原始界面的学习桌面试用")
     parser.add_argument("--url", help="连接已经运行的本项目 /desktop/ 页面，不管理该后台")
     parser.add_argument("--backend-port", type=int, default=8766)
@@ -56,7 +145,25 @@ def main() -> int:
     parser.add_argument("--hidden", action="store_true", help="仅验收使用：加载但不显示窗口")
     parser.add_argument("--user-data-dir", type=Path, help="使用独立的桌面浏览器状态目录")
     parser.add_argument("--no-prepare", action="store_true", help="只使用已经准备的固定运行时")
+    parser.add_argument("--show-errors", action="store_true", help="通过桌面提示显示启动失败")
     args = parser.parse_args()
+    from learning_app.data_location import ProfileLocation
+
+    identity = args.url or str(ProfileLocation(args.data_dir.resolve()).current()).casefold()
+    gate = StartupGate(identity)
+    try:
+        if not gate.acquired:
+            print("学习桌面正在启动，请稍候。", flush=True)
+            return 0
+        return launch(args, gate, parser)
+    finally:
+        gate.close()
+
+
+def launch(args, startup_gate, parser) -> int:
+    from learning_app.dev import _request_owned_exit, wait_for_http
+    from learning_app.processes import OwnedProcessGroup, ProcessError, require_free_port
+
     if args.timeout <= 0 or not 1024 <= args.backend_port <= 65535:
         parser.error("等待时限和本地端口无效")
     if args.debug_port is not None and not 1024 <= args.debug_port <= 65535:
@@ -73,14 +180,27 @@ def main() -> int:
     # actual Electron launch to detect another process winning the port race.
     if args.debug_port is not None:
         require_free_port("127.0.0.1", args.debug_port)
+    existing = None
     if not args.url:
         try:
             require_free_port("127.0.0.1", args.backend_port)
         except ProcessError:
-            if activate_existing(args.backend_port, args.runtime_dir.resolve()):
+            if activate_existing(args.backend_port, args.runtime_dir.resolve(), data_dir=args.data_dir.resolve()):
                 return 0
-            raise
-    if not args.no_prepare:
+            existing = find_running_backend(None, args.runtime_dir.resolve(), args.data_dir.resolve())
+            if existing is None:
+                args.backend_port = available_port()
+                print("原端口暂不可用，已自动选择可用端口。", flush=True)
+        else:
+            existing = find_running_backend(None, args.runtime_dir.resolve(), args.data_dir.resolve())
+        if existing:
+            args.backend_port = existing[0]["backend_port"]
+            if activate_existing(args.backend_port, args.runtime_dir.resolve(), data_dir=args.data_dir.resolve()):
+                return 0
+            print("已连接现有学习后台，正在重新打开窗口。", flush=True)
+        url = f"http://127.0.0.1:{args.backend_port}/desktop/"
+        address = urlsplit(url)
+    if not args.no_prepare and existing is None:
         prepare()
     electron = verified_executable()
     runtime_root = args.runtime_dir.resolve()
@@ -96,7 +216,7 @@ def main() -> int:
         LEARNING_APP_DATA_DIR=str(args.data_dir.resolve()),
         LEARNING_DESKTOP_URL=url,
         LEARNING_DESKTOP_OWNS_BACKEND="0" if args.url else "1",
-        LEARNING_DESKTOP_OWNER_FILE=str(logs / "native-owner.json"),
+        LEARNING_DESKTOP_OWNER_FILE=str(existing[1] if existing else logs / "native-owner.json"),
         PYTHONUNBUFFERED="1",
         PYTHONIOENCODING="utf-8",
     )
@@ -108,7 +228,7 @@ def main() -> int:
         env["LEARNING_DESKTOP_USER_DATA"] = str(args.user_data_dir.resolve())
     group = OwnedProcessGroup("learning-desktop")
     backend = None
-    record = None
+    record = existing[0] if existing else None
     exit_attempted = False
 
     def cleanup_backend() -> None:
@@ -135,7 +255,7 @@ def main() -> int:
             (logs / "electron.stdout.log").open("w", encoding="utf-8") as output,
             (logs / "electron.stderr.log").open("w", encoding="utf-8") as errors,
         ):
-            if not args.url:
+            if not args.url and existing is None:
                 require_free_port("127.0.0.1", args.backend_port)
                 # The existing launcher owns its own Job Object. Keeping it
                 # separate means a window crash or uncertain exit cannot kill
@@ -172,7 +292,8 @@ def main() -> int:
                     processes=[backend], timeout=args.timeout, instance_id=str(record["instance_id"]),
                 )
             else:
-                wait_for_http(f"{address.scheme}://{address.netloc}/api/v1/health", processes=[], timeout=args.timeout)
+                wait_for_http(f"{address.scheme}://{address.netloc}/api/v1/health", processes=[], timeout=args.timeout,
+                              **({"instance_id": record["instance_id"]} if existing else {}))
             command = [str(electron)]
             if args.debug_port is not None:
                 require_free_port("127.0.0.1", args.debug_port)
@@ -187,6 +308,7 @@ def main() -> int:
                     raise ProcessError("DESKTOP_WINDOW_TIMEOUT", f"桌面窗口未就绪，请查看 {logs}。")
                 time.sleep(.1)
             print("LEARNING_DESKTOP_READY " + json.dumps({"url": url, "pid": desktop.pid, "logs": str(logs), "owns_backend": not bool(args.url)}, ensure_ascii=False), flush=True)
+            startup_gate.close()
             while desktop.poll() is None:
                 if backend is not None and backend.poll() is None:
                     # A bounded backend recovery retains this desktop carrier.
@@ -224,6 +346,9 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (OSError, RuntimeError, ValueError) as error:
-        print(f"{getattr(error, 'code', 'DESKTOP_START_FAILED')}: {error}", file=sys.stderr)
+    except (OSError, RuntimeError, ValueError, AppError) as error:
+        if sys.stderr is not None:
+            print(f"{getattr(error, 'code', 'DESKTOP_START_FAILED')}: {error}", file=sys.stderr)
+        if os.name == "nt" and "--show-errors" in sys.argv:
+            ctypes.windll.user32.MessageBoxW(None, "学习桌面暂时无法打开。\n\n" + str(error), "AI 辅助学习", 0x10)
         raise SystemExit(1) from None

@@ -80,11 +80,11 @@ def granted_origin(conn, owner_course_id, snapshot_id):
 def course_scope(conn, owner_course_id, declared):
     choices = list(declared) if declared else [owner_course_id]
     if (
-        len(choices) > 4
+        len(choices) > 32
         or any(not isinstance(value, str) for value in choices)
         or len(set(choices)) != len(choices)
     ):
-        raise AppError("SOURCE_COURSE_SCOPE_INVALID", "读取课程须为至多四个明确且不重复的课程", 422)
+        raise AppError("SOURCE_COURSE_SCOPE_INVALID", "读取工作区须为明确且不重复的课程", 422)
     found = set(
         conn.execute(
             select(business.courses.c.course_id).where(business.courses.c.course_id.in_(choices))

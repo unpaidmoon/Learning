@@ -51,10 +51,7 @@
   // Seed a single business-owned blank before the native first-use navigation
   // starts. Both the restored native selection and this plugin reuse that id.
   const prepareCourse = ready.then(async () => {
-    const courses = await api('/courses');
-    const requested = new URLSearchParams(location.search).get('course_id');
-    const course = requested ? courses.find(value => value.course_id === requested) : courses[0];
-    if (course) await api('/desktop/courses/' + course.course_id + '/open', {});
+    await api('/desktop/default/open', {});
   }).catch(() => {});
   const boot = window.__DSH_BOOT_READY__ ??= Promise.withResolvers();
   const resolveBoot = boot.resolve;
@@ -209,54 +206,62 @@
       finally { newChatIntent--; }
     }
     async function chooseCourse(course, chatId, action = 'open') {
-      const navigation = ++navigationRevision;
-      const targetCourse = course.course_id;
-      navigationPending = true; notify();
-      try {
-        if (captureRequest) throw new Error('请完成或取消当前截图（CAPTURE_CONTEXT_LOCKED）');
-        if (activeSessionId && !readOnlyHistory()) await drafts?.beforeNavigate(activeSessionId);
-        if (navigation !== navigationRevision) return;
-        const opened = chatId
-          ? await api('/desktop/chats/' + chatId + '/' + action, {})
-          : await api('/desktop/courses/' + targetCourse + '/open', {});
-        if (navigation !== navigationRevision) return;
-        bindings.set(opened.session_id, { ...opened, course_id: targetCourse });
-        if (library) await library.setCourse(targetCourse);
-        if (navigation !== navigationRevision) return;
-        await ctx.sessions.refresh();
-        if (navigation !== navigationRevision) return;
-        if (activeSessionId && !readOnlyHistory()) await drafts?.beforeNavigate(activeSessionId);
-        if (navigation !== navigationRevision) return;
-        selectedCourse = targetCourse;
-        activeSessionId = opened.session_id;
-        ctx.uiWorkspace.openSession(opened.session_id);
-        if (!opened.read_only) await drafts?.attach(opened.session_id, opened.chat_id);
-      } catch (error) {
-        if (navigation === navigationRevision && library && selectedCourse && selectedCourse !== targetCourse) void library.setCourse(selectedCourse);
-        throw error;
-      } finally {
-        if (navigation === navigationRevision) { navigationPending = false; notify(); }
+      if (captureRequest) throw new Error('请先完成或取消截图（CAPTURE_CONTEXT_LOCKED）');
+      if (!chatId) {
+        selectedCourse = course.course_id;
+        await library?.setCourse(selectedCourse);
+        notify(); return;
       }
+      if (activeSessionId && !readOnlyHistory()) await drafts?.beforeNavigate(activeSessionId);
+      const opened = await api('/desktop/chats/' + chatId + '/' + action, {});
+      bindings.set(opened.session_id, opened);
+      activeSessionId = opened.session_id;
+      ctx.uiWorkspace.openSession(opened.session_id);
+      if (!opened.read_only) await drafts?.attach(opened.session_id, opened.chat_id);
+      notify();
     }
     function HistoryTitle({ displayTitle }) {
       const [open, setOpen] = useState(false);
       const [items, setItems] = useState([]);
       const show = async () => {
         try {
-          const chats = await api('/courses/' + selectedCourse + '/chats');
-          const current = activeSessionId ? await bindingFor(activeSessionId) : null;
-          setItems(chats.map((chat, index) => ({ id: chat.chat_id,
-            label: chat.chat_id === current?.chat_id ? displayTitle || '新对话' : `对话 ${index + 1}`,
-          })).reverse());
+          await ctx.sessions.refresh();
+          const chats = Object.values(ctx.sessions.list.getSnapshot().byId);
+          setItems(chats.map(chat => ({ id: chat.id, label: chat.displayTitle || '新对话' })).reverse());
           setOpen(true);
         } catch (reason) { if (activeSessionId) inputFor(activeSessionId).notify('error', reason.message); }
       };
       return h(Menu, { open, portal: true, listClassName: 'learning-menu-surface', items, onClose: () => setOpen(false),
         anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-conversation-title', title: displayTitle || '新对话',
-          'aria-label': '选择历史对话', disabled: !selectedCourse, onClick: show }, h('span', null, displayTitle || '新对话'), h(library.components.Icon, { name: 'chevron-down', size: 14 })),
-        onSelect: chatId => { setOpen(false); void chooseCourse({ course_id: selectedCourse }, chatId)
-          .catch(reason => { if (activeSessionId) inputFor(activeSessionId).notify('error', reason.message); }); },
+          'aria-label': '选择历史对话', onClick: show }, h('span', null, displayTitle || '新对话'), h(library.components.Icon, { name: 'chevron-down', size: 14 })),
+        onSelect: sid => { setOpen(false); void (async () => {
+          if (captureRequest) throw new Error('请先完成或取消截图（CAPTURE_CONTEXT_LOCKED）');
+          if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
+          ctx.uiWorkspace.openSession(sid);
+        })().catch(reportError); },
       });
+    }
+    function WorkspaceMenu() {
+      useRevision();
+      const [open, setOpen] = useState(false);
+      const [adding, setAdding] = useState(false);
+      const [courses, setCourses] = useState([]);
+      const ids = bindings.get(activeSessionId)?.workspace_ids || [];
+      const choose = async identity => {
+        if (identity === '__add') { setAdding(true); return; }
+        const sid = activeSessionId;
+        const next = ids.includes(identity) ? ids.filter(id => id !== identity) : [...ids, identity];
+        const result = await api('/desktop/sessions/' + sid + '/workspaces', { course_ids: next });
+        bindings.set(sid, result); setOpen(false); setAdding(false); notify();
+      };
+      const items = courses.filter(course => adding ? !ids.includes(course.course_id) : ids.includes(course.course_id))
+        .map(course => ({ id: course.course_id, label: (adding ? '' : '✓ ') + course.title }));
+      if (!adding) items.push({ id: '__add', label: '＋ 添加工作区…' });
+      const title = ids.map(id => courses.find(item => item.course_id === id)?.title || '课程').join('、') || '工作区';
+      useEffect(() => { void api('/courses').then(setCourses).catch(reportError); }, [open]);
+      return h(Menu, { open, portal: true, items, onClose: () => { setOpen(false); setAdding(false); },
+        anchor: h(Button, { size: 'sm', variant: 'ghost', title, 'aria-label': '对话工作区', disabled: !activeSessionId || readOnlyHistory(), onClick: () => setOpen(true) }, title),
+        onSelect: identity => { void choose(identity).catch(reportError); } });
     }
     function VideoButton() {
       useRevision();
@@ -268,7 +273,7 @@
           if (activeSessionId) {
             const current = await bindingFor(activeSessionId);
             const chat = await api('/chats/' + current.chat_id);
-            if (!chat.messages?.length && !chat.generations?.length) { inputFor(activeSessionId).focus(); return; }
+            if (current.course_id === selectedCourse && !chat.messages?.length && !chat.generations?.length) { inputFor(activeSessionId).focus(); return; }
             if (!readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
           }
           const sid = await createLearningChat();
@@ -287,7 +292,7 @@
       return h(React.Fragment, null,
         h('header', { className: 'learning-ai-header', 'data-testid': 'learning-ai-header' },
           h('div', { className: 'learning-ai-title' }, h(HistoryTitle, { displayTitle: title })), h('div', { className: 'learning-ai-actions', role: 'toolbar', 'aria-label': '对话操作' },
-            h(VideoButton), h(AttachmentsButton),
+            h(WorkspaceMenu), h(VideoButton), h(AttachmentsButton),
             h(Button, { variant: 'ghost', size: 'sm', className: 'learning-icon-action', 'aria-label': '截图', title: '截图 · Ctrl+Shift+S',
               icon: h(library.components.Icon, { name: 'capture', size: 17 }),
             onClick: beginWorkspaceCapture, disabled: !activeSessionId || navigationPending || readOnlyHistory() }), h(CollapseAiButton))),
@@ -357,7 +362,7 @@
       const state = materialState();
       state.contextFile = file; state.contextMedia = null;
       const key = materialKey(file);
-      if (!state.tabs.some(value => value.id === key)) state.tabs.push({ id: key, kind: 'file', file, title: file.entry.name });
+      if (!state.tabs.some(value => value.id === key)) state.tabs.push({ id: key, kind: file.generated_artifact?.kind === 'book' ? 'book' : 'file', file, title: file.entry.name });
       if (sourceJump) state.tabs.find(value => value.id === key).sourceJump = sourceJump;
       state.active = key;
       notify();
@@ -377,7 +382,7 @@
         const state = materialState();
         videoHandles.get(state.active)?.current?.pauseForCapture();
         void videoComponents.interactionPriority(true).catch(() => {});
-        captureRequest = { sessionId, binding, workspace: true };
+        captureRequest = { sessionId, binding, workspace: true, sourceCourseId: state.contextMedia?.source_course_id || selectedCourse };
         notify();
       } catch (error) { reportError(error); }
     }
@@ -554,35 +559,21 @@
           const revision = ++sourceJumpRevision;
           const binding = await bindingFor(sessionId);
           const file = await api('/courses/' + binding.course_id + '/learning/selections/' + id + '/open', {});
-          if (revision !== sourceJumpRevision || activeSessionId !== sessionId || selectedCourse !== binding.course_id) return;
-          if (caption && file.video) openMaterial(file.video, { time_ms: source.reference.start_ms });
+          if (revision !== sourceJumpRevision || activeSessionId !== sessionId) return;
+          if (caption && file.video) openMaterial({ ...file.video, source_course_id: source.course_id }, { time_ms: source.reference.start_ms });
           else openFile({ ...file, learning_source_owner: binding.course_id, learning_source_snapshot: id }, { request_id: crypto.randomUUID(), reference: source.reference });
         })().catch(reason => setError(reason.message)); } }, '回看原文'),
         h(Button, { size: 'sm', 'aria-label': '移除资料引用', onClick: () => controller.update({ source_snapshot_ids: (controller.snapshot().value.source_snapshot_ids || []).filter(value => value !== id) }) }, '移除'));
     }
     async function sourceAction(action) {
+      if (action.intent !== 'quote') throw new Error('此专门流程已取消（LEARNING_FEATURE_REMOVED）');
       if (navigationPending || !activeSessionId) throw new Error('请等待课程切换完成（NAVIGATION_PENDING）');
       const sessionId = activeSessionId;
       const binding = await bindingFor(sessionId);
       if (binding.course_id !== action.file.course_id) {
         const visible = materialState().tabs.some(tab => tab.file?.course_id === action.file.course_id
-          && tab.file?.asset_id === action.file.asset_id && tab.file?.source_version === action.file.source_version
-          && tab.file?.learning_source_owner === binding.course_id && tab.file?.learning_source_snapshot);
+          && tab.file?.asset_id === action.file.asset_id && tab.file?.source_version === action.file.source_version);
         if (!visible) throw new Error('选区不属于原对话或已核定跨课程来源（SOURCE_COURSE_DENIED）');
-      }
-      if (action.intent === 'translation') {
-        return library.components.translatePdfSelection(sessionId, binding.course_id, binding.chat_id, action);
-      }
-      if (action.intent === 'aligned_translation') {
-        let source;
-        try { source = await api('/courses/' + action.file.course_id + '/learning/selections/pdf', action.selection); }
-        catch { throw Object.assign(new Error('无法冻结选中文字，尚未创建对照任务；选区仍保留（TRANSLATION_SELECTION_NOT_FROZEN）'), { status: 422 }); }
-        return api('/desktop/sessions/' + sessionId + '/learning-task-intents', {
-          operation_id: action.operation_id, kind: 'aligned_translation', coverage_mode: 'selection',
-          instruction: '将这份实际选中的文字逐段翻译为中文，保留原文和译文对应，不补前后文。',
-          sources: [{ kind: 'selection', snapshot_id: source.snapshot_id }], sources_only: true,
-          target: { mode: 'create', title: '选区段落对照' },
-        });
       }
       const source = await api('/courses/' + action.file.course_id + '/learning/selections/pdf', action.selection);
       const controller = library.components.getDraftController(binding.chat_id);
@@ -631,6 +622,8 @@
       const bytes = Uint8Array.from(atob(result.dataUrl.split(',')[1]), value => value.charCodeAt(0));
       const blob = new Blob([bytes], { type: 'image/png' });
       const attachment = await api('/attachments', { confirmed: true, media_type: 'image/png', data_base64: result.dataUrl.split(',')[1] });
+      if (result.source.source) result.source.source = { ...result.source.source,
+        source_course_id: result.source.source.source_course_id || captureRequest?.sourceCourseId || binding.course_id };
       await api('/attachments/' + attachment.attachment_id + '/source', {
         chat_id: binding.chat_id, origin: result.source.origin || (result.source.source ? 'video' : 'workspace'),
         ...result.source.source, source_width: result.source.width, source_height: result.source.height,
@@ -647,11 +640,12 @@
       }
       aiCollapsed = false; notify(); input.focus();
     }
-    async function openWorkbenchSource(source) {
+    async function openWorkbenchSource(source, sourceOwner) {
       if (navigationPending || captureRequest || !activeSessionId) throw Error('NAVIGATION_PENDING');
       const sid = activeSessionId, revision = ++sourceJumpRevision;
       const binding = await bindingFor(sid);
-      const allowed = await api('/courses/' + binding.course_id + '/learning/selections/' + source.snapshot_id);
+      const owner = sourceOwner || binding.course_id;
+      const allowed = await api('/courses/' + owner + '/learning/selections/' + source.snapshot_id);
       if (allowed.course_id !== source.course_id || allowed.content_hash !== source.content_hash) throw Error('SOURCE_COURSE_DENIED');
       let located = source, offset = 0;
       for (let depth = 0; located.reference.kind === 'snapshot_slice'; depth++) {
@@ -659,9 +653,9 @@
         offset += located.reference.start;
         located = await api('/courses/' + located.course_id + '/learning/selections/' + located.reference.parent_snapshot_id);
       }
-      const file = await api('/courses/' + binding.course_id + '/learning/selections/' + source.snapshot_id + '/open', {});
-      if (revision !== sourceJumpRevision || sid !== activeSessionId || selectedCourse !== binding.course_id) return;
-      if (located.reference.kind === 'subtitle' && file.video) openMaterial(file.video, { time_ms: located.reference.start_ms });
+      const file = await api('/courses/' + owner + '/learning/selections/' + source.snapshot_id + '/open', {});
+      if (revision !== sourceJumpRevision || sid !== activeSessionId) return;
+      if (located.reference.kind === 'subtitle' && file.video) openMaterial({ ...file.video, source_course_id: located.course_id }, { time_ms: located.reference.start_ms });
       else {
         let reference = located.reference;
         if (source.reference.kind === 'snapshot_slice' && reference.kind === 'document') reference = { ...reference,
@@ -669,35 +663,94 @@
         if (reference.kind === 'document_image' || reference.kind === 'document_region_image') reference = { kind: 'document', asset_id: reference.asset_id,
           source_version: reference.source_version, source_digest: reference.source_digest,
           page_index: reference.page_index, page_label: null, parser_version: reference.parser_version, start: 0, end: 0, regions: reference.region ? [reference.region] : [] };
-        openFile({ ...file, learning_source_owner: binding.course_id, learning_source_snapshot: source.snapshot_id }, { request_id: crypto.randomUUID(), reference });
+        openFile({ ...file, learning_source_owner: owner, learning_source_snapshot: source.snapshot_id }, { request_id: crypto.randomUUID(), reference });
       }
     }
-    async function openLearningTask(taskId, sid) {
-      if (!sid || sid !== activeSessionId || navigationPending) return;
-      const binding = await bindingFor(sid);
-      await api('/courses/' + binding.course_id + '/learning/tasks/' + taskId);
-      if (sid !== activeSessionId || selectedCourse !== binding.course_id || navigationPending) return;
-      materialState().active = 'workbench'; notify();
-      window.dispatchEvent(new CustomEvent('learning-open-task', { detail: { courseId: binding.course_id, taskId } }));
+    function GeneratedDocument({ taskId, sid, title }) {
+      const [value, setValue] = useState(null);
+      const [error, setError] = useState('');
+      useEffect(() => {
+        let live = true, timer;
+        const read = async () => {
+          try {
+            const result = await api('/desktop/sessions/' + sid + '/documents/' + taskId);
+            if (!live) return;
+            setValue(result);
+            if (result.file && result.open_requested && ['completed', 'partial'].includes(result.task.state)
+                && sid === activeSessionId && !captureRequest && !navigationPending) {
+              const key = 'learning.opened-result.' + taskId;
+              if (!localStorage.getItem(key)) { localStorage.setItem(key, '1'); openFile(result.file); }
+            }
+            if (!['completed', 'partial', 'failed', 'cancelled'].includes(result.task.state)) timer = setTimeout(read, 1500);
+          } catch (reason) { if (live) setError(reason.message); }
+        };
+        void read();
+        return () => { live = false; clearTimeout(timer); };
+      }, [taskId, sid]);
+      const controls = async action => {
+        try {
+          const binding = await bindingFor(sid);
+          await api('/courses/' + binding.course_id + '/learning/tasks/' + taskId + '/control/' + action,
+            { operation_id: crypto.randomUUID(), expected_revision: value.task.revision });
+        } catch (reason) { setError(reason.message); }
+      };
+      return h('span', { className: 'learning-document-result' },
+        value?.file ? h(Button, { size: 'sm', variant: 'ghost', onClick: () => openFile(value.file) }, title || value.file.entry.name)
+          : h('span', { role: 'status' }, (title || '文档') + ' · ' + ({ queued: '等待生成', preparing: '正在处理', running: '正在生成', paused: '已暂停', failed: '未完成', completed: '已完成', partial: '部分完成', unknown: '结果待核对' }[value?.task.state] || '正在读取')),
+        value && ['queued', 'preparing', 'running'].includes(value.task.state) && h(Button, { size: 'sm', variant: 'ghost', onClick: () => { void controls('pause'); } }, '暂停'),
+        value?.task.state === 'paused' && h(Button, { size: 'sm', variant: 'ghost', onClick: () => { void controls('resume'); } }, '继续'),
+        value?.outline?.proposal && h('span', null,
+          h('ol', null, ...value.outline.proposal.chapters.map(chapter => h('li', { key: chapter.chapter_id }, chapter.title))),
+          h(Button, { size: 'sm', onClick: () => { void (async () => {
+            const binding = await bindingFor(sid);
+            await api('/courses/' + binding.course_id + '/learning/tasks/' + taskId + '/book-outline', {
+              operation_id: crypto.randomUUID(), expected_revision: value.outline.task_revision,
+              proposal_hash: value.outline.proposal_hash, outline: value.outline.proposal });
+          })().catch(reason => setError(reason.message)); } }, '确认目录并生成')),
+        error && h('span', { role: 'alert' }, error));
+    }
+    function SubtitleProgress({ sid, turn }) {
+      const [items, setItems] = useState([]);
+      useEffect(() => {
+        let live = true, timer;
+        const read = async () => {
+          try {
+            const values = await api('/desktop/sessions/' + sid + '/answer-subtitles?native_turn=' + turn);
+            if (!live) return;
+            setItems(values);
+            if (values.some(item => ['queued', 'running'].includes(item.job.state))) timer = setTimeout(read, 1500);
+          } catch (error) { if (live) reportError(error); }
+        };
+        void read(); return () => { live = false; clearTimeout(timer); };
+      }, [sid, turn]);
+      return items.map(({ job, video }) => h('span', { key: job.job_id, role: 'status' },
+        '字幕 · ' + ({ queued: '等待处理', running: '正在转写', completed: '已完成', failed: '未完成', paused: '已暂停' }[job.state] || job.state),
+        h(Button, { size: 'sm', variant: 'ghost', onClick: () => { materialState().subtitleAsset = video.asset_id; openMaterial({ ...video, source_course_id: job.course_id }); } }, '查看字幕')));
     }
     function RequestedTaskActions({ messageId }) {
       useRevision();
       const sid = activeSessionId;
-      const [links, setLinks] = useState([]);
+      const [links, setLinks] = useState([]), [sources, setSources] = useState([]), [turn, setTurn] = useState(null);
       useEffect(() => {
         let live = true;
-        setLinks([]);
+        setLinks([]); setSources([]); setTurn(null);
         if (!sid) return;
         const snapshot = ctx.uiConversation.binding(sid).target('chat').getSnapshot();
         const tail = [...(snapshot?.nodes?.values() || [])].find(node => node.kind === 'turn-tail'
           && node.data?.closing?.finalNode?.messageId === messageId);
         if (!tail || !Number.isSafeInteger(tail.data.turn) || tail.data.turn < 1) return;
-        void api('/desktop/sessions/' + sid + '/learning-task-links?native_turn=' + tail.data.turn)
-          .then(value => { if (live) setLinks(value); }).catch(error => { if (live && sid === activeSessionId) reportError(error); });
+        setTurn(tail.data.turn);
+        void Promise.all([
+          api('/desktop/sessions/' + sid + '/learning-task-links?native_turn=' + tail.data.turn),
+          api('/desktop/sessions/' + sid + '/answer-sources?native_turn=' + tail.data.turn),
+        ]).then(([tasks, evidence]) => { if (live) { setLinks(tasks); setSources(evidence); } }).catch(reportError);
         return () => { live = false; };
       }, [sid, messageId]);
-      return links.map(task => h(Button, { key: task.task_id, size: 'sm', variant: 'ghost',
-        title: task.title, onClick: () => { void openLearningTask(task.task_id, sid).catch(reportError); } }, '查看学习任务'));
+      return h(React.Fragment, null,
+        turn && h(SubtitleProgress, { sid, turn }),
+        ...links.map(task => h(GeneratedDocument, { key: task.task_id, taskId: task.task_id, sid, title: task.title })),
+        ...sources.map((item, index) => h(Button, { key: item.source.snapshot_id, size: 'sm', variant: 'ghost',
+          onClick: () => { void openWorkbenchSource(item.source).catch(reportError); } }, '[' + (index + 1) + '] ' + item.label)));
     }
     function MaterialsRoot() {
       useRevision();
@@ -720,8 +773,6 @@
         h('div', { className: 'learning-material-tabs', role: 'tablist', 'aria-label': '资料标签' },
           h(Button, { role: 'tab', 'aria-selected': state.active === 'files', size: 'sm', variant: state.active === 'files' ? 'outline' : 'ghost',
             onClick: () => { ++sourceJumpRevision; state.active = 'files'; notify(); } }, '文件'),
-          h(Button, { role: 'tab', 'aria-selected': state.active === 'workbench', size: 'sm', disabled: navigationPending || !activeSessionId || !selectedCourse, variant: state.active === 'workbench' ? 'outline' : 'ghost',
-            onClick: () => { ++sourceJumpRevision; state.active = 'workbench'; notify(); } }, '学习成果与任务'),
           state.tabs.map(item => h('span', { key: item.id, className: 'learning-material-tab' },
             h(Button, { role: 'tab', 'aria-selected': state.active === item.id, size: 'sm', variant: state.active === item.id ? 'outline' : 'ghost',
               onClick: () => { ++sourceJumpRevision; state.active = item.id;
@@ -741,12 +792,9 @@
           onMouseEnter: toggleAi, onFocus: toggleAi, onClick: () => { if (aiCollapsed) toggleAi(); } }, '问答'),
         h('div', { className: 'learning-material-body', role: 'tabpanel' },
           h('div', { hidden: state.active !== 'files', className: 'learning-material-page' }, h(library.LibraryFiles)),
-          activeSessionId && selectedCourse && h('div', { hidden: state.active !== 'workbench', className: 'learning-material-page learning-legacy-module' },
-            h(library.components.WorkbenchPanel, { key: selectedCourse, courseId: selectedCourse, sessionId: activeSessionId,
-              file: state.contextFile || undefined, media: state.contextMedia || undefined,
-              visible: state.active === 'workbench', onOpenSource: openWorkbenchSource })),
           activeSessionId && state.tabs.map(item => h('div', { key: item.id, hidden: state.active !== item.id, className: 'learning-material-page' },
             item.kind === 'video' ? h(VideoPanel, { sessionId: activeSessionId, selectedAsset: item.video, active: state.active === item.id, tabId: item.id, seekRequest: item.seekRequest })
+              : item.kind === 'book' ? h(library.components.BookReader, { courseId: item.file.generated_artifact.course_id, artifactId: item.file.generated_artifact.artifact_id, fixedRevision: item.file.generated_artifact.revision_id, onOpenSource: source => { void openWorkbenchSource(source).catch(reportError); } })
               : h(library.ResourceViewer, { file: item.file, onQuote: addMaterialQuote, onSourceAction: sourceAction, sourceJump: item.sourceJump, visible: state.active === item.id })))),
         h('div', { className: 'learning-ai-resizer', role: 'separator', tabIndex: 0, 'aria-label': '调整 AI 宽度', 'aria-orientation': 'vertical',
           onPointerDown: event => {
@@ -790,7 +838,7 @@
           if (!video || !asset || !binding) throw new Error('视频尚未就绪（VIDEO_FRAME_UNAVAILABLE）');
           const captured = library.components.captureVideoFrame(video, source);
           void videoComponents.interactionPriority(true).catch(() => {});
-          captureRequest = { sessionId, binding, source: captured };
+          captureRequest = { sessionId, binding, source: captured, sourceCourseId: selectedAsset.source_course_id || selectedCourse };
           setCandidate(captured);
           notify();
         } catch (reason) { setError(reason.message); }
@@ -808,7 +856,8 @@
           h(Button, { variant: 'toolbar', size: 'sm', disabled: !asset || !binding || asset.media_type?.startsWith('audio/'),
             'data-testid': 'learning-capture', onClick: screenshot }, '截图提问')),
         h(videoComponents.VideoWorkspace, {
-          courseId: binding?.course_id || selectedCourse, assetId: selectedAsset.asset_id,
+          courseId: selectedAsset.source_course_id || selectedCourse, assetId: selectedAsset.asset_id,
+          showSubtitles: materialState().subtitleAsset === selectedAsset.asset_id,
           onSubtitleAction: subtitleAction,
           active, connected: true, minimal: true, workspaceHandleRef: handle, workspaceRef,
           onLibraryChange: () => {}, onAssetChange: setAsset,
@@ -858,9 +907,17 @@
             // only; the separate confirmed-image pathway remains unchanged.
             const time = player?.currentTime;
             const questionVideo = tab && Number.isFinite(time) && time >= 0 ? {
-              asset_id: tab.video.asset_id, source_version: tab.video.source_version, time_ms: Math.round(time * 1000),
+              asset_id: tab.video.asset_id, source_version: tab.video.source_version, time_ms: Math.round(time * 1000), source_course_id: tab.video.source_course_id || selectedCourse,
             } : null;
+            const currentFile = state.tabs.find(item => item.id === state.active && ['file', 'book'].includes(item.kind))?.file;
+            let pageIndex = 0;
+            if (currentFile?.viewer === 'pdf') {
+              const frame = document.querySelector('.learning-material-page:not([hidden]) iframe.pdf-reader-frame');
+              pageIndex = Math.max(0, (frame?.contentWindow?.PDFViewerApplication?.pdfViewer?.currentPageNumber || 1) - 1);
+            }
             const prepared = await drafts.beforeSubmit(sid, requestId, request);
+            if (currentFile) prepared.current_document = { course_id: currentFile.course_id,
+              asset_id: currentFile.asset_id, source_version: currentFile.source_version, page_index: pageIndex };
             if (questionVideo) prepared.question_video = questionVideo;
             return prepared;
           },
@@ -884,6 +941,18 @@
         disposers.push(() => quotes.dispose());
         disposers.push(library.subscribeOpenVideo(openMaterial));
         disposers.push(library.subscribeOpenFile(openFile));
+        const followSource = event => {
+          const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
+          if (!anchor) return;
+          const url = new URL(anchor.href, location.href);
+          const match = url.origin === location.origin && url.pathname.match(/^\/api\/v1\/courses\/([A-Za-z0-9_-]+)\/learning\/selections\/([A-Za-z0-9_-]+)$/);
+          if (!match) return;
+          event.preventDefault(); event.stopPropagation();
+          void api('/courses/' + match[1] + '/learning/selections/' + match[2])
+            .then(source => openWorkbenchSource(source, match[1])).catch(reportError);
+        };
+        document.addEventListener('click', followSource, true);
+        disposers.push(() => document.removeEventListener('click', followSource, true));
         const register = (name, options, component) => disposers.push(ctx.slots.inject(name, () => {
           try { return ctx.slots.register({ name, ...options }, component); }
           catch (error) { console.error('LEARNING_DESKTOP_SLOT_FAILED:', name, String(error.message || error)); throw error; }
@@ -898,7 +967,7 @@
         register('shell.overlay', { id: 'learning-app-overlays', order: 0 }, AppOverlays);
         register('sidebar.settings', { priority: -100 }, SettingsButton);
         register('conversation.input.dock', { id: 'learning-references', order: 0 }, ReferenceDock);
-        register('conversation.chat.assistant-actions', { id: 'learning-task', order: 50, label: '学习任务' }, RequestedTaskActions);
+        register('conversation.chat.assistant-actions', { id: 'learning-task', order: 50, label: '文档与引用' }, RequestedTaskActions);
         const revealTask = event => {
           const detail = event.detail;
           if (!detail || detail.courseId !== selectedCourse || !activeSessionId || navigationPending
@@ -906,7 +975,7 @@
           const sid = activeSessionId;
           void api('/courses/' + detail.courseId + '/learning/tasks/' + detail.taskId).then(() => {
             if (sid === activeSessionId && selectedCourse === detail.courseId && !navigationPending) {
-              materialState().active = 'workbench'; notify();
+              notify();
             }
           }).catch(reportError);
         };
@@ -956,8 +1025,7 @@
           activeSessionId = current.id;
           void bindingFor(current.id).then(value => {
             if (activeSessionId !== current.id) return;
-            selectedCourse = value.course_id;
-            void library.setCourse(value.course_id);
+            if (!selectedCourse) { selectedCourse = value.course_id; void library.setCourse(value.course_id); }
             if (!value.read_only) void drafts.attach(current.id, value.chat_id).catch(reportError);
             notify();
           }).catch(() => {});

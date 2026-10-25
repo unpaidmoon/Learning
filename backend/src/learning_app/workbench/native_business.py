@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict
 
 from pydantic import ValidationError
@@ -14,6 +15,7 @@ from learning_app.execution.types import ExecutionBinding
 from learning_app.imported_executions import imported_executions
 from learning_app.storage import schema as business
 from learning_app.storage.repository import _hash
+from learning_app.workspaces import explicit_subtitles, read_workspaces
 
 from . import corpus_schema as corpus_s
 from . import schema as s
@@ -24,6 +26,7 @@ from .models import ArtifactBody
 from .native_document_images import TOOL as DOCUMENT_IMAGE_TOOL
 from .native_document_images import NativeDocumentImages
 from .nearby_subtitles import NearbySubtitles, select_anchor
+from .on_demand_sources import search as search_documents
 from .question_context import freeze_subtitle_anchors
 from .requested_learning import TOOL as ADMISSION_TOOL
 from .requested_learning import RequestedLearning
@@ -265,9 +268,9 @@ class NativeBusiness:
             query_courses = (
                 previous.get("corpus_course_ids")
                 if previous is not None
-                else course_scope(conn, chat["course_id"], current.get("read_course_ids", []))
-                if current.get("read_course_ids")
-                else None
+                else list(current["read_course_ids"])
+                if "read_course_ids" in current
+                else read_workspaces(conn, chat)
             )
             if requested:
                 sources = list(dict.fromkeys([*sources, *requested["source_snapshot_ids"]]))
@@ -281,12 +284,12 @@ class NativeBusiness:
                 [
                     "skill",
                     "read_source_handle",
-                    "search_course_concept",
+                    *(["search_course_concept"] if query_courses else []),
                     *([DOCUMENT_IMAGE_TOOL] if image_enabled else []),
                     *([ADMISSION_TOOL] if requested else []),
                     *(
                         ["read_nearby_subtitles"]
-                        if freeze_subtitle_anchors(conn, chat["course_id"], context, current)
+                        if explicit_subtitles(current["text"]) and freeze_subtitle_anchors(conn, chat["course_id"], context, current)
                         else []
                     ),
                 ],
@@ -679,6 +682,8 @@ class NativeBusiness:
                 raise AppError("COURSE_QUERY_SCOPE_DENIED", "只有本次课程问答可按需检索", 403)
             concept_argument(arguments)
         elif call.tool_name == "read_nearby_subtitles":
+            if not explicit_subtitles(scope["raw_user_text"]):
+                raise AppError("SUBTITLE_REQUEST_REQUIRED", "本次没有明确的字幕请求", 403)
             if scope["owner_kind"] != "chat" or scope["purpose"] != "qa":
                 raise AppError("NEARBY_SUBTITLE_SCOPE_DENIED", "仅允许本次问题附近字幕", 403)
             select_anchor(scope, arguments)
@@ -993,6 +998,8 @@ class NativeBusiness:
                 return known["result"]
             course = scope["course_id"]
             courses = scope["grants"].get("corpus_course_ids", [course])
+            if not courses:
+                raise AppError("WORKSPACE_SCOPE_REQUIRED", "请先为对话添加资料工作区", 403)
             course_scope(conn, course, courses)
             titles = dict(
                 conn.execute(
@@ -1002,7 +1009,7 @@ class NativeBusiness:
                 ).all()
             )
         groups = [
-            CourseCorpus(self.repository).search(origin, concept_argument(arguments))
+            search_documents(self.repository, origin, concept_argument(arguments))
             for origin in courses
         ]
         if courses == [course]:
@@ -1041,7 +1048,9 @@ class NativeBusiness:
                 locator = {"snapshot_id": snapshot.snapshot_id, "retrieval": True}
                 if origin != course:
                     locator["source_course_id"] = origin
-                if item.get("document_id"):
+                if item.get("live_document"):
+                    locator["live_document"] = True
+                elif item.get("document_id"):
                     CourseCorpus.document_allowed(conn, origin, item["document_id"])
                     locator["corpus_document_id"] = item["document_id"]
                 else:
@@ -1096,13 +1105,7 @@ class NativeBusiness:
                         ),
                     }
                 )
-            availability = CourseCorpus.availability(conn, course)
-            if courses != [course]:
-                scoped = {origin: CourseCorpus.availability(conn, origin) for origin in courses}
-                availability = {
-                    "incomplete": any(value["incomplete"] for value in scoped.values()),
-                    "courses": scoped,
-                }
+            availability = {"incomplete": True, "mode": "on_demand", "bounded": True}
             result = {
                 "course_id": course,
                 **({"read_course_ids": courses} if courses != [course] else {}),
@@ -1110,14 +1113,10 @@ class NativeBusiness:
                 "results": results,
                 "status": "matched"
                 if results
-                else "not_ready"
-                if availability["incomplete"]
-                else "not_found",
+                else "no_match_in_checked_range",
                 "index_status": availability,
                 "external_fallback": False,
-                "scope": "current_course_documents_and_indexed_artifacts"
-                if courses == [course]
-                else "explicit_courses_documents_and_indexed_artifacts",
+                "scope": "explicit_workspaces_on_demand_documents",
                 "coverage": "retrieval_only",
             }
             conn.execute(
@@ -1158,9 +1157,26 @@ class NativeBusiness:
                 "snapshots": [],
             }
         else:
-            value = NearbySubtitles(self.repository).read(
-                scope, anchor, lambda: self.authorize(call, arguments)
-            )
+            if re.search(r"生成|转写|制作|转录", scope["raw_user_text"]) and not re.search(r"附近|这一段|这段|片段", scope["raw_user_text"]):
+                from learning_app.config import PROJECT_ROOT
+
+                from .preparations import PreparationStore
+                from .processing_models import PreparationCreate
+
+                self.authorize(call, arguments)
+                store = PreparationStore(self.repository)
+                origin = anchor.get("source_course_id") or scope["course_id"]
+                definition = store.define_asr(origin, PreparationCreate(
+                    kind="asr", asset_id=anchor["asset_id"], source_version=anchor["source_version"],
+                ), PROJECT_ROOT, explicit=True)
+                job = store.publish_pdf(definition, summary=True)
+                value = {"status": job.state, "preparation_id": job.job_id, "course_id": origin,
+                         "track_id": definition["payload"]["parameters"]["track_id"],
+                         "scope": "explicit_current_video", "snapshots": []}
+            else:
+                value = NearbySubtitles(self.repository).read(
+                    scope, anchor, lambda: self.authorize(call, arguments)
+                )
         snapshots = value.pop("snapshots")
         with self.repository._lock, self.repository.engine.begin() as conn:
             self._authorize(conn, call, arguments)
@@ -1177,6 +1193,8 @@ class NativeBusiness:
                     <= value["end_ms"]
                 ):
                     raise AppError("NEARBY_SUBTITLE_SCOPE_DENIED", "字幕超出冻结问题范围", 403)
+                declare_snapshot(conn, scope["course_id"], snapshot.snapshot_id,
+                                 authority={"kind": "explicit_subtitles", "run_id": call.run_id})
                 handle_id = "nearby_" + _hash(
                     {"anchor": anchor["anchor_id"], "snapshot": snapshot.content_hash}
                 )

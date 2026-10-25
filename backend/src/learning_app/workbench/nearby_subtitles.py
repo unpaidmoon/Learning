@@ -94,7 +94,7 @@ class NearbySubtitles:
         return track, sorted(expected - ready), segments, gaps
 
     def read(self, scope, anchor, check_active):
-        course, run = scope["course_id"], scope["run_id"]
+        course, run = anchor.get("source_course_id") or scope["course_id"], scope["run_id"]
         grid = anchor["time_ms"] // WINDOW_MS
         first, last = max(0, grid - 1), grid + 1
         tracks = self.tracks.list(course, anchor["asset_id"], anchor["source_version"])
@@ -116,7 +116,7 @@ class NearbySubtitles:
                     check_active()
                     missing.sort(key=lambda unit: (abs(unit - grid), unit))
                     definition = (
-                        store.define_asr_track(course, track_id, self.project_root)
+                        store.define_asr_track(course, track_id, self.project_root, explicit=True)
                         if track_id
                         else store.define_asr(
                             course,
@@ -128,6 +128,7 @@ class NearbySubtitles:
                                 unit_index=missing[0],
                             ),
                             self.project_root,
+                            explicit=True,
                         )
                     )
                     track_id = definition["payload"]["parameters"]["track_id"]

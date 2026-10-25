@@ -99,6 +99,8 @@ class TaskStore:
         )
 
     def create(self, course_id: str, value: TaskCreate) -> TaskView:
+        if value.kind not in {"note", "handout", "book", "research"}:
+            raise AppError("LEARNING_FEATURE_REMOVED", "此专门学习流程已取消，请使用普通对话", 410)
         if value.kind == "essay_review":
             raise AppError(
                 "ESSAY_REVIEW_SCOPE_REQUIRED", "作文参考评价须绑定实际稿件修订及轮次", 422

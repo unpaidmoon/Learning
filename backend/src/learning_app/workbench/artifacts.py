@@ -128,6 +128,11 @@ class ArtifactStore:
                 raise AppError("SOURCE_QUOTE_MISMATCH", "原文引述须是所引用快照中的实际文字", 422)
 
     def _index(self, conn: Connection, artifact: ArtifactView) -> None:
+        # Kept as a compatibility seam; new assets no longer feed a knowledge
+        # index or automatically enroll reviews. Ordinary files remain readable.
+        return
+
+    def _legacy_index(self, conn: Connection, artifact: ArtifactView) -> None:
         conn.execute(
             delete(s.search_entries).where(
                 s.search_entries.c.artifact_id == artifact.artifact_id,
@@ -185,10 +190,19 @@ class ArtifactStore:
 
     def create(self, course_id: str, value: ArtifactCreate) -> ArtifactReceipt:
         """User creation endpoint; it cannot label arbitrary text as original material."""
+        if value.kind not in {"note", "handout", "book", "report"}:
+            raise AppError("LEARNING_FEATURE_REMOVED", "此专门学习功能已取消", 410)
         with self.repository._lock, self.repository.engine.begin() as conn:
             return self._create(conn, course_id, value, author="user", task_id=None)
 
     def publish_run_result(self, run_id: str, value: ArtifactCreate) -> ArtifactReceipt:
+        result = self._publish_run_result(run_id, value)
+        from .artifact_files import save_artifact_file
+
+        save_artifact_file(self.repository, result.artifact, run_id=run_id)
+        return result
+
+    def _publish_run_result(self, run_id: str, value: ArtifactCreate) -> ArtifactReceipt:
         """Exactly one product per task run, independent of ordinary chat generations."""
         value = value.model_copy(update={"operation_id": f"publish_{run_id}"})
         with self.repository._lock, self.repository.engine.begin() as conn:

@@ -307,14 +307,14 @@ def test_restore_retains_native_mapping_and_same_source_can_belong_to_two_runs(t
     repo.close()
 
 
-def prepare_chat(repo, course, source, submission, *, turn=1, source_locators=()):
+def prepare_chat(repo, course, source, submission, *, turn=1, source_locators=(), text="解释这段资料"):
     if not repo.list_chats(course):
         repo.create_chat(course, "native_chat")
     with repo.engine.connect() as conn:
         conditions = source_selection_conditions(conn, course, [source.snapshot_id])
     result = repo.publish_submission(
         "native_chat",
-        "解释这段资料",
+        text,
         submission,
         conditions=conditions,
         source_locators=source_locators,

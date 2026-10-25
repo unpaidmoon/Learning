@@ -5737,6 +5737,7 @@
       "post": {
         "summary": "Submit Answer",
         "operationId": "submit_answer_api_v1_courses__course_id__learning_artifacts__artifact_id__answers_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -5797,6 +5798,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -6055,6 +6059,7 @@
       "post": {
         "summary": "Override",
         "operationId": "override_api_v1_courses__course_id__learning_answers__answer_id__override_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6115,6 +6120,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -6258,6 +6266,7 @@
       "post": {
         "summary": "Set Review Preferences",
         "operationId": "set_review_preferences_api_v1_courses__course_id__learning_review_preferences_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6309,6 +6318,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -6504,6 +6516,7 @@
       "post": {
         "summary": "Review Control",
         "operationId": "review_control_api_v1_courses__course_id__learning_reviews__review_id__control_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6565,6 +6578,9 @@
             },
             "description": "Conflict"
           },
+          "410": {
+            "description": "该专门学习功能已取消"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -6582,6 +6598,7 @@
       "post": {
         "summary": "Review Open",
         "operationId": "review_open_api_v1_courses__course_id__learning_reviews__review_id__sessions_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6642,6 +6659,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -6737,6 +6757,7 @@
       "post": {
         "summary": "Review Reveal",
         "operationId": "review_reveal_api_v1_courses__course_id__learning_reviews__review_id__sessions__session_id__reveal_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6807,6 +6828,9 @@
             },
             "description": "Conflict"
           },
+          "410": {
+            "description": "该专门学习功能已取消"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -6824,6 +6848,7 @@
       "post": {
         "summary": "Review Rating",
         "operationId": "review_rating_api_v1_courses__course_id__learning_reviews__review_id__rating_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6885,6 +6910,9 @@
             },
             "description": "Conflict"
           },
+          "410": {
+            "description": "该专门学习功能已取消"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -6902,6 +6930,7 @@
       "post": {
         "summary": "Review Undo",
         "operationId": "review_undo_api_v1_courses__course_id__learning_reviews__review_id__undo_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -6962,6 +6991,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -7048,6 +7080,7 @@
       "post": {
         "summary": "Path Action",
         "operationId": "path_action_api_v1_courses__course_id__learning_artifacts__artifact_id__path_actions_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -7108,6 +7141,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -7456,6 +7492,7 @@
       "post": {
         "summary": "Assessment",
         "operationId": "assessment_api_v1_courses__course_id__learning_essay_rounds__round_id__assessments_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -7517,6 +7554,9 @@
             },
             "description": "Conflict"
           },
+          "410": {
+            "description": "该专门学习功能已取消"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -7534,6 +7574,7 @@
       "post": {
         "summary": "Accept Suggestions",
         "operationId": "accept_suggestions_api_v1_courses__course_id__learning_essay_rounds__round_id__apply_suggestions_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -7594,6 +7635,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -7750,6 +7794,7 @@
       "post": {
         "summary": "Configure",
         "operationId": "configure_api_v1_courses__course_id__learning_corpus_policy_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "course_id",
@@ -7801,6 +7846,9 @@
               }
             },
             "description": "Conflict"
+          },
+          "410": {
+            "description": "该专门学习功能已取消"
           },
           "422": {
             "description": "Validation Error",
@@ -12192,6 +12240,313 @@
         }
       }
     },
+    "/api/v1/desktop/default/open": {
+      "post": {
+        "summary": "Open Default",
+        "operationId": "open_default_api_v1_desktop_default_open_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesktopSessionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/desktop/sessions/{session_id}/answer-sources": {
+      "get": {
+        "summary": "Answer Sources",
+        "operationId": "answer_sources_api_v1_desktop_sessions__session_id__answer_sources_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "native_turn",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Native Turn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/desktop/sessions/{session_id}/answer-subtitles": {
+      "get": {
+        "summary": "Answer Subtitles",
+        "operationId": "answer_subtitles_api_v1_desktop_sessions__session_id__answer_subtitles_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "native_turn",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Native Turn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/desktop/sessions/{session_id}/documents/{task_id}": {
+      "get": {
+        "summary": "Generated Document",
+        "operationId": "generated_document_api_v1_desktop_sessions__session_id__documents__task_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/desktop/sessions/{session_id}/workspaces": {
+      "post": {
+        "summary": "Update Workspaces",
+        "operationId": "update_workspaces_api_v1_desktop_sessions__session_id__workspaces_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DesktopWorkspaceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DesktopSessionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/desktop/chats/{chat_id}/history": {
       "post": {
         "summary": "History",
@@ -14301,6 +14656,18 @@
             ],
             "title": "Source Version"
           },
+          "source_course_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Course Id"
+          },
           "time_ms": {
             "anyOf": [
               {
@@ -14403,6 +14770,18 @@
               }
             ],
             "title": "Source Version"
+          },
+          "source_course_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Course Id"
           },
           "time_ms": {
             "anyOf": [
@@ -15916,6 +16295,16 @@
                 "type": "null"
               }
             ]
+          },
+          "generated_artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GeneratedArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -16980,6 +17369,14 @@
             "type": "boolean",
             "title": "Has Unresolved History",
             "default": false
+          },
+          "workspace_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Workspace Ids",
+            "default": []
           }
         },
         "type": "object",
@@ -17033,6 +17430,22 @@
           "installs_updates"
         ],
         "title": "DesktopUpdateStatus"
+      },
+      "DesktopWorkspaceInput": {
+        "properties": {
+          "course_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Course Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "course_ids"
+        ],
+        "title": "DesktopWorkspaceInput"
       },
       "DiagramData": {
         "properties": {
@@ -17850,7 +18263,7 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 4,
+            "maxItems": 32,
             "title": "Read Course Ids"
           },
           "model": {
@@ -18014,7 +18427,7 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 4,
+            "maxItems": 32,
             "title": "Read Course Ids"
           },
           "model": {
@@ -18959,6 +19372,34 @@
           "source"
         ],
         "title": "EvidenceCard"
+      },
+      "GeneratedArtifactReference": {
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "title": "Artifact Id"
+          },
+          "course_id": {
+            "type": "string",
+            "title": "Course Id"
+          },
+          "revision_id": {
+            "type": "string",
+            "title": "Revision Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "artifact_id",
+          "course_id",
+          "revision_id",
+          "kind"
+        ],
+        "title": "GeneratedArtifactReference"
       },
       "GenerationResponse": {
         "properties": {
@@ -21892,6 +22333,18 @@
             "maximum": 315360000000.0,
             "minimum": 0.0,
             "title": "Time Ms"
+          },
+          "source_course_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Course Id"
           }
         },
         "additionalProperties": false,
@@ -23881,7 +24334,7 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 4,
+            "maxItems": 32,
             "title": "Read Course Ids"
           },
           "question_video": {

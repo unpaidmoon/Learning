@@ -140,6 +140,8 @@ class TaskExecutor:
             return
         task = self.tasks.get(course_id, task_id)
         priority = 0 if reconcile_run or task.kind == "translation" else 10
+        if not reconcile_run and task.kind not in {"note", "handout", "book", "research"}:
+            return
         self._serial += 1
         self._queued.add(key)
         self._queue.put_nowait((priority, self._serial, course_id, task_id, reconcile_run))

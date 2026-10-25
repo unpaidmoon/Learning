@@ -157,6 +157,13 @@ class CourseFileListResponse(CourseFolderResponse):
     entries: list[CourseFileEntry]
 
 
+class GeneratedArtifactReference(BaseModel):
+    artifact_id: str
+    course_id: str
+    revision_id: str
+    kind: str
+
+
 class CourseFileOpenResponse(BaseModel):
     course_id: str
     entry: CourseFileEntry
@@ -165,6 +172,7 @@ class CourseFileOpenResponse(BaseModel):
     viewer: Literal["video", "image", "text", "pdf", "external"]
     content_url: str | None = None
     video: MediaAssetResponse | None = None
+    generated_artifact: GeneratedArtifactReference | None = None
 
 
 class CourseImportResponse(BaseModel):
@@ -915,6 +923,18 @@ class CourseFileStore:
             video = self.media.attach_source(source, path) if viewer == "video" else None
             if video:
                 video = self.media.open(source["asset_id"], source["source_version"])
+            from learning_app.workbench import schema as workbench_schema
+            from learning_app.workbench.artifact_files import generated_files
+
+            with self.engine.connect() as conn:
+                generated = conn.execute(select(
+                    generated_files.c.artifact_id, generated_files.c.revision_id,
+                    workbench_schema.artifacts.c.course_id, workbench_schema.artifacts.c.kind,
+                ).join(workbench_schema.artifacts,
+                       workbench_schema.artifacts.c.artifact_id == generated_files.c.artifact_id)
+                    .where(generated_files.c.asset_id == source["asset_id"],
+                           generated_files.c.source_version == source["source_version"])
+                ).mappings().first()
             return {
                 "course_id": course_id,
                 "entry": self._entry(course_id, root, path),
@@ -922,6 +942,7 @@ class CourseFileStore:
                 "source_version": source["source_version"],
                 "viewer": viewer,
                 "video": video,
+                "generated_artifact": dict(generated) if generated else None,
                 "content_url": f"/api/v1/videos/{source['asset_id']}/content?source_version={source['source_version']}"
                 if viewer == "video"
                 else f"/api/v1/course-files/{source['asset_id']}/content?source_version={source['source_version']}"

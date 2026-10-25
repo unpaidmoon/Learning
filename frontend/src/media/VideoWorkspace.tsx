@@ -34,6 +34,7 @@ export function VideoWorkspace({
   workspaceRef,
   active = true,
   minimal = false,
+  showSubtitles = false,
   assetId,
   ref,
 }: {
@@ -48,6 +49,7 @@ export function VideoWorkspace({
   workspaceRef?: RefObject<HTMLElement | null>;
   active?: boolean;
   minimal?: boolean;
+  showSubtitles?: boolean;
   assetId?: string;
   ref?: Ref<VideoWorkspaceHandle>;
 }) {
@@ -558,7 +560,7 @@ export function VideoWorkspace({
           />
         )}
       </div>
-      {asset && connected && (
+      {asset && connected && showSubtitles && (
         <SubtitlePanel
           key={`${asset.asset_id}:${asset.source_version}`}
           courseId={courseId}

@@ -149,6 +149,11 @@ async def test_native_explicit_request_admits_once_then_background_task_stages_a
                 and assets[0].revision.content_role == "ai_generated"
             )
             assert assets[0].revision.task_id == tasks[0].task_id
+            from learning_app.workbench.artifact_files import published_file
+
+            saved_document = published_file(repo, tasks[0])
+            assert saved_document is not None
+            assert saved_document["generated_artifact"]["artifact_id"] == assets[0].artifact_id
             for run_id, request in boundary.requests:
                 tools = {item["name"] for item in request.get("tools", [])}
                 if run_id == ordinary["generation_id"]:

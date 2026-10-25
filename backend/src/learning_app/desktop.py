@@ -48,6 +48,11 @@ from learning_app.workbench.requested_learning import NativeLearningTaskLink, ad
 from learning_app.workbench.task_scope_models import TaskAdmission, TaskIntent
 from learning_app.workbench.tasks import TaskStore
 from learning_app.workbench.translation_reuse import TranslationCacheEntry, TranslationPolicyView
+from learning_app.workspaces import (
+    ensure_unclassified,
+    read_workspaces,
+    set_workspaces,
+)
 
 _READ_METHODS = frozenset(
     {
@@ -58,6 +63,7 @@ _READ_METHODS = frozenset(
         "session/attachment",
         "session/modelCatalog",
         "session/initializeDefaultModel",
+        "skills/list",
         "settings/describe",
         "account/getState",
         "account/getProfile",
@@ -205,6 +211,11 @@ class DesktopSessionResponse(BaseModel):
     read_only: bool = False
     history_available: bool = False
     has_unresolved_history: bool = False
+    workspace_ids: list[str] = []
+
+
+class DesktopWorkspaceInput(BaseModel):
+    course_ids: list[str]
 
 
 def _method(value: str) -> str:
@@ -290,7 +301,12 @@ class DesktopGateway:
         return content
 
     def read_mapping(self, session_id):
-        return self.history.mapping(session_id) or self.mapping(session_id)
+        mapped = self.history.mapping(session_id)
+        if mapped is None:
+            return self.mapping(session_id)
+        chat = self.service.repository.get_chat(mapped["chat_id"])
+        with self.service.repository.engine.connect() as conn:
+            return {**mapped, "workspace_ids": read_workspaces(conn, chat)}
 
     def mapping(self, session_id: str) -> dict:
         if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", session_id):
@@ -304,12 +320,15 @@ class DesktopGateway:
         binding = repository.current_binding(chat_id)
         if not binding or binding["session_id"] != session_id:
             raise AppError("DESKTOP_SESSION_STALE", "此对话执行身份已更新，请重新打开", 409)
+        with repository.engine.connect() as conn:
+            workspace_ids = read_workspaces(conn, chat)
         return {
             "chat_id": chat_id,
             "course_id": chat["course_id"],
             "session_id": session_id,
             "epoch": binding["epoch"],
             "history_available": chat_id in self.history.chats,
+            "workspace_ids": workspace_ids,
         }
 
     async def open_chat(self, chat_id: str, *, history_view=True) -> dict:
@@ -318,7 +337,7 @@ class DesktopGateway:
             chat = service.repository.get_chat(chat_id)
             current = service.repository.current_binding(chat_id)
             if history_view and chat_id in self.history.chats and (not current or current["state"] in {"stale", "retired"} or service.imported.contains("session", current["session_id"])):
-                return self.history.mapping(self.history.chats[chat_id])
+                return self.read_mapping(self.history.chats[chat_id])
             if (
                 current
                 and current["state"] not in {"stale", "retired"}
@@ -362,10 +381,11 @@ class DesktopGateway:
 
     async def create_chat(
         self,
-        course_id: str,
+        course_id: str | None,
         requested_session: str | None,
         current_session: str | None = None,
     ) -> dict:
+        course_id = course_id or ensure_unclassified(self.service.repository)
         async with self.course_locks[course_id]:
             repository = self.service.repository
             if not current_session:
@@ -377,7 +397,9 @@ class DesktopGateway:
             if current_session:
                 mapped = self.read_mapping(current_session)
                 if mapped["course_id"] != course_id:
-                    raise AppError("DESKTOP_CREATE_CONFLICT", "当前对话不属于所选课程", 409)
+                    current_session = None
+            if current_session:
+                mapped = self.read_mapping(current_session)
                 current = repository.get_chat(mapped["chat_id"])
                 if not current["messages"] and not current["generations"]:
                     # Draft state is owned by this same business/native identity.
@@ -676,6 +698,16 @@ class DesktopGateway:
                     "DESKTOP_ATTACHMENT_UNSUPPORTED", "附件支持图片、PDF、TXT 和 Markdown", 422
                 )
         model, thinking = self.selected(session_id)
+        chat = self.service.repository.get_chat(chat_id)
+        with self.service.repository.engine.connect() as conn:
+            workspace_ids = read_workspaces(conn, chat)
+        selections = list(request.get("source_snapshot_ids", []))
+        if request.get("current_document"):
+            from learning_app.workbench.on_demand_sources import current_selection
+
+            snapshot = current_selection(self.service.repository, request["current_document"], "\n".join(texts))
+            if snapshot:
+                selections.append(snapshot.snapshot_id)
         try:
             value = SubmissionInput(
                 chat_id=chat_id,
@@ -683,8 +715,8 @@ class DesktopGateway:
                 text="\n".join(texts),
                 attachment_ids=attachment_ids,
                 references=request.get("references", []),
-                source_snapshot_ids=request.get("source_snapshot_ids", []),
-                read_course_ids=request.get("read_course_ids", []),
+                source_snapshot_ids=list(dict.fromkeys(selections)),
+                read_course_ids=workspace_ids,
                 question_video=request.get("question_video"),
                 model=model,
                 thinking=thinking,
@@ -694,7 +726,10 @@ class DesktopGateway:
         async with self.app.state.submission_gate:
             if self.app.state.exit_prepared:
                 raise AppError("APPLICATION_EXIT_PREPARED", "应用正在安全退出", 409)
-            await self.service.submit(value.model_dump())
+            submitted_draft = {**value.model_dump(),
+                               "source_snapshot_ids": request.get("source_snapshot_ids", []),
+                               "read_course_ids": request.get("read_course_ids", [])}
+            await self.service.submit(value.model_dump(), submitted_draft=submitted_draft)
         # The same requestId is used by ExecutionAdapter's native prompt; the
         # durable user event retires the official composer's pending echo.
         return {"accepted": True}
@@ -830,10 +865,11 @@ class DesktopGateway:
                         raise
                 else:
                     course_id = mapped["course_id"]
-            if not course_id or not any(
+            course_id = course_id or ensure_unclassified(self.service.repository)
+            if not any(
                 c["course_id"] == course_id for c in self.service.repository.list_courses()
             ):
-                raise AppError("DESKTOP_COURSE_REQUIRED", "请先选择课程，再新建对话", 409)
+                raise AppError("DESKTOP_COURSE_REQUIRED", "指定工作区不存在", 409)
             opened = await self.create_chat(course_id, previous, request.get("currentSessionId"))
             return {"sessionId": opened["session_id"]}
         if method == "workspace/initializeDefault":
@@ -906,12 +942,85 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
     async def mapping(session_id: str):
         return gateway.read_mapping(session_id)
 
+    @app.post("/api/v1/desktop/default/open", response_model=DesktopSessionResponse)
+    async def open_default():
+        return await gateway.create_chat(None, None)
+
+    @app.get("/api/v1/desktop/sessions/{session_id}/answer-sources")
+    def answer_sources(session_id: str, native_turn: int = Query(ge=1)):
+        from sqlalchemy import select
+
+        from learning_app.workbench import schema as ws
+        from learning_app.workbench.evidence import chat_evidence
+
+        mapped = gateway.read_mapping(session_id)
+        repository = gateway.service.repository
+        with repository.engine.connect() as conn:
+            runs = set(conn.execute(select(ws.native_scopes.c.run_id).where(
+                ws.native_scopes.c.session_id == session_id,
+                ws.native_scopes.c.business_binding["native_turn"].as_integer() == native_turn,
+            )).scalars())
+        return [item for item in chat_evidence(repository, mapped["course_id"], mapped["chat_id"]).items
+                if item.generation_id in runs]
+
+    @app.get("/api/v1/desktop/sessions/{session_id}/answer-subtitles")
+    def answer_subtitles(session_id: str, native_turn: int = Query(ge=1)):
+        from sqlalchemy import select
+
+        from learning_app.media import MediaStore
+        from learning_app.workbench import corpus_schema
+        from learning_app.workbench import schema as ws
+        from learning_app.workbench.preparations import PreparationStore
+
+        gateway.read_mapping(session_id)
+        repository = gateway.service.repository
+        with repository.engine.connect() as conn:
+            rows = list(conn.execute(select(corpus_schema.query_receipts.c.result).join(
+                ws.native_scopes, ws.native_scopes.c.run_id == corpus_schema.query_receipts.c.run_id
+            ).where(ws.native_scopes.c.session_id == session_id,
+                    ws.native_scopes.c.business_binding["native_turn"].as_integer() == native_turn)
+            ).scalars())
+        results = []
+        for result in rows:
+            if not result.get("preparation_id"):
+                continue
+            job = PreparationStore(repository).summary(result["course_id"], result["preparation_id"])
+            results.append({"job": job, "video": MediaStore(repository).open(job.asset_id, job.source_version)})
+        return results
+
+    @app.get("/api/v1/desktop/sessions/{session_id}/documents/{task_id}")
+    def generated_document(session_id: str, task_id: str):
+        from sqlalchemy import select
+
+        from learning_app.workbench import schema as ws
+        from learning_app.workbench.artifact_files import published_file
+
+        mapped = gateway.read_mapping(session_id)
+        task = TaskStore(gateway.service.repository).get(mapped["course_id"], task_id)
+        if task.chat_id != mapped["chat_id"]:
+            raise AppError("TASK_CHAT_DENIED", "该文档不属于当前对话", 403)
+        outline = None
+        if task.kind == "book" and task.state == "awaiting_outline":
+            from learning_app.workbench.books import BookStore
+
+            outline = BookStore(gateway.service.repository).outline(task.course_id, task_id)
+        with gateway.service.repository.engine.connect() as conn:
+            spec = conn.execute(select(ws.tasks.c.scope_spec).where(ws.tasks.c.task_id == task_id)).scalar_one()
+        return {"task": task, "file": published_file(gateway.service.repository, task), "outline": outline,
+                "open_requested": bool((spec or {}).get("origin", {}).get("open_result"))}
+
+    @app.post("/api/v1/desktop/sessions/{session_id}/workspaces", response_model=DesktopSessionResponse)
+    async def update_workspaces(session_id: str, value: DesktopWorkspaceInput):
+        mapped = gateway.mapping(session_id)
+        set_workspaces(gateway.service.repository, mapped["chat_id"], value.course_ids)
+        return gateway.mapping(session_id)
+
     @app.post("/api/v1/desktop/chats/{chat_id}/history", response_model=DesktopSessionResponse)
     async def history(chat_id: str):
         sid = gateway.history.chats.get(chat_id)
         if not sid:
             raise AppError("IMPORT_HISTORY_NOT_FOUND", "此对话没有导入历史", 404)
-        return gateway.history.mapping(sid)
+        return gateway.read_mapping(sid)
 
     @app.post("/api/v1/desktop/chats/{chat_id}/continue", response_model=DesktopSessionResponse)
     async def continue_chat(chat_id: str):

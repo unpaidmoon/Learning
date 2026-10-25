@@ -199,6 +199,8 @@ class TaskCoverage:
         origin=None,
     ):
         """Shared atomic admission; native callers prevalidate their frozen grant."""
+        if value.kind not in {"note", "handout", "book", "research"}:
+            raise AppError("LEARNING_FEATURE_REMOVED", "此专门学习流程已取消，请使用普通对话", 410)
         prior = prior_operation(conn, course_id, "task_create", value.operation_id, payload)
         if prior is not None:
             return TaskView.model_validate(prior)

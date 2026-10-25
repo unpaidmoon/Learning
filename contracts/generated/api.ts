@@ -1466,7 +1466,10 @@ export interface paths {
         /** Answer History */
         get: operations["answer_history_api_v1_courses__course_id__learning_artifacts__artifact_id__answers_get"];
         put?: never;
-        /** Submit Answer */
+        /**
+         * Submit Answer
+         * @deprecated
+         */
         post: operations["submit_answer_api_v1_courses__course_id__learning_artifacts__artifact_id__answers_post"];
         delete?: never;
         options?: never;
@@ -1517,7 +1520,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Override */
+        /**
+         * Override
+         * @deprecated
+         */
         post: operations["override_api_v1_courses__course_id__learning_answers__answer_id__override_post"];
         delete?: never;
         options?: never;
@@ -1568,7 +1574,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Set Review Preferences */
+        /**
+         * Set Review Preferences
+         * @deprecated
+         */
         post: operations["set_review_preferences_api_v1_courses__course_id__learning_review_preferences_post"];
         delete?: never;
         options?: never;
@@ -1619,7 +1628,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Review Control */
+        /**
+         * Review Control
+         * @deprecated
+         */
         post: operations["review_control_api_v1_courses__course_id__learning_reviews__review_id__control_post"];
         delete?: never;
         options?: never;
@@ -1636,7 +1648,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Review Open */
+        /**
+         * Review Open
+         * @deprecated
+         */
         post: operations["review_open_api_v1_courses__course_id__learning_reviews__review_id__sessions_post"];
         delete?: never;
         options?: never;
@@ -1670,7 +1685,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Review Reveal */
+        /**
+         * Review Reveal
+         * @deprecated
+         */
         post: operations["review_reveal_api_v1_courses__course_id__learning_reviews__review_id__sessions__session_id__reveal_post"];
         delete?: never;
         options?: never;
@@ -1687,7 +1705,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Review Rating */
+        /**
+         * Review Rating
+         * @deprecated
+         */
         post: operations["review_rating_api_v1_courses__course_id__learning_reviews__review_id__rating_post"];
         delete?: never;
         options?: never;
@@ -1704,7 +1725,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Review Undo */
+        /**
+         * Review Undo
+         * @deprecated
+         */
         post: operations["review_undo_api_v1_courses__course_id__learning_reviews__review_id__undo_post"];
         delete?: never;
         options?: never;
@@ -1738,7 +1762,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Path Action */
+        /**
+         * Path Action
+         * @deprecated
+         */
         post: operations["path_action_api_v1_courses__course_id__learning_artifacts__artifact_id__path_actions_post"];
         delete?: never;
         options?: never;
@@ -1823,7 +1850,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Assessment */
+        /**
+         * Assessment
+         * @deprecated
+         */
         post: operations["assessment_api_v1_courses__course_id__learning_essay_rounds__round_id__assessments_post"];
         delete?: never;
         options?: never;
@@ -1840,7 +1870,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Accept Suggestions */
+        /**
+         * Accept Suggestions
+         * @deprecated
+         */
         post: operations["accept_suggestions_api_v1_courses__course_id__learning_essay_rounds__round_id__apply_suggestions_post"];
         delete?: never;
         options?: never;
@@ -1891,7 +1924,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Configure */
+        /**
+         * Configure
+         * @deprecated
+         */
         post: operations["configure_api_v1_courses__course_id__learning_corpus_policy_post"];
         delete?: never;
         options?: never;
@@ -2838,6 +2874,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/desktop/default/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open Default */
+        post: operations["open_default_api_v1_desktop_default_open_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/desktop/sessions/{session_id}/answer-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Answer Sources */
+        get: operations["answer_sources_api_v1_desktop_sessions__session_id__answer_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/desktop/sessions/{session_id}/answer-subtitles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Answer Subtitles */
+        get: operations["answer_subtitles_api_v1_desktop_sessions__session_id__answer_subtitles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/desktop/sessions/{session_id}/documents/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Generated Document */
+        get: operations["generated_document_api_v1_desktop_sessions__session_id__documents__task_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/desktop/sessions/{session_id}/workspaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update Workspaces */
+        post: operations["update_workspaces_api_v1_desktop_sessions__session_id__workspaces_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/desktop/chats/{chat_id}/history": {
         parameters: {
             query?: never;
@@ -3494,6 +3615,8 @@ export interface components {
             asset_id?: string | null;
             /** Source Version */
             source_version?: string | null;
+            /** Source Course Id */
+            source_course_id?: string | null;
             /** Time Ms */
             time_ms?: number | null;
             /** Source Width */
@@ -3520,6 +3643,8 @@ export interface components {
             asset_id?: string | null;
             /** Source Version */
             source_version?: string | null;
+            /** Source Course Id */
+            source_course_id?: string | null;
             /** Time Ms */
             time_ms?: number | null;
             /** Source Width */
@@ -4032,6 +4157,7 @@ export interface components {
             /** Content Url */
             content_url?: string | null;
             video?: components["schemas"]["MediaAssetResponse"] | null;
+            generated_artifact?: components["schemas"]["GeneratedArtifactReference"] | null;
         };
         /** CourseFileOperationResponse */
         CourseFileOperationResponse: {
@@ -4398,6 +4524,11 @@ export interface components {
              * @default false
              */
             has_unresolved_history: boolean;
+            /**
+             * Workspace Ids
+             * @default []
+             */
+            workspace_ids: string[];
         };
         /** DesktopUpdateStatus */
         DesktopUpdateStatus: {
@@ -4411,6 +4542,11 @@ export interface components {
             automatic_interval_hours: number;
             /** Installs Updates */
             installs_updates: boolean;
+        };
+        /** DesktopWorkspaceInput */
+        DesktopWorkspaceInput: {
+            /** Course Ids */
+            course_ids: string[];
         };
         /** DiagramData */
         DiagramData: {
@@ -5099,6 +5235,17 @@ export interface components {
             /** Label */
             label: string;
             source: components["schemas"]["SourceSnapshot"];
+        };
+        /** GeneratedArtifactReference */
+        GeneratedArtifactReference: {
+            /** Artifact Id */
+            artifact_id: string;
+            /** Course Id */
+            course_id: string;
+            /** Revision Id */
+            revision_id: string;
+            /** Kind */
+            kind: string;
         };
         /** GenerationResponse */
         GenerationResponse: {
@@ -6190,6 +6337,8 @@ export interface components {
             source_version: string;
             /** Time Ms */
             time_ms: number;
+            /** Source Course Id */
+            source_course_id?: string | null;
         };
         /** ReadingFocusInput */
         ReadingFocusInput: {
@@ -12512,6 +12661,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -12666,6 +12822,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -12806,6 +12969,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -12964,6 +13134,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -13017,6 +13194,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -13124,6 +13308,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -13178,6 +13369,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -13231,6 +13429,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -13335,6 +13540,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -13596,6 +13808,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -13649,6 +13868,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -13803,6 +14029,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description 该专门学习功能已取消 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -16825,6 +17058,249 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DesktopSessionResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_default_api_v1_desktop_default_open_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DesktopSessionResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    answer_sources_api_v1_desktop_sessions__session_id__answer_sources_get: {
+        parameters: {
+            query: {
+                native_turn: number;
+            };
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    answer_subtitles_api_v1_desktop_sessions__session_id__answer_subtitles_get: {
+        parameters: {
+            query: {
+                native_turn: number;
+            };
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generated_document_api_v1_desktop_sessions__session_id__documents__task_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_workspaces_api_v1_desktop_sessions__session_id__workspaces_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DesktopWorkspaceInput"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

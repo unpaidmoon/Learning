@@ -37,7 +37,7 @@ from . import schema as s
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0034_data_import_fences"
+SCHEMA_REVISION = "0035_chat_workspaces"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -507,7 +507,7 @@ class Repository:
             _one(
                 conn,
                 s.course_assets,
-                (s.course_assets.c.course_id == chat["course_id"])
+                (s.course_assets.c.course_id == (locator.get("source_course_id") or chat["course_id"]))
                 & (s.course_assets.c.asset_id == asset_id),
                 "SOURCE_NOT_IN_COURSE",
             )
@@ -590,8 +590,7 @@ class Repository:
             "corrections": list(corrections),
             "source_locators": list(source_locators),
         }
-        if read_course_ids:
-            result["read_course_ids"] = list(read_course_ids)
+        result["read_course_ids"] = list(read_course_ids)
         return result
 
     def _messages(self, conn: Connection, chat_id: str) -> list[dict[str, Any]]:
@@ -694,6 +693,7 @@ class Repository:
         max_output_tokens: int = 8192,
         timeout_seconds: float = 180,
         question_root_id: str | None = None,
+        draft_content_hash: str | None = None,
     ) -> dict[str, Any]:
         _checked_id(submission_id)
         if max_output_tokens < 1 or timeout_seconds <= 0:
@@ -701,6 +701,10 @@ class Repository:
         payload = self._payload(
             text, attachment_ids, conditions, corrections, source_locators, read_course_ids
         )
+        if draft_content_hash is not None:
+            if not re.fullmatch(r"[a-f0-9]{64}", draft_content_hash):
+                raise StorageError("DRAFT_HASH_INVALID")
+            payload["draft_content_hash"] = draft_content_hash
         payload_hash = _hash(
             {
                 "chat_id": chat_id,

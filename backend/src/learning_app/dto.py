@@ -75,7 +75,7 @@ class SubmissionInput(InputDTO):
     )
     references: list[DraftReference] = Field(default_factory=list, max_length=100)
     source_snapshot_ids: list[str] = Field(default_factory=list, max_length=100)
-    read_course_ids: list[str] = Field(default_factory=list, max_length=4)
+    read_course_ids: list[str] = Field(default_factory=list, max_length=32)
     question_video: "QuestionVideoContext | None" = None
     model: str = "deepseek-flash"
     thinking: Literal["none", "low", "medium", "high", "xhigh", "max"] = "high"
@@ -87,6 +87,7 @@ class QuestionVideoContext(InputDTO):
     asset_id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,160}$")
     source_version: str = Field(pattern=r"^[A-Za-z0-9_-]{1,160}$")
     time_ms: int = Field(ge=0, le=315_360_000_000, strict=True)
+    source_course_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,160}$")
 
 
 class SubmissionResponse(BaseModel):

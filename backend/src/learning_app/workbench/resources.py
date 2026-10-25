@@ -19,7 +19,15 @@ class ReadingResources:
         manifests = self.project_root / "resources/workbench"
         lock = json.loads((manifests / "engines.lock.json").read_text("utf-8"))["pdfjs"]
         manifest = manifests / lock["files_manifest"]
-        if hashlib.sha256(manifest.read_bytes()).hexdigest() != lock["files_manifest_sha256"]:
+        raw_manifest = manifest.read_bytes()
+        # This pinned manifest was recorded with Windows newlines; Git's LF
+        # checkout must not invalidate identical JSON. Accept only bytes whose
+        # exact original or CRLF projection matches the pinned digest.
+        manifest_hashes = {
+            hashlib.sha256(raw_manifest).hexdigest(),
+            hashlib.sha256(raw_manifest.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")).hexdigest(),
+        }
+        if lock["files_manifest_sha256"] not in manifest_hashes:
             raise AppError("READING_RESOURCE_MANIFEST_INVALID", "阅读资源清单完整性不符")
         value = json.loads(manifest.read_text("utf-8"))
         if (

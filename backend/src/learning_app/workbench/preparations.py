@@ -180,7 +180,9 @@ class PreparationStore:
             return self.define_asr(course_id, value, project_root)
         return self.define_pdf(course_id, value, project_root)
 
-    def define_asr(self, course_id: str, value: PreparationCreate, project_root) -> dict:
+    def define_asr(self, course_id: str, value: PreparationCreate, project_root, *, explicit=False) -> dict:
+        if not explicit:
+            raise AppError("SUBTITLE_REQUEST_REQUIRED", "请在对话中明确要求处理字幕", 403)
         resources = AsrResources(project_root)
         if not resources.prepared():
             raise AppError("ASR_RESOURCES_NOT_PREPARED", "须先准备固定本地语音资源", 503)
@@ -237,6 +239,7 @@ class PreparationStore:
             scope=value.scope,
             parameters={
                 "engine": engine,
+                "user_requested": True,
                 "track_id": track,
                 "scope_indexes": [0],
                 "requested_unit_index": value.unit_index,
@@ -245,7 +248,7 @@ class PreparationStore:
         priority = value.priority_unit if value.priority_unit is not None else value.unit_index
         return {"payload": payload, "priority_unit": priority + 1 if priority is not None else None}
 
-    def define_asr_track(self, course_id: str, track_id: str, project_root) -> dict:
+    def define_asr_track(self, course_id: str, track_id: str, project_root, *, explicit=False) -> dict:
         """Expand a current-only track without changing its engine or edit head."""
         from .transcripts import TranscriptStore
 
@@ -260,6 +263,7 @@ class PreparationStore:
                 language=track["parameters"].get("language"),
             ),
             project_root,
+            explicit=explicit,
         )
         payload = definition["payload"]
         engine = payload["parameters"]["engine"]
@@ -293,6 +297,9 @@ class PreparationStore:
         return definition
 
     def define_pdf(self, course_id: str, value: PreparationCreate, project_root) -> dict:
+        raise AppError("OCR_REMOVED", "已取消OCR；请直接选取原文或截图提问", 410)
+
+    def _legacy_define_pdf(self, course_id: str, value: PreparationCreate, project_root) -> dict:
         if value.kind != "pdf_ocr":
             raise AppError("ASR_PREPARATION_HANDLER_NOT_READY", "语音任务的检查点接口尚未接通", 503)
         resources = OcrResources(project_root)
@@ -451,6 +458,10 @@ class PreparationStore:
                         "PREPARATION_OPERATION_CONFLICT", "同一处理操作身份的内容发生变化"
                     )
                 return PreparationView.model_validate(prior["receipt"])
+            if action in {"resume", "retry"} and row["kind"] == "pdf_ocr":
+                raise AppError("OCR_REMOVED", "OCR功能已取消，旧结果仍保留", 410)
+            if action in {"resume", "retry"} and not row["parameters"].get("user_requested"):
+                raise AppError("SUBTITLE_REQUEST_REQUIRED", "请在对话中明确发起字幕请求", 403)
             if row["revision"] != value.expected_revision:
                 changed_control = conn.execute(
                     select(s.preparation_events.c.revision)
@@ -523,6 +534,8 @@ class PreparationStore:
                     .join(s.preparation_units)
                     .where(
                         s.preparations.c.state.in_(["queued", "running"]),
+                        s.preparations.c.kind == "asr",
+                        s.preparations.c.parameters["user_requested"].as_boolean().is_(True),
                         s.preparation_units.c.state == "pending",
                         SubtitleWaits.schedulable(),
                         s.preparations.c.job_id.in_(SubtitleWaits.active_ids())
