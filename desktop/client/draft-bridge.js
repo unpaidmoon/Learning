@@ -199,7 +199,10 @@
         if (entry.muting || entry.submitting || !entry.input) return;
         clearTimeout(entry.timer);
         entry.timer = setTimeout(() => {
-          entry.work = (entry.work || Promise.resolve()).then(() => persist(entry));
+          // A rejected draft (for example duplicate file picks) must not
+          // poison later user edits. Reconcile the current draft only; this
+          // neither retries an upload nor submits a question.
+          entry.work = (entry.work || Promise.resolve()).catch(() => {}).then(() => persist(entry));
           entry.work.catch(error => report(entry, error));
         }, saveDelay);
       }

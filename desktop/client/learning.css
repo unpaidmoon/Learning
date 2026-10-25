@@ -5,6 +5,11 @@
 .learning-video { display: block; width: 100%; max-height: calc(100% - 100px); aspect-ratio: 16 / 9; object-fit: contain; background: #000; border-radius: 8px; }
 .learning-empty, .learning-capture-hint { color: var(--dsw-alias-label-tertiary, inherit); font-size: 13px; }
 .learning-error { font-size: 13px; overflow-wrap: anywhere; }
+.learning-message-results { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin-block: 10px; font-size: 13px; overflow-wrap: anywhere; }
+.learning-message-results:empty { display: none; }
+.learning-document-result { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.learning-data-settings { display: flex; flex-direction: column; gap: 16px; }
+.learning-data-settings h2 { font-size: 16px; font-weight: 500; margin: 0; }
 .learning-course-list { display: flex; flex-direction: column; gap: 8px; }
 .learning-course-list label { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .learning-capture-modal { width: min(840px, calc(100vw - 48px)); }

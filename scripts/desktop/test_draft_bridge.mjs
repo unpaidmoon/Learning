@@ -148,6 +148,24 @@ test('failed autosave work is reconciled without replay and new edits can save',
   f.bridge.dispose();
 });
 
+test('a corrected native draft saves after an earlier autosave rejection without recovery or resubmission', async () => {
+  const f = fixture();
+  await f.bridge.attach('s1', 'chat1');
+  f.setFlushError(new Error('invalid duplicate attachment draft'));
+  f.input.setDraft('尚未通过校验');
+  await new Promise(resolve => setTimeout(resolve, 25));
+  assert.ok(f.errors.length > 0);
+  const before = f.flushCount();
+  f.setFlushError(undefined);
+  f.input.setDraft('用户已修正附件和输入');
+  await new Promise(resolve => setTimeout(resolve, 25));
+  assert.ok(f.flushCount() > before);
+  await f.bridge.beforeNavigate('s1');
+  assert.equal(f.controller.snapshot().value.text, '用户已修正附件和输入');
+  assert.equal(f.apiCalls.length, 0);
+  f.bridge.dispose();
+});
+
 test('typing while the recovery GET is pending stays local and saves only on the next edit', async () => {
   const f = fixture();
   await f.bridge.attach('s1', 'chat1');

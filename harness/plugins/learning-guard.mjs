@@ -10,6 +10,7 @@ import { syncBuiltinESMExports } from 'node:module';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { prepareDocumentImages } from './native-images.mjs';
 import { workspaceRelocator } from './workspace-relocation.mjs';
+import { installDesktopSettings } from './desktop-settings.mjs';
 
 function required(name) {
   const value = process.env[`LEARNING_HARNESS_${name}`];
@@ -170,6 +171,7 @@ process.dlopen = function(module, filename, ...rest) {
 export const name = 'learning-guard';
 export const inject = ['tools', 'skills', 'agents', 'systemPrompt', 'llm', 'sessions', 'sessionPersistence', 'attachments', 'workingDirectory'];
 export function apply(ctx) {
+  installDesktopSettings(ctx, process.env.LEARNING_HARNESS_DESKTOP_PREFERENCES_PATH);
   const movesPath = process.env.LEARNING_HARNESS_WORKSPACE_RELOCATIONS;
   const relocateWorkspace = workspaceRelocator(movesPath && fs.existsSync(movesPath)
     ? JSON.parse(fs.readFileSync(movesPath, 'utf8')) : null, process.cwd());

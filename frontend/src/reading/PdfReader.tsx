@@ -69,6 +69,8 @@ export function PdfReader({
     setError("");
     try {
       await onSourceAction({ intent: "quote", operation_id: crypto.randomUUID(), file, selection });
+      host.current?.querySelector("iframe")?.contentWindow?.getSelection()?.removeAllRanges();
+      setSelection(null);
     } catch (reason) {
       setError(errorMessage(reason));
     } finally {
@@ -91,6 +93,7 @@ export function PdfReader({
           }}
         >
           <Button
+            variant="outline"
             disabled={busy}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => void quote()}

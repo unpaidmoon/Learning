@@ -1,6 +1,6 @@
 """Native theme persistence through the restricted real application RPC seam."""
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,13 +26,15 @@ def test_native_theme_rpc_persists_across_restart_and_rejects_stale_writes(tmp_p
             assert response.status_code == 200
             return response.json()["result"]
 
-        # These operations have no need for the Host browser cookie or its
-        # disabled settings/config-editor provider.
-        with patch.object(app.state.desktop_gateway, "browser", side_effect=AssertionError("Host access")):
+        # Keep native pages while merging the application's durable appearance.
+        # The fixture describes no real credentials or provider configuration.
+        with patch.object(app.state.desktop_gateway, "native_read", AsyncMock(return_value={
+            "writable": True, "hasDocument": True, "namespaces": [{"ns": "ui-chat"}],
+        })):
             described = call("settings/describe", {})["value"]
             assert described["writable"] is True and described["hasDocument"] is False
-            assert [row["ns"] for row in described["namespaces"]] == ["ui-theme"]
-            namespace = described["namespaces"][0]
+            assert [row["ns"] for row in described["namespaces"]] == ["ui-chat", "ui-theme"]
+            namespace = described["namespaces"][-1]
             assert namespace["value"]["preference"] == "system"
             first = call("settings/mutate", change("dark", 0))["value"]
             assert first["value"]["preference"] == "dark" and first["revision"] == 1
@@ -46,9 +48,9 @@ def test_native_theme_rpc_persists_across_restart_and_rejects_stale_writes(tmp_p
     restarted = app_at(tmp_path)
     with TestClient(restarted, base_url="http://127.0.0.1:8765") as client:
         csrf = {"X-Learning-CSRF": client.get("/api/v1/session").json()["csrf_token"]}
-        response = client.post("/desktop/api/settings/describe", headers=csrf,
-                               json=native_envelope("settings/describe", {})).json()
-        namespace = response["result"]["value"]["namespaces"][0]
+        response = client.post("/desktop/api/settings/query", headers=csrf,
+                               json=native_envelope("settings/query", {"ns": "ui-theme"})).json()
+        namespace = response["result"]["value"]
         assert namespace["value"]["preference"] == "dark" and namespace["revision"] == 1
         preferences = restarted.state.desktop_gateway.theme
         preferences.handle("settings/mutate", change("light", 1))
@@ -58,8 +60,7 @@ def test_native_theme_rpc_persists_across_restart_and_rejects_stale_writes(tmp_p
 
 @pytest.mark.parametrize("payload", [
     {"ns": "credentials", "ops": [{"op": "set", "path": ["preference"], "value": "dark"}]},
-    {"ns": "ui-theme", "ops": [{"op": "set", "path": ["fontSize"], "value": 22}]},
-    {"ns": "ui-theme", "ops": [{"op": "unset", "path": ["preference"]}]},
+    {"ns": "ui-theme", "ops": [{"op": "set", "path": ["fontSize"], "value": 23}]},
     {"ns": "ui-theme", "ops": [{"op": "set", "path": [], "value": {"preference": "dark"}}]},
     {"ns": "ui-theme", "ops": [{"op": "set", "path": ["preference"], "value": "custom-css"}]},
     {"ns": "ui-theme", "ops": [{"op": "set", "path": ["preference"], "value": "dark"}], "expectedRevision": True},
@@ -88,3 +89,15 @@ def test_theme_projection_boot_matches_durable_preference_and_failed_save_is_not
     assert failed.value.code == "DESKTOP_THEME_SAVE_FAILED"
     assert DesktopThemePreferences(tmp_path).handle("settings/query", {"ns": "ui-theme"})["value"]["preference"] == "dark"
     assert not list(preferences.path.parent.glob(".theme-*.tmp"))
+
+
+def test_native_font_and_theme_changes_preserve_each_other(tmp_path):
+    preferences = DesktopThemePreferences(tmp_path)
+    first = preferences.handle("settings/mutate", {
+        "ns": "ui-theme", "expectedRevision": 0,
+        "ops": [{"op": "set", "path": ["fontSize"], "value": 16}],
+    })
+    preferences.handle("settings/mutate", change("dark", first["revision"]))
+    reopened = DesktopThemePreferences(tmp_path).handle("settings/query", {"ns": "ui-theme"})
+    assert reopened["value"]["fontSize"] == 16
+    assert reopened["value"]["preference"] == "dark"

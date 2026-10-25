@@ -119,6 +119,10 @@ class HarnessHost:
                 LEARNING_HARNESS_BUSINESS_URL=self.business_url,
                 LEARNING_HARNESS_BUSINESS_TOKEN=self._business_token,
             )
+        if self.desktop_enabled:
+            env["LEARNING_HARNESS_DESKTOP_PREFERENCES_PATH"] = str(
+                self.home / "learning-desktop-settings.json"
+            )
         env["LEARNING_HARNESS_RECONCILE_RUNS_PATH"] = str(
             self.run_dir / "private/reconcile-runs.json"
         )
@@ -158,6 +162,21 @@ class HarnessHost:
         profile = profile.replace('"__MAX_TOKENS__"', str(self.max_tokens))
         profile = profile.replace('"__TIMEOUT_MS__"', str(int(self.timeout * 1000)))
         effective_profile = json.loads(profile)
+        preferences = self.home / "learning-desktop-settings.json"
+        if self.desktop_enabled and preferences.is_file():
+            try:
+                saved = json.loads(preferences.read_text("utf-8"))
+                if saved.get("version") != 1 or not isinstance(saved.get("namespaces"), dict):
+                    raise ValueError("invalid settings document")
+                for namespace, values in saved["namespaces"].items():
+                    if not isinstance(namespace, str) or not isinstance(values, dict) or not (
+                        namespace.startswith("ui-")
+                        or namespace in {"locale", "agent-preset-registry", "agent-default-model"}
+                    ):
+                        raise ValueError("settings namespace is not presentation-owned")
+                    effective_profile.append({"id": namespace, "config": values})
+            except (OSError, ValueError, TypeError) as exc:
+                raise ExecutionError("DESKTOP_SETTINGS_STORAGE_INVALID") from exc
         if not self.business_url:
             for item in effective_profile:
                 if item.get("id") == "tool-skill":

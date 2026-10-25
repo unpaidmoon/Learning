@@ -7,7 +7,7 @@
   },
   "lock_sha256": "fb8155baa15fabedc9ebefcf687bdf9f413d3454f101a42feb7c5bf94396602e",
   "inputs": {
-    "frontend/src/chat/MarkdownAnswer.tsx": "dc78a7fe52f3e798bfbc084f63ddb4b632f2eca7536f5fb541e1dd7d8e791ea1",
+    "frontend/src/chat/MarkdownAnswer.tsx": "eb6324b70276b54af648879d3b42b1e1d4f4346e0aef88a37b7162fa93016172",
     "frontend/src/chat/selection.ts": "1911919325522ed29875fc1ffc86e8a87cb51cf3ea22ffe04ba10c148c5b5114",
     "frontend/src/offline/OfflineReader.tsx": "cb8514db8f3ec985bcb457be62b85a3c9a9d2c8cf15a4be2572cb5cf9cb74ffa",
     "frontend/src/offline/entry.tsx": "6288ea5772686c93583df48c3c7d022b2d1d9f4638b2c2ee7d6e25f79a02f973",
@@ -917,8 +917,8 @@
   "files": [
     {
       "path": "reader.js",
-      "bytes": 1810730,
-      "sha256": "9a7b5cab38154f188e9f0d2cdf5c91cbda2c5ffa3e305be7048f1e4c2537f66e"
+      "bytes": 1811299,
+      "sha256": "363a54cd70253ea15ae22bff0906e360c7d851b997a2854daaa634ea8c4914c7"
     },
     {
       "path": "reader.css",
