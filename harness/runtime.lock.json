@@ -130,7 +130,7 @@
     {
       "id": "private-boundary-policy",
       "implementation": "plugins/learning-guard.mjs",
-      "scope": "Pin outbound fetch/http/https/net to configured 127.0.0.1 boundary. Tools have no registrations and a deny-all execution guard."
+      "scope": "Pin provider IO to the authenticated loopback boundary and scoped business IO to its private loopback handler. Only own native skill, immutable source handles and task/object/version result staging are registered; execution and business authority are checked separately. Legacy hosts without the business port keep tools closed."
     }
   ],
   "profile": {
@@ -142,11 +142,29 @@
     "automatic_compaction": false,
     "image_offload": false,
     "model_request_count_limit": null,
-    "model_selection": "explicit user configuration; no silent fallback"
+    "model_selection": "explicit user configuration; no silent fallback",
+    "native_business": {
+      "skill": "course-read",
+      "tools": [
+        "read_source_handle",
+        "stage_result",
+        "search_course_concept",
+        "read_nearby_subtitles",
+        "search_research_web",
+        "read_research_page"
+      ],
+      "ownership": "run-specific native lease; separate business binding epoch",
+      "unknown": "reconcile original immutable receipts; no effect or provider replay",
+      "recovery": "reconcile-only source gate and physical persisted native cut"
+    }
   },
   "project_sources": {
-    "profiles/learning.patch.json": "df29a8154370b35e58ec7676821659408763dc7d16a576f9d5de1fa0670b3ff9",
+    "profiles/learning.patch.json": "830023594223b0275f6f7a464af194240c2746b73fc9c178f82a3c1242da992f",
     "profiles/package.json": "302d9af6a90f100fb351028728ec47f2431141ac5a1ee86fda132eeec0a2cbee",
-    "plugins/learning-guard.mjs": "33a806b9641c2d246094a07ee1b1cecdb851bcf0eb77a1e90e6fbb265c66710b"
+    "plugins/learning-guard.mjs": "c6d9f57d334fbd77a3d51581fac18dbc344df3c7d4923fbb462c2a4de6b4108b",
+    "plugins/native-images.mjs": "cfc3640010b6ed75f9e69b50f8f5e51893a4b6f37bf16441a89b71c033de16f2",
+    "plugins/native-attempt.mjs": "7c860a37621fe7258711218c69aa67af5e3d43039054dc2597b044353e2afd13",
+    "plugins/native-lease.mjs": "dd897c5ad61f8b452fe91e5b076d3e7d62d538e0a1b0b83198d00e0e6f219e22",
+    "plugins/native-recovery.mjs": "898fc6c9ff4fc570c0ccc8e05770ffe605e29dd86725d652d810e444e9bdbd9d"
   }
 }

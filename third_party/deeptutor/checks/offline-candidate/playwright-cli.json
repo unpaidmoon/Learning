@@ -1,0 +1,14 @@
+{
+  "allowUnrestrictedFileAccess": true,
+  "outputDir": "evidence/browser",
+  "browser": {
+    "launchOptions": {"headless": true},
+    "contextOptions": {
+      "viewport": {"width": 1440, "height": 1000},
+      "deviceScaleFactor": 1,
+      "offline": true,
+      "serviceWorkers": "block",
+      "reducedMotion": "reduce"
+    }
+  }
+}

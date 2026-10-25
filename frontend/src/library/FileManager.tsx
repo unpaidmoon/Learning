@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import type { ClipboardEvent, DragEvent, FormEvent, KeyboardEvent, MouseEvent } from "react";
+import type {
+  ClipboardEvent,
+  DragEvent,
+  FormEvent,
+  KeyboardEvent,
+  MouseEvent,
+  ReactNode,
+} from "react";
 import { api, ApiError, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
@@ -87,6 +94,8 @@ export function FileManager({
   onPathChange,
   onOpen,
   onChanged,
+  compact = false,
+  renderFileIcon,
 }: {
   courseId: string;
   connected: boolean;
@@ -95,6 +104,8 @@ export function FileManager({
   onPathChange?: (path: string) => void;
   onOpen: (file: OpenFile) => void;
   onChanged?: () => void;
+  compact?: boolean;
+  renderFileIcon?: (entry: Entry) => ReactNode;
 }) {
   const [navigation, setNavigation] = useState({ paths: [path || ""], at: 0 });
   const currentPath = path ?? navigation.paths[navigation.at];
@@ -125,6 +136,52 @@ export function FileManager({
   const propertyRequest = useRef(0);
   const { pending, receipt } = useFileOperation(courseId);
   const prefix = `/courses/${encodeURIComponent(courseId)}/files`;
+
+  useEffect(() => {
+    if (!action) return;
+    const owner = root.current;
+    const dialog = owner?.querySelector<HTMLElement>('[role="dialog"]');
+    if (!dialog) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () =>
+      [
+        ...dialog.querySelectorAll<HTMLElement>(
+          'button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href],[tabindex="0"]',
+        ),
+      ].filter((element) => element.getClientRects().length);
+    focusable()[0]?.focus({ preventScroll: true });
+    const key = (event: globalThis.KeyboardEvent) => {
+      if (document.querySelector("[data-workspace-capture-overlay]")) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!working.current) {
+          propertyRequest.current += 1;
+          setAction(null);
+        }
+      } else if (event.key === "Tab") {
+        const targets = focusable();
+        const next = !dialog.contains(document.activeElement)
+          ? targets[0]
+          : event.shiftKey && document.activeElement === targets[0]
+            ? targets.at(-1)
+            : !event.shiftKey && document.activeElement === targets.at(-1)
+              ? targets[0]
+              : null;
+        if (next) {
+          event.preventDefault();
+          next.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      document.removeEventListener("keydown", key, true);
+      if (previous?.isConnected && previous.getClientRects().length)
+        previous.focus({ preventScroll: true });
+      else if (owner?.isConnected) owner.focus({ preventScroll: true });
+    };
+  }, [action]);
 
   useEffect(() => {
     const at = ++epoch.current;
@@ -736,6 +793,7 @@ export function FileManager({
       <button
         type="button"
         role={menu ? "menuitem" : undefined}
+        className="file-manager-secondary-action"
         disabled={disabled || !selection.length}
         onClick={() => show("move")}
         aria-label="移动到"
@@ -766,6 +824,7 @@ export function FileManager({
       <button
         type="button"
         role={menu ? "menuitem" : undefined}
+        className="file-manager-secondary-action"
         disabled={!ready || selection.length !== 1}
         onClick={() => show("properties")}
         aria-label="属性"
@@ -787,7 +846,8 @@ export function FileManager({
           : "属性";
   return (
     <section
-      className={`file-manager ${dragOver ? "file-manager-drop-active" : ""}`}
+      className={`file-manager ${compact ? "file-manager-compact" : ""} ${dragOver ? "file-manager-drop-active" : ""}`}
+      data-selected-count={selection.length}
       aria-label="文件资源管理器"
       tabIndex={0}
       ref={root}
@@ -875,7 +935,61 @@ export function FileManager({
         />
       </div>
       <div className="file-manager-toolbar" role="toolbar" aria-label="文件操作">
-        <div className="file-manager-actions">{actionButtons()}</div>
+        <div className="file-manager-actions">
+          {actionButtons()}
+          {compact && (
+            <details
+              className="file-manager-more"
+              onKeyDown={(event) => event.stopPropagation()}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget))
+                  event.currentTarget.removeAttribute("open");
+              }}
+            >
+              <summary aria-label="更多文件操作" title="更多文件操作">
+                <Icon name="more" />
+              </summary>
+              <div
+                className="file-actions-menu"
+                role="menu"
+                aria-label="更多文件操作"
+                onClick={(event) => {
+                  if ((event.target as Element).closest("button"))
+                    event.currentTarget.parentElement?.removeAttribute("open");
+                }}
+                onKeyDown={(event) => {
+                  const buttons = [
+                    ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                      "button:not(:disabled)",
+                    ),
+                  ];
+                  const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+                  if (event.key === "Escape") {
+                    event.currentTarget.parentElement?.removeAttribute("open");
+                    event.currentTarget.parentElement
+                      ?.querySelector<HTMLElement>("summary")
+                      ?.focus();
+                  } else if (
+                    ["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) &&
+                    buttons.length
+                  ) {
+                    event.preventDefault();
+                    const next =
+                      event.key === "Home"
+                        ? 0
+                        : event.key === "End"
+                          ? buttons.length - 1
+                          : (index + (event.key === "ArrowUp" ? -1 : 1) + buttons.length) %
+                            buttons.length;
+                    buttons[next]?.focus();
+                  }
+                }}
+              >
+                {actionButtons(true)}
+              </div>
+            </details>
+          )}
+        </div>
         <div className="file-manager-view">
           <label className="sr-only" htmlFor={`file-sort-${courseId}`}>
             排序方式
@@ -1023,20 +1137,24 @@ export function FileManager({
               }}
             >
               <span className="file-manager-file-icon">
-                <Icon
-                  name={
-                    entry.kind === "directory"
-                      ? "folder"
-                      : entry.viewer === "video"
-                        ? "video"
-                        : entry.viewer === "pdf"
-                          ? "file-pdf"
-                          : entry.viewer === "text"
-                            ? "file-text"
-                            : "file"
-                  }
-                  size={view === "icons" ? 42 : 19}
-                />
+                {renderFileIcon ? (
+                  renderFileIcon(entry)
+                ) : (
+                  <Icon
+                    name={
+                      entry.kind === "directory"
+                        ? "folder"
+                        : entry.viewer === "video"
+                          ? "video"
+                          : entry.viewer === "pdf"
+                            ? "file-pdf"
+                            : entry.viewer === "text"
+                              ? "file-text"
+                              : "file"
+                    }
+                    size={view === "icons" ? 42 : 19}
+                  />
+                )}
               </span>
               <span className="file-manager-file-name">{entry.name}</span>
               {view === "list" && (

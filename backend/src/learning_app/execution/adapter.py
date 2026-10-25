@@ -6,6 +6,7 @@ import asyncio
 import base64
 import hashlib
 import json
+import threading
 from pathlib import Path
 from typing import AsyncIterator
 
@@ -13,9 +14,16 @@ import httpx
 
 from .boundary import MessagesBoundary
 from .host import HarnessHost
+from .native_tools import NativeToolTransport
 from .remote import RemotePeer
 from .selection import native_thinking, supports_images, validate_selection
-from .types import ApprovedAttachment, ExecutionBinding, ExecutionError, NormalizedEvent
+from .types import (
+    ApprovedAttachment,
+    ExecutionBinding,
+    ExecutionError,
+    ExecutionPolicy,
+    NormalizedEvent,
+)
 
 TERMINAL_STATUS = {
     "completed": "completed",
@@ -75,11 +83,15 @@ class ExecutionAdapter:
         boundary: MessagesBoundary | None = None,
         credential_route: str = "api_key",
         account_home: Path | None = None,
+        desktop_enabled: bool = False,
+        native_tools: NativeToolTransport | None = None,
     ) -> None:
         self.repository, self.run_dir = Path(repository), Path(run_dir)
         self.model, self.thinking = model, thinking
         self.timeout = timeout
         self.mode, self.credential_route = mode, credential_route
+        self.native_tools = native_tools
+        self._business_scopes: dict[str, dict] = {}
         self._account_models: list[dict] = []
         self._account_signed_in = False
         self.boundary = boundary or MessagesBoundary(
@@ -92,7 +104,12 @@ class ExecutionAdapter:
             timeout=timeout,
             credential_route=credential_route,
             account_enabled=mode == "official",
+            native_registry=native_tools.registry if native_tools else None,
         )
+        if native_tools is not None:
+            if self.boundary.native_registry not in (None, native_tools.registry):
+                raise ExecutionError("NATIVE_REGISTRY_CONFLICT")
+            self.boundary.native_registry = native_tools.registry
         self.host = HarnessHost(
             self.repository,
             self.run_dir / "host",
@@ -104,6 +121,9 @@ class ExecutionAdapter:
             timeout=timeout,
             account_enabled=mode == "official",
             home_directory=account_home,
+            desktop_enabled=desktop_enabled,
+            business_url=native_tools.url if native_tools else None,
+            business_token=native_tools.token if native_tools else None,
         )
         self.peer: RemotePeer | None = None
         self._streams: dict[str, str] = {}
@@ -113,8 +133,21 @@ class ExecutionAdapter:
         self._chunk_floors: dict[str, int] = {}
         self._open = False
         self._image_sessions: set[str] = set()
+        self._run_policies: dict[str, ExecutionPolicy] = {}
+        self._native_terminals: dict[str, dict] = {}
+
+    @property
+    def translation_cache_scope(self) -> str | None:
+        return self.boundary.provider_scope_fingerprint
 
     async def open(self) -> ExecutionAdapter:
+        self._image_codec_loop = asyncio.get_running_loop()
+        self._image_codec_thread = threading.get_ident()
+        if self.native_tools is not None and hasattr(self.native_tools.port, "document_images"):
+            self.native_tools.port.document_images.prepare = self._prepare_tool_images
+            self.native_tools.port.document_images.supports_images = self.supports_model_images
+        if self.native_tools is not None:
+            self.native_tools.start()
         self.boundary.start()
         self.host.boundary_url, self.host.boundary_token = (
             self.boundary.url,
@@ -135,6 +168,8 @@ class ExecutionAdapter:
             await self.peer.close()
         host_cleanup = await self.host.stop()
         await asyncio.to_thread(self.boundary.stop)
+        if self.native_tools is not None:
+            await asyncio.to_thread(self.native_tools.close)
         self._open = False
         return {"host": host_cleanup}
 
@@ -150,36 +185,316 @@ class ExecutionAdapter:
         submission_id: str,
         generation_id: str,
         epoch: int = 1,
+        *,
+        session_id: str | None = None,
     ) -> ExecutionBinding:
         """Prepare identity and take a native cut, before business marks dispatching."""
         if not self.peer:
             raise ExecutionError("EXECUTION_NOT_OPEN")
-        sid = "learning-" + hashlib.sha256(f"{conversation_id}:{epoch}".encode()).hexdigest()[:32]
+        # Reuse the stored identity for an existing chat. A deliberate business
+        # rebuild uses its new binding epoch; ordinary turns keep that epoch.
+        sid = (
+            session_id
+            or "learning-" + hashlib.sha256(f"{conversation_id}:{epoch}".encode()).hexdigest()[:32]
+        )
+        return await self._prepare_session(
+            sid,
+            conversation_id,
+            submission_id,
+            generation_id,
+            epoch,
+        )
+
+    async def prepare_task(
+        self,
+        task_id: str,
+        unit_id: str,
+        run_id: str,
+        request_id: str,
+        epoch: int = 1,
+    ) -> ExecutionBinding:
+        # Each run gets an empty context in the existing Host; no chat is forked.
+        sid = (
+            "learning-task-"
+            + hashlib.sha256(f"{task_id}:{unit_id}:{run_id}:{epoch}".encode()).hexdigest()[:32]
+        )
+        return await self._prepare_session(sid, task_id, request_id, run_id, epoch)
+
+    async def _prepare_session(
+        self,
+        sid: str,
+        owner_id: str,
+        request_id: str,
+        run_id: str,
+        epoch: int,
+    ) -> ExecutionBinding:
+        if not self.peer:
+            raise ExecutionError("EXECUTION_NOT_OPEN")
         try:
             stream, snapshot = await self.peer.follow(sid)
         except ExecutionError as error:
             if error.code != "HARNESS_FOLLOW_NOT_FOUND":
                 raise
-            await self.peer.rpc(
+            created = await self.peer.rpc(
                 "session/create", {"cwd": str(self.host.workspace), "sessionId": sid}
             )
+            sid = created.get("sessionId", sid)
             stream, snapshot = await self.peer.follow(sid)
         if snapshot.get("assistantStream", {}).get("activeAttempt"):
             await self.peer.unfollow(stream)
             raise ExecutionError("CONVERSATION_ALREADY_ACTIVE")
         native_turn = max([e.get("data", {}).get("turn", 0) for e in _events(snapshot)] or [0]) + 1
         binding = ExecutionBinding(
-            conversation_id,
-            submission_id,
-            generation_id,
+            owner_id,
+            request_id,
+            run_id,
             epoch,
             sid,
-            submission_id,
+            request_id,
             native_floor=snapshot["cursor"],
             native_turn=native_turn,
         )
-        self._streams[generation_id] = stream
+        self._streams[run_id] = stream
         return binding
+
+    def configure_business_scope(self, binding: ExecutionBinding, scope: dict) -> None:
+        if self.native_tools is None:
+            raise ExecutionError("NATIVE_TOOLS_NOT_CONFIGURED")
+        if any(
+            scope.get(key) != value
+            for key, value in (
+                ("session_id", binding.session_id),
+                ("run_id", binding.generation_id),
+                ("request_id", binding.request_id),
+            )
+        ):
+            raise ExecutionError("NATIVE_BUSINESS_SCOPE_OWNER")
+        epoch = scope.get("epoch")
+        if type(epoch) is not int or epoch < 1 or binding.native_lease_epoch not in (None, epoch):
+            raise ExecutionError("NATIVE_BUSINESS_SCOPE_EPOCH")
+        value = {key: scope[key] for key in ("course_id", "purpose", "task_id", "allowed_tools")}
+        prior = self._business_scopes.get(binding.generation_id)
+        if prior is not None and prior != value:
+            raise ExecutionError("NATIVE_BUSINESS_SCOPE_IMMUTABLE")
+        self._business_scopes[binding.generation_id] = value
+        binding.native_lease_epoch = epoch
+
+    def _native_epoch(self, binding: ExecutionBinding) -> int:
+        if self.native_tools is None:
+            return binding.epoch
+        if binding.native_lease_epoch is None:
+            raise ExecutionError("NATIVE_BUSINESS_SCOPE_REQUIRED")
+        return binding.native_lease_epoch
+
+    async def register_execution_policy(
+        self,
+        binding: ExecutionBinding | dict,
+        policy: ExecutionPolicy,
+        *,
+        scope: dict | None = None,
+    ) -> None:
+        binding = self._binding(binding)
+        if self.native_tools is not None:
+            if scope is not None:
+                self.configure_business_scope(binding, scope)
+            scope = self._business_scopes.get(binding.generation_id)
+            if scope is None:
+                raise ExecutionError("NATIVE_BUSINESS_SCOPE_REQUIRED")
+            prior_scope = self._business_scopes.get(binding.generation_id)
+            if prior_scope is not None and prior_scope != scope:
+                raise ExecutionError("NATIVE_BUSINESS_SCOPE_IMMUTABLE")
+            self._business_scopes[binding.generation_id] = dict(scope)
+        prior = self._run_policies.get(binding.generation_id)
+        if prior is not None and prior != policy:
+            raise ExecutionError("EXECUTION_POLICY_IMMUTABLE")
+        # The native source gate must be installed before accepting a session
+        # header as a continuation attribution hint at the transport boundary.
+        await self.host.configure_execution(
+            binding.session_id,
+            binding.generation_id,
+            policy,
+            request_id=binding.request_id,
+            epoch=self._native_epoch(binding),
+            scope=scope,
+        )
+        self.boundary.bind(
+            binding.generation_id,
+            policy=policy,
+            session_id=binding.session_id,
+            request_id=binding.request_id,
+            epoch=self._native_epoch(binding),
+            scope=self.host.execution_policies[binding.session_id] if scope is not None else None,
+        )
+        self._run_policies[binding.generation_id] = policy
+
+    def restore_execution_policy(
+        self,
+        binding: ExecutionBinding | dict,
+        policy: ExecutionPolicy,
+        *,
+        task_owned: bool,
+        scope: dict | None = None,
+        reconcile_only: bool = True,
+    ) -> None:
+        """Register frozen ownership before Host start can resume an accepted turn."""
+        binding = self._binding(binding)
+        if self.native_tools is not None and scope is None:
+            raise ExecutionError("NATIVE_BUSINESS_SCOPE_REQUIRED")
+        if scope is not None:
+            self.configure_business_scope(binding, scope)
+            scope = self._business_scopes[binding.generation_id]
+        if reconcile_only:
+            self.host.reconcile_only_runs.add(binding.generation_id)
+        if task_owned or self.native_tools is not None:
+            if scope is not None:
+                self._business_scopes[binding.generation_id] = dict(scope)
+            self.host.remember_execution_policy(
+                binding.session_id,
+                binding.generation_id,
+                policy,
+                request_id=binding.request_id,
+                epoch=self._native_epoch(binding),
+                scope=scope,
+            )
+            self.boundary.bind(
+                binding.generation_id,
+                policy=policy,
+                session_id=binding.session_id,
+                request_id=binding.request_id,
+                epoch=self._native_epoch(binding),
+                scope=self.host.execution_policies[binding.session_id]
+                if scope is not None
+                else None,
+            )
+        else:
+            self.boundary.bind(binding.generation_id, policy=policy)
+        self._run_policies[binding.generation_id] = policy
+
+    async def prepare_document_images(
+        self, binding: ExecutionBinding, policy: ExecutionPolicy, images: list[dict]
+    ) -> list[dict]:
+        if not images or binding.generation_id in self._started:
+            raise ExecutionError("DOCUMENT_IMAGE_PREPARATION_STATE_INVALID")
+        await self.host.configure_execution(
+            binding.session_id,
+            binding.generation_id,
+            policy,
+            request_id=binding.request_id,
+            epoch=self._native_epoch(binding),
+            scope=self._business_scopes.get(binding.generation_id),
+        )
+        proofs = await self.host.prepare_document_images(
+            {
+                "session_id": binding.session_id,
+                "run_id": binding.generation_id,
+                "request_id": binding.request_id,
+                "epoch": self._native_epoch(binding),
+                "provider": "deepseek-account"
+                if self.mode == "official" and self.credential_route == "account"
+                else "deepseek-official",
+                "images": images,
+            }
+        )
+        for proof in proofs:
+            proof["runtime_sha256"] = (
+                "f9ed01f241df37c50c702d81b6c226d576210b8f3947699735ca90285ea13365"
+            )
+        return proofs
+
+    def _prepare_tool_images(self, scope, images):
+        """Tool HTTP worker -> existing authenticated Host attachment service."""
+        if threading.get_ident() == self._image_codec_thread:
+            raise ExecutionError("DOCUMENT_IMAGE_CODEC_THREAD_REQUIRED")
+        future = asyncio.run_coroutine_threadsafe(
+            self.host.prepare_document_images(
+                {
+                    "session_id": scope["session_id"],
+                    "run_id": scope["run_id"],
+                    "request_id": scope["request_id"],
+                    "epoch": scope["native_epoch"],
+                    "provider": "deepseek-account"
+                    if self.mode == "official" and self.credential_route == "account"
+                    else "deepseek-official",
+                    "images": images,
+                }
+            ),
+            self._image_codec_loop,
+        )
+        proofs = future.result(timeout=min(60, scope["settings"]["timeout_seconds"] + 5))
+        for proof in proofs:
+            proof["runtime_sha256"] = (
+                "f9ed01f241df37c50c702d81b6c226d576210b8f3947699735ca90285ea13365"
+            )
+        return proofs
+
+    async def release_execution(self, binding: ExecutionBinding | dict) -> dict:
+        binding = self._binding(binding)
+        if self.native_tools is None:
+            raise ExecutionError("NATIVE_TOOLS_NOT_CONFIGURED")
+        previous = self.native_tools.registry.release_receipts.get(binding.generation_id)
+        if previous is not None:
+            self.native_tools.port.mark_released(previous)
+            return previous
+        for _ in range(200):
+            if self.native_tools.registry.transport_closed(binding.generation_id):
+                break
+            await asyncio.sleep(0.01)
+        self.native_tools.registry.reconcile_effects(binding.generation_id, self.native_tools.port)
+        terminal = self._native_terminals.get(binding.generation_id)
+        if terminal is None:
+            raise ExecutionError("NATIVE_TERMINAL_EVIDENCE_MISSING")
+        self.native_tools.port.remember_terminal(binding.generation_id, terminal)
+        lease = {
+            "session_id": binding.session_id,
+            "run_id": binding.generation_id,
+            "request_id": binding.request_id,
+            "epoch": self._native_epoch(binding),
+        }
+        if terminal["reason"].get("kind") in {"aborted", "error"}:
+            registry = self.native_tools.registry
+            proof = registry.tool_stops.get(binding.generation_id)
+            attempts = [
+                a for a in registry.attempts.values() if a["run_id"] == binding.generation_id
+            ]
+            if (
+                terminal["reason"].get("kind") == "aborted"
+                and proof is None
+                and attempts
+                and all(a["state"] == "completed" for a in attempts)
+            ):
+                proof = await self.host.prove_tool_stop(lease)
+            registry.reconcile_terminal(lease, terminal, self.native_tools.port, tool_stop=proof)
+        if binding.generation_id in self.host.reconcile_only_runs:
+            recovered = await self.host.recover_readonly_execution(
+                binding.session_id,
+                binding.generation_id,
+                binding.request_id,
+                self._native_epoch(binding),
+            )
+            if recovered["native_terminal"] != terminal:
+                raise ExecutionError("NATIVE_READONLY_TERMINAL_MISMATCH")
+        receipt = await self.host.release_execution(
+            binding.session_id,
+            binding.generation_id,
+            binding.request_id,
+            self._native_epoch(binding),
+        )
+        self.boundary.release_execution(receipt, self.native_tools.port)
+        self.native_tools.port.mark_released(receipt)
+        return receipt
+
+    def retire_unstarted_execution(self, binding: ExecutionBinding) -> bool:
+        if self.native_tools is None or binding.native_lease_epoch is None:
+            return False
+        return self.native_tools.registry.retire_unstarted(
+            {
+                "session_id": binding.session_id,
+                "run_id": binding.generation_id,
+                "request_id": binding.request_id,
+                "epoch": binding.native_lease_epoch,
+            },
+            self.native_tools.port,
+        )
 
     async def start(
         self,
@@ -190,6 +505,8 @@ class ExecutionAdapter:
         model: str | None = None,
         thinking: str | None = None,
         history_context: str | None = None,
+        policy: ExecutionPolicy | None = None,
+        business_scope: dict | None = None,
     ) -> ExecutionBinding:
         binding = self._binding(binding)
         if not self.peer:
@@ -198,6 +515,19 @@ class ExecutionAdapter:
             raise ExecutionError("GENERATION_ALREADY_DISPATCHED")
         selected_model, selected_thinking = model or self.model, thinking or self.thinking
         await self.validate_choice(selected_model, selected_thinking)
+        if self.native_tools is not None and policy is None:
+            raise ExecutionError("NATIVE_EXECUTION_POLICY_REQUIRED")
+        if policy is not None:
+            if (policy.model, policy.thinking) != (selected_model, selected_thinking):
+                raise ExecutionError("EXECUTION_POLICY_SELECTION_CONFLICT")
+            await self.register_execution_policy(binding, policy, scope=business_scope)
+        if self.native_tools is not None and hasattr(self.native_tools.port, "document_images"):
+            await asyncio.to_thread(
+                self.native_tools.port.document_images.prepare_history,
+                self.native_tools.port,
+                binding.generation_id,
+                bool(history_context),
+            )
         if not self.supports_model_images(selected_model) and (
             attachments or binding.session_id in self._image_sessions
         ):
@@ -233,18 +563,43 @@ class ExecutionAdapter:
                     "data": base64.b64encode(data).decode("ascii"),
                 }
             )
+        if (
+            history_context
+            and self.native_tools is not None
+            and hasattr(self.native_tools.port, "document_images")
+        ):
+            historical = await asyncio.to_thread(
+                self.native_tools.port.document_images.history_content,
+                self.native_tools.port,
+                binding.generation_id,
+            )
+            if historical:
+                content.append(
+                    {
+                        "type": "text",
+                        "text": "READ_ONLY_DOCUMENT_IMAGE_HISTORY:"
+                        + json.dumps(
+                            [item["metadata"] for item in historical],
+                            ensure_ascii=False,
+                        ),
+                    }
+                )
+                content.extend(
+                    {"type": "image", "mediaType": item["mediaType"], "data": item["data"]}
+                    for item in historical
+                )
         await self.peer.rpc(
             "session/selectModel",
             {
                 "sessionId": binding.session_id,
-                "provider": "deepseek-account" if self.mode == "official" and self.credential_route == "account" else "deepseek-official",
+                "provider": "deepseek-account"
+                if self.mode == "official" and self.credential_route == "account"
+                else "deepseek-official",
                 "model": selected_model,
                 "reasoningEffort": native_thinking(selected_thinking),
             },
         )
-        self.boundary.bind(
-            binding.generation_id, model=selected_model, thinking=selected_thinking
-        )
+        self.boundary.bind(binding.generation_id, model=selected_model, thinking=selected_thinking)
         if attachments:
             self._image_sessions.add(binding.session_id)
         self._started.add(binding.generation_id)
@@ -310,7 +665,10 @@ class ExecutionAdapter:
             self._account_models = []
             raise ExecutionError("ACCOUNT_SIGN_IN_REQUIRED")
         catalog = await self.peer.rpc_args("session/modelCatalog", {})
-        group = next((item for item in catalog.get("groups", []) if item.get("id") == "deepseek-account"), None)
+        group = next(
+            (item for item in catalog.get("groups", []) if item.get("id") == "deepseek-account"),
+            None,
+        )
         if not self.boundary.account_catalog_observed or group is None:
             self._account_models = []
             raise ExecutionError("ACCOUNT_CATALOG_UNAVAILABLE")
@@ -320,19 +678,28 @@ class ExecutionAdapter:
             if model_id not in self.boundary.account_model_modalities:
                 continue
             efforts = model.get("reasoning", {}).get("efforts", [])
-            levels = ["none" if effort.get("id") == "off" else effort.get("id") for effort in efforts]
-            choices.append({
-                "id": model_id,
-                "name": model.get("name", model_id),
-                "supports_images": "image" in self.boundary.account_model_modalities[model_id],
-                "thinking_levels": [level for level in levels if level in {"none", "low", "high", "max"}],
-            })
+            levels = [
+                "none" if effort.get("id") == "off" else effort.get("id") for effort in efforts
+            ]
+            choices.append(
+                {
+                    "id": model_id,
+                    "name": model.get("name", model_id),
+                    "supports_images": "image" in self.boundary.account_model_modalities[model_id],
+                    "thinking_levels": [
+                        level for level in levels if level in {"none", "low", "high", "max"}
+                    ],
+                }
+            )
         self._account_models = choices
         return choices
 
     def supports_model_images(self, model: str) -> bool:
         if self.mode == "official" and self.credential_route == "account":
-            return any(choice["id"] == model and choice["supports_images"] for choice in self._account_models)
+            return any(
+                choice["id"] == model and choice["supports_images"]
+                for choice in self._account_models
+            )
         return supports_images(model)
 
     async def validate_choice(self, model: str, thinking: str) -> None:
@@ -367,6 +734,72 @@ class ExecutionAdapter:
             event_id, number, binding.generation_id, binding.epoch, kind, **kwargs
         )
 
+    def _terminal_status(self, binding, reason):
+        if self.native_tools is not None:
+            self.native_tools.registry.reconcile_effects(
+                binding.generation_id, self.native_tools.port
+            )
+            if not self.native_tools.registry.effects_settled(binding.generation_id):
+                return "unknown"
+        status = TERMINAL_STATUS.get(
+            reason.get("kind") if isinstance(reason, dict) else reason, "unknown"
+        )
+        if status == "failed":
+            known = {
+                "completed",
+                "fixture_http_500",
+                "provider_http_error",
+                "execution_policy_blocked",
+                "configuration_blocked",
+                "credential_missing",
+                "native_attribution_denied",
+                "upstream_redirect_blocked",
+            }
+            if any(
+                row["status"] not in known
+                for row in self.boundary.records
+                if row.get("generation_id") == binding.generation_id
+            ):
+                return "unknown"
+        return status
+
+    async def _settled_terminal_status(self, binding, reason):
+        status = self._terminal_status(binding, reason)
+        if (
+            status != "unknown"
+            or self.native_tools is None
+            or not isinstance(reason, dict)
+            or reason.get("kind") != "aborted"
+            or reason.get("reason", {}).get("kind") != "user"
+        ):
+            return status
+        registry = self.native_tools.registry
+        with registry.lock:
+            pending_image = any(
+                value["run_id"] == binding.generation_id
+                and value["state"] != "completed"
+                and registry.bindings.get(key, {}).get("tool_name") == "read_document_region"
+                for key, value in registry.operations.items()
+            )
+        if not pending_image:
+            return status
+        # Observe the original local read's late acknowledgement. This never
+        # invokes a tool, resends a model request, or changes an unknown write.
+        for _ in range(200):
+            await asyncio.sleep(0.01)
+            status = self._terminal_status(binding, reason)
+            if status != "unknown":
+                break
+        return status
+
+    @staticmethod
+    def _terminal_data(status, reason):
+        return (
+            {"reason": "NATIVE_EXECUTION_UNKNOWN", "native_reason": reason}
+            if status == "unknown"
+            else {"reason": reason}
+        )
+
     async def observe(
         self,
         binding: ExecutionBinding | dict,
@@ -390,7 +823,9 @@ class ExecutionAdapter:
             yield self._event(
                 binding, f"{binding.request_id}:accepted", "accepted", status="accepted"
             )
-        async with asyncio.timeout(self.timeout + 15):
+        policy = self._run_policies.get(binding.generation_id)
+        timeout = policy.timeout_seconds if policy is not None else self.timeout
+        async with asyncio.timeout(timeout + 15):
             while True:
                 wire = await queue.get()
                 if wire.get("type") == "disconnected":
@@ -412,7 +847,7 @@ class ExecutionAdapter:
                         self._chunk_floors[binding.generation_id] = 0
                         yield self._event(
                             binding,
-                            f"{binding.session_id}:{attempt}:start",
+                            f"{binding.generation_id}:attempt:{attempt}:start",
                             "activity",
                             status="active",
                             attempt_id=attempt,
@@ -432,7 +867,7 @@ class ExecutionAdapter:
                         if kind and chunk.get("text"):
                             yield self._event(
                                 binding,
-                                f"{binding.session_id}:{attempt}:chunk:{frame['index']}",
+                                f"{binding.generation_id}:attempt:{attempt}:chunk:{frame['index']}",
                                 kind,
                                 text=chunk["text"],
                                 status="active",
@@ -447,17 +882,21 @@ class ExecutionAdapter:
                         and native.get("data", {}).get("turn") == binding.native_turn
                     ):
                         reason = native["data"].get("reason", {})
-                        status = TERMINAL_STATUS.get(
-                            reason.get("kind") if isinstance(reason, dict) else reason, "unknown"
-                        )
+                        status = await self._settled_terminal_status(binding, reason)
                         binding.status = status
+                        self._native_terminals[binding.generation_id] = {
+                            "turn": binding.native_turn,
+                            "seq": native["seq"],
+                            "reason": reason,
+                        }
                         yield self._event(
                             binding,
-                            f"{binding.session_id}:event:{native['seq']}",
-                            "terminal",
+                            f"{binding.session_id}:event:{native['seq']}"
+                            + (":unknown" if status == "unknown" else ""),
+                            "unknown" if status == "unknown" else "terminal",
                             status=status,
                             native_seq=native["seq"],
-                            data={"reason": reason},
+                            data=self._terminal_data(status, reason),
                         )
                         await self.peer.unfollow(stream)
                         self._streams.pop(binding.generation_id, None)
@@ -465,18 +904,24 @@ class ExecutionAdapter:
                             yield event
                         return
 
-    async def _usage(self, binding) -> list[NormalizedEvent]:
+    async def accounting_events(self, binding: ExecutionBinding | dict) -> list[NormalizedEvent]:
+        return await self._usage(self._binding(binding), wait_for_settlement=False)
+
+    async def _usage(self, binding, *, wait_for_settlement: bool = True) -> list[NormalizedEvent]:
         # Provider terminal may reach durable Host just before boundary handler finalizes.
-        for _ in range(200):
+        for _ in range(200 if wait_for_settlement else 1):
             records = [
                 r for r in self.boundary.records if r.get("generation_id") == binding.generation_id
             ]
             if not records or all(r.get("finished_ns") for r in records):
                 break
-            await asyncio.sleep(0.01)
+            if wait_for_settlement:
+                await asyncio.sleep(0.01)
         result = []
         for record in records:
             usage = record.get("usage", {})
+            if not usage:
+                continue
             observation = hashlib.sha256(
                 json.dumps(usage, sort_keys=True, separators=(",", ":")).encode("utf-8")
             ).hexdigest()[:24]
@@ -600,17 +1045,21 @@ class ExecutionAdapter:
         if terminals:
             terminal = terminals[-1]
             reason = terminal["data"].get("reason", {})
-            status = TERMINAL_STATUS.get(
-                reason.get("kind") if isinstance(reason, dict) else reason, "unknown"
-            )
+            self._native_terminals[binding.generation_id] = {
+                "turn": binding.native_turn,
+                "seq": terminal["seq"],
+                "reason": reason,
+            }
+            status = await self._settled_terminal_status(binding, reason)
             result_events.append(
                 self._event(
                     binding,
-                    f"{binding.session_id}:event:{terminal['seq']}",
-                    "terminal",
+                    f"{binding.session_id}:event:{terminal['seq']}"
+                    + (":unknown" if status == "unknown" else ""),
+                    "unknown" if status == "unknown" else "terminal",
                     status=status,
                     native_seq=terminal["seq"],
-                    data={"reason": reason},
+                    data=self._terminal_data(status, reason),
                 )
             )
             await self.peer.unfollow(stream)

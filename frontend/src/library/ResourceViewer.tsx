@@ -3,9 +3,21 @@ import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
 import { Icon } from "../components/ui/Icon";
+import { PdfReader } from "../reading/PdfReader";
+import type { ReadingActionHandler, SourceJump } from "../reading/actions";
 
 /** Every URL here is a version-bound local business resource, never answer HTML. */
-export function ResourceViewer({ file }: { file: Schema<"CourseFileOpenResponse"> }) {
+export function ResourceViewer({
+  file,
+  onSourceAction,
+  sourceJump,
+  visible = true,
+}: {
+  file: Schema<"CourseFileOpenResponse">;
+  onSourceAction?: ReadingActionHandler;
+  sourceJump?: SourceJump;
+  visible?: boolean;
+}) {
   const [view, setView] = useState({
     file,
     text: "",
@@ -71,7 +83,15 @@ export function ResourceViewer({ file }: { file: Schema<"CourseFileOpenResponse"
           {error}
         </p>
       )}
-      {file.viewer === "image" && file.content_url ? (
+      {file.viewer === "pdf" && file.content_url ? (
+        <PdfReader
+          file={file}
+          onSourceAction={onSourceAction}
+          sourceJump={sourceJump}
+          visible={visible}
+          key={`${file.asset_id}:${file.source_version}`}
+        />
+      ) : file.viewer === "image" && file.content_url ? (
         <img
           className="document-image"
           src={file.content_url}
@@ -102,11 +122,7 @@ export function ResourceViewer({ file }: { file: Schema<"CourseFileOpenResponse"
         <div className="unsupported-document">
           <Icon name="file" size={34} />
           <h2>{file.entry.name}</h2>
-          <p>
-            {file.viewer === "pdf"
-              ? "PDF 阅读将在后续阶段接入；当前可使用系统默认程序打开。"
-              : "当前格式使用系统默认程序打开。"}
-          </p>
+          <p>当前格式使用系统默认程序打开。</p>
           <Button variant="outline" disabled={busy} onClick={() => void openExternal()}>
             {busy ? "正在打开…" : "使用系统默认程序打开"}
           </Button>

@@ -10,7 +10,8 @@ import sys
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    python = (
+    packaged = root / "runtime/python/python.exe"
+    python = packaged if (root / "desktop-release.json").is_file() else (
         root
         / "backend/.venv"
         / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
@@ -26,7 +27,10 @@ def main() -> int:
         # subprocess while forwarding Ctrl+C to the actual owned launcher.
         command = [str(python), str(Path(__file__).resolve()), *sys.argv[1:]]
         try:
-            return subprocess.call(command, cwd=root)
+            return subprocess.call(
+                command, cwd=root,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            )
         except KeyboardInterrupt:
             return 130
     from learning_app.dev import main as run_app

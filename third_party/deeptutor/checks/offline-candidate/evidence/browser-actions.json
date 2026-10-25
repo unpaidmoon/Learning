@@ -1,0 +1,186 @@
+[
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e26",
+    "chunk_id": "b017d6",
+    "wall_time_seconds": 1.8149918999999999,
+    "exit_code": 0,
+    "original_token_count": 95,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('button', { name: '向下读一屏' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-23-17-384Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 eval '() => ({scrollTop:document.getElementById(\"reader\").scrollTop, reading:document.getElementById(\"reading-percent\").textContent})'",
+    "chunk_id": "cad0c7",
+    "wall_time_seconds": 1.7602152,
+    "exit_code": 0,
+    "original_token_count": 60,
+    "output": "### Result\n{\n  \"scrollTop\": 628,\n  \"reading\": \"90%\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('() => ({scrollTop:document.getElementById(\"reader\").scrollTop, reading:document.getElementById(\"reading-percent\").textContent})');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e175",
+    "chunk_id": "822a5c",
+    "wall_time_seconds": 1.7797918,
+    "exit_code": 0,
+    "original_token_count": 93,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('slider', { name: '系数 a' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-23-21-257Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 press End",
+    "chunk_id": "d17ffa",
+    "wall_time_seconds": 1.2690374,
+    "exit_code": 0,
+    "original_token_count": 21,
+    "output": "### Ran Playwright code\n```js\n// Press End\nawait page.keyboard.press('End');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 press ArrowLeft",
+    "chunk_id": "ba7e5d",
+    "wall_time_seconds": 1.2624396,
+    "exit_code": 0,
+    "original_token_count": 24,
+    "output": "### Ran Playwright code\n```js\n// Press ArrowLeft\nawait page.keyboard.press('ArrowLeft');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 press ArrowLeft",
+    "chunk_id": "6bc421",
+    "wall_time_seconds": 1.3197247,
+    "exit_code": 0,
+    "original_token_count": 24,
+    "output": "### Ran Playwright code\n```js\n// Press ArrowLeft\nawait page.keyboard.press('ArrowLeft');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e179",
+    "chunk_id": "5cea95",
+    "wall_time_seconds": 1.8378104,
+    "exit_code": 0,
+    "original_token_count": 94,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('slider', { name: '切点 x₀' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-23-27-612Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 press End",
+    "chunk_id": "861bcc",
+    "wall_time_seconds": 1.2411164000000001,
+    "exit_code": 0,
+    "original_token_count": 21,
+    "output": "### Ran Playwright code\n```js\n// Press End\nawait page.keyboard.press('End');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 eval '() => { const card=document.querySelector(\".plot-card\"); if(card.dataset.slope!==\"8\" || card.dataset.pointY!==\"8\") throw new Error(\"PLOT_MATH_MISMATCH\"); return {a:document.getElementById(\"parameter-a\").value,x0:document.getElementById(\"parameter-x0\").value,slope:card.dataset.slope,pointY:card.dataset.pointY,label:card.querySelector(\"strong\").textContent}; }'",
+    "chunk_id": "60f2f9",
+    "wall_time_seconds": 1.8020994,
+    "exit_code": 0,
+    "original_token_count": 135,
+    "output": "### Result\n{\n  \"a\": \"2\",\n  \"x0\": \"2\",\n  \"slope\": \"8\",\n  \"pointY\": \"8\",\n  \"label\": \"斜率 8.00 · 切点 (2.00, 8.00)\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('() => { const card=document.querySelector(\".plot-card\"); if(card.dataset.slope!==\"8\" || card.dataset.pointY!==\"8\") throw new Error(\"PLOT_MATH_MISMATCH\"); return {a:document.getElementById(\"parameter-a\").value,x0:document.getElementById(\"parameter-x0\").value,slope:card.dataset.slope,pointY:card.dataset.pointY,label:card.querySelector(\"strong\").textContent}; }');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 eval 'el => el.scrollIntoView({block:\"start\"})' f1e159",
+    "chunk_id": "750233",
+    "wall_time_seconds": 1.954606,
+    "exit_code": 0,
+    "original_token_count": 50,
+    "output": "### Result\n{\n  \"interrupted\": false\n}\n### Ran Playwright code\n```js\nawait page.getByRole('heading', { name: '动手改变系数与切点' }).evaluate('el => el.scrollIntoView({block:\"start\"})');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 screenshot --filename=evidence/offline-interaction.png",
+    "chunk_id": "b677ab",
+    "wall_time_seconds": 1.4488658,
+    "exit_code": 0,
+    "original_token_count": 70,
+    "output": "### Result\n- [Screenshot of viewport](evidence\\offline-interaction.png)\n### Ran Playwright code\n```js\n// Screenshot viewport and save it as evidence\\offline-interaction.png\nawait page.screenshot({\n  path: 'evidence\\\\offline-interaction.png',\n  scale: 'css',\n  type: 'png'\n});\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e13",
+    "chunk_id": "d11fec",
+    "wall_time_seconds": 1.9689060999999999,
+    "exit_code": 0,
+    "original_token_count": 95,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('button', { name: '自测与核对' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-24-09-234Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 snapshot",
+    "chunk_id": "ec7aed",
+    "wall_time_seconds": 1.2866712,
+    "exit_code": 0,
+    "original_token_count": 983,
+    "output": "### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n```yaml\n- generic [ref=f1e1]:\n  - banner [ref=f1e2]:\n    - generic [ref=f1e3]:\n      - generic [ref=f1e4]: L\n      - generic [ref=f1e5]: 学习书离线可用\n    - generic [ref=f1e6]: 完全合成示例 · 2章\n  - generic [ref=f1e7]:\n    - complementary [ref=f1e8]:\n      - paragraph [ref=f1e9]: 本书目录\n      - navigation \"章节目录\" [ref=f1e10]:\n        - button \"01 从图像到切线\" [ref=f1e11] [cursor=pointer]:\n          - generic [ref=f1e12]: \"01\"\n          - text: 从图像到切线\n        - button \"02 自测与核对\" [active] [ref=f1e13] [cursor=pointer]:\n          - generic [ref=f1e14]: \"02\"\n          - text: 自测与核对\n      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。\n      - button \"查看来源\" [ref=f1e16] [cursor=pointer]\n    - main [ref=f1e17]:\n      - generic [ref=f1e18]:\n        - paragraph [ref=f1e19]: 数学 · 概念与应用\n        - heading \"二次函数：从图像到切线\" [level=1] [ref=f1e20]\n        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。\n      - generic [ref=f1e22]:\n        - generic [ref=f1e23]: 自测与核对\n        - generic [ref=f1e24]:\n          - button \"向上读一屏\" [ref=f1e25] [cursor=pointer]: ↑ 上一屏\n          - button \"向下读一屏\" [ref=f1e26] [cursor=pointer]: ↓ 下一屏\n          - generic [ref=f1e27]: 0%\n      - article \"章节内容\" [ref=f1e28]:\n        - generic [ref=f1e270]:\n          - generic [ref=f1e271]:\n            - heading \"做两道小练习\" [level=2] [ref=f1e272]\n            - generic [ref=f1e273]: 合成练习\n          - generic [ref=f1e274]:\n            - heading \"1. 当 a=1、x₀=2 时，切线斜率是多少？\" [level=3] [ref=f1e275]\n            - generic [ref=f1e276]:\n              - generic [ref=f1e277]:\n                - radio \"选项 A：2\" [ref=f1e278]\n                - text: A 2\n              - generic [ref=f1e279]:\n                - radio \"选项 B：4\" [ref=f1e280]\n                - text: B 4\n              - generic [ref=f1e281]:\n                - radio \"选项 C：8\" [ref=f1e282]\n                - text: C 8\n            - button \"核对选择\" [ref=f1e283] [cursor=pointer]\n            - paragraph\n          - generic [ref=f1e284]:\n            - heading \"2. 为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。\" [level=3] [ref=f1e285]\n            - paragraph [ref=f1e286]: 先尝试口述或写在自己的纸上。查看参考不会自动判对错。\n            - button \"查看参考答案\" [ref=f1e287] [cursor=pointer]\n        - generic [ref=f1e288]:\n          - generic [ref=f1e289]:\n            - heading \"记住关键关系\" [level=2] [ref=f1e290]\n            - generic [ref=f1e291]: 合成练习\n          - generic [ref=f1e292]:\n            - group [ref=f1e293]:\n              - generic \"二次函数 ax² 的导数是什么？\" [ref=f1e294] [cursor=pointer]\n            - group [ref=f1e295]:\n              - generic \"切点移动时，切线斜率由什么决定？\" [ref=f1e296] [cursor=pointer]\n        - generic [ref=f1e297]:\n          - generic [ref=f1e298]:\n            - heading \"继续学习\" [level=2] [ref=f1e299]\n            - generic [ref=f1e300]: 补充解释\n          - generic [ref=f1e301]:\n            - strong [ref=f1e302]: 练习建议\n            - text: 回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。\n      - generic [ref=f1e204]:\n        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。\n        - button \"重置本次自测\" [ref=f1e206] [cursor=pointer]\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 snapshot",
+    "chunk_id": "07cbfb",
+    "wall_time_seconds": 1.2334464,
+    "exit_code": 0,
+    "original_token_count": 1004,
+    "output": "### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n```yaml\n- generic [ref=f1e1]:\n  - banner [ref=f1e2]:\n    - generic [ref=f1e3]:\n      - generic [ref=f1e4]: L\n      - generic [ref=f1e5]: 学习书离线可用\n    - generic [ref=f1e6]: 完全合成示例 · 2章\n  - generic [ref=f1e7]:\n    - complementary [ref=f1e8]:\n      - paragraph [ref=f1e9]: 本书目录\n      - navigation \"章节目录\" [ref=f1e10]:\n        - button \"01 从图像到切线\" [ref=f1e11] [cursor=pointer]:\n          - generic [ref=f1e12]: \"01\"\n          - text: 从图像到切线\n        - button \"02 自测与核对\" [ref=f1e13] [cursor=pointer]:\n          - generic [ref=f1e14]: \"02\"\n          - text: 自测与核对\n      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。\n      - button \"查看来源\" [ref=f1e16] [cursor=pointer]\n    - main [ref=f1e17]:\n      - generic [ref=f1e18]:\n        - paragraph [ref=f1e19]: 数学 · 概念与应用\n        - heading \"二次函数：从图像到切线\" [level=1] [ref=f1e20]\n        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。\n      - generic [ref=f1e22]:\n        - generic [ref=f1e23]: 自测与核对\n        - generic [ref=f1e24]:\n          - button \"向上读一屏\" [ref=f1e25] [cursor=pointer]: ↑ 上一屏\n          - button \"向下读一屏\" [ref=f1e26] [cursor=pointer]: ↓ 下一屏\n          - generic [ref=f1e27]: 0%\n      - article \"章节内容\" [ref=f1e28]:\n        - generic [ref=f1e270]:\n          - generic [ref=f1e271]:\n            - heading \"做两道小练习\" [level=2] [ref=f1e272]\n            - generic [ref=f1e273]: 合成练习\n          - generic [ref=f1e274]:\n            - heading \"1. 当 a=1、x₀=2 时，切线斜率是多少？\" [level=3] [ref=f1e275]\n            - generic [ref=f1e276]:\n              - generic [ref=f1e277]:\n                - radio \"选项 A：2\" [checked] [ref=f1e278]\n                - text: A 2\n              - generic [ref=f1e279]:\n                - radio \"选项 B：4\" [ref=f1e280]\n                - text: B 4\n              - generic [ref=f1e281]:\n                - radio \"选项 C：8\" [ref=f1e282]\n                - text: C 8\n            - button \"核对选择\" [active] [ref=f1e283] [cursor=pointer]\n            - paragraph [ref=f1e303]: 还没选对，可以根据切线斜率公式再试一次。\n          - generic [ref=f1e284]:\n            - heading \"2. 为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。\" [level=3] [ref=f1e285]\n            - paragraph [ref=f1e286]: 先尝试口述或写在自己的纸上。查看参考不会自动判对错。\n            - button \"查看参考答案\" [ref=f1e287] [cursor=pointer]\n        - generic [ref=f1e288]:\n          - generic [ref=f1e289]:\n            - heading \"记住关键关系\" [level=2] [ref=f1e290]\n            - generic [ref=f1e291]: 合成练习\n          - generic [ref=f1e292]:\n            - group [ref=f1e293]:\n              - generic \"二次函数 ax² 的导数是什么？\" [ref=f1e294] [cursor=pointer]\n            - group [ref=f1e295]:\n              - generic \"切点移动时，切线斜率由什么决定？\" [ref=f1e296] [cursor=pointer]\n        - generic [ref=f1e297]:\n          - generic [ref=f1e298]:\n            - heading \"继续学习\" [level=2] [ref=f1e299]\n            - generic [ref=f1e300]: 补充解释\n          - generic [ref=f1e301]:\n            - strong [ref=f1e302]: 练习建议\n            - text: 回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。\n      - generic [ref=f1e204]:\n        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。\n        - button \"重置本次自测\" [ref=f1e206] [cursor=pointer]\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 check f1e280",
+    "chunk_id": "1e245e",
+    "wall_time_seconds": 1.2755991,
+    "exit_code": 0,
+    "original_token_count": 25,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('radio', { name: '选项 B：' }).check();\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e283",
+    "chunk_id": "f3dd21",
+    "wall_time_seconds": 1.8044799,
+    "exit_code": 0,
+    "original_token_count": 94,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('button', { name: '核对选择' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-26-07-175Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 eval '() => {const q=document.querySelector(\"[data-question-id=q-choice]\");if(q.dataset.grade!==\"correct\")throw new Error(\"QUIZ_KEY_MISMATCH\");return{grade:q.dataset.grade,answerKey:window.DTQuiz.resolveChoiceAnswerKey(\"4\",{A:\"2\",B:\"4\",C:\"8\"}),feedback:q.querySelector(\".feedback\").textContent};}'",
+    "chunk_id": "a5cf56",
+    "wall_time_seconds": 1.7338425,
+    "exit_code": 0,
+    "original_token_count": 119,
+    "output": "### Result\n{\n  \"grade\": \"correct\",\n  \"answerKey\": \"B\",\n  \"feedback\": \"回答正确。代入 k=2ax₀，得到 2×1×2=4。\"\n}\n### Ran Playwright code\n```js\nawait page.evaluate('() => {const q=document.querySelector(\"[data-question-id=q-choice]\");if(q.dataset.grade!==\"correct\")throw new Error(\"QUIZ_KEY_MISMATCH\");return{grade:q.dataset.grade,answerKey:window.DTQuiz.resolveChoiceAnswerKey(\"4\",{A:\"2\",B:\"4\",C:\"8\"}),feedback:q.querySelector(\".feedback\").textContent};}');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 snapshot",
+    "chunk_id": "9a285b",
+    "wall_time_seconds": 1.3671543,
+    "exit_code": 0,
+    "original_token_count": 1002,
+    "output": "### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n```yaml\n- generic [ref=f1e1]:\n  - banner [ref=f1e2]:\n    - generic [ref=f1e3]:\n      - generic [ref=f1e4]: L\n      - generic [ref=f1e5]: 学习书离线可用\n    - generic [ref=f1e6]: 完全合成示例 · 2章\n  - generic [ref=f1e7]:\n    - complementary [ref=f1e8]:\n      - paragraph [ref=f1e9]: 本书目录\n      - navigation \"章节目录\" [ref=f1e10]:\n        - button \"01 从图像到切线\" [ref=f1e11] [cursor=pointer]:\n          - generic [ref=f1e12]: \"01\"\n          - text: 从图像到切线\n        - button \"02 自测与核对\" [ref=f1e13] [cursor=pointer]:\n          - generic [ref=f1e14]: \"02\"\n          - text: 自测与核对\n      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。\n      - button \"查看来源\" [ref=f1e16] [cursor=pointer]\n    - main [ref=f1e17]:\n      - generic [ref=f1e18]:\n        - paragraph [ref=f1e19]: 数学 · 概念与应用\n        - heading \"二次函数：从图像到切线\" [level=1] [ref=f1e20]\n        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。\n      - generic [ref=f1e22]:\n        - generic [ref=f1e23]: 自测与核对\n        - generic [ref=f1e24]:\n          - button \"向上读一屏\" [ref=f1e25] [cursor=pointer]: ↑ 上一屏\n          - button \"向下读一屏\" [ref=f1e26] [cursor=pointer]: ↓ 下一屏\n          - generic [ref=f1e27]: 0%\n      - article \"章节内容\" [ref=f1e28]:\n        - generic [ref=f1e270]:\n          - generic [ref=f1e271]:\n            - heading \"做两道小练习\" [level=2] [ref=f1e272]\n            - generic [ref=f1e273]: 合成练习\n          - generic [ref=f1e274]:\n            - heading \"1. 当 a=1、x₀=2 时，切线斜率是多少？\" [level=3] [ref=f1e275]\n            - generic [ref=f1e276]:\n              - generic [ref=f1e277]:\n                - radio \"选项 A：2\" [ref=f1e278]\n                - text: A 2\n              - generic [ref=f1e279]:\n                - radio \"选项 B：4\" [checked] [ref=f1e280]\n                - text: B 4\n              - generic [ref=f1e281]:\n                - radio \"选项 C：8\" [ref=f1e282]\n                - text: C 8\n            - button \"核对选择\" [active] [ref=f1e283] [cursor=pointer]\n            - paragraph [ref=f1e303]: 回答正确。代入 k=2ax₀，得到 2×1×2=4。\n          - generic [ref=f1e284]:\n            - heading \"2. 为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。\" [level=3] [ref=f1e285]\n            - paragraph [ref=f1e286]: 先尝试口述或写在自己的纸上。查看参考不会自动判对错。\n            - button \"查看参考答案\" [ref=f1e287] [cursor=pointer]\n        - generic [ref=f1e288]:\n          - generic [ref=f1e289]:\n            - heading \"记住关键关系\" [level=2] [ref=f1e290]\n            - generic [ref=f1e291]: 合成练习\n          - generic [ref=f1e292]:\n            - group [ref=f1e293]:\n              - generic \"二次函数 ax² 的导数是什么？\" [ref=f1e294] [cursor=pointer]\n            - group [ref=f1e295]:\n              - generic \"切点移动时，切线斜率由什么决定？\" [ref=f1e296] [cursor=pointer]\n        - generic [ref=f1e297]:\n          - generic [ref=f1e298]:\n            - heading \"继续学习\" [level=2] [ref=f1e299]\n            - generic [ref=f1e300]: 补充解释\n          - generic [ref=f1e301]:\n            - strong [ref=f1e302]: 练习建议\n            - text: 回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。\n      - generic [ref=f1e204]:\n        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。\n        - button \"重置本次自测\" [ref=f1e206] [cursor=pointer]\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e287",
+    "chunk_id": "416fde",
+    "wall_time_seconds": 1.7738555,
+    "exit_code": 0,
+    "original_token_count": 96,
+    "output": "### Ran Playwright code\n```js\nawait page.getByRole('button', { name: '查看参考答案' }).click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-26-12-549Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 eval '() => {const q=document.querySelector(\"[data-question-id=q-written]\");if(q.dataset.grade!==\"ungraded\")throw new Error(\"WRITTEN_WRONGLY_GRADED\");return{grade:q.dataset.grade,revealed:!q.querySelector(\".reference-answer\").hidden,storageWrites:window.__offlineStorageWrites};}'",
+    "chunk_id": "0efa93",
+    "wall_time_seconds": 1.7485974,
+    "exit_code": 0,
+    "original_token_count": 103,
+    "output": "### Result\n{\n  \"grade\": \"ungraded\",\n  \"revealed\": true,\n  \"storageWrites\": []\n}\n### Ran Playwright code\n```js\nawait page.evaluate('() => {const q=document.querySelector(\"[data-question-id=q-written]\");if(q.dataset.grade!==\"ungraded\")throw new Error(\"WRITTEN_WRONGLY_GRADED\");return{grade:q.dataset.grade,revealed:!q.querySelector(\".reference-answer\").hidden,storageWrites:window.__offlineStorageWrites};}');\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 snapshot",
+    "chunk_id": "4f4c99",
+    "wall_time_seconds": 1.2699105,
+    "exit_code": 0,
+    "original_token_count": 1075,
+    "output": "### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n```yaml\n- generic [ref=f1e1]:\n  - banner [ref=f1e2]:\n    - generic [ref=f1e3]:\n      - generic [ref=f1e4]: L\n      - generic [ref=f1e5]: 学习书离线可用\n    - generic [ref=f1e6]: 完全合成示例 · 2章\n  - generic [ref=f1e7]:\n    - complementary [ref=f1e8]:\n      - paragraph [ref=f1e9]: 本书目录\n      - navigation \"章节目录\" [ref=f1e10]:\n        - button \"01 从图像到切线\" [ref=f1e11] [cursor=pointer]:\n          - generic [ref=f1e12]: \"01\"\n          - text: 从图像到切线\n        - button \"02 自测与核对\" [ref=f1e13] [cursor=pointer]:\n          - generic [ref=f1e14]: \"02\"\n          - text: 自测与核对\n      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。\n      - button \"查看来源\" [ref=f1e16] [cursor=pointer]\n    - main [ref=f1e17]:\n      - generic [ref=f1e18]:\n        - paragraph [ref=f1e19]: 数学 · 概念与应用\n        - heading \"二次函数：从图像到切线\" [level=1] [ref=f1e20]\n        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。\n      - generic [ref=f1e22]:\n        - generic [ref=f1e23]: 自测与核对\n        - generic [ref=f1e24]:\n          - button \"向上读一屏\" [ref=f1e25] [cursor=pointer]: ↑ 上一屏\n          - button \"向下读一屏\" [ref=f1e26] [cursor=pointer]: ↓ 下一屏\n          - generic [ref=f1e27]: 0%\n      - article \"章节内容\" [ref=f1e28]:\n        - generic [ref=f1e270]:\n          - generic [ref=f1e271]:\n            - heading \"做两道小练习\" [level=2] [ref=f1e272]\n            - generic [ref=f1e273]: 合成练习\n          - generic [ref=f1e274]:\n            - heading \"1. 当 a=1、x₀=2 时，切线斜率是多少？\" [level=3] [ref=f1e275]\n            - generic [ref=f1e276]:\n              - generic [ref=f1e277]:\n                - radio \"选项 A：2\" [ref=f1e278]\n                - text: A 2\n              - generic [ref=f1e279]:\n                - radio \"选项 B：4\" [checked] [ref=f1e280]\n                - text: B 4\n              - generic [ref=f1e281]:\n                - radio \"选项 C：8\" [ref=f1e282]\n                - text: C 8\n            - button \"核对选择\" [ref=f1e283] [cursor=pointer]\n            - paragraph [ref=f1e303]: 回答正确。代入 k=2ax₀，得到 2×1×2=4。\n          - generic [ref=f1e284]:\n            - heading \"2. 为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。\" [level=3] [ref=f1e285]\n            - paragraph [ref=f1e286]: 先尝试口述或写在自己的纸上。查看参考不会自动判对错。\n            - button \"收起参考答案\" [active] [ref=f1e304] [cursor=pointer]\n            - generic [ref=f1e305]:\n              - paragraph [ref=f1e306]: 读过只是接触了信息，能独立说明和应用还需要另行检验。\n              - paragraph [ref=f1e307]: 这是主观表达题。离线包只提供参考，揭示答案不产生对错或掌握判定。\n        - generic [ref=f1e288]:\n          - generic [ref=f1e289]:\n            - heading \"记住关键关系\" [level=2] [ref=f1e290]\n            - generic [ref=f1e291]: 合成练习\n          - generic [ref=f1e292]:\n            - group [ref=f1e293]:\n              - generic \"二次函数 ax² 的导数是什么？\" [ref=f1e294] [cursor=pointer]\n            - group [ref=f1e295]:\n              - generic \"切点移动时，切线斜率由什么决定？\" [ref=f1e296] [cursor=pointer]\n        - generic [ref=f1e297]:\n          - generic [ref=f1e298]:\n            - heading \"继续学习\" [level=2] [ref=f1e299]\n            - generic [ref=f1e300]: 补充解释\n          - generic [ref=f1e301]:\n            - strong [ref=f1e302]: 练习建议\n            - text: 回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。\n      - generic [ref=f1e204]:\n        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。\n        - button \"重置本次自测\" [ref=f1e206] [cursor=pointer]\n```\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 click f1e294",
+    "chunk_id": "2818f3",
+    "wall_time_seconds": 1.7714894,
+    "exit_code": 0,
+    "original_token_count": 96,
+    "output": "### Ran Playwright code\n```js\nawait page.getByText('二次函数 ax² 的导数是什么？').click();\n```\n### Page\n- Page URL: file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html\n- Page Title: 二次函数：从图像到切线 · 离线学习书\n### Snapshot\n- [Snapshot](evidence\\browser\\page-2026-10-23T05-26-17-829Z.yml)\n"
+  },
+  {
+    "cmd": "npx --no-install --package=@playwright/cli@0.1.22 playwright-cli -s=dt-offline-c10c12 screenshot --filename=evidence/offline-selftest.png",
+    "chunk_id": "9fe9f6",
+    "wall_time_seconds": 1.256756,
+    "exit_code": 0,
+    "original_token_count": 68,
+    "output": "### Result\n- [Screenshot of viewport](evidence\\offline-selftest.png)\n### Ran Playwright code\n```js\n// Screenshot viewport and save it as evidence\\offline-selftest.png\nawait page.screenshot({\n  path: 'evidence\\\\offline-selftest.png',\n  scale: 'css',\n  type: 'png'\n});\n```\n"
+  }
+]

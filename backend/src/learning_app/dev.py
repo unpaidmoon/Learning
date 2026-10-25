@@ -18,7 +18,11 @@ from urllib.error import HTTPError, URLError
 from urllib.request import HTTPCookieProcessor, ProxyHandler, Request, build_opener
 
 from learning_app.config import load_config
+from learning_app.errors import AppError
 from learning_app.processes import OwnedProcessGroup, ProcessError, require_free_port
+
+BACKEND_RECOVERY_LIMIT = 2
+BACKEND_RECOVERY_DELAYS = (1, 4)
 
 
 def _write_record(path: Path, value: dict[str, object]) -> None:
@@ -82,7 +86,18 @@ def _request_owned_exit(record: dict[str, object], *, confirm_active: bool, time
             runtime = json.load(response)
         if runtime.get("instance_id") != identity:
             raise ProcessError("INSTANCE_MISMATCH", "后台实例已变化，未请求停止。")
-        if runtime.get("active_generations") and not confirm_active:
+        if (
+            any(
+                runtime.get(key)
+                for key in (
+                    "active_generations",
+                    "active_tasks",
+                    "active_preparations",
+                    "active_data_operations",
+                )
+            )
+            and not confirm_active
+        ):
             if not sys.stdin.isatty():
                 raise ProcessError(
                     "ACTIVE_GENERATIONS_CONFIRMATION_REQUIRED",
@@ -192,7 +207,12 @@ def _launch_background(arguments: argparse.Namespace, config) -> int:
     )
 
 
-def run(argv: list[str] | None = None) -> int:
+def run(
+    argv: list[str] | None = None,
+    *,
+    restart_budget: int = BACKEND_RECOVERY_LIMIT,
+    recovery_parent: str | None = None,
+) -> int:
     parser = argparse.ArgumentParser(description="统一启动学习应用开发或构建模式")
     parser.add_argument("mode", choices=["dev", "start", "launch", "stop"])
     parser.add_argument("--host")
@@ -256,6 +276,16 @@ def run(argv: list[str] | None = None) -> int:
     elif not (config.static_dir / "index.html").is_file():
         raise ProcessError("BUILD_MISSING", "缺少 frontend/dist/index.html，请先执行构建。")
 
+    from learning_app.data_location import ProfileLocation
+
+    location = ProfileLocation(config.data_dir)
+    if location.pending.exists():
+        pending_id = json.loads(location.pending.read_text("utf-8"))["operation_id"]
+        pending_state = json.loads(location.transfer(pending_id).read_text("utf-8"))["state"]
+        if pending_state not in {"failed", "cancelled", "publish_blocked"}:
+            with location.lease():
+                location.apply_closed()
+
     local_node = config.project_root / ".tools/node/node.exe"
     node = str(local_node) if local_node.is_file() else shutil.which("node")
     vite = config.project_root / "frontend/node_modules/vite/bin/vite.js"
@@ -278,6 +308,8 @@ def run(argv: list[str] | None = None) -> int:
         "frontend_port": config.frontend_port if arguments.mode == "dev" else None,
         "started_at_ns": time.time_ns(),
         "owned_pids": [],
+        "recovery_parent": recovery_parent,
+        "automatic_restarts_remaining": restart_budget,
     }
     _write_record(record_path, record)
     environment = os.environ.copy()
@@ -308,6 +340,7 @@ def run(argv: list[str] | None = None) -> int:
     logs = []
     backend: subprocess.Popen[str] | None = None
     exit_code = 0
+    restart_backend = False
 
     def request_interrupt(*_: object) -> None:
         if record.get("status") == "ready":
@@ -399,6 +432,13 @@ def run(argv: list[str] | None = None) -> int:
                 break
             for child in children:
                 if child.poll() is not None:
+                    if child is backend and restart_budget > 0:
+                        restart_backend = True
+                        record["recovery"] = {
+                            "state": "scheduled",
+                            "reason": "BACKEND_PROCESS_EXITED",
+                            "remaining_after_restart": restart_budget - 1,
+                        }
                     raise ProcessError("SERVICE_EXITED", "所属服务意外退出，已回滚本次实例。")
             time.sleep(0.1)
     except KeyboardInterrupt:
@@ -427,13 +467,53 @@ def run(argv: list[str] | None = None) -> int:
         _write_record(record_path, record)
         for signum, handler in original_handlers.items():
             signal.signal(signum, handler)
+    if restart_backend:
+        # The old complete owned group is gone before the new process can open
+        # the same profile. New instance/cookies; original execution journals
+        # are restored read-only by GenerationService, never replayed here.
+        delay = BACKEND_RECOVERY_DELAYS[
+            min(BACKEND_RECOVERY_LIMIT - restart_budget, len(BACKEND_RECOVERY_DELAYS) - 1)
+        ]
+        print(
+            "LEARNING_APP_RECOVERING "
+            + json.dumps(
+                {
+                    "previous_instance": instance_id,
+                    "remaining": restart_budget - 1,
+                    "delay_seconds": delay,
+                }
+            ),
+            flush=True,
+        )
+        time.sleep(delay)
+        return run(argv, restart_budget=restart_budget - 1, recovery_parent=instance_id)
+    if record.get("stop_reason") == "instance_request" and not record.get(
+        "graceful_backend_timeout"
+    ):
+        from learning_app.data_location import ProfileLocation
+
+        location = ProfileLocation(config.data_dir)
+        with location.lease():
+            switched = location.apply_closed()
+        if switched:
+            print(
+                "LEARNING_DATA_SWITCHED "
+                + json.dumps(
+                    {
+                        "operation_id": switched["operation_id"],
+                        "data_directory": switched["active_data"],
+                    },
+                    ensure_ascii=False,
+                ),
+                flush=True,
+            )
     return exit_code
 
 
 def main() -> int:
     try:
         return run()
-    except (ProcessError, OSError, ValueError) as exc:
+    except (AppError, ProcessError, OSError, ValueError) as exc:
         print(f"{getattr(exc, 'code', 'CONFIGURATION_ERROR')}: {exc}", file=sys.stderr)
         return 1
 

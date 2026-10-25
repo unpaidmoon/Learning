@@ -1,5 +1,6 @@
 import { CaptureError, checkImageDimensions } from "./capture";
 import type { CaptureSource } from "./capture";
+import { readingCaptureDocument } from "../reading/captureFrame";
 
 export interface WorkspaceBounds {
   left: number;
@@ -15,6 +16,13 @@ export interface WorkspaceSnapshot {
 
 type Rectangle = { left: number; top: number; right: number; bottom: number };
 const fontData = new Map<string, Promise<string>>();
+
+// A trusted reader lives in another Window realm; instanceof against the parent
+// constructors would fail. Tag checks here never grant an embedded-frame read.
+const isVideo = (node: Element): node is HTMLVideoElement => node.tagName === "VIDEO";
+const isImage = (node: Element): node is HTMLImageElement => node.tagName === "IMG";
+const isCanvas = (node: Element): node is HTMLCanvasElement => node.tagName === "CANVAS";
+const styled = (node: Element): node is HTMLElement | SVGElement => "style" in node;
 
 function intersection(left: Rectangle, right: Rectangle): Rectangle {
   return {
@@ -39,25 +47,43 @@ function blobData(blob: Blob): Promise<string> {
   });
 }
 
-async function localResource(value: string, resources: Map<string, Promise<string>>) {
+async function localResource(
+  value: string,
+  resources: Map<string, Promise<string>>,
+  displayedImage?: HTMLImageElement,
+) {
   if (value.startsWith("data:")) return value;
   const url = new URL(value, document.baseURI);
-  if (url.origin !== location.origin && url.protocol !== "blob:") {
+  if (url.origin !== location.origin) {
     throw new CaptureError("CAPTURE_EXTERNAL_RESOURCE", "截图包含无法在本机读取的外部资源");
   }
   let pending = resources.get(url.href);
   if (!pending) {
-    pending = fetch(url.href, { credentials: "same-origin", signal: AbortSignal.timeout(15_000) })
-      .then((response) => {
-        if (!response.ok)
-          throw new CaptureError("CAPTURE_RESOURCE_UNAVAILABLE", "截图资源尚未就绪");
-        return response.blob();
-      })
-      .then(blobData)
-      .catch((reason: unknown) => {
-        resources.delete(url.href);
-        throw reason;
-      });
+    // Blob images already belong to this page's local rendering. Reading their
+    // displayed pixels uses img-src rather than a connect-src network request;
+    // fetching the object URL fails under the desktop's unchanged strict CSP.
+    pending = (
+      url.protocol === "blob:"
+        ? displayedImage
+          ? Promise.resolve(imageFromCanvas(displayedImage).src)
+          : new Promise<HTMLImageElement>((resolve, reject) => {
+              const image = new Image();
+              image.onload = () => resolve(image);
+              image.onerror = () =>
+                reject(new CaptureError("CAPTURE_RESOURCE_UNAVAILABLE", "截图资源尚未就绪"));
+              image.src = url.href;
+            }).then((image) => imageFromCanvas(image).src)
+        : fetch(url.href, { credentials: "same-origin", signal: AbortSignal.timeout(15_000) })
+            .then((response) => {
+              if (!response.ok)
+                throw new CaptureError("CAPTURE_RESOURCE_UNAVAILABLE", "截图资源尚未就绪");
+              return response.blob();
+            })
+            .then(blobData)
+    ).catch((reason: unknown) => {
+      resources.delete(url.href);
+      throw reason;
+    });
     resources.set(url.href, pending);
   }
   return pending;
@@ -84,12 +110,19 @@ function cleanAttributes(node: Element) {
   }
 }
 
-function imageFromCanvas(node: HTMLVideoElement | HTMLCanvasElement) {
-  if (node instanceof HTMLVideoElement && node.readyState < 2) {
+function imageFromCanvas(node: HTMLVideoElement | HTMLCanvasElement | HTMLImageElement) {
+  if (isVideo(node) && node.readyState < 2) {
     throw new CaptureError("VIDEO_FRAME_UNAVAILABLE", "视频画面尚未就绪，请等待缓冲后重新截图");
   }
-  const width = node instanceof HTMLVideoElement ? node.videoWidth : node.width;
-  const height = node instanceof HTMLVideoElement ? node.videoHeight : node.height;
+  if (isImage(node) && (!node.complete || !node.naturalWidth)) {
+    throw new CaptureError("CAPTURE_RESOURCE_UNAVAILABLE", "截图图片尚未就绪，请等待显示后重试");
+  }
+  const width = isVideo(node) ? node.videoWidth : isImage(node) ? node.naturalWidth : node.width;
+  const height = isVideo(node)
+    ? node.videoHeight
+    : isImage(node)
+      ? node.naturalHeight
+      : node.height;
   checkImageDimensions(width, height);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -163,8 +196,12 @@ export async function captureWorkspace(root: HTMLElement): Promise<WorkspaceSnap
 
   const textCanPaint = (node: Node, visibleClip: Rectangle) => {
     const parent = node.parentElement;
-    if (!parent || getComputedStyle(parent).visibility !== "visible") return false;
-    const range = document.createRange();
+    if (
+      !parent ||
+      parent.ownerDocument.defaultView?.getComputedStyle(parent).visibility !== "visible"
+    )
+      return false;
+    const range = node.ownerDocument!.createRange();
     range.selectNodeContents(node);
     if (typeof range.getClientRects === "function") {
       return [...range.getClientRects()].some((rect) => hasArea(intersection(rect, visibleClip)));
@@ -175,12 +212,16 @@ export async function captureWorkspace(root: HTMLElement): Promise<WorkspaceSnap
 
   // This walk is synchronous, so streaming text and video do not change midway through a freeze.
   const clone = (node: Node, visibleClip: Rectangle): Node | null => {
-    if (!(node instanceof Element))
+    if (node.nodeType !== Node.ELEMENT_NODE)
       return node.nodeType === Node.TEXT_NODE && !textCanPaint(node, visibleClip)
         ? document.createTextNode("")
         : node.cloneNode(false);
+    const element = node as Element;
+    return cloneElement(element, visibleClip);
+  };
+  const cloneElement = (node: Element, visibleClip: Rectangle): Node | null => {
     if (node.matches("script,style,link,meta,[data-workspace-capture-ignore]")) return null;
-    const style = getComputedStyle(node);
+    const style = node.ownerDocument.defaultView!.getComputedStyle(node);
     const rect = node.getBoundingClientRect();
     const hiddenBranch =
       style.display === "none" || style.opacity === "0" || style.contentVisibility === "hidden";
@@ -190,29 +231,46 @@ export async function captureWorkspace(root: HTMLElement): Promise<WorkspaceSnap
       style.visibility !== "collapse" &&
       hasArea(intersection(rect, visibleClip));
     let result: Element;
-    if (node instanceof HTMLVideoElement || node instanceof HTMLCanvasElement)
+    if (isVideo(node) || isCanvas(node))
       result = visible ? imageFromCanvas(node) : document.createElement("img");
-    else if (node instanceof HTMLImageElement) result = document.createElement("img");
-    else if (visible && node.matches("iframe,object,embed")) {
+    else if (isImage(node)) result = document.createElement("img");
+    else if (
+      visible &&
+      node.tagName === "IFRAME" &&
+      readingCaptureDocument(node as HTMLIFrameElement)
+    ) {
+      const embedded = readingCaptureDocument(node as HTMLIFrameElement)!;
+      const localClip = intersection(
+        { left: 0, top: 0, right: rect.width, bottom: rect.height },
+        {
+          left: visibleClip.left - rect.left,
+          top: visibleClip.top - rect.top,
+          right: visibleClip.right - rect.left,
+          bottom: visibleClip.bottom - rect.top,
+        },
+      );
+      result = document.createElement("div");
+      const contents = clone(embedded.body, localClip);
+      if (contents) result.append(contents);
+      copyStyle(style, result as HTMLElement);
+      (result as HTMLElement).style.overflow = "hidden";
+      return result;
+    } else if (visible && node.matches("iframe,object,embed")) {
       throw new CaptureError(
         "CAPTURE_CONTENT_UNAVAILABLE",
         "当前嵌入内容无法截图，请在软件支持的资料视图中重试",
       );
     } else if (node.matches("iframe,object,embed")) result = document.createElement("div");
-    else if (
-      node instanceof HTMLInputElement ||
-      node instanceof HTMLTextAreaElement ||
-      node instanceof HTMLSelectElement
-    ) {
+    else if (["INPUT", "TEXTAREA", "SELECT"].includes(node.tagName)) {
       result = document.createElement("div");
       if (visible)
         result.textContent =
-          node instanceof HTMLSelectElement
-            ? node.selectedOptions[0]?.textContent || ""
-            : node.value || node.getAttribute("placeholder") || "";
+          node.tagName === "SELECT"
+            ? (node as HTMLSelectElement).selectedOptions[0]?.textContent || ""
+            : (node as HTMLInputElement).value || node.getAttribute("placeholder") || "";
     } else result = node.cloneNode(false) as Element;
     cleanAttributes(result);
-    if (result instanceof HTMLElement || result instanceof SVGElement) copyStyle(style, result);
+    if (styled(result)) copyStyle(style, result);
     if (visible) {
       for (const family of style.fontFamily.split(","))
         families.add(family.replaceAll(/["']/g, "").trim());
@@ -220,7 +278,7 @@ export async function captureWorkspace(root: HTMLElement): Promise<WorkspaceSnap
     if (!visible) {
       // Zero-height inline/table ancestors can paint visible descendants (for example KaTeX
       // fractions). Preserve their original geometry instead of resizing or pruning the branch.
-      if (result instanceof HTMLElement || result instanceof SVGElement) {
+      if (styled(result)) {
         for (const property of [
           "background-image",
           "mask-image",
@@ -232,20 +290,20 @@ export async function captureWorkspace(root: HTMLElement): Promise<WorkspaceSnap
           result.style.setProperty(property, "none", "important");
         result.style.cursor = "auto";
       }
-      if (result instanceof HTMLImageElement) result.removeAttribute("src");
+      if (isImage(result)) result.removeAttribute("src");
     }
-    if (visible && result instanceof HTMLImageElement && node instanceof HTMLImageElement) {
+    if (visible && isImage(result) && isImage(node)) {
       const source = node.currentSrc || node.src;
       result.removeAttribute("srcset");
       result.removeAttribute("loading");
       if (source)
         pending.push(
-          localResource(source, resources).then((data) => {
+          localResource(source, resources, node).then((data) => {
             result.setAttribute("src", data);
           }),
         );
     }
-    if (visible && (result instanceof HTMLElement || result instanceof SVGElement)) {
+    if (visible && styled(result)) {
       for (const property of ["background-image", "mask-image", "-webkit-mask-image"]) {
         const value = style.getPropertyValue(property);
         const matches = [...value.matchAll(/url\(["']?([^"')]+)["']?\)/g)];

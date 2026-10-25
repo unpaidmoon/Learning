@@ -19,6 +19,7 @@ class ExecutionBinding:
     native_turn: int | None = None
     accepted: bool = False
     status: str = "prepared"
+    native_lease_epoch: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -59,3 +60,16 @@ class ExecutionError(RuntimeError):
     def __init__(self, code: str):
         self.code = code
         super().__init__(code)
+
+
+@dataclass(frozen=True)
+class ExecutionPolicy:
+    """Immutable per-run transport settings; task authority is checked separately."""
+
+    model: str
+    thinking: str
+    max_output_tokens: int
+    timeout_seconds: float
+    allowed_tool_names: tuple[str, ...] = ()
+    allowed_image_sha256: tuple[str, ...] | None = None
+    exact_image_sequence: bool = False

@@ -1,0 +1,20 @@
+[package]
+name = "learning-fsrs-helper"
+version = "0.2.0"
+edition = "2021"
+publish = false
+license = "AGPL-3.0-or-later"
+description = "Bounded, stateless JSON adapter around the pinned DeepStudent scheduler"
+
+[dependencies]
+chrono = { version = "=0.4.41", default-features = false, features = ["std"] }
+chrono-tz = "=0.10.4"
+fsrs = "=6.6.2"
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.149"
+
+[profile.release]
+opt-level = "s"
+lto = "thin"
+codegen-units = 1
+strip = "symbols"

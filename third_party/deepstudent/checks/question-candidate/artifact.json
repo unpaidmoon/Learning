@@ -1,0 +1,174 @@
+{
+  "scope": "candidate-only",
+  "helper_version": "0.1.0",
+  "protocol_version": 1,
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "target": "x86_64-pc-windows-msvc",
+  "static_crt": true,
+  "command": [
+    "rustup",
+    "run",
+    "stable",
+    "cargo",
+    "rustc",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "D:\\Codex\\Learning\\third_party\\deepstudent\\checks\\question-candidate\\Cargo.toml",
+    "--release",
+    "--target",
+    "x86_64-pc-windows-msvc",
+    "--target-dir",
+    "D:\\Codex\\Learning\\.local\\cache\\workbench\\ds-question-candidate\\target",
+    "--bin",
+    "learning-question-helper",
+    "--",
+    "-C",
+    "target-feature=+crt-static"
+  ],
+  "binary_path": "D:\\Codex\\Learning\\.local\\cache\\workbench\\ds-question-candidate\\target\\x86_64-pc-windows-msvc\\release\\learning-question-helper.exe",
+  "binary_size": 449536,
+  "binary_sha256": "41edfcc367cc0d9b48738baeacbc96015c373649901a61483002df8d3a314654",
+  "dumpbin": "Microsoft (R) COFF/PE Dumper Version 14.44.35228.0",
+  "imported_dlls": [
+    "api-ms-win-core-synch-l1-2-0.dll",
+    "KERNEL32.dll",
+    "ntdll.dll"
+  ],
+  "input_limit_bytes": 262144,
+  "output_limit_bytes": 65536,
+  "source_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "9bf3fce87d9ecbe36c6e8f90602e89125f9e5d6eb8f7011ed42f5fbc64021f1d"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "77a46e8fc9d76f9fd731c43d802de9ae024a72aeee1323043a35d5e21273254e"
+    },
+    {
+      "path": "src/lib.rs",
+      "sha256": "0544aae49d63fae78adcfbe25c3423c234d93afe8de1f38cd01e27c6f8bc36c3"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "e1d08e2138bfb833f1764df0505e5a7e11775dad34006edb1e6267f6657861d4"
+    },
+    {
+      "path": "src/upstream_pure.rs",
+      "sha256": "23ec3b28a514f49e94d562e5cbbf41dd11a81448138b4ff54370906862534afe"
+    }
+  ],
+  "release_cases": 24,
+  "dependency_count": 11,
+  "dependency_manifest_sha256": "ad1a7440ed69a478b9124c644824de1d3912d4557f1463673cbf96894658808f",
+  "extraction_manifest_sha256": "85df246f92fa3ec8217646cf323a962e91d1d925c01268c8e9b7520640cb25ee",
+  "notices": [
+    {
+      "path": "notices/LICENSE.AGPL-3.0",
+      "sha256": "8943429804542a78e4f48d6a7ac6323f059a5a8540200eb0a2a9b3de7c33bf1d"
+    },
+    {
+      "path": "notices/PROJECT-ADAPTATION.txt",
+      "sha256": "b8e185c3e6c317029550d08251d048db8c4a5471c95ad58df64ba400eb7497c2"
+    },
+    {
+      "path": "notices/THIRD_PARTY_LICENSES.upstream.txt",
+      "sha256": "f995a88edcee3eaf93bbc883adb285621e3e0ae40d99468fa6cf56400ebdd6d1"
+    },
+    {
+      "path": "notices/THIRD_PARTY_NOTICES.txt",
+      "sha256": "57f9e3dba3fdd2bad5d59110af24118ee71deab5c5300349dca8a3eef790ee73"
+    },
+    {
+      "path": "notices/rust/itoa-1.0.17/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/itoa-1.0.17/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/memchr-2.8.0/COPYING",
+      "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+    },
+    {
+      "path": "notices/rust/memchr-2.8.0/LICENSE-MIT",
+      "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+    },
+    {
+      "path": "notices/rust/proc-macro2-1.0.106/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/proc-macro2-1.0.106/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/quote-1.0.47/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/quote-1.0.47/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/serde-1.0.228/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/serde-1.0.228/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/serde_core-1.0.228/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/serde_core-1.0.228/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/serde_derive-1.0.228/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/serde_derive-1.0.228/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/serde_json-1.0.149/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/serde_json-1.0.149/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/syn-2.0.119/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/syn-2.0.119/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/unicode-ident-1.0.23/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+    },
+    {
+      "path": "notices/rust/unicode-ident-1.0.23/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "notices/rust/unicode-ident-1.0.23/LICENSE-UNICODE",
+      "sha256": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1"
+    },
+    {
+      "path": "notices/rust/zmij-1.0.21/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    }
+  ]
+}

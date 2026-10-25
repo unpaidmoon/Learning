@@ -1,0 +1,16 @@
+{
+  "protocol_version": 1,
+  "request_id": "fixture_1",
+  "question": {
+    "question_id": "q1",
+    "question_revision_id": "revision_1",
+    "source_snapshot_ids": [
+      "selection_1"
+    ],
+    "question_type": "single_choice",
+    "reference_status": "ai_reference",
+    "answer": "A",
+    "structured_data": null
+  },
+  "user_answer": "A"
+}

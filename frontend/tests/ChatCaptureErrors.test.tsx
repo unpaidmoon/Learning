@@ -65,6 +65,7 @@ const source: CaptureSource = {
   initialCrop: { x: 10, y: 5, width: 20, height: 15 },
 };
 const savedText = "保留文字、题目条件与其他附件";
+const migratedText = savedText + "\n\n补充：\nx>0\n\n更正：\n改为x<3";
 let remoteDraft: Schema<"DraftResponse">;
 let ChatWorkspace: typeof import("../src/chat/ChatWorkspace").ChatWorkspace;
 let useDraft: typeof import("../src/chat/draft").useDraft;
@@ -171,8 +172,8 @@ describe("确认选区时可处理的业务拒绝", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "每次最多加入 8 张确认图片，请取消后移除其他图片。（ATTACHMENT_LIMIT）",
     );
-    expect(screen.getByLabelText("问题或追问")).toHaveValue(savedText);
-    expect(screen.getByLabelText("当前题目条件（每行一项）")).toHaveValue("x>0");
+    expect(screen.getByLabelText("问题或追问")).toHaveValue(migratedText);
+    expect(screen.queryByLabelText("当前题目条件（每行一项）")).not.toBeInTheDocument();
     expect(screen.getAllByAltText(/待发送的确认图片/)).toHaveLength(8);
     expect(screen.getByLabelText("选区左侧")).toHaveValue(10);
     expect(screen.getByLabelText("选区宽度")).toHaveValue(20);
@@ -202,7 +203,7 @@ describe("确认选区时可处理的业务拒绝", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "原附件已移除，请取消后重新选择。（ATTACHMENT_REPLACEMENT_STALE）",
     );
-    expect(screen.getByLabelText("问题或追问")).toHaveValue(savedText);
+    expect(screen.getByLabelText("问题或追问")).toHaveValue(migratedText);
     expect(screen.getByAltText("待发送的确认图片 1")).toHaveAttribute(
       "src",
       "/api/v1/attachments/other-confirmed",

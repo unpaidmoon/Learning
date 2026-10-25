@@ -24,6 +24,7 @@ coverage/
 .coverage.*
 htmlcov/
 playwright-report/
+.playwright-cli/
 test-results/
 output/playwright/
 
@@ -33,6 +34,8 @@ output/playwright/
 .local/
 .codex-attachments/
 data/
+!frontend/src/data/
+!frontend/src/data/**
 models/
 model-cache/
 .dsh/

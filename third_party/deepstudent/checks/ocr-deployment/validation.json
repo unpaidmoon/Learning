@@ -1,0 +1,116 @@
+{
+  "manifest_version": 1,
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "scope": "fixed OCR resources and explicit import candidate; not product acceptance",
+  "release_id": "ocr-node24-win-x64-20261023-r1",
+  "runtime_lock": "resources/workbench/ocr-runtime.lock.json",
+  "runtime_lock_sha256": "791d2c84c38bb1d932f57b48510fee53b445b155952ef08f34f8b2a581cb3cb2",
+  "package_lock": "resources/workbench/ocr-package-lock.json",
+  "package_lock_sha256": "1faada74b7ed6090ad5a63a706554739619bae2cb4874f5fdeb13eb466a5b789",
+  "checks": [
+    {
+      "command": "backend/.venv/Scripts/python.exe .local/cache/workbench/ocr-deployment/prepare_lock.py",
+      "status": "passed",
+      "node_packages": 13,
+      "language_models": 2,
+      "locked_install_files": 266,
+      "install_bytes": 41821379,
+      "all_npm_archives_sri_and_sha256_verified": true,
+      "canonical_tarball_files_match_existing_cache_bytes": true,
+      "core_js_wasm_files_matching_fixed_public_git_blobs": 12,
+      "language_gzip_files_matching_fixed_public_git_blobs": 2,
+      "note": "Archive verification during preparation, per-file verification during import; package URL/SRI/SHA256 and installed paths preserved in the formal lock."
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe -m unittest -v test_import_runtime.py (cwd=third_party/deepstudent/checks/ocr-deployment)",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "coverage": [
+        "all source hashes checked before any destination writes",
+        "mismatched destination preserved without overwrite",
+        "unmanaged existing files preserved without deletion",
+        "matching partial import completed",
+        "repeat import does not rewrite matching files",
+        "changed install record rejected",
+        "verify does not implicitly recover missing files or read source cache",
+        "unsafe paths and unowned destination rejected"
+      ],
+      "test_directories_preserved": true
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe third_party/deepstudent/checks/ocr-deployment/import_runtime.py --import-from D:/Codex/Learning/.local/cache/workbench/reading-audit",
+      "status": "passed",
+      "destination": ".runtime/workbench/ocr",
+      "created_files": 266,
+      "downloaded_files": 0,
+      "deleted_files_or_directories": 0,
+      "npm_or_other_install_scripts_executed": false
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe third_party/deepstudent/checks/ocr-deployment/import_runtime.py --verify-only",
+      "status": "passed",
+      "when": "before and after the standalone OCR smoke",
+      "verified_files": 266,
+      "source_cache_argument": null
+    },
+    {
+      "command": ".tools/node/node.exe third_party/deepstudent/checks/ocr-deployment/smoke.cjs (cwd=.runtime/workbench/ocr; child NODE_PATH removed)",
+      "status": "passed",
+      "node": "v24.14.0",
+      "tesseract_js": "6.0.1",
+      "core": "6.0.0",
+      "observed_engine": "5.1.0-284-g9c08",
+      "code_resolution": [
+        ".runtime/workbench/ocr/node_modules/tesseract.js/src/index.js",
+        ".runtime/workbench/ocr/node_modules/tesseract.js-core/index.js"
+      ],
+      "model_directory": ".runtime/workbench/ocr/models",
+      "synthetic_fixture_sha256": "2a6dcb822a5b3e80e6178418f5ba40d023402a73e7bb69c66e90af67a3cdc5da",
+      "word_count": 14,
+      "tsv": true,
+      "hocr": true,
+      "audit_cache_path_passed_to_worker": false,
+      "raw_results": ".local/cache/workbench/ocr-deployment-tests/smoke-result.json",
+      "stderr": ".local/cache/workbench/ocr-deployment-tests/smoke-stderr.txt",
+      "note": "Only the copied runtime and a separately copied fixed synthetic image were supplied. This is resource/runtime evidence, not OCR accuracy or product queue acceptance."
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe -m ruff check --select E4,E7,E9,F,I --fix third_party/deepstudent/checks/ocr-deployment/import_runtime.py third_party/deepstudent/checks/ocr-deployment/test_import_runtime.py",
+      "status": "passed",
+      "note": "Three import/unused-import findings fixed; no functional code change."
+    }
+  ],
+  "notice_provenance": {
+    "formal_directory": "resources/workbench/notices/ocr",
+    "tr46_original_package_commit": "a8009f9ce80ff5dbe71dd71e203afe4e4c878d28",
+    "tr46_supplemental_upstream_license_commit": "3a6f29721e7063b9ffd421e461a54beae6170001",
+    "tr46_license_body_first_added": "2016-08-02; later than npm0.0.3, not misrepresented as shipped in that package",
+    "model_packaging_commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+    "tessdata_best_submodule_commit": "e9f15884bc503cf905c8a1dbbc9cb14458152628",
+    "traineddata_upstream_license": "Apache-2.0, original README and LICENSE archived",
+    "language_npm_metadata_license": "MIT, original package metadata and generator preserved separately",
+    "no_relicensing_assumption": true,
+    "native_source_component_notices": 9,
+    "quantization_or_training_reproduced": false,
+    "final_distribution_legal_compatibility_assessment": "not_run"
+  },
+  "not_run": [
+    "formal project installer and engines.lock integration",
+    "application-owned Node worker interface and resource lifecycle",
+    "page permission guard and source-version binding",
+    "active cancellation promise settlement and stale callback guard",
+    "persistent queue, current-page priority, pause/resume and browser-close persistence",
+    "real materials OCR, mathematical or handwritten accuracy and user learning experience",
+    "clean user-machine installer and offline product package"
+  ],
+  "known_prior_observations_preserved": [
+    "Synthetic mixed Chinese output had errors under initial settings and scanned-page rendering retained an extra character after adaptation.",
+    "Upstream Tesseract.js terminate resolves while the original recognition promise remains pending; application wrapper must settle cancellation."
+  ],
+  "llm_or_cloud_model_calls": 0,
+  "local_ocr_inference_executed": true,
+  "private_user_materials_or_screen_video_read": false,
+  "backend_frontend_harness_or_engines_lock_modified": false
+}

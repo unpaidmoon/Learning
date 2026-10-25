@@ -1,0 +1,286 @@
+{
+  "date": "2026-10-23",
+  "sources": [
+    {
+      "path": "tr46-0.0.3/LICENSE.upstream-20160802.txt",
+      "repository": "jsdom/tr46",
+      "commit": "3a6f29721e7063b9ffd421e461a54beae6170001",
+      "source_path": "LICENSE.md",
+      "git_blob_sha1": "e90f20a5cc7763e1ad07e5c15c193c51cdf3182b",
+      "source_url": "https://github.com/jsdom/tr46/blob/3a6f29721e7063b9ffd421e461a54beae6170001/LICENSE.md",
+      "role": "supplemental upstream text first added after npm 0.0.3"
+    },
+    {
+      "path": "models/tessdata_best-LICENSE.Apache-2.0.txt",
+      "repository": "tesseract-ocr/tessdata_best",
+      "commit": "e9f15884bc503cf905c8a1dbbc9cb14458152628",
+      "source_path": "LICENSE",
+      "git_blob_sha1": "d9a10c0d8e868ebf8da0b3dc95bb0be634c34bfe",
+      "source_url": "https://github.com/tesseract-ocr/tessdata_best/blob/e9f15884bc503cf905c8a1dbbc9cb14458152628/LICENSE",
+      "role": "original model provenance notice"
+    },
+    {
+      "path": "models/tessdata_best-README.upstream.txt",
+      "repository": "tesseract-ocr/tessdata_best",
+      "commit": "e9f15884bc503cf905c8a1dbbc9cb14458152628",
+      "source_path": "README.md",
+      "git_blob_sha1": "90ab65b4bab1c14c202ce685a85cb223d54d3de0",
+      "source_url": "https://github.com/tesseract-ocr/tessdata_best/blob/e9f15884bc503cf905c8a1dbbc9cb14458152628/README.md",
+      "role": "original model provenance notice"
+    },
+    {
+      "path": "models/gen-pkg.js.upstream.txt",
+      "repository": "naptha/tessdata",
+      "commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+      "source_path": "scripts/gen-pkg.js",
+      "git_blob_sha1": "180fbf428c1e7cd683319b5cacccdca1352e99e6",
+      "source_url": "https://github.com/naptha/tessdata/blob/b86746569320a6103cea84cc2b8d9ee74f0f45d3/scripts/gen-pkg.js",
+      "role": "original model provenance notice"
+    },
+    {
+      "path": "models/gzip-integerize-traineddata.sh.upstream.txt",
+      "repository": "naptha/tessdata",
+      "commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+      "source_path": "gzip-integerize-traineddata.sh",
+      "git_blob_sha1": "9033e777ee83db88dea75c3110f473ef5e407345",
+      "source_url": "https://github.com/naptha/tessdata/blob/b86746569320a6103cea84cc2b8d9ee74f0f45d3/gzip-integerize-traineddata.sh",
+      "role": "original model provenance notice"
+    },
+    {
+      "path": "models/tessdata-gitmodules.upstream.txt",
+      "repository": "naptha/tessdata",
+      "commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+      "source_path": ".gitmodules",
+      "git_blob_sha1": "561b7eeac78413de6cda33f613d05b0eac0f88d5",
+      "source_url": "https://github.com/naptha/tessdata/blob/b86746569320a6103cea84cc2b8d9ee74f0f45d3/.gitmodules",
+      "role": "original model provenance notice"
+    },
+    {
+      "path": "native/leptonica/NOTICE.upstream.txt",
+      "repository": "DanBloomberg/leptonica",
+      "commit": "4af068b56a9674da915debea4ed7e1b9885b17e8",
+      "source_path": "leptonica-license.txt",
+      "git_blob_sha1": "73d44c601c0746534128804c3fb0b93772897f82",
+      "source_url": "https://github.com/DanBloomberg/leptonica/blob/4af068b56a9674da915debea4ed7e1b9885b17e8/leptonica-license.txt",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/giflib/NOTICE.upstream.txt",
+      "repository": "mirrorer/giflib",
+      "commit": "fa37672085ce4b3d62c51627ab3c8cf2dda8009a",
+      "source_path": "COPYING",
+      "git_blob_sha1": "b9c0b50126076f30f0f9db7e940eac64e60febd6",
+      "source_url": "https://github.com/mirrorer/giflib/blob/fa37672085ce4b3d62c51627ab3c8cf2dda8009a/COPYING",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/libwebp-copying/NOTICE.upstream.txt",
+      "repository": "webmproject/libwebp",
+      "commit": "20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c",
+      "source_path": "COPYING",
+      "git_blob_sha1": "7a6f99547d4d6b4c5e6d5321acfaeba313e08de3",
+      "source_url": "https://github.com/webmproject/libwebp/blob/20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c/COPYING",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/libwebp-patents/NOTICE.upstream.txt",
+      "repository": "webmproject/libwebp",
+      "commit": "20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c",
+      "source_path": "PATENTS",
+      "git_blob_sha1": "caedf607e95ae4c3dc84d057fddcc301cd0e4863",
+      "source_url": "https://github.com/webmproject/libwebp/blob/20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c/PATENTS",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/tesseract/NOTICE.upstream.txt",
+      "repository": "Balearica/tesseract",
+      "commit": "5a21eebeacd77dd181eec17317de7e3a20b7b9fb",
+      "source_path": "LICENSE",
+      "git_blob_sha1": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+      "source_url": "https://github.com/Balearica/tesseract/blob/5a21eebeacd77dd181eec17317de7e3a20b7b9fb/LICENSE",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/openlibm/NOTICE.upstream.txt",
+      "repository": "JuliaMath/openlibm",
+      "commit": "ae2d91698508701c83cab83714d42a1146dccf85",
+      "source_path": "LICENSE.md",
+      "git_blob_sha1": "d76019ef1d1e038a7d43b3389cdb23789896651d",
+      "source_url": "https://github.com/JuliaMath/openlibm/blob/ae2d91698508701c83cab83714d42a1146dccf85/LICENSE.md",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/zlib/NOTICE.upstream.txt",
+      "repository": "madler/zlib",
+      "commit": "21767c654d31d2dccdde4330529775c6c5fd5389",
+      "source_path": "README",
+      "git_blob_sha1": "024b79d3d8c8b84ceaab461e04a9a7d3c6d46bb9",
+      "source_url": "https://github.com/madler/zlib/blob/21767c654d31d2dccdde4330529775c6c5fd5389/README",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/libjpeg/NOTICE.upstream.txt",
+      "repository": "LuaDist/libjpeg",
+      "commit": "6c0fcb8ddee365e7abc4d332662b06900612e923",
+      "source_path": "README",
+      "git_blob_sha1": "014ad3017424327607d157a1a33307294d754aeb",
+      "source_url": "https://github.com/LuaDist/libjpeg/blob/6c0fcb8ddee365e7abc4d332662b06900612e923/README",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/core-build.upstream.txt",
+      "repository": "naptha/tesseract.js-core",
+      "commit": "8135c61fadee753821cb6a9916e17e1309a6bbf7",
+      "source_path": "build.sh",
+      "git_blob_sha1": "bd0802250afacd8dd503c63286c80a231c8edb95",
+      "source_url": "https://github.com/naptha/tesseract.js-core/blob/8135c61fadee753821cb6a9916e17e1309a6bbf7/build.sh",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/core-gitmodules.upstream.txt",
+      "repository": "naptha/tesseract.js-core",
+      "commit": "8135c61fadee753821cb6a9916e17e1309a6bbf7",
+      "source_path": ".gitmodules",
+      "git_blob_sha1": "b499765bfe2cfdd732cbd637130ef575cd5e5d7c",
+      "source_url": "https://github.com/naptha/tesseract.js-core/blob/8135c61fadee753821cb6a9916e17e1309a6bbf7/.gitmodules",
+      "role": "original native component source notice or build provenance"
+    },
+    {
+      "path": "native/libtiff/COPYRIGHT.upstream.txt",
+      "repository": "https://gitlab.com/libtiff/libtiff",
+      "commit": "b51bb157123264e26d34c09cc673d213aea61fc7",
+      "source_path": "COPYRIGHT",
+      "source_url": "https://gitlab.com/libtiff/libtiff/-/raw/b51bb157123264e26d34c09cc673d213aea61fc7/COPYRIGHT",
+      "role": "original native source notice"
+    },
+    {
+      "path": "native/libpng/NOTICE.upstream.txt",
+      "repository": "pnggroup/libpng",
+      "commit": "a37d4836519517bdce6cb9d956092321eca3e73b",
+      "source_path": "LICENSE",
+      "git_blob_sha1": "93fe2348627df3d44f878a141818f148791928e2",
+      "source_url": "https://github.com/pnggroup/libpng/blob/a37d4836519517bdce6cb9d956092321eca3e73b/LICENSE",
+      "role": "original native component source notice; repository redirects from glennrp/libpng"
+    }
+  ],
+  "native_source_submodules_at_core_npm_gitHead": [
+    {
+      "path": "giflib",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "fa37672085ce4b3d62c51627ab3c8cf2dda8009a"
+    },
+    {
+      "path": "leptonica",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "4af068b56a9674da915debea4ed7e1b9885b17e8"
+    },
+    {
+      "path": "libjpeg",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "6c0fcb8ddee365e7abc4d332662b06900612e923"
+    },
+    {
+      "path": "libpng",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "a37d4836519517bdce6cb9d956092321eca3e73b"
+    },
+    {
+      "path": "libtiff",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "b51bb157123264e26d34c09cc673d213aea61fc7"
+    },
+    {
+      "path": "libwebp",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c"
+    },
+    {
+      "path": "openlibm",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "ae2d91698508701c83cab83714d42a1146dccf85"
+    },
+    {
+      "path": "tesseract",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "5a21eebeacd77dd181eec17317de7e3a20b7b9fb"
+    },
+    {
+      "path": "zlib",
+      "mode": "160000",
+      "type": "commit",
+      "sha": "21767c654d31d2dccdde4330529775c6c5fd5389"
+    }
+  ],
+  "actual_core_package_files_match_source_git_blobs": [
+    {
+      "path": "tesseract-core-lstm.js",
+      "git_blob_sha1": "f53418211ca6f714d5a061ae94a2f2579adcde93",
+      "sha256": "48a3ee8e00924cb8c7f0cc0d099b1318fea120af56b3ee8fb3a70dd2311806c2"
+    },
+    {
+      "path": "tesseract-core-lstm.wasm",
+      "git_blob_sha1": "e5f7e2a4fd53a4a277069dd46951aecefd0492aa",
+      "sha256": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b"
+    },
+    {
+      "path": "tesseract-core-lstm.wasm.js",
+      "git_blob_sha1": "98e27db70996a18d3101710d04496eddb96e1799",
+      "sha256": "775a35df6f2ae100e02609443e6bd5cafcd07983dd6175454ca4a432a7730687"
+    },
+    {
+      "path": "tesseract-core-simd-lstm.js",
+      "git_blob_sha1": "37c7e37bf6c7a4716aa474cf389f3c3b4c5390a3",
+      "sha256": "be3504705d7111d1d1f3f7f9dff326c26d334031ede36e31c4d3cf883027e982"
+    },
+    {
+      "path": "tesseract-core-simd-lstm.wasm",
+      "git_blob_sha1": "e3e16610b1d7e00fb98c36717c1f727570bc9a28",
+      "sha256": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d"
+    },
+    {
+      "path": "tesseract-core-simd-lstm.wasm.js",
+      "git_blob_sha1": "9dae06195e3bf8803cf369e449fb80612053aee0",
+      "sha256": "9d7c43fb206dc9f48475228b46bf35f888fa9e6259da2e67d5a75c77049f2dc7"
+    },
+    {
+      "path": "tesseract-core-simd.js",
+      "git_blob_sha1": "1a0d7d8729924ba848f57cc0a1cecb5733315511",
+      "sha256": "85762abcc52bc6f4762b1429e2986c8ea963db76632770970c0485fb6d6aa820"
+    },
+    {
+      "path": "tesseract-core-simd.wasm",
+      "git_blob_sha1": "ffe4e980f6533a5ffb8250ef8a1ef921818e2f5d",
+      "sha256": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b"
+    },
+    {
+      "path": "tesseract-core-simd.wasm.js",
+      "git_blob_sha1": "80a86995ad7a83e5504356e36abca743f374e27d",
+      "sha256": "3b0678c47a8dea6abb931b214171c08b742a5b9a9fcbbb1a028a08d5de6e9d4c"
+    },
+    {
+      "path": "tesseract-core.js",
+      "git_blob_sha1": "d8776fee0d7c9a167eee15ff6e0ce29f73dbce5e",
+      "sha256": "8d7d9776c8552951f8d3bb903dafb22d4e2e065564d7e1b3d523383670a94ecd"
+    },
+    {
+      "path": "tesseract-core.wasm",
+      "git_blob_sha1": "1296a59c8ab8aedf5a4c0ec4d5fd7b1ef2d509e2",
+      "sha256": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106"
+    },
+    {
+      "path": "tesseract-core.wasm.js",
+      "git_blob_sha1": "0e4fb94931e99de77efe4a6310f1b358ff2a7426",
+      "sha256": "e66872f6a76f5ad414d73d21512245df0de3060ad4871a97c47efceaab27b955"
+    }
+  ],
+  "license_distinction": "npm language package metadata says MIT. Original tessdata_best README says all model data Apache-2.0. Both original statements and Apache text are preserved; no MIT relicensing assumption is made.",
+  "tr46_notice_limitation": "MIT was declared by the original 0.0.3 package; upstream first added the original full MIT file later in 2016. The exact later source is identified, not misdated."
+}

@@ -124,6 +124,103 @@ describe("当前软件视口冻结边界", () => {
     expect(rendered).toHaveLength(0);
   });
 
+  it("原生题图的本地Blob只冻结已显示像素，不经被CSP禁止的fetch读取", async () => {
+    const root = document.createElement("main");
+    const image = document.createElement("img");
+    image.src = `blob:${location.origin}/confirmed-question`;
+    Object.defineProperties(image, {
+      complete: { value: true },
+      naturalWidth: { value: 480 },
+      naturalHeight: { value: 200 },
+    });
+    root.append(image);
+    document.body.append(root);
+    box(root, 0, 0, 320, 200);
+    box(image, 0, 0, 240, 100);
+    vi.mocked(fetch).mockRejectedValue(new TypeError("connect-src self denies blob fetch"));
+    await captureWorkspace(root);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(draw).toHaveBeenNthCalledWith(1, image, 0, 0, 480, 200);
+    const svg = decodeURIComponent(rendered[0].slice(rendered[0].indexOf(",") + 1));
+    expect(svg).toContain("data:image/png;base64,c3ludGhldGlj");
+    expect(svg).not.toContain("blob:");
+  });
+
+  it("Blob图片未完成解码时明确拒绝，不补读其他画面", async () => {
+    const root = document.createElement("main");
+    const image = document.createElement("img");
+    image.src = `blob:${location.origin}/pending-question`;
+    Object.defineProperty(image, "complete", { value: false });
+    root.append(image);
+    document.body.append(root);
+    box(root, 0, 0, 320, 200);
+    box(image, 0, 0, 240, 100);
+    vi.mocked(fetch).mockRejectedValue(new TypeError("connect-src self denies blob fetch"));
+    await expect(captureWorkspace(root)).rejects.toMatchObject({
+      code: "CAPTURE_RESOURCE_UNAVAILABLE",
+    });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(draw).not.toHaveBeenCalled();
+  });
+
+  it("可见CSS本地Blob通过图片解码冻结，不放宽连接权限", async () => {
+    vi.stubGlobal("Image", function () {
+      const image = document.createElement("img");
+      Object.defineProperties(image, {
+        complete: { value: true },
+        naturalWidth: { value: 40 },
+        naturalHeight: { value: 20 },
+        src: {
+          set(value: string) {
+            rendered.push(value);
+            queueMicrotask(() => image.dispatchEvent(new Event("load")));
+          },
+        },
+      });
+      return image;
+    });
+    const root = document.createElement("main");
+    const background = document.createElement("div");
+    background.style.backgroundImage = `url("blob:${location.origin}/visible-icon")`;
+    root.append(background);
+    document.body.append(root);
+    box(root, 0, 0, 320, 200);
+    box(background, 0, 0, 100, 50);
+    await captureWorkspace(root);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(rendered[0]).toBe(`blob:${location.origin}/visible-icon`);
+    const svg = decodeURIComponent(rendered[1].slice(rendered[1].indexOf(",") + 1));
+    expect(svg).toContain("data:image/png;base64,c3ludGhldGlj");
+    expect(svg).not.toContain("blob:");
+    expect(draw).toHaveBeenCalledTimes(2);
+  });
+
+  it("外部Blob与屏外Blob都不成为读取权限", async () => {
+    const root = document.createElement("main");
+    const image = document.createElement("img");
+    image.src = "blob:https://outside.invalid/private-picture";
+    Object.defineProperties(image, {
+      complete: { value: true },
+      naturalWidth: { value: 200 },
+      naturalHeight: { value: 100 },
+    });
+    root.append(image);
+    document.body.append(root);
+    box(root, 0, 0, 320, 200);
+    box(image, 0, 0, 200, 100);
+    await expect(captureWorkspace(root)).rejects.toMatchObject({
+      code: "CAPTURE_EXTERNAL_RESOURCE",
+    });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(draw).not.toHaveBeenCalled();
+    box(image, 0, 500, 200, 100);
+    await captureWorkspace(root);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(draw).toHaveBeenCalledTimes(1);
+    const svg = decodeURIComponent(rendered[0].slice(rendered[0].indexOf(",") + 1));
+    expect(svg).not.toContain("outside.invalid");
+  });
+
   it("零高公式骨架与屏外偏移祖先保留真实可见子孙，不改写基线几何", async () => {
     const root = document.createElement("main");
     root.innerHTML =

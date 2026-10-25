@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "request_id": "fixture-paused",
+  "operation": {
+    "type": "eligibility",
+    "now_ms": 1790866800000,
+    "due_ms": 1790866800000,
+    "suspended": true,
+    "removed": false
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "playwright_cli_version": "0.1.22",
+  "browser": "155.0.8059.81",
+  "file_entrypoint": "verification/unpacked-r1/index.html",
+  "network_scope": "Browser context offline plus HTTP(S) route abort; no application backend started or called",
+  "before_reload": {
+    "phase": "all_interactions_before_reload",
+    "browser": "155.0.8059.81",
+    "checkpoints": [
+      {
+        "phase": "selftest",
+        "choiceGrade": "correct",
+        "writtenGrade": "ungraded",
+        "writtenRevealed": true,
+        "openCards": 1,
+        "storageWrites": [],
+        "diagnostics": {
+          "renderedPages": [
+            "page-graph",
+            "page-practice"
+          ],
+          "renderedBlockIds": [
+            "b-text",
+            "b-figure",
+            "b-plot",
+            "b-quiz",
+            "b-cards",
+            "b-note"
+          ],
+          "quizTypes": [
+            "choice",
+            "written"
+          ],
+          "policyViolations": [],
+          "errors": []
+        }
+      },
+      {
+        "phase": "parameter_restored_after_chapter_switch",
+        "a": "2",
+        "x0": "2",
+        "slope": "8",
+        "offline": true,
+        "storageWrites": []
+      }
+    ],
+    "observations": {
+      "requests": [
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html",
+          "resourceType": "document"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/vendor/katex/katex.min.css",
+          "resourceType": "stylesheet"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/runtime/reader.css",
+          "resourceType": "stylesheet"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/vendor/katex/katex.min.js",
+          "resourceType": "script"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/runtime/upstream.js",
+          "resourceType": "script"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/runtime/reader.js",
+          "resourceType": "script"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/vendor/katex/fonts/KaTeX_Math-Italic.woff2",
+          "resourceType": "font"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/vendor/katex/fonts/KaTeX_Main-Regular.woff2",
+          "resourceType": "font"
+        },
+        {
+          "url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/assets/parabola-secant.svg",
+          "resourceType": "image"
+        }
+      ],
+      "failedRequests": [],
+      "webSockets": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "dialogs": []
+    },
+    "document": {
+      "offline": true,
+      "storageWrites": [],
+      "diagnostics": {
+        "renderedPages": [
+          "page-graph",
+          "page-practice",
+          "page-graph"
+        ],
+        "renderedBlockIds": [
+          "b-text",
+          "b-figure",
+          "b-plot",
+          "b-quiz",
+          "b-cards",
+          "b-note",
+          "b-text",
+          "b-figure",
+          "b-plot"
+        ],
+        "quizTypes": [
+          "choice",
+          "written"
+        ],
+        "policyViolations": [],
+        "errors": []
+      },
+      "fontsStatus": "loaded"
+    }
+  },
+  "after_reload": {
+    "phase": "after_reload",
+    "ready": "true",
+    "offline": true,
+    "currentPage": "page-graph",
+    "a": "1",
+    "x0": "1",
+    "slope": "2",
+    "storageWrites": [],
+    "mathErrors": 0,
+    "diagnostics": {
+      "renderedPages": [
+        "page-graph"
+      ],
+      "renderedBlockIds": [
+        "b-text",
+        "b-figure",
+        "b-plot"
+      ],
+      "quizTypes": [],
+      "policyViolations": [],
+      "errors": []
+    }
+  },
+  "harness_failures": [
+    {
+      "stage": "quiz_locator_parser",
+      "result": "failed",
+      "reason": "Snapshot parser expected [ref] immediately after a button label; the CLI included [active] first",
+      "retest_change": "Accept intervening snapshot state markers; resnapshot and continue with exact current refs",
+      "tool_output_note": "Prior actual wrong-answer check returned grade=incorrect; application remained usable"
+    }
+  ]
+}

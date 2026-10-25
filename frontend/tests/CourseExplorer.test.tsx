@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CourseExplorer } from "../src/library/CourseExplorer";
@@ -49,6 +49,48 @@ afterEach(() => {
 });
 
 describe("精简课程侧栏", () => {
+  it("后台恢复后的列表读取清除旧连接提示，不派发文件修改", async () => {
+    const request = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+      .mockImplementation(() => response(listing()));
+    vi.stubGlobal("fetch", request);
+    const callbacks = props();
+    const view = render(<CourseExplorer {...callbacks} />);
+    await screen.findByRole("alert");
+    view.rerender(<CourseExplorer {...callbacks} revision={1} />);
+    await screen.findByRole("button", { name: "说明.txt" });
+    await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
+    expect(
+      request.mock.calls.every(([, options]) => !options?.method || options.method === "GET"),
+    ).toBe(true);
+  });
+
+  it("缺少原件时重新定位并保留旧版本未匹配提示", async () => {
+    let current = {
+      ...listing(),
+      root_status: "missing" as const,
+      entries: [],
+    } as Schema<"CourseFileListResponse">;
+    const request = vi.fn((url: string, options?: RequestInit) => {
+      if (url.endsWith("/root/relocate")) {
+        const body = JSON.parse(String(options?.body));
+        expect(body.expected_root).toBe("D:/synthetic/course-root");
+        expect(body.operation_id).toMatch(/^[A-Za-z0-9_-]+$/);
+        expect(body.path).toBeUndefined();
+        current = listing();
+        return response({ state: "completed", unavailable_versions: ["old-version"] });
+      }
+      return response(current);
+    });
+    vi.stubGlobal("fetch", request);
+    render(<CourseExplorer {...props()} />);
+    await userEvent.click(await screen.findByRole("button", { name: "重新定位课程原件" }));
+    expect(await screen.findByText(/1 个旧版本仍不可用/)).toBeInTheDocument();
+    expect(request.mock.calls.filter(([url]) => url.endsWith("/root/relocate"))).toHaveLength(1);
+    expect(request.mock.calls.some(([url]) => url.endsWith("/root"))).toBe(false);
+  });
+
   it("仅保留课程操作和文件浏览，目录选择通知中间文件页", async () => {
     const callbacks = props();
     vi.stubGlobal(

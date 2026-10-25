@@ -40,6 +40,9 @@ class HarnessHost:
         timeout: float = 240,
         account_enabled: bool = False,
         home_directory: Path | None = None,
+        desktop_enabled: bool = False,
+        business_url: str | None = None,
+        business_token: str | None = None,
     ) -> None:
         import secrets
 
@@ -48,6 +51,11 @@ class HarnessHost:
         self.model, self.thinking = model, thinking
         self.max_tokens, self.timeout = max_tokens, timeout
         self.account_enabled = account_enabled
+        self.desktop_enabled = desktop_enabled
+        self.business_url, self._business_token = business_url, business_token
+        self._released_native_runs: set[str] = set()
+        self._execution_policy_history: dict[str, dict] = {}
+        self.reconcile_only_runs: set[str] = set()
         self.workspace, self.home = self.run_dir / "workspace", self.run_dir / "home"
         if home_directory is not None:
             self.home = home_directory.resolve()
@@ -60,6 +68,7 @@ class HarnessHost:
         self._changed = threading.Event()
         self.process = None
         self.cleanup: dict = {}
+        self.execution_policies: dict[str, dict] = {}
 
     def _environment(self) -> dict[str, str]:
         # Deliberately do not inherit provider keys, user hooks or global Node options.
@@ -93,13 +102,25 @@ class HarnessHost:
             LEARNING_HARNESS_AUDIT_PATH=str(self.run_dir / "private" / "plugin-audit.jsonl"),
             LEARNING_HARNESS_CONTROL_PORT=str(self.control_port),
             LEARNING_HARNESS_CONTROL_TOKEN=self._control_token,
+            LEARNING_HARNESS_EXECUTION_POLICIES_PATH=str(
+                self.run_dir / "private" / "execution-policies.json"
+            ),
             LEARNING_HARNESS_ACCOUNT_ENABLED="1" if self.account_enabled else "0",
+            LEARNING_HARNESS_WORKSPACE_RELOCATIONS=str(self.run_dir.parent / "workspace-relocations.json"),
             PKG_NATIVE_CACHE_PATH=str(
                 self.repository
                 / ".runtime"
                 / "hn"
                 / hashlib.sha256(str(self.run_dir).encode()).hexdigest()[:10]
             ),
+        )
+        if self.business_url and self._business_token:
+            env.update(
+                LEARNING_HARNESS_BUSINESS_URL=self.business_url,
+                LEARNING_HARNESS_BUSINESS_TOKEN=self._business_token,
+            )
+        env["LEARNING_HARNESS_RECONCILE_RUNS_PATH"] = str(
+            self.run_dir / "private/reconcile-runs.json"
         )
         return env
 
@@ -118,6 +139,13 @@ class HarnessHost:
             raise ExecutionError("HARNESS_ARTIFACT_HASH_MISMATCH")
         for directory in (self.home, self.workspace, self.run_dir / "private"):
             directory.mkdir(parents=True, exist_ok=True)
+        (self.run_dir / "private" / "execution-policies.json").write_text(
+            json.dumps(list(self.execution_policies.values())),
+            encoding="utf-8",
+        )
+        (self.run_dir / "private/reconcile-runs.json").write_text(
+            json.dumps(sorted(self.reconcile_only_runs)), encoding="utf-8"
+        )
         profile = (self.repository / "harness/profiles/learning.patch.json").read_text("utf-8")
         replacements = {
             "__BOUNDARY_URL__": self.boundary_url,
@@ -130,9 +158,17 @@ class HarnessHost:
         profile = profile.replace('"__MAX_TOKENS__"', str(self.max_tokens))
         profile = profile.replace('"__TIMEOUT_MS__"', str(int(self.timeout * 1000)))
         effective_profile = json.loads(profile)
+        if not self.business_url:
+            for item in effective_profile:
+                if item.get("id") == "tool-skill":
+                    item["disabled"] = True
         if self.account_enabled:
             for item in effective_profile:
-                if item.get("id") in {"account-controller", "deepseek-account", "llm-deepseek-account"}:
+                if item.get("id") in {
+                    "account-controller",
+                    "deepseek-account",
+                    "llm-deepseek-account",
+                }:
                     item["disabled"] = False
                 if item.get("id") == "deepseek-account":
                     item["config"] = {
@@ -153,7 +189,8 @@ class HarnessHost:
         provider["config"]["models"] = [
             {
                 **{key: value for key, value in template.items() if key != "systemPromptUpdate"},
-                "id": choice, "name": choice,
+                "id": choice,
+                "name": choice,
                 "inputModalities": ["text", "image"] if supports_images(choice) else ["text"],
                 # The pinned Host cannot represent the newer leading-only
                 # metadata. Do not declare its sole in-history value for pro;
@@ -217,12 +254,181 @@ class HarnessHost:
                     )
                     response.raise_for_status()
                     value = response.json()
-                    if value.get("tools") != []:
+                    expected = (
+                        [
+                            "admit_requested_artifact",
+                            "read_document_region",
+                            "read_nearby_subtitles",
+                            "read_research_page",
+                            "read_source_handle",
+                            "search_course_concept",
+                            "search_research_web",
+                            "skill",
+                            "stage_result",
+                        ]
+                        if self.business_url
+                        else []
+                    )
+                    if sorted(value.get("tools", [])) != expected:
                         raise ExecutionError("HARNESS_UNEXPECTED_TOOLS")
+                    if value.get("continuationRoutingVersion") != 1:
+                        raise ExecutionError("HARNESS_CONTINUATION_PROTOCOL_MISMATCH")
+                    if self.business_url and (
+                        value.get("businessBridgeVersion") != 1 or "nativeAttempts" not in value
+                    ):
+                        raise ExecutionError("HARNESS_NATIVE_TOOLS_PROTOCOL_MISMATCH")
                     return value
                 except httpx.ConnectError:
                     await asyncio.sleep(0.05)
         raise ExecutionError("HARNESS_PROFILE_NOT_READY")
+
+    async def configure_execution(
+        self,
+        session_id: str,
+        run_id: str,
+        policy,
+        *,
+        request_id: str | None = None,
+        epoch: int | None = None,
+        scope: dict | None = None,
+    ) -> None:
+        value = self.remember_execution_policy(
+            session_id, run_id, policy, request_id=request_id, epoch=epoch, scope=scope
+        )
+        async with httpx.AsyncClient(trust_env=False, timeout=8) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/executions",
+                headers={"X-Learning-Harness-Control": self._control_token},
+                json=value,
+            )
+            if response.status_code != 200:
+                raise ExecutionError("HARNESS_EXECUTION_POLICY_REJECTED")
+
+    async def prepare_document_images(self, value: dict) -> list[dict]:
+        async with httpx.AsyncClient(trust_env=False, timeout=35) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/document-images/prepare",
+                headers={"X-Learning-Harness-Control": self._control_token},
+                json=value,
+            )
+        if response.status_code != 200:
+            raise ExecutionError("DOCUMENT_IMAGE_PREPARATION_REJECTED")
+        proofs = response.json().get("proofs")
+        if not isinstance(proofs, list) or len(proofs) != len(value["images"]):
+            raise ExecutionError("DOCUMENT_IMAGE_PREPARATION_INVALID")
+        return proofs
+
+    def remember_execution_policy(
+        self,
+        session_id: str,
+        run_id: str,
+        policy,
+        *,
+        request_id: str | None = None,
+        epoch: int | None = None,
+        scope: dict | None = None,
+    ) -> dict:
+        value = {
+            "session_id": session_id,
+            "run_id": run_id,
+            "model": policy.model,
+            "thinking": native_thinking(policy.thinking),
+            "max_output_tokens": policy.max_output_tokens,
+            "timeout_seconds": policy.timeout_seconds,
+        }
+        if request_id is not None or epoch is not None:
+            if (
+                not isinstance(request_id, str)
+                or not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", request_id)
+                or type(epoch) is not int
+                or epoch < 1
+            ):
+                raise ExecutionError("HARNESS_CONTINUATION_BINDING_INVALID")
+            value.update(request_id=request_id, epoch=epoch)
+        if scope is not None:
+            expected = {"course_id", "purpose", "task_id", "allowed_tools"}
+            if set(scope) != expected:
+                raise ExecutionError("HARNESS_BUSINESS_SCOPE_INVALID")
+            value.update(scope)
+        known = self._execution_policy_history.get(run_id)
+        if known is not None:
+            if known != value:
+                raise ExecutionError("HARNESS_EXECUTION_POLICY_IMMUTABLE")
+            return known
+        prior = self.execution_policies.get(session_id)
+        if (
+            prior is not None
+            and prior != value
+            and (
+                prior["run_id"] not in self._released_native_runs
+                or value.get("epoch", 0) <= prior.get("epoch", 0)
+            )
+        ):
+            raise ExecutionError("HARNESS_EXECUTION_POLICY_IMMUTABLE")
+        self.execution_policies[session_id] = value
+        self._execution_policy_history[run_id] = value
+        return value
+
+    async def release_execution(
+        self, session_id: str, run_id: str, request_id: str, epoch: int
+    ) -> dict:
+        async with httpx.AsyncClient(trust_env=False, timeout=8) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/leases/release",
+                headers={"X-Learning-Harness-Control": self._control_token},
+                json={
+                    "session_id": session_id,
+                    "run_id": run_id,
+                    "request_id": request_id,
+                    "epoch": epoch,
+                },
+            )
+            if response.status_code != 200:
+                raise ExecutionError("HARNESS_NATIVE_LEASE_NOT_RELEASABLE")
+            receipt = response.json()
+            if (
+                receipt.get("released") is not True
+                or receipt.get("run_id") != run_id
+                or receipt.get("request_id") != request_id
+                or receipt.get("epoch") != epoch
+            ):
+                raise ExecutionError("HARNESS_NATIVE_RELEASE_RECEIPT_INVALID")
+            self._released_native_runs.add(run_id)
+            return receipt
+
+    async def recover_readonly_execution(self, session_id, run_id, request_id, epoch):
+        async with httpx.AsyncClient(trust_env=False, timeout=8) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/leases/recover-readonly",
+                headers={"X-Learning-Harness-Control": self._control_token},
+                json={
+                    "session_id": session_id,
+                    "run_id": run_id,
+                    "request_id": request_id,
+                    "epoch": epoch,
+                },
+            )
+            if response.status_code != 200:
+                raise ExecutionError("NATIVE_READONLY_RECOVERY_UNCONFIRMED")
+            result = response.json()
+            if (
+                result.get("recovered") is not True
+                or result.get("source") != "physical_read_handle"
+                or not isinstance(result.get("native_terminal"), dict)
+            ):
+                raise ExecutionError("NATIVE_READONLY_RECOVERY_INVALID")
+            return result
+
+    async def prove_tool_stop(self, lease):
+        async with httpx.AsyncClient(trust_env=False, timeout=8) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/leases/prove-tool-stop",
+                headers={"X-Learning-Harness-Control": self._control_token},
+                json=lease,
+            )
+            if response.status_code != 200:
+                raise ExecutionError("NATIVE_TOOL_STOP_UNCONFIRMED")
+            return response.json()
 
     async def stop(self) -> dict:
         self.cleanup = await asyncio.to_thread(self._group.close, grace_seconds=2)

@@ -1,0 +1,29 @@
+Source: https://github.com/helixnow/deep-student
+Commit: 635216503c0b34bdf812e17942e0f09f51872e6f
+
+translationCache.ts, translationNdjsonParser.ts, translationTypes.ts are read
+unchanged from the existing archived upstream tree. selectionRef.ts is newly
+archived byte-for-byte in this candidate's upstream directory.
+
+Build extracts exact source slices for SelectionSourceKind, SelectionRefData,
+MAX_SELECTION_TEXT_CHARS, describeSelectionLocator, buildSelectionDisplayName
+and serializeSelectionRefData. A local t dependency supplies only default label
+interpolation. Function bodies are unchanged. Slice hashes and source lines
+are recorded in the generated build-manifest.json.
+
+The upstream root license is GNU AGPLv3; the upstream third-party notice states
+AGPL-3.0-or-later. Original root notices are copied into the compiled closure's
+notices directory. This file records provenance and adaptations, not a decision
+about an as-yet unchosen final project distribution arrangement.
+
+New project-owned wrapper: complete-identity namespace, terminal/accounting
+gates, immutable cached text, cache-only zero-outbound publication proposal,
+strict selected-only bounds, final NDJSON validation and a bounded persistent
+stdio helper. These do not import upstream application stores, UI, providers,
+Tauri or VFS. They do not dispatch models or modify project business state.
+
+The old selection serializer's overlength truncation is not used as source
+authority. Raw selections above20,000 UTF-16 units bypass caching; they are
+neither truncated nor silently replaced. Ordinary translation never invokes
+the aligned parser. The aligned collector is only a prepared future explicit
+aligned-output seam, with the same single project-owned Host run.

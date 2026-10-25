@@ -14,7 +14,11 @@ dependencies = [
   "alembic==1.16.5",
   "pillow==12.2.0",
   "pypdfium2==5.14.0",
+  "learning-deeptutor-reuse==0.1.0",
 ]
+
+[tool.uv.sources]
+learning-deeptutor-reuse = { path = "../third_party/deeptutor" }
 
 [dependency-groups]
 dev = ["pytest==8.4.2", "pytest-asyncio==1.2.0", "ruff==0.13.3"]

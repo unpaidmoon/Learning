@@ -81,7 +81,7 @@
   },
   {
     "id": "tool-skill",
-    "disabled": true
+    "disabled": false
   },
   {
     "id": "command-goal",
@@ -326,5 +326,13 @@
         "name": "__PLUGIN_PATH__"
       }
     ]
+  },
+  {
+    "id": "sandbox",
+    "disabled": true
+  },
+  {
+    "id": "pwsh-sandbox",
+    "disabled": true
   }
 ]

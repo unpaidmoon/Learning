@@ -1,0 +1,934 @@
+{
+  "format": 1,
+  "release_id": "offline-reader-v3",
+  "compiler": {
+    "name": "rolldown",
+    "version": "1.2.14"
+  },
+  "lock_sha256": "fb8155baa15fabedc9ebefcf687bdf9f413d3454f101a42feb7c5bf94396602e",
+  "inputs": {
+    "frontend/src/chat/MarkdownAnswer.tsx": "dc78a7fe52f3e798bfbc084f63ddb4b632f2eca7536f5fb541e1dd7d8e791ea1",
+    "frontend/src/chat/selection.ts": "1911919325522ed29875fc1ffc86e8a87cb51cf3ea22ffe04ba10c148c5b5114",
+    "frontend/src/offline/OfflineReader.tsx": "cb8514db8f3ec985bcb457be62b85a3c9a9d2c8cf15a4be2572cb5cf9cb74ffa",
+    "frontend/src/offline/entry.tsx": "6288ea5772686c93583df48c3c7d022b2d1d9f4638b2c2ee7d6e25f79a02f973",
+    "frontend/src/offline/offline.css": "c190902164dd98e4fba277b8e0dbcb901f5146c33de05bf7db2726d9152af814",
+    "frontend/src/workbench/ContentBlock.tsx": "9af30152e2dbe87c086f676e9ebcde0bee24d0c3a730d060eccff5f78dd45e2e",
+    "frontend/src/workbench/TranslationParagraph.tsx": "1b692eac4e222cc8698f838144521f54f0c497e77a58fc270773ea2b0f646f7c",
+    "frontend/src/workbench/VisualizationViewer.tsx": "6ddf89fb8487402c2ffada8df840cd9b50eb36ad3be3fd8c4148fbb60f04512e",
+    "frontend/src/workbench/translation.css": "04587a87b05e1a868c5201edca63b3808019b12af974ca7d868ac1c4899e9c91",
+    "frontend/src/workbench/visualization.css": "0c96ab58517e8de10ddd8ba9c056449cdf0aa6d1d17cbcefee6b188287a4717e",
+    "frontend/src/workbench/visualizationMath.ts": "6d3b5210e38b62e07528b48799a0072a0d52162bad08a32e9ebfeb74f9560fb6",
+    "frontend/src/workbench/visualizationWorkers.ts": "310d19fd646b9b8c3fde6677104ae4764d7da628514a54eb91868f56381d9e8e",
+    "node_modules/.pnpm/@ungap+structured-clone@1.4.0/node_modules/@ungap/structured-clone/LICENSE": "dc6d4961d8b6ee747231582ae9c53ce1d66bf76bc9f5a28f554c0e97210953bf",
+    "node_modules/.pnpm/@ungap+structured-clone@1.4.0/node_modules/@ungap/structured-clone/esm/deserialize.js": "6b114d6e4acfa158885fcb8d0e0dda1f8daa8a6ba54acd5ccae59806eca1089f",
+    "node_modules/.pnpm/@ungap+structured-clone@1.4.0/node_modules/@ungap/structured-clone/esm/index.js": "7ddb0560a1215343ca695210f659fb348ec5d93d0b0e76bbc5959f88cdc2036b",
+    "node_modules/.pnpm/@ungap+structured-clone@1.4.0/node_modules/@ungap/structured-clone/esm/serialize.js": "913596ce0a90bade01473863f1f9895bd7e0d4e505f21b73bb206dc1d763a88f",
+    "node_modules/.pnpm/@ungap+structured-clone@1.4.0/node_modules/@ungap/structured-clone/esm/types.js": "c0978dfc8d304b12d62aadc583977355f714ee8c1e4d1290620226fb78247800",
+    "node_modules/.pnpm/bail@2.0.2/node_modules/bail/index.js": "bf9c61413349a74801f2583d1922c323b4b41ca520a70461b438fd08d1381bae",
+    "node_modules/.pnpm/bail@2.0.2/node_modules/bail/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/ccount@2.0.1/node_modules/ccount/index.js": "cbba065a9f66c5909d49f740a64f12cfde03220303a845b2273d54af59e70af9",
+    "node_modules/.pnpm/ccount@2.0.1/node_modules/ccount/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/comma-separated-tokens@2.0.3/node_modules/comma-separated-tokens/index.js": "a62eb07c352878a940619595a2e2d11221bc02a16f9a64501612105fddbc2c0b",
+    "node_modules/.pnpm/comma-separated-tokens@2.0.3/node_modules/comma-separated-tokens/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.dom.js": "bbfdff9072ab38fb0669b2fe2fef28e9b36e5cbbeed3592cd13fc29748755dd3",
+    "node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/default.js": "702fcb7d6bfdfe7b673b8bb7fa9d531d9b7d02693bed89f8dbb0a2c461604cf6",
+    "node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/license": "6f296a5eccc1dc96714bb94ebaa9cac25b0a1467d74cc5263ac4d0646ab01f62",
+    "node_modules/.pnpm/escape-string-regexp@5.0.0/node_modules/escape-string-regexp/index.js": "af2065ad2f2d2b91946c2121e21618daa3f4b18787af9226f8c953ca54cca2f5",
+    "node_modules/.pnpm/escape-string-regexp@5.0.0/node_modules/escape-string-regexp/license": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+    "node_modules/.pnpm/estree-util-is-identifier-name@3.0.0/node_modules/estree-util-is-identifier-name/index.js": "027d2c35f1adb51f1381a5ae1d96ede90e1a5d4014eb81d9053d47831aa0e6b9",
+    "node_modules/.pnpm/estree-util-is-identifier-name@3.0.0/node_modules/estree-util-is-identifier-name/lib/index.js": "6d8907d1847bf9d24d7a8158a89296dbf6e1be33fd97efb2e411ea5a1cc37809",
+    "node_modules/.pnpm/estree-util-is-identifier-name@3.0.0/node_modules/estree-util-is-identifier-name/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/extend@3.0.2/node_modules/extend/LICENSE": "97af7428f93afbab9bf79cd09254da1357161794f4255eb1b4599f04dd2d2e7c",
+    "node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js": "b4879ec38a11a2458846788b91be630e6b1d06eb07f9515adc1ff9030af0b00b",
+    "node_modules/.pnpm/hast-util-from-dom@5.0.1/node_modules/hast-util-from-dom/index.js": "3274e39fc145a36e5bc9f6a07506c6e916db03276d011501771ec50f3513052c",
+    "node_modules/.pnpm/hast-util-from-dom@5.0.1/node_modules/hast-util-from-dom/lib/index.js": "22a217ed7f3701587f35531acff1f7637e20d02afc2f5a40aa306696e6e8fa23",
+    "node_modules/.pnpm/hast-util-from-dom@5.0.1/node_modules/hast-util-from-dom/license": "c01b44788e1829e81cb20d621c93c07a08ea010063118b956739f2ab050d17ca",
+    "node_modules/.pnpm/hast-util-from-html-isomorphic@2.0.0/node_modules/hast-util-from-html-isomorphic/lib/browser.js": "f8423485cf579d691af6a50cc8242cbcd19dac5849b5201c38ce88c62cbe29d0",
+    "node_modules/.pnpm/hast-util-from-html-isomorphic@2.0.0/node_modules/hast-util-from-html-isomorphic/license": "fb5678944a6345b1d30a8fe006aef2be2f6bb1c22431a7cc92674fb0944a7578",
+    "node_modules/.pnpm/hast-util-is-element@3.0.0/node_modules/hast-util-is-element/index.js": "492b2e817d4dfed895a0c21d1796c5b8ad7bba77d34db4eac5f887a3e6b15e2c",
+    "node_modules/.pnpm/hast-util-is-element@3.0.0/node_modules/hast-util-is-element/lib/index.js": "b0d0daa95c5f4b870c2cdae20576277784bbfbf1a22520757cd6e0ba22c91428",
+    "node_modules/.pnpm/hast-util-is-element@3.0.0/node_modules/hast-util-is-element/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/hast-util-parse-selector@4.0.0/node_modules/hast-util-parse-selector/index.js": "eeeefbd434261f5f3fb8e1d66cf3523cde05a0b3379352f735dcf3e3995dfb1b",
+    "node_modules/.pnpm/hast-util-parse-selector@4.0.0/node_modules/hast-util-parse-selector/lib/index.js": "76d02635547a5cbc5eb94c18c0010336b0dac306e4e39cfa48364c089f3919e4",
+    "node_modules/.pnpm/hast-util-parse-selector@4.0.0/node_modules/hast-util-parse-selector/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/hast-util-to-jsx-runtime@2.3.6_supports-color@10.2.2/node_modules/hast-util-to-jsx-runtime/index.js": "83cd6452ebf818e02d03b39c726407b2c3c38a73b52aa8f1c7d88fff23d1894e",
+    "node_modules/.pnpm/hast-util-to-jsx-runtime@2.3.6_supports-color@10.2.2/node_modules/hast-util-to-jsx-runtime/lib/index.js": "986dd5ff765f424432ab12dc8401f33acc50a5bed9ffb2e48f88300a25f9562f",
+    "node_modules/.pnpm/hast-util-to-jsx-runtime@2.3.6_supports-color@10.2.2/node_modules/hast-util-to-jsx-runtime/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/hast-util-to-text@4.0.2/node_modules/hast-util-to-text/index.js": "bec1af0f6e7a927c83c00d8523f6b4c92d8a4d159ca090c773484605ba785898",
+    "node_modules/.pnpm/hast-util-to-text@4.0.2/node_modules/hast-util-to-text/lib/index.js": "187c17641008598b344d8799cc2faae3ca6f5c3aa9bb1f27dcc112555d681b7c",
+    "node_modules/.pnpm/hast-util-to-text@4.0.2/node_modules/hast-util-to-text/license": "691115fe0234b1f05cb52a9c4aded367e389784a6501af824e85a7e54ca47d38",
+    "node_modules/.pnpm/hast-util-whitespace@3.0.0/node_modules/hast-util-whitespace/index.js": "1e443111d1b477b45f35f751834b5a031c1ed1272f53322c7f40e2b28d790cc2",
+    "node_modules/.pnpm/hast-util-whitespace@3.0.0/node_modules/hast-util-whitespace/lib/index.js": "8b9342003bf1956922a92d6299ec98fdd6369e0d83f3d96bc144a793137e80f7",
+    "node_modules/.pnpm/hast-util-whitespace@3.0.0/node_modules/hast-util-whitespace/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/hastscript@9.0.1/node_modules/hastscript/index.js": "c4fbf2ca6ae755dd3821e5f1ebe3fdbcd5df7aae6ec2bd50447d96ffe36614f5",
+    "node_modules/.pnpm/hastscript@9.0.1/node_modules/hastscript/lib/create-h.js": "6496dd7cca2c50351ccdc474cb2c8d788ee89325dc8cde54de81e0df4a45267a",
+    "node_modules/.pnpm/hastscript@9.0.1/node_modules/hastscript/lib/index.js": "54e6abdaf206033fcff422b71e7c8087e27bd09f29f72bdd4ceabeb84e4ea647",
+    "node_modules/.pnpm/hastscript@9.0.1/node_modules/hastscript/lib/svg-case-sensitive-tag-names.js": "32f46483617509daf5cd801d1ceb732338d0fe2f418d3bb7ad05987fbbbb4c92",
+    "node_modules/.pnpm/hastscript@9.0.1/node_modules/hastscript/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/html-url-attributes@3.0.1/node_modules/html-url-attributes/index.js": "c8f91253c03e47771a22af46551979b255447590a3cc8f50406e8a2b0f1a00e4",
+    "node_modules/.pnpm/html-url-attributes@3.0.1/node_modules/html-url-attributes/lib/index.js": "294ddb9a402e62c9b05253165265b6f54bd67ae3db70c55e17819557130019b9",
+    "node_modules/.pnpm/html-url-attributes@3.0.1/node_modules/html-url-attributes/license": "e18cf5173e928f808f0cd208097fee8fbec9d28fc0255213938e4c559e29ff58",
+    "node_modules/.pnpm/inline-style-parser@0.2.7/node_modules/inline-style-parser/LICENSE": "395c95f20598da653ff1eb1cb9d74947c7fac689697147f1d192fd0242a0e635",
+    "node_modules/.pnpm/inline-style-parser@0.2.7/node_modules/inline-style-parser/cjs/index.js": "02245958daf61d5e477fa13dbd577a8e53aff477768c183e9c51bad775c01c42",
+    "node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js": "957e14eb5863048b3eb7a97c7cedcf62cbca2bb94745198982d8e278f7b2f89d",
+    "node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/license": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/LICENSE": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.ttf": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff2": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.ttf": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.woff": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.woff2": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.ttf": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.woff": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.woff2": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.ttf": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.woff": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.woff2": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.ttf": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.woff": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.woff2": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Bold.ttf": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Bold.woff": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Bold.woff2": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.ttf": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.woff": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.woff2": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Italic.ttf": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Italic.woff": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Italic.woff2": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Regular.ttf": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff2": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.ttf": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.woff": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.woff2": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-Italic.ttf": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff2": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.ttf": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.woff": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.woff2": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.ttf": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.woff": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.woff2": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.ttf": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.woff": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.woff2": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Script-Regular.ttf": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Script-Regular.woff": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Script-Regular.woff2": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.ttf": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.woff": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.woff2": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.ttf": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.woff": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.woff2": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.ttf": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.woff": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.woff2": "73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.ttf": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.woff": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.woff2": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.ttf": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/katex.min.css": "19095127357ed6d29fe0a63a6b000c913a89f7f1963b765dd3715e97c9852e75",
+    "node_modules/.pnpm/katex@0.16.22/node_modules/katex/dist/katex.mjs": "7af1aa5e484a4ae881e181ff97ddffdce2deabef42596d2679658b9fe4cd4615",
+    "node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js": "41d5da657563b0bf09d2e5235349195276e9246e1239370d98416e27a85b989c",
+    "node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/license": "9f084fac69d8cf1e6ce983ba5a3499c7695ed74a26ec625c38f0fd19fddd5e10",
+    "node_modules/.pnpm/markdown-table@3.0.4/node_modules/markdown-table/index.js": "2dd3014e8ce92317dfd819fc678217d8fdf47086a4607cc49566f0dee02b832a",
+    "node_modules/.pnpm/markdown-table@3.0.4/node_modules/markdown-table/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-find-and-replace@3.0.3/node_modules/mdast-util-find-and-replace/index.js": "7a4656d4f6e259733e75f160544e681c1250180db6f099907dde936bce1d8c7b",
+    "node_modules/.pnpm/mdast-util-find-and-replace@3.0.3/node_modules/mdast-util-find-and-replace/lib/index.js": "a0258067b982faf86e02a64ed5f25db4dc8407e74bbcea442755bcbf4b4ac38a",
+    "node_modules/.pnpm/mdast-util-find-and-replace@3.0.3/node_modules/mdast-util-find-and-replace/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-from-markdown@2.1.0_supports-color@10.2.2/node_modules/mdast-util-from-markdown/index.js": "b5ac1d75a898f7e28ae90ce26ab937b5f574bd5b4e8c17745bd15ba78a4a33f5",
+    "node_modules/.pnpm/mdast-util-from-markdown@2.1.0_supports-color@10.2.2/node_modules/mdast-util-from-markdown/lib/index.js": "dd0cd20672558ab4ca548b4f7e442e850863228915fff8eafd6d987d29fb107b",
+    "node_modules/.pnpm/mdast-util-from-markdown@2.1.0_supports-color@10.2.2/node_modules/mdast-util-from-markdown/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-gfm-autolink-literal@2.0.1/node_modules/mdast-util-gfm-autolink-literal/index.js": "c3c1073e83ac96d470b41a7ace9636321578659a83e1d14d4c8ac7f7f85db8a8",
+    "node_modules/.pnpm/mdast-util-gfm-autolink-literal@2.0.1/node_modules/mdast-util-gfm-autolink-literal/lib/index.js": "4965bd92f22009a0fd0fa4f7af73903e4d793165634c26ab5827fe5386fbcff2",
+    "node_modules/.pnpm/mdast-util-gfm-autolink-literal@2.0.1/node_modules/mdast-util-gfm-autolink-literal/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/mdast-util-gfm-footnote@2.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm-footnote/index.js": "b94bca85a6eefc173cd3a68381c45bfdc75643ed8f901a428d311d5a01575678",
+    "node_modules/.pnpm/mdast-util-gfm-footnote@2.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm-footnote/lib/index.js": "47f5f97e3698325187eff57567e05f0a63162506cdd95f8f6468f2a7bbf69eff",
+    "node_modules/.pnpm/mdast-util-gfm-footnote@2.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm-footnote/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-gfm-strikethrough@2.0.1_supports-color@10.2.2/node_modules/mdast-util-gfm-strikethrough/index.js": "0156f05d678b6885b4e2a41248ac1366232e51e92bb0b6fc561c209062f5a721",
+    "node_modules/.pnpm/mdast-util-gfm-strikethrough@2.0.1_supports-color@10.2.2/node_modules/mdast-util-gfm-strikethrough/lib/index.js": "3dde7bed9aac562d2db25c24150eea442b73a8a5288277636f50ee0813b3f69c",
+    "node_modules/.pnpm/mdast-util-gfm-strikethrough@2.0.1_supports-color@10.2.2/node_modules/mdast-util-gfm-strikethrough/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-gfm-table@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-table/index.js": "9cc7b5b80a5b94d6c0803936b9a120c272e32a63f802cb960de7c6c59907ee65",
+    "node_modules/.pnpm/mdast-util-gfm-table@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-table/lib/index.js": "5f5fc1551fe95d4e4e5a8729e52391abb9a053c0a618aa79dfb0364728299be8",
+    "node_modules/.pnpm/mdast-util-gfm-table@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-table/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/mdast-util-gfm-task-list-item@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-task-list-item/index.js": "38e8209a8b251e633588fd16ad1152c33daced7ff21be821827c29be7bf37d3f",
+    "node_modules/.pnpm/mdast-util-gfm-task-list-item@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-task-list-item/lib/index.js": "1986b0f334e23659909982bc930ebc11784212d9331ef97efa14f268af01d852",
+    "node_modules/.pnpm/mdast-util-gfm-task-list-item@2.0.0_supports-color@10.2.2/node_modules/mdast-util-gfm-task-list-item/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/mdast-util-gfm@3.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm/index.js": "f6d345b843a3b44d74a5e8ee123f90c7d16f0c670542810c8b06367c44a01b50",
+    "node_modules/.pnpm/mdast-util-gfm@3.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm/lib/index.js": "0ead64b5f705ade5818adf7059c62c34353f00aaf4528549aceccd342004297e",
+    "node_modules/.pnpm/mdast-util-gfm@3.1.0_supports-color@10.2.2/node_modules/mdast-util-gfm/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-math@3.0.0_supports-color@10.2.2/node_modules/mdast-util-math/index.js": "266fcd72f8606ae61640f98ea2aa660562c08d3e5cc14956d09051813aab47c0",
+    "node_modules/.pnpm/mdast-util-math@3.0.0_supports-color@10.2.2/node_modules/mdast-util-math/lib/index.js": "fabe05044becc9ae3ff1320f4c2ed30d8aa8859b4944e126cac22a570bae9574",
+    "node_modules/.pnpm/mdast-util-math@3.0.0_supports-color@10.2.2/node_modules/mdast-util-math/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/index.js": "f87bb5f2c3fe0f98bd2802db6438ecf751f051c64fe502377444067a9c59ce6e",
+    "node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/lib/index.js": "cfba43614dcc2d644d7f0b2a83a172b6119aa70ba10a504f03528a0fb4c873eb",
+    "node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/license": "b6d1a4e1831b177acc96f22a817d4f0f4c18419355badc3125754445fc69e3a7",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/index.js": "681480f0d8fcae35643e8bbcc81085827be1a663106453d9549232d9b6a27721",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/footer.js": "40a9dbaa5cf1e3f3ff993bbdd7e9d8666cb620b3dabd4276af5212d1f95fe7d7",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/blockquote.js": "9744b0434bd3f70716b1208a8e580ce01cdc3b99736ddac44aafe32503a05b60",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/break.js": "bbd9617fec60951f0a0d46477cfa1a3355375f6a655adb13f11a6fd9d8aee47d",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/code.js": "60d18f00c0f40917ad26a2e112f5dd0be66e7ab1088832932ec14aa69df8eb29",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/delete.js": "20a3aa0fca3e1cb6c80e4103392168c945c97477573d13bd123f92cfea071672",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/emphasis.js": "d40b9afbcd5a1ab9f598d5ff439e73cbfa8f1cc9708115e439c030ffc5bf1edf",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/footnote-reference.js": "f5c49df607b90b1a1e89b754cfdd3290f49e5ca42b5af9ea9a01f1af1ccacae8",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/heading.js": "c54a67319a4ac1d9d25eb8a8fb73f094b2ffac385d11f64ef748d8e0a0c0aec3",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/html.js": "18af5a6b0d9eebad977bb78e60b247d4cde445bb1cc5c275f1bea61e1151b14a",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/image-reference.js": "79c616d913f42ecb997b008a3147a3a208c08c18dfd01c573976656f370b425c",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/image.js": "06c2c63d11c4ef7b0fe8f082ec2fe47ffd5bf00e7a2a2d4756515951dccad50e",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/index.js": "4de11cfac2c9486f6633a60f180e7fb772d48d005a6168b50d41c7de062098aa",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/inline-code.js": "99e74e1891add9c61f640f859308e3f907c90eb4e92c381b1f29fab2e16c19a1",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/link-reference.js": "c1dcf7f39f12ab58603197504f6707372bf936fc113aaa7625910faff37063b5",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/link.js": "ac8d90073fee56d692f964775332dce0ffda38b07f86f1b412212f21f1d19d1e",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/list-item.js": "0da607553981392d7ce7c1bc49f74bb4eb643ee517e959fac6dbd276d7b80488",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/list.js": "f6b70088d06ca8c101c07c6dff2363c7962a5aeecd7a2b26005848b2e14100d8",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/paragraph.js": "a77301efe0f60029bd39935a64c456556f945f22c780e2c93f610a4711ab68d7",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/root.js": "aeba8659e5c4dca7c269f4ded5c39688876f3f76057b5f2459eadd956bf44a86",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/strong.js": "3dba3cfd6954bc3c52653ba74c50771e3b776b561c901f542f28e07eb6591191",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/table-cell.js": "6faa2956741b11b277e7d2189f5bb97786a13462e39e412aeaefa65325588f8f",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/table-row.js": "bec1dca051d327477166c745be7d7a51fe97ef182b57e889f17e7b57bd7ecee3",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/table.js": "f12e3d16638a2159b08e6f0cb816c34d3c2ede3ab592235621bb60cda3d0d128",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/text.js": "66aa96a1369887fe40759b200f80b609316e8cc66da424e2832400aad41eebeb",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/handlers/thematic-break.js": "bf3cfab49b184da92b8e53ddf86e13625da8d5055db3a9abc904daff1312aa56",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/index.js": "f6e0be6ee208cd0d0d6ee5a532cc61d9a6a88b87de60d2453a241f3e5a113413",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/revert.js": "09ec851551e7d2076f9a542975f480e046efd0b66db755903fb7a8855e23acff",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/lib/state.js": "3efa2af554f55b9d6b9fde660f40886669976e73bdea09c4884fabf6a65e2803",
+    "node_modules/.pnpm/mdast-util-to-hast@13.2.1/node_modules/mdast-util-to-hast/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/index.js": "424f094d7793c73a0a94e6b11bc747d122fa409037cf13e48ac490c2e283c03a",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/configure.js": "19c756ad512d06fa6716f5ee1691a0ad4e69e2d8ff0d1448f6f61563dd04ef14",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js": "3612c47afdd6d45dd7101ce55341b9c9c82ed0d26038c22c8483c86dd6465b1b",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/break.js": "9a62eba63d895398498893fda044f91b9fff0f6451915f21c549ecff59e4e99f",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/code.js": "8e4ea87d06a7adbd788811e47312c3f080d3ad96c0ddfa38f9a77989cb629e38",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/definition.js": "bea11725a190842251ea5a66a65518fdcf8e2df6e2f160cd1437a9c538e20348",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js": "0f126fe257f4632b0adbf0922536e7dd477f6673f3e18ba103a591e5b843736b",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/heading.js": "7395f281e4cf9b78191cdb2d9fda0eb6be1f7fc02af233d718f946dde8e24de5",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/html.js": "6aacacd2ee3646d4fbe98be5ed2b22012ef35c2fc1160791296a0ecb865690b8",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js": "7b43ac169b208e68cab5e7e857e964b82fccf9958b3ced69bad815c612cc9daf",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/image.js": "4372df3f81d47c46645d3d8b57909cab249df4a404a7cc4d091aef9824c8b7a0",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/index.js": "490a5bac7d713e0c0576cde3bad5e18a581836540f62c2bb08ec6ecb01fd6c83",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js": "d8efae83a3e82c41277b31c8104f3173cd0828e2f8330599865fd6db53aa889a",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js": "fe9de6e7073e7bfebd5bfdca1175fcdcb2f7727c0dac3c2d267f87a12e16cc0c",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/link.js": "c06030c9037f426f7eebca929f7d03e8bbab15d3cdc720077d2c018cf30985fc",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/list-item.js": "f98dbb028581df514d55716f484338208a7f3e287ba554af96dd96171db45447",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/list.js": "dc4a8b6fc1783640c3cd6fc6effa4b360dca089f50b76e46b8fe614450b87091",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js": "d46fa062df3840a2f5010aec6924a48ea43a5fc4b973649a2debe3b641380598",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/root.js": "6fc0248c23b0b0b9c91bd98ca62e99dd5dfa1a714ea5c9e30b7b9e06086d422c",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/strong.js": "052e68425dc8d15b2ae388fee2ed1e94f85a9cd14ed14d8c164101e769e4c46b",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/text.js": "d85483dc323028a20f5b05be6f9646edd839c4afa5ed00741ea70e0ef142a524",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js": "f9cbc4096fe64700fb560378168ff69c25f4dd894e54a07a9ddfc29a7c58f138",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/index.js": "0f0365ab6701eb54155965cf6f4370f040e3cc1355f573d1ce44fc8b6b0d73e9",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/join.js": "742807299d3e71a220a61834abb858a321461abb2f61b54a30d7d7031281cf0e",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/unsafe.js": "6ecd7226a86df621bd963a7eb2534728e08aec4ec9d341c82ab535c4e6e582ad",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/association.js": "a7059dc12cccb03befe1d118d062240b0f08201be9da238f2056f4cfe5d3ba53",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/character.js": "4f1e386bb4621ef393515f94789585029d7d82196930c9b325368c9078901561",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js": "92ee16f617804b623faa12ea90cbb52e01e7b7b6069235d5173a55b2e41091e3",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js": "a7228c78a5e8bf8e0000e26e4f700b3d0d18bea32ee44ad8b125096667dfeea7",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js": "d9bdba93f1574c090b949d6c6e10f1524933beaf0a2953cdcd22088632dbb166",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js": "180e6f87481de03aa5a8495fca38e2d0c2de0b22b3da7b63132a09a66adf6fca",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-fence.js": "bfa1940fc621da40e87d90eb042066391aa2341688f71195be38751560f26ecd",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js": "f256fd6dda3b3a01ec45a370772b4fb111dec45ba0c9f8b4967bccf38c7fc592",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js": "66427ad80edc36c5f790b77340a245271e81cf15375cb19f801a47f40ddfea29",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js": "0e3e6754c9632fc31a50f69a9b2d642e4d0a7a1a02369a403bd0af034103bdc0",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-rule.js": "d3c5726de238c530026f3f36b0de86737d0dda5e632910d4d320474de01f9015",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-strong.js": "85b29305319bf3f4526ae55cc029442aa627c7ce125710e70b4f6bca9987ab09",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/compile-pattern.js": "98a23e377c79ff43a4167928f91da0b7b225e26fbcf3d93bd9129b546cf61775",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/container-flow.js": "871375c24cc08dd4d1628b3d13ffdd39895e5e1fbb60bbbbb77c7df52c336472",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js": "e6c97ee1a544e107b7eda2a230a3d61bd0765c9f548147066f3d0e7f69ded418",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js": "a1aacc0ea2e4cd7fb84deaa115a5deaf4576e0701dd9441d5d6ffa70386c5dfd",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/encode-info.js": "1edf49c5b8f760d39acdaee4369ffc5afef463f9ef49ed451f2f4206897f1863",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js": "615179730ba061cd5a626c434a0020fcbfc25ff4a5d627838d386bc5af207015",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js": "7c575d8408bce3dc406aaf24f2206e94aba3b5daa69115e11b526fba048bff5d",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js": "5489fb2b89234088f84ec2c39e3ff481ab6e519443c81832d8dd90a58608efad",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/html-kind.js": "718cdd2449de05d14285535b838fe899f54e335e3397195c18b8f79faf21cf8c",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/indent-lines.js": "082a139197a4572d97ce97fbffa871d8dbed09fb702c546415111d4e1d5ffd7b",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js": "6e5c7fe11a24ccd5b943d5eee96dc5b5e3f09803f34820569fceae03f5c0deee",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/safe.js": "a587a5e7735ce7daa242f638337e8741b87cb2d3887be2a7a3b168bb0379f243",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/track.js": "a7254e9fa9b1c92e349e2fde6bbacfc9b2453806f9cf06f16ff735fdde900f8e",
+    "node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/index.js": "46fb60d03aacb0a3f66c7be7f7c93e85013076f59d595c7220554b05027d8ada",
+    "node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js": "53015b2b0b7a72aed1c2d880d3c2aaed73972241f968d4a206a18d92fbe57b21",
+    "node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/index.js": "67211c138962eb4153158d185781612cb5a4f811a7f26f98863d03e7560595b6",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/attention.js": "cd9329ed32379acf1e80e427124f25648fba7722886ecc0de3c5dc8551268ee4",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/autolink.js": "d0762261ea02440fbc81b5facf994bc42ba1561d4c7bf822dd9d09a7c05a69ed",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/blank-line.js": "ef542164abcf6a5e6806720105146feba7e340a1f6d8c08c840707208ca76d69",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/block-quote.js": "dc87caa801ada12890767e83534b15746097b3cc6c9d5a99c046c1a252632366",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/character-escape.js": "8fd107627d4f0363999adf68fadd375a17a7536da8eee96799c805e3e57b3fe4",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/character-reference.js": "cc8138483321def7b2f4304df0e76ee2bcea84bb1bc5bc603534063b30ddd959",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-fenced.js": "57966350d6a9407a58af84fc325dc30085529f177c34e8edf9709e907c4db026",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-indented.js": "c140b105e03ea81816d760081d8ebb79cb0ef88153c8f131be813ca70ba5d995",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-text.js": "6e59e9b77a76a825c8cd142b0a2f0495aa5122da271770cb09322456a5207451",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/content.js": "86fe007055efee6edaecfbb2ccebb9bdd1e7887a45d1c5881bcaa7ed6a973b77",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/definition.js": "800e7ef9f722e2536dc5e9774d0e22b0dcc58770d7a8011dc2c205f5fd263009",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/hard-break-escape.js": "a84fdfcc8ad17557345f074d2cc61ac902349ae4666a86c934be7914029a80bd",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/heading-atx.js": "401caddfc10436f9ffb9e7395d0b6b2262bd13ed324f716c505a96b4e5052717",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/html-flow.js": "d32bc5869302bb4b54bd6c5c9c25b3004bd97a2155e0d9cdeb53fbd08510e7d8",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/html-text.js": "017f2b1f7be2303f4b849394f29430f4daea803dbb7eaf4ce82bb63e42e6c47c",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-end.js": "055ac0d7f62144011730fbd5bf81ee6f4cb40bdd8428b44d2f0febd3f1ea4364",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-start-image.js": "f7798649e305506de8a5f9cacabca6c0b9a9ea0cea8c2531e9669bbde1e5860d",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-start-link.js": "46b5641a812fedf1023e247a4d4939d7ec03f5f0fb84ad4f50487bcb7004d72a",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/line-ending.js": "3fa206316adeeb5a76e93c52d044f9ed32c1c1aad3a25346b913fec375ada089",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/list.js": "86115cefb14f3d7076cfe28a6f06dd805ae4e024b0897eaa897d64db1966c7e4",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/partial-non-lazy-continuation.js": "b81419f360ea1704bf19b0fd4147ff9a20ec12dcae11e935c25e5a8cec6badb1",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/setext-underline.js": "c343a50a90138a7cf0f8df9bb833299f8ee0352b74c29238500715e616ade0a6",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/thematic-break.js": "0249d3b4ed750ed74d7b9cdcf7b0ad07048a6fcf735c22a41c43d6f54c8d4a10",
+    "node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/index.js": "df8add1053d02f32b6fbbd72d5d7fb213590ea32d666bc15c7f4e69467d021be",
+    "node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/lib/html.js": "531d28a41ae6add3cdb04ecf8be50bace69bd334df9271cd146907ac4c5eb685",
+    "node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js": "2b45c68982c1f80daf125b709faba88803b131a0d710b0374dd309495a74efeb",
+    "node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/index.js": "9f2dd0393871a1d2db494fd4e5502ede219eda13ac05fea9ea6dd9c8ccf8dff6",
+    "node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/lib/html.js": "eb300069225e67d6a71c96d16c7e69c64d14ba54c42c2ea7a3bfb5a8012d83b3",
+    "node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/lib/syntax.js": "5fd8d63fcbb9918a0f7b92f2ba6adea3845e9cbf7f1e74ee239f4d018943ef6b",
+    "node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/license": "807a88522a850092aece49486207c17c313c4d5708ac276524840fe1caa0b0fa",
+    "node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/index.js": "0ee76753d9416266808227424eac60626edd98daeb27b74df4da71d2444c147c",
+    "node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/lib/html.js": "6230e158b586049d3ba5612c7a2cd781bb48af69e5f3985339519d0720a7eeea",
+    "node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js": "293e9b13a554fe569efd096cd7f1c3f4d6da861f30bba701e8b923f621181250",
+    "node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/index.js": "bfdd4285a9f61faa334ced8f98fbbd1c3ba35f00a1613839c23c30c0786dcc97",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/edit-map.js": "46973cc1af222ae8c47c90df32b58fd7a1745e6052a5c141a8524e012985cda6",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/html.js": "adc7cbc65e7ee27de8fd6b874d6cc9d42c29d459a25c4a28a6e96e0966525ef0",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/infer.js": "c2a038479872bd8026d513d528e56717fa266f09905f53192c6b5a0da6bc9ea7",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/syntax.js": "2e4cd89043d22236dcc386c92e9a20f9b631b039197ced3f6141b27329d52b0b",
+    "node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-extension-gfm-tagfilter@2.0.0/node_modules/micromark-extension-gfm-tagfilter/index.js": "11a91af64d788b9cef27855f6dad3cd2bf5f5b7a5b0ce3ba6794ef587699675f",
+    "node_modules/.pnpm/micromark-extension-gfm-tagfilter@2.0.0/node_modules/micromark-extension-gfm-tagfilter/lib/index.js": "ea626eefc8e4c741e450f31eed8476eeb1b344ea0db00363ad176c117a845a35",
+    "node_modules/.pnpm/micromark-extension-gfm-tagfilter@2.0.0/node_modules/micromark-extension-gfm-tagfilter/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/index.js": "9642f1c0386a40107895796c2207e55f981c762614887835e56ad18849f24788",
+    "node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/lib/html.js": "8a90e3c2badc4eb1f640f7ae84d9ec5c6835c17c39aaec9a08c0014fdcad1623",
+    "node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js": "b819eb327b98387d58b3c254df11324b9291420e7b59306cc41d8a25b0820385",
+    "node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-extension-gfm@3.0.0/node_modules/micromark-extension-gfm/index.js": "66b05551c6efe3d6a1c75bca914c192139bc3c998fdb2b0d0784ab6685934bbc",
+    "node_modules/.pnpm/micromark-extension-gfm@3.0.0/node_modules/micromark-extension-gfm/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/index.js": "d2651b530ac7e16dac559f6230bae438846f693dbc7b8e39b2b3001bf8455208",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/html.js": "556cea30c8cbfb9f4482de842d504bf714c15c1634416b2f3d654d8f25eb3396",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-flow.js": "5399d010e7dee830eb033b56bc3162c6ec0be64cc4da82d808533bd9aa918248",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-text.js": "228234cea5f5ee00ebe3e1c2e5e0362efbbdc7f296d77f0ead3ee0b9fdb8ef78",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/syntax.js": "abe6c2f50bdd1899290310c20d77ca6db1f17c5542eea85141e83460a4b02810",
+    "node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/license": "536804b3adbff17dbbb9ed0d2bf9655b78f07640278581e37e3d7475282d5e61",
+    "node_modules/.pnpm/micromark-factory-destination@2.0.1/node_modules/micromark-factory-destination/index.js": "8ef4475091af9f26c98ef6ee0fcccc8964fcbf60c7654b9f3d4af34da2adaa4b",
+    "node_modules/.pnpm/micromark-factory-destination@2.0.1/node_modules/micromark-factory-destination/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-factory-label@2.0.1/node_modules/micromark-factory-label/index.js": "011484772e200ea32f3139c0a258627af573dcabd78bd4eb514a34495cb4aea0",
+    "node_modules/.pnpm/micromark-factory-label@2.0.1/node_modules/micromark-factory-label/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-factory-space@2.1.0/node_modules/micromark-factory-space/index.js": "52114eb0c4995741081b53942f9b429d04b8a20e84c1aed368e8edc2aef586a0",
+    "node_modules/.pnpm/micromark-factory-space@2.1.0/node_modules/micromark-factory-space/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-factory-title@2.0.1/node_modules/micromark-factory-title/index.js": "1556b0f5d6f04b32d7178ea89b6381b936d7b8a18c92f4ca2844c4c062ed7a89",
+    "node_modules/.pnpm/micromark-factory-title@2.0.1/node_modules/micromark-factory-title/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-factory-whitespace@2.0.1/node_modules/micromark-factory-whitespace/index.js": "8cdbba455b8ff17dee625a111eab27ccf3966ac3840e66a8b21aa0d800c639d4",
+    "node_modules/.pnpm/micromark-factory-whitespace@2.0.1/node_modules/micromark-factory-whitespace/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/index.js": "0ec487160ae3fa7f375698f9f951a0c5d7d752800bca2e3b1de15e3a07ee0417",
+    "node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/index.js": "0776986647dd83ca16594bc02984a288f11e4c8a2d6f81b2487b3c9ef3a34f94",
+    "node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/index.js": "fa7b4a93bc117a88844216e2bb8fef3483825bac1d9186126048ca42f1ed3e57",
+    "node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-combine-extensions@2.0.1/node_modules/micromark-util-combine-extensions/index.js": "b2aaec9f3549d92afb610d41b4f5ab73293fbeab0d2b6080ad7a8bd3518e46e1",
+    "node_modules/.pnpm/micromark-util-combine-extensions@2.0.1/node_modules/micromark-util-combine-extensions/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/index.js": "74d2139b3651d79a7f4c1d3b21159d9c89459256e12b263ed2eb6b4fce599f87",
+    "node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/index.js": "d38b07736ff9de94721153d910fd2966608bf8cd423f2dad9c091acf8ef3377d",
+    "node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-edit-map@1.0.0/node_modules/micromark-util-edit-map/index.js": "0a29b60e6299a7b17e57e3c185014ad9bfe5a0ad6fd1365ce14605d6d299cbf0",
+    "node_modules/.pnpm/micromark-util-edit-map@1.0.0/node_modules/micromark-util-edit-map/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-encode@2.0.1/node_modules/micromark-util-encode/index.js": "323cc4fbd190cdcb56be068ff98e104aa2f431ea1039d7e967f3f7891cb859f0",
+    "node_modules/.pnpm/micromark-util-encode@2.0.1/node_modules/micromark-util-encode/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-html-tag-name@2.0.1/node_modules/micromark-util-html-tag-name/index.js": "da74ea4080075b3f45a13eda9a05789e7038e1560954aff6979daafa68d0f096",
+    "node_modules/.pnpm/micromark-util-html-tag-name@2.0.1/node_modules/micromark-util-html-tag-name/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/index.js": "6def6e2422ac8905df740d27603d8eaa5d2fdbe41122c40958ac785ff0c8dfe3",
+    "node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-resolve-all@2.0.1/node_modules/micromark-util-resolve-all/index.js": "fa3b71cedce7b6f31ae68720dccfd561b7191e3d7280663cee1400a2dd38698c",
+    "node_modules/.pnpm/micromark-util-resolve-all@2.0.1/node_modules/micromark-util-resolve-all/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-sanitize-uri@2.0.1/node_modules/micromark-util-sanitize-uri/index.js": "c8c100c6e730dd6b19ecaa70ef9f1da99c10c415dc9b6539820d41756c0fc197",
+    "node_modules/.pnpm/micromark-util-sanitize-uri@2.0.1/node_modules/micromark-util-sanitize-uri/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/index.js": "a70e48d4652be4f956606dcda3e4c13707952dc74b86f6f71990eba88d4a1e79",
+    "node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/lib/splice-buffer.js": "addce56cc7eccc0cb0ba10f7f8eab4c902f5ddf55ff43e0fb2907815ea63440e",
+    "node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/index.js": "0abeeca43ffae89b3d911da05de284f4ea6b80bde67ee8f30d7bc9655f4dad97",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/compile.js": "c94defb9025e464586e802386c1296db76253a65f3b0ea5abc372890607b29e3",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/constructs.js": "afecd299e4b5e7edb3ecba007000c311ed2b7c86e4e28729f9783da9021da2cf",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/create-tokenizer.js": "4d563d31e0f48eb0460072c869c6e38d92da7179768a671c66fa9db9fbe4fadf",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/initialize/content.js": "a1e1ad9cb372cc3ad2caa172de2f0658a9d38cde01a3f1109041a8b1ea83345e",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/initialize/document.js": "81ba0ecd6105c92a3b1f40490c67bf9b02e765894430ece35257b2f4a80f2dc3",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/initialize/flow.js": "36a507211b00526d6ec1e9d9cca7547d26a5b01db61bb6d0d94d625d2babe66f",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/initialize/text.js": "1c5682291dbb6cea7f95edeb6d50421238b91752c9e0fb9485bdde44628ce090",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/parse.js": "a8e110b17213a26a212332b2c8c39d31c302735c810bb0078e00b752f00552d9",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/postprocess.js": "0faf397c79cefaa71f92b00aa11c5b2e954aa7560ceb1c93d85d21853136b5d6",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/lib/preprocess.js": "7b537d897bec551f515477d1033e1fafaa84519ee296cad0c5331ecd2e86d188",
+    "node_modules/.pnpm/micromark@4.0.3_supports-color@10.2.2/node_modules/micromark/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/index.js": "c70e5d2c76ea00116e87d0fabe961f6d260e94641ab76dfb0a73c9c9498a4a3d",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/aria.js": "e46d46194887fe65bfc84dac050b20c163f131f81f10e88f38b48925cf01602b",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/find.js": "0e7b3a54af5d32fe6b30648b420f82ccf0bf7e2d2af9460e3c173c2785084336",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/hast-to-react.js": "47ba04ebd32327cae23e50c70f218c17161722942616182d46ce0cde7a2d58a8",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/html.js": "e204fcc00f9ba1c19049be6dbe1fa0c9378d8401482aead17cb0d0e47adff671",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/normalize.js": "b682cd82e5383c9752b3fd9b354d4694150a1b70027337998bcd46e030ed3e93",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/svg.js": "c12f46a6c616f46cf7d24f4979471402f78320d71e6642db88c3566f160f0356",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/case-insensitive-transform.js": "ed53a57e86ad3153460b9aa558206d9781bb21ace54f825b3ff8ba26c708aa5e",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/case-sensitive-transform.js": "4935f8bbb39e31920d1efe1a1feb742678113f6355b4feb7b3060118a04c9eda",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/create.js": "e1da7557afffe2afa5ee8b582fa8e302578342e9ced8bc8410fc618968730137",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/defined-info.js": "abfc5c18f95ffe73105e336370b778d4d24eb539fe609428035f690e3ded73b2",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/info.js": "9cacb8f3711acde4ef79814c4f42d97a4923ccb37e5a6ddd550ebbffb452a1e5",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/merge.js": "4f9b3be6a66510d379a3096297da53f2a5a49eebeba6b8db17a5e7b044a90c33",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/schema.js": "d97aa20f271dd5e3ea798dff8cc1fa196a074081b92e60b9335824ce00d05ba6",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/util/types.js": "534ee498a7991c73556e49cf8031de26b193f4ffdf3da0aeac52add9d7b6ea1c",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/xlink.js": "9a92f5105b5f4558bf1b63cb43a11c57289fb4b638e9ad4f1d99716602b95a91",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/xml.js": "aa91faf152020c8be409ae8253d3ebaf85b2a9246c5a3ed96d9d5424c9e4064c",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/lib/xmlns.js": "5e3700fcaa7faf7542982e2657286be3a652744c0f3d0ee64c311ed158ef00d9",
+    "node_modules/.pnpm/property-information@7.2.0/node_modules/property-information/license": "5d0698266086f217bb11ea0499d33453e401fe479fb9126ad04e625e63d3557b",
+    "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js": "a319b413b7a19ee34422d9a12a8e7afd003c07846716d278ba1a0898e8cb6251",
+    "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js": "7a05d7f7bb2b02aae84018a88d4815a2181eef48d2cb8172d403eaa2b131eefd",
+    "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/client.js": "00e348ab3d6bc2eef908345d0bc4e008c95bcfecec060dfda5c4967953761396",
+    "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/index.js": "ba1a3e33489f868371561777607e3ee5091df0f7ea3f1a10f789d6b86e4c1505",
+    "node_modules/.pnpm/react-markdown@10.1.0_@type_fb22cd735349f3341a5daac8be66c3ab/node_modules/react-markdown/index.js": "1420b7245c57274cbaa448e57282bba0f9a60a93ba43bdfe30ac83deba53c1e2",
+    "node_modules/.pnpm/react-markdown@10.1.0_@type_fb22cd735349f3341a5daac8be66c3ab/node_modules/react-markdown/lib/index.js": "1c8d95723a74051c354dd4470fb669ae5269baf0ac62aa9b52c4516960ace5ee",
+    "node_modules/.pnpm/react-markdown@10.1.0_@type_fb22cd735349f3341a5daac8be66c3ab/node_modules/react-markdown/license": "f6196c64e144f9a6fa9154c3a80bc8b89615a9567934b83a8951879f06ba2aef",
+    "node_modules/.pnpm/react@19.3.1/node_modules/react/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react-jsx-runtime.production.js": "1e46f15002696985e80c61d47aaa30dabb03c954270a690f5f7dfbbacfa9002b",
+    "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js": "0b5529981841afa1b58c76ba85c29bb681ff5f07cd8cde6a10b967d3915b8e1c",
+    "node_modules/.pnpm/react@19.3.1/node_modules/react/index.js": "60caffdecbdc5db3bc4ec4e83df9488345ccb271d07533b9210bf5750918d97e",
+    "node_modules/.pnpm/react@19.3.1/node_modules/react/jsx-runtime.js": "b392951a77d0a2e6a6bd017e49d768481ae5b63c4109c6c31f622cf7b2433edc",
+    "node_modules/.pnpm/rehype-katex@7.0.1/node_modules/rehype-katex/index.js": "ff503a9bd25827d5d77b2bc2ef6a5cfc830c24b217ebcc0613484fe513001de7",
+    "node_modules/.pnpm/rehype-katex@7.0.1/node_modules/rehype-katex/lib/index.js": "54d3d2c7df56a9e35a53a437a11bc92e70d7c7a4e7ee29ef2cf30852555f6f5c",
+    "node_modules/.pnpm/remark-gfm@4.0.1_supports-color@10.2.2/node_modules/remark-gfm/index.js": "0cf2ebbaae90578f4a838505ebc3d7fd1d8339484c7f13be1a3d4d09427c2dc9",
+    "node_modules/.pnpm/remark-gfm@4.0.1_supports-color@10.2.2/node_modules/remark-gfm/lib/index.js": "9317003279e791d39b7e3482cecfb3409843378164a238a535984f644e53c7ef",
+    "node_modules/.pnpm/remark-gfm@4.0.1_supports-color@10.2.2/node_modules/remark-gfm/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/remark-math@6.0.0_supports-color@10.2.2/node_modules/remark-math/index.js": "ff503a9bd25827d5d77b2bc2ef6a5cfc830c24b217ebcc0613484fe513001de7",
+    "node_modules/.pnpm/remark-math@6.0.0_supports-color@10.2.2/node_modules/remark-math/lib/index.js": "d89e4f61bb3e92fd317064a2419edc99e863b1a63783fcddeb428c7eccb03de9",
+    "node_modules/.pnpm/remark-parse@11.0.0_supports-color@10.2.2/node_modules/remark-parse/index.js": "0cf2ebbaae90578f4a838505ebc3d7fd1d8339484c7f13be1a3d4d09427c2dc9",
+    "node_modules/.pnpm/remark-parse@11.0.0_supports-color@10.2.2/node_modules/remark-parse/lib/index.js": "9d5a9a197d1d91a1abbf47b8cf67e1ee0decbfc9471d94c4a2ee712ff73b90c8",
+    "node_modules/.pnpm/remark-parse@11.0.0_supports-color@10.2.2/node_modules/remark-parse/license": "413654b0a78b98661dce96d2aff2e4d075603d220b8483e28b1aa010ccc138b4",
+    "node_modules/.pnpm/remark-rehype@11.1.2/node_modules/remark-rehype/index.js": "995628e8b0f98e9f185dfec8570bed3d8c72a291eaf8d28c7b63495f29a85ed5",
+    "node_modules/.pnpm/remark-rehype@11.1.2/node_modules/remark-rehype/lib/index.js": "85f8d8985414613d2a64c4b6927e10ebd1edefe87a956190a1343dd833f689ef",
+    "node_modules/.pnpm/remark-rehype@11.1.2/node_modules/remark-rehype/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js": "679adff761d31e9426604f80c0e99be44a3e6f4c6834b0218ecf0312a67c171f",
+    "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/index.js": "145965504d60007bc25486ab930b0367867dcd5d579ccd343c148d69349a7cfb",
+    "node_modules/.pnpm/space-separated-tokens@2.0.2/node_modules/space-separated-tokens/index.js": "080bce26a6623cdb189d1cd62c6bdd27fe9984b40f19d81abe113a20dae3c379",
+    "node_modules/.pnpm/space-separated-tokens@2.0.2/node_modules/space-separated-tokens/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/style-to-js@1.1.21/node_modules/style-to-js/LICENSE": "bbb380e5c1a717079378d6ea4d33c8a5a81655d4612b749f882e34e46712aab5",
+    "node_modules/.pnpm/style-to-js@1.1.21/node_modules/style-to-js/cjs/index.js": "4d72a5338a27ea5526f6d3111e4a02129576f6238e0b346743454381c835bef2",
+    "node_modules/.pnpm/style-to-js@1.1.21/node_modules/style-to-js/cjs/utilities.js": "0463aa5f7ac6322ebcdce9bafe3b2ce018e9428e340b9e97f034cc6e8abc6a5c",
+    "node_modules/.pnpm/style-to-object@1.0.14/node_modules/style-to-object/LICENSE": "896c9fd6b5fc48ac31800b9d29a6e3ffcb0c2d534ed077ebfa5c2fa388cc38b7",
+    "node_modules/.pnpm/style-to-object@1.0.14/node_modules/style-to-object/cjs/index.js": "210c4e97e6134e0617412ce7ee84e7a0a8923a1fd4d8adbc58206d766eed55fc",
+    "node_modules/.pnpm/trim-lines@3.0.1/node_modules/trim-lines/index.js": "d784a46164df3f83ea47bedc6a5c316fd29469e79b6a99e206856961321c2460",
+    "node_modules/.pnpm/trim-lines@3.0.1/node_modules/trim-lines/license": "9f084fac69d8cf1e6ce983ba5a3499c7695ed74a26ec625c38f0fd19fddd5e10",
+    "node_modules/.pnpm/trough@2.2.0/node_modules/trough/index.js": "cd3300bc71f3f23850f8b583abb140c98c63072011482a270aab544085e41e00",
+    "node_modules/.pnpm/trough@2.2.0/node_modules/trough/lib/index.js": "a5a84b499ac99ebc3435fe0027de0b836cdbcb5c7413e525fd8e13f2aec5b1c2",
+    "node_modules/.pnpm/trough@2.2.0/node_modules/trough/license": "6c03fd41cfd7c92d8aa8a2fa521b94b2683f059123281dcf921ddea9216b6254",
+    "node_modules/.pnpm/unified@11.0.5/node_modules/unified/index.js": "12a98242be891512cbdec8bce2ec1a9147d9d89b2802165560411c5fe5037508",
+    "node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/callable-instance.js": "28c9baa7aea87597c4eca19a2e2b3342d3017347fabf7d513278787b5a950c58",
+    "node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js": "4a2e5111187985134153358e282f2613d3e862ee9da6336bfb95ed1850f3914d",
+    "node_modules/.pnpm/unified@11.0.5/node_modules/unified/license": "05811400116ed61f1a7693b78fe8ca6598c155a12f3978e609db4df648a4cb3d",
+    "node_modules/.pnpm/unist-util-find-after@5.0.0/node_modules/unist-util-find-after/index.js": "bbafaa21ffc055de8a9abf57f609929e5fa5f274f99b6264b1bba5725587cec1",
+    "node_modules/.pnpm/unist-util-find-after@5.0.0/node_modules/unist-util-find-after/lib/index.js": "dce4a988b2957a9f51a7b27b56289cd0fa7dc1f138ec76c4140560d2300b183a",
+    "node_modules/.pnpm/unist-util-find-after@5.0.0/node_modules/unist-util-find-after/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/index.js": "037c062d404356c6bbb8dad28d39445165d23e84ac35a63496a98d40aaa8d645",
+    "node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js": "ce90bad6b772a7e1115d76e4cc53bfade1ee1fe8ac1b8880f48b0e1512ffba44",
+    "node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/license": "82974dbf2639d13edab95c32ed9cb6c0867ede272cd2e07ce47ce8548fe55c05",
+    "node_modules/.pnpm/unist-util-position@5.0.0/node_modules/unist-util-position/index.js": "0852ccb10e53cbe0d096e5598806e431af3c2a40ef272a56db87643b6f1f07b5",
+    "node_modules/.pnpm/unist-util-position@5.0.0/node_modules/unist-util-position/lib/index.js": "3a751e6977493112a744188be93f88005f89c6490a7ee88b2e50ff3756d79e44",
+    "node_modules/.pnpm/unist-util-position@5.0.0/node_modules/unist-util-position/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/index.js": "7b80d608db2ab15251da8c71c4ed8029102b16677d80f4977487136e6b9e5774",
+    "node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js": "9d66941cf43fa4f4faa5912019ad9dae3f1ea3395b0c2fe64c2bcd5c2d4b2c28",
+    "node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/index.js": "6e3e10026230a33197e56422a2d95fc1815528c0bde7c1c790fd1a733b04bd39",
+    "node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.js": "84d02ef62d60a8e4fc8529fa6725abb85729274a873afbb8d4d9fb317ae01135",
+    "node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js": "8789a4f20d3e3c82bcaeec9628697752d662461bf6237ecfba61cfcc00f30bf7",
+    "node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/index.js": "0bd7a392932d4578d13e0ab49705ba1488ecaad56fa4cf865f85dac64d34de91",
+    "node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js": "83779ce32216704c4a7593fd350c48a6570f445b1bb583cbe6d1da12d86cc4bd",
+    "node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/license": "63cb98b3f6abfb3c3592c16f88253c1bdc834087bf52671e8ce5609e4eb693cf",
+    "node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/index.js": "b5a79b593628629d6e3e10dd9ea2637418b5b2822914621daf3d954396de9791",
+    "node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/lib/index.js": "2aa3a64765f6708ef3a65a2a6637a4b9647d4a14ca934b157f51e1e3330cd9b8",
+    "node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/license": "dd1081884a92952802f4803110a6bb543acea9a814c786d58605b4c1219b5ebb",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/index.js": "db1e3da681ec50cc73fa278083581a9605266615dbef264d99336c57f0f3b251",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/index.js": "c3ace457947030204553dc06a65249cfa427649ce18949999b34029c5a270265",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minpath.browser.js": "6c011d74955d2c202e1af91c8616e92e0a2381dce628128553dd81b03c900f95",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minproc.browser.js": "f13b22707f7048a983027bec0bfefa9f4630ae4b992031cfd772642c1598f993",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.browser.js": "c0fdbff8069606f5eef2ccb588abe8f06a7597bcf1894bd1a9ba155b1ebafc1f",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.shared.js": "92df001e690fd3b8ec4bbe2cfb0d176da8aa9011e404a454c88158c05153b8f1",
+    "node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/license": "05811400116ed61f1a7693b78fe8ca6598c155a12f3978e609db4df648a4cb3d",
+    "node_modules/.pnpm/web-namespaces@2.0.1/node_modules/web-namespaces/index.js": "8f72a63a66820c0e4656958f8ba33be2635a87a74ad5cc0734507eabf9770743",
+    "node_modules/.pnpm/web-namespaces@2.0.1/node_modules/web-namespaces/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/index.js": "81f592d700aff8042238e7cab8e03c002e689117ecf15844ed753e08825a2873",
+    "node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
+    "resources/workbench/notices/offline/rehype-katex@7.0.1.LICENSE": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983",
+    "resources/workbench/notices/offline/remark-math@6.0.0.LICENSE": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983",
+    "scripts/workbench/build-offline.mjs": "e58588e204381e65343c9584d55dd784ab1470b1d7579b302f00c4227dbd279e"
+  },
+  "dependencies": [
+    {
+      "name": "@ungap/structured-clone",
+      "version": "1.4.0",
+      "license": "ISC"
+    },
+    {
+      "name": "bail",
+      "version": "2.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "ccount",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "comma-separated-tokens",
+      "version": "2.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "decode-named-character-reference",
+      "version": "1.3.0",
+      "license": "MIT"
+    },
+    {
+      "name": "devlop",
+      "version": "1.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "escape-string-regexp",
+      "version": "5.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "estree-util-is-identifier-name",
+      "version": "3.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "extend",
+      "version": "3.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-from-dom",
+      "version": "5.0.1",
+      "license": "ISC"
+    },
+    {
+      "name": "hast-util-from-html-isomorphic",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-is-element",
+      "version": "3.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-parse-selector",
+      "version": "4.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-to-jsx-runtime",
+      "version": "2.3.6",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-to-text",
+      "version": "4.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "hast-util-whitespace",
+      "version": "3.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "hastscript",
+      "version": "9.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "html-url-attributes",
+      "version": "3.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "inline-style-parser",
+      "version": "0.2.7",
+      "license": "MIT"
+    },
+    {
+      "name": "is-plain-obj",
+      "version": "4.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "katex",
+      "version": "0.16.22",
+      "license": "MIT"
+    },
+    {
+      "name": "longest-streak",
+      "version": "3.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "markdown-table",
+      "version": "3.0.4",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-find-and-replace",
+      "version": "3.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-from-markdown",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm-autolink-literal",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm-footnote",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm-strikethrough",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm-table",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm-task-list-item",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-gfm",
+      "version": "3.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-math",
+      "version": "3.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-phrasing",
+      "version": "4.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-to-hast",
+      "version": "13.2.1",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-to-markdown",
+      "version": "2.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "mdast-util-to-string",
+      "version": "4.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-core-commonmark",
+      "version": "2.0.4",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-autolink-literal",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-footnote",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-strikethrough",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-table",
+      "version": "2.1.2",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-tagfilter",
+      "version": "2.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm-task-list-item",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-gfm",
+      "version": "3.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-extension-math",
+      "version": "3.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-factory-destination",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-factory-label",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-factory-space",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-factory-title",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-factory-whitespace",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-character",
+      "version": "2.1.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-chunked",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-classify-character",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-combine-extensions",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-decode-numeric-character-reference",
+      "version": "2.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-decode-string",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-edit-map",
+      "version": "1.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-encode",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-html-tag-name",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-normalize-identifier",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-resolve-all",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-sanitize-uri",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark-util-subtokenize",
+      "version": "2.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "micromark",
+      "version": "4.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "property-information",
+      "version": "7.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.3.1",
+      "license": "MIT"
+    },
+    {
+      "name": "react-markdown",
+      "version": "10.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "react",
+      "version": "19.3.1",
+      "license": "MIT"
+    },
+    {
+      "name": "rehype-katex",
+      "version": "7.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "remark-gfm",
+      "version": "4.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "remark-math",
+      "version": "6.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "remark-parse",
+      "version": "11.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "remark-rehype",
+      "version": "11.1.2",
+      "license": "MIT"
+    },
+    {
+      "name": "scheduler",
+      "version": "0.28.0",
+      "license": "MIT"
+    },
+    {
+      "name": "space-separated-tokens",
+      "version": "2.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "style-to-js",
+      "version": "1.1.21",
+      "license": "MIT"
+    },
+    {
+      "name": "style-to-object",
+      "version": "1.0.14",
+      "license": "MIT"
+    },
+    {
+      "name": "trim-lines",
+      "version": "3.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "trough",
+      "version": "2.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "unified",
+      "version": "11.0.5",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-find-after",
+      "version": "5.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-is",
+      "version": "6.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-position",
+      "version": "5.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-stringify-position",
+      "version": "4.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-visit-parents",
+      "version": "6.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "unist-util-visit",
+      "version": "5.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "vfile-message",
+      "version": "4.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "vfile",
+      "version": "6.0.3",
+      "license": "MIT"
+    },
+    {
+      "name": "web-namespaces",
+      "version": "2.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "zwitch",
+      "version": "2.0.4",
+      "license": "MIT"
+    }
+  ],
+  "files": [
+    {
+      "path": "reader.js",
+      "bytes": 1810730,
+      "sha256": "9a7b5cab38154f188e9f0d2cdf5c91cbda2c5ffa3e305be7048f1e4c2537f66e"
+    },
+    {
+      "path": "reader.css",
+      "bytes": 1462767,
+      "sha256": "1f83d1e058dd03745e8a1a594bfd1997697f4d03c7959e17d48e9cd393e6fa61"
+    },
+    {
+      "path": "notices.txt",
+      "bytes": 102670,
+      "sha256": "fd8775af48b5357c17c7e68473d322f846ae39a61da5d7352be175b48d9f5431"
+    }
+  ]
+}

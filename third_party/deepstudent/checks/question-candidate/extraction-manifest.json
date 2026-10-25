@@ -1,0 +1,49 @@
+{
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "sources": [
+    {
+      "source_path": "src-tauri/src/question_bank_service.rs",
+      "sha256": "fa7357428b9a2fdea0692cc241802a42e62cef56b0f99d69335c1422c2152060",
+      "git_blob_sha1": "ac7d07f548930c3e7129d8582356bb5fdb3cb3da",
+      "bytes": 178089
+    },
+    {
+      "source_path": "src-tauri/src/vfs/repos/question_repo.rs",
+      "sha256": "465ba3dd7c3cef9722dbdbb2e1b2c3f66b950812851331db5daf006d228cc4c3",
+      "git_blob_sha1": "88f634f9cc4e9f1404f1bf85605995bc3473e928",
+      "bytes": 121756
+    }
+  ],
+  "slices": [
+    {
+      "label": "QuestionType and methods",
+      "start_line": 46,
+      "end_line": 115,
+      "sha256": "f5bc4c219b0cdde1f0a200c39585882b8f640da6bc3676b188145bdf7ff261a9",
+      "modification": "none; source bodies unchanged"
+    },
+    {
+      "label": "deterministic answer grader",
+      "start_line": 1031,
+      "end_line": 1556,
+      "sha256": "db1913b1792f193e4fc42873774644e95df84112971eb335f2956d458d6314a9",
+      "modification": "none; source bodies unchanged"
+    },
+    {
+      "label": "upstream pure grader tests",
+      "start_line": 3716,
+      "end_line": 4159,
+      "sha256": "19647cb5bd90e58648df193fc106ff1d3945d1bdbf947b53ec92df08516c3959",
+      "modification": "none; source bodies unchanged"
+    },
+    {
+      "label": "upstream test helper functions",
+      "start_line": 3572,
+      "end_line": 3585,
+      "sha256": "82641a60e88b95dd31e2f1459f25a7bb18515e2fe4c3028d259e95fbbb2a086e",
+      "modification": "none; source bodies unchanged"
+    }
+  ],
+  "output_sha256": "23ec3b28a514f49e94d562e5cbbf41dd11a81448138b4ff54370906862534afe",
+  "adaptation": "New empty service container, original functions and tests, thin public entry; no VFS/Tauri/provider/database imports."
+}

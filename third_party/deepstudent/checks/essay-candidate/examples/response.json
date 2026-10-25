@@ -1,0 +1,122 @@
+{
+  "protocol_version": 1,
+  "request_id": "fixture_round_1",
+  "ok": true,
+  "result": {
+    "origin": "ai_reference",
+    "draft_id": "essay_1",
+    "draft_revision_id": "draft_r1",
+    "draft_content_hash": "00e6f9c0b235872f954d8fb310512f0bcb72970406ab0b76fb2223e42b40116d",
+    "content_role": "user_note",
+    "raw_feedback": "<score max=\"100\" total=\"70\"><dim score=\"40\" name=\"表达 &amp; 文法\" max=\"60\">评语</dim><dim name=\"内容\" max=\"40\" score=\"30\">评语</dim></score>",
+    "raw_annotated_text": "前🙂 bad 后 <err type=\"grammar\" explanation=\"可改进\">bad</err> 末",
+    "stats": {
+      "hanChars": 3,
+      "englishWords": 2,
+      "punctuationTotal": 0,
+      "cnPunctuation": 0,
+      "enPunctuation": 0,
+      "nonWhitespaceChars": 10,
+      "totalChars": 14,
+      "lineCount": 1,
+      "paragraphCount": 1
+    },
+    "codepoint_count": 14,
+    "algorithm": {
+      "adapter_version": "0.1.0",
+      "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+      "node_version": "24.14.0",
+      "offset_unit": "unicode_codepoint",
+      "source_files": [
+        {
+          "path": "src/essay-grading/types.ts",
+          "sha256": "85d18a55e77d1218adb3ae94554424c4108762e0ec9ef7a875397505dffe2f30"
+        },
+        {
+          "path": "src/essay-grading/markerTypes.ts",
+          "sha256": "144c609105267503e97f7eb9905bd21062dd4def7a4c56f23f973aa3bd8c37c9"
+        },
+        {
+          "path": "src/essay-grading/streamingMarkerParser.ts",
+          "sha256": "1f661d0415f7fab894812bac7d5a411f116cd473006c53449a3cedcca3abfe90"
+        },
+        {
+          "path": "src/essay-grading/markerParser.ts",
+          "sha256": "b6e7bf9575449ddebcb62be427ab3d4ebbd3d58ee4cacd206f873336467329b8"
+        },
+        {
+          "path": "src/essay-grading/suggestionAnchors.ts",
+          "sha256": "99109cd4aff1789b5f014b34ede33d7cad4b7acb3d8f8f0d5932d5247edb9ea4"
+        },
+        {
+          "path": "src/essay-grading/textStats.ts",
+          "sha256": "c41c5a868cc6b98a4ccb88560942e13ba60b02c9846bf76c6ca3e4ac36f46a59"
+        },
+        {
+          "path": "src/essay-grading/essayContentState.ts",
+          "sha256": "e752f0a3f1f1611f7c02a319278a35cff6f715a16e7f032464557e6731361045"
+        }
+      ]
+    },
+    "parsed_candidate": {
+      "total": 70,
+      "maxTotal": 100,
+      "grade": "pass",
+      "dimensions": [
+        {
+          "name": "表达 & 文法",
+          "score": 40,
+          "maxScore": 60,
+          "comment": "评语"
+        },
+        {
+          "name": "内容",
+          "score": 30,
+          "maxScore": 40,
+          "comment": "评语"
+        }
+      ],
+      "isComplete": true
+    },
+    "diagnostics": [],
+    "status": "reference_ready",
+    "reference_evaluation": {
+      "total": 70,
+      "max_total": 100,
+      "grade": "pass",
+      "dimensions": [
+        {
+          "name": "表达 & 文法",
+          "score": 40,
+          "max_score": 60,
+          "comment": "评语"
+        },
+        {
+          "name": "内容",
+          "score": 30,
+          "max_score": 40,
+          "comment": "评语"
+        }
+      ],
+      "origin": "ai_reference"
+    },
+    "annotations": [
+      {
+        "status": "mapped",
+        "draft_revision_id": "draft_r1",
+        "draft_content_hash": "00e6f9c0b235872f954d8fb310512f0bcb72970406ab0b76fb2223e42b40116d",
+        "start": 9,
+        "end": 12,
+        "offset_unit": "unicode_codepoint",
+        "quote": "bad",
+        "replacement": "bad",
+        "utf16_index": 10,
+        "kind": "err",
+        "error_type": "grammar",
+        "comment": "可改进",
+        "marker_index": 1
+      }
+    ],
+    "unmapped_annotations": []
+  }
+}

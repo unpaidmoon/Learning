@@ -1,0 +1,28 @@
+DeepStudent source: https://github.com/helixnow/deep-student
+Fixed commit: 635216503c0b34bdf812e17942e0f09f51872e6f
+
+Archived byte-for-byte sources:
+src-tauri/src/question_bank_service.rs
+src-tauri/src/vfs/repos/question_repo.rs
+
+src/upstream_pure.rs contains exact source slices for QuestionType and its
+methods, deterministic grading methods1031-1556, original test helpers and15
+pure tests. Original function bodies are unchanged. extraction-manifest.json
+records the byte/content hashes and source lines. New surrounding code creates
+an empty service container and exposes the original grader/numeric utilities.
+
+Project adapter: explicit confirmed/reference-only status; nullable pending;
+finite structured numeric reference requirements; conservative units/surface
+guards; strict versioned bounded JSON stdin/stdout; stable error codes; source
+identity echo. No VFS, Tauri, database, mastery, SM-2, provider or model runtime.
+
+Original upstream root license is GNU AGPLv3; upstream third-party notices state
+AGPL-3.0-or-later. Original notices are retained with this candidate. Each fixed
+serde/compiler dependency has original notices and hashes in
+dependency-manifest.json. This records provenance/adaptation, not a final
+distribution or legal-compatibility decision for the whole product.
+
+This helper computes only. The owning application authorizes actual submissions,
+keeps original answers and AI reference judgments, uses append-only corrections,
+operation hashes and CAS, and arbitrates paused/removed/limited review queues.
+The helper never commits or deletes business data and never wakes paused work.

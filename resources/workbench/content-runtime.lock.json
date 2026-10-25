@@ -1,0 +1,130 @@
+{
+  "manifest_version": 1,
+  "release_id": "source-content-node24-20261024-r2",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "source_files": {
+    "third_party/deepstudent/upstream/src/features/media-handout/windowing.ts": "b84e36c4b3d9bba1c6ef1ac8d53641a87fb8ae9770c664fce130309ec97691ec",
+    "third_party/deepstudent/upstream/src/features/media-handout/ir.ts": "9f6e31a9c1d5d2b099eeb690d317d869bc8291f9d1fb910fb9928bfad6d7e381",
+    "third_party/deepstudent/upstream/src/features/chat/components/translationNdjsonParser.ts": "86118e364aa9c87b8e285d0a8923e320e6e9f931437c85fa8e624ca774931b64",
+    "third_party/deepstudent/upstream/src/features/chat/components/translationTypes.ts": "4c1c77e6b389c7562df35d187f57be04114e8cb7c98fc7d1c974a7b43da009d8"
+  },
+  "declarations": {
+    "CHUNK_CHARS": "98f0d72df94d4779eeb51c69df940c0639233fa706ec30c54dbad81765260dc0",
+    "chunkTranscript": "3b441b58421f32c869734768d7b4967037fae61638d7e4c1917b027b8a8c299e",
+    "formatClock": "d887654c8457eae1f636b02c650729124b61c2c84f176c8bdd3c51242f5cd13f"
+  },
+  "aligned_parser": {
+    "declarations": {
+      "NdjsonLineResult": "6b9301b6de21354126d7b252140b21e63aaeb86a7bcab2c213ccb24df91be20b",
+      "createNdjsonParser": "f6afb95cb4a33e0ff0d2df4fd30dd7e3144a9c1c4b2ee6cfdf149f8d33a72ae5",
+      "AlignedSegment": "76628d9ece62f33646d092dbf3df6210801044665c2d2e0c978425f0f0939a45"
+    },
+    "adapted_sha256": "1cab2faabfee146feee3d235c67b513bdd77217e367885fcc5577cc476c7397d",
+    "edits": [
+      {
+        "before_sha256": "a602dbc0b470011f342ff2e133434dd30e76d3aabec8c0211b1f546b29126825",
+        "after_sha256": "d5d9c7100f00f265491af4e3a5f2b8179192e8cba8e0c4e6e95ac5c4279a71d8",
+        "reason": "Expose invalid objects, outside text, incomplete tail and content after the terminator."
+      },
+      {
+        "before_sha256": "046d42acd057142c969980eefebc1a407764a939906aa7bab2646604a09e0b9c",
+        "after_sha256": "aa9d164b07386f46d3d775f2356e7167ee99e977975fe72cae4443bb4825ae5e",
+        "reason": "Only a standalone done object is a terminator."
+      },
+      {
+        "before_sha256": "600881046877d052903966fa1e74a86c959133cfe202cc2aa6833e7003672e6f",
+        "after_sha256": "2d4c2c19a13bf06563e285d5f0aa3d5b48b7c82eae4003a8954eec14234aa805",
+        "reason": "No extra fields or empty source; whitespace-only segments must preserve whitespace exactly."
+      },
+      {
+        "before_sha256": "cd782f2013010c8cf469b348e090dd19b4fa4597ca4255582153d5ea72c86150",
+        "after_sha256": "7982b28a47fb6f7a9dfcc1abc40b751821e7dbaa89c88c1c88062321b8660616",
+        "reason": "A malformed or unrecognized balanced object cannot be silently discarded."
+      },
+      {
+        "before_sha256": "ebfd9693a5a6c1a9955388ae4c2828a115feb062b6916909ecbbbf1143d3dcc7",
+        "after_sha256": "589bb0c2ad92b850227ddb0eac3e96c10af192eb58a595651fb21a18bf03b712",
+        "reason": "Framing noise and code fences remain observable, not silently accepted."
+      },
+      {
+        "before_sha256": "2aca2159e7be3e1c160202710c075adbe29dfe4ff3070a81cd50e1ba07123b3e",
+        "after_sha256": "65d164c6fc7dcdd1152efcfaa751ed7b0b24c614a27e10191563a481d6b382a9",
+        "reason": "Any object after done invalidates completion even if it would be ignored upstream."
+      },
+      {
+        "before_sha256": "e16313b076f0147f3c0cc7f7ed18417724e92e25dcff3dc591a99c4c90dfe8f8",
+        "after_sha256": "74a0e2ec9af6ef517c6793e3307ab4f6cc4b43124e951136d0cec2c0e70645b9",
+        "reason": "Exactly one terminator is required."
+      },
+      {
+        "before_sha256": "e350822ea592b7e6885da81b3d8ce4db85e351abba877ae87cb8f502adccc4c1",
+        "after_sha256": "87f0eed8e5531a3cbfcfabc9d227b83d150db68151f8cd4031344e88c1d35733",
+        "reason": "Expose the pre-flush tail; the caller must not use upstream flush to erase an incomplete object."
+      }
+    ]
+  },
+  "node_sha256": "63c259c81e5d472b5f11c8d506070130cb04a1ecf84b80377a34ed6ec9048088",
+  "protocol": {
+    "version": 1,
+    "max_input_bytes": 2097152,
+    "max_output_bytes": 131072,
+    "timeout_seconds": 5
+  },
+  "files": [
+    {
+      "path": "helper.cjs",
+      "bytes": 3747,
+      "sha256": "0dd3f3f60d6b5fdb8f7936d14d03b067fac9793017bfbfa2ff92a55b0b5b310b"
+    },
+    {
+      "path": "dist/chunkTranscript.cjs",
+      "bytes": 894,
+      "sha256": "83816db15ce8f84485d40c3f22fd9e9c03abe2aad915b3df53823ec853a4e775"
+    },
+    {
+      "path": "dist/alignedParser.cjs",
+      "bytes": 4198,
+      "sha256": "1e5ed5dd44ee7e816bd07506e446f86a685e7cdd774593074be931a21baa7ec6"
+    },
+    {
+      "path": "notices/translationNdjsonParser.ts",
+      "bytes": 5830,
+      "sha256": "86118e364aa9c87b8e285d0a8923e320e6e9f931437c85fa8e624ca774931b64"
+    },
+    {
+      "path": "notices/translationTypes.ts",
+      "bytes": 1033,
+      "sha256": "4c1c77e6b389c7562df35d187f57be04114e8cb7c98fc7d1c974a7b43da009d8"
+    },
+    {
+      "path": "notices/alignedParser.adapted.ts",
+      "bytes": 3692,
+      "sha256": "1cab2faabfee146feee3d235c67b513bdd77217e367885fcc5577cc476c7397d"
+    },
+    {
+      "path": "notices/aligned-adaptation.json",
+      "bytes": 2668,
+      "sha256": "4175945a6a0dc630e6f75e88e1437d1ad1e6d86af3a36021e60fa57b6aa650d3"
+    },
+    {
+      "path": "notices/LICENSE.AGPL-3.0",
+      "bytes": 34532,
+      "sha256": "8943429804542a78e4f48d6a7ac6323f059a5a8540200eb0a2a9b3de7c33bf1d"
+    },
+    {
+      "path": "notices/windowing.ts",
+      "bytes": 5849,
+      "sha256": "b84e36c4b3d9bba1c6ef1ac8d53641a87fb8ae9770c664fce130309ec97691ec"
+    },
+    {
+      "path": "notices/ir.ts",
+      "bytes": 8241,
+      "sha256": "9f6e31a9c1d5d2b099eeb690d317d869bc8291f9d1fb910fb9928bfad6d7e381"
+    }
+  ],
+  "time_presentation": {
+    "path": "third_party/deepstudent/web/timePresentation.ts",
+    "sha256": "9a1a002c8dcd6e2e304ae5109adaf10311b3b79c6bacd0aeb407019285bb6fa3"
+  },
+  "build_typescript": "5.9.3"
+}

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import mimetypes
 import os
 import re
@@ -36,7 +37,7 @@ from learning_app.course_files_schema import (
 )
 from learning_app.course_files_schema import course_visibility as visibility
 from learning_app.errors import AppError
-from learning_app.media import VIDEO_TYPES, MediaAssetResponse, MediaStore, _read_locked
+from learning_app.media import PLAYBACK_TYPES, MediaAssetResponse, MediaStore, _read_locked
 from learning_app.native_files import pick_paths, read_clipboard_paths, recycle_path
 from learning_app.storage import Repository
 from learning_app.storage import schema as business
@@ -56,6 +57,12 @@ class CourseFileInput(BaseModel):
 class CourseFolderInput(CourseFileInput):
     path: str | None = Field(default=None, max_length=32760)
     title: str | None = Field(default=None, min_length=1, max_length=200)
+
+
+class CourseRelocationInput(CourseFileInput):
+    operation_id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,160}$")
+    expected_root: str | None = None
+    path: str | None = Field(default=None, max_length=32760)
 
 
 class CourseMutationInput(CourseFileInput):
@@ -236,7 +243,7 @@ def _viewer(path: Path) -> Viewer:
     if path.is_dir():
         return "directory"
     suffix = path.suffix.lower()
-    if suffix in VIDEO_TYPES:
+    if suffix in PLAYBACK_TYPES:
         return "video"
     if suffix in _IMAGES:
         return "image"
@@ -313,6 +320,8 @@ class CourseFileStore:
             if root is None
             else "detached"
             if root["state"] == "detached"
+            else "missing"
+            if root["state"] == "needs_source"
             else "ready"
             if path.is_dir() and not _is_link(path)
             else "missing"
@@ -449,10 +458,162 @@ class CourseFileStore:
                         .where(business.courses.c.course_id == course_id)
                         .values(title=title)
                     )
+        previews = getattr(self.repository, "video_previews", None)
+        if previews is not None:
+            previews.enqueue_course(course_id)
         return self.folder(course_id)
+
+    def relocate_root(self, course_id, value, *, expected_root, operation_id):
+        """User-selected association only; never move/delete originals or change IDs."""
+        payload = {"old_root": expected_root, "new_path": value}
+        replay = self._prior(course_id, "relocate_root", payload, operation_id)
+        if replay is not None:
+            return replay
+        new_root = _local_path(value, directory=True)
+        if not new_root.name or new_root == Path(new_root.anchor):
+            raise AppError("COURSE_ROOT_INVALID", "请选择独立课程目录")
+        with self._lock:
+            folder = self.folder(course_id)
+            if folder["root_path"] != expected_root:
+                raise AppError("COURSE_ROOT_CHANGED", "课程位置已变化，请重新核对")
+            with self.engine.connect() as connection:
+                others = (
+                    connection.execute(
+                        select(roots.c.local_path).where(roots.c.course_id != course_id)
+                    )
+                    .scalars()
+                    .all()
+                )
+                registered = [
+                    dict(r)
+                    for r in connection.execute(
+                        select(business.source_versions)
+                        .join(
+                            business.course_assets,
+                            business.course_assets.c.asset_id
+                            == business.source_versions.c.asset_id,
+                        )
+                        .where(business.course_assets.c.course_id == course_id)
+                    ).mappings()
+                ]
+                known = [
+                    dict(r)
+                    for r in connection.execute(
+                        select(entries).where(entries.c.course_id == course_id)
+                    ).mappings()
+                ]
+                old_locations = {}
+                if connection.exec_driver_sql(
+                    "SELECT 1 FROM sqlite_master WHERE name='data_imported_owners'"
+                ).first():
+                    for row in connection.exec_driver_sql(
+                        "SELECT owner_id,facts FROM data_imported_owners WHERE kind='source'"
+                    ):
+                        old_locations[row[0]] = json.loads(row[1]).get("local_path")
+            if any(
+                new_root.is_relative_to(Path(other)) or Path(other).is_relative_to(new_root)
+                for other in others
+            ):
+                raise AppError("COURSE_ROOT_OVERLAP", "课程目录不能相互包含")
+            op_id, _ = self._begin(course_id, "relocate_root", payload, operation_id)
+            matches = []
+            missing = []
+            checked = {}
+            for row in registered:
+                relative = [
+                    entry["relative_path"]
+                    for entry in known
+                    if entry["asset_id"] == row["asset_id"]
+                ]
+                previous = old_locations.get(
+                    row["asset_id"] + ":" + row["source_version"], row["local_path"]
+                )
+                if not relative:
+                    relative = [PureWindowsPath(previous).name]
+                selected = None
+                for name in relative:
+                    path = self._path(new_root, name, exists=False)
+                    if not path.is_file():
+                        continue
+                    if path not in checked:
+                        with _read_locked(path) as stream:
+                            signature = (os.fstat(stream.fileno()).st_size, path.stat().st_mtime_ns)
+                            digest = hashlib.file_digest(stream, "sha256").hexdigest()
+                        checked[path] = (signature, digest)
+                    if (
+                        checked[path][1] == row["content_hash"]
+                        and checked[path][0][0] == row["byte_length"]
+                    ):
+                        selected = path
+                        break
+                if selected is None:
+                    missing.append(
+                        {
+                            "asset_id": row["asset_id"],
+                            "source_version": row["source_version"],
+                            "status": "原版本缺失或内容不符",
+                        }
+                    )
+                else:
+                    matches.append((row, selected))
+            self.repository._hook("course_root_relocation_after_check", operation_id=op_id)
+            with self.engine.begin() as connection:
+                current = connection.execute(
+                    select(roots.c.local_path).where(roots.c.course_id == course_id)
+                ).scalar_one_or_none()
+                if current != expected_root:
+                    raise AppError("COURSE_ROOT_CHANGED", "课程关联已改变，未覆盖新位置")
+                for row, path in matches:
+                    stat = path.stat()
+                    if (stat.st_size, stat.st_mtime_ns) != checked[path][0]:
+                        raise AppError(
+                            "SOURCE_VERSION_UNAVAILABLE", "核对后原件又发生变化，未更新关联"
+                        )
+                    connection.execute(
+                        update(business.source_versions)
+                        .where(
+                            business.source_versions.c.asset_id == row["asset_id"],
+                            business.source_versions.c.source_version == row["source_version"],
+                        )
+                        .values(local_path=str(path))
+                    )
+                if current is None:
+                    connection.execute(
+                        insert(roots).values(
+                            course_id=course_id,
+                            local_path=str(new_root),
+                            state="active",
+                            created_at=_now(),
+                        )
+                    )
+                else:
+                    connection.execute(
+                        update(roots)
+                        .where(roots.c.course_id == course_id)
+                        .values(local_path=str(new_root), state="active")
+                    )
+                result = {
+                    "operation_id": op_id,
+                    "state": "completed",
+                    "course_id": course_id,
+                    "root_path": str(new_root),
+                    "matched_versions": len(matches),
+                    "unavailable_versions": missing,
+                }
+                connection.execute(
+                    update(operations)
+                    .where(operations.c.operation_id == op_id)
+                    .values(state="completed", result=result, updated_at=_now())
+                )
+                self.repository._hook("course_root_relocation_before_commit", operation_id=op_id)
+            self.repository._hook("course_root_relocation_after_commit", operation_id=op_id)
+            return result
 
     def list(self, course_id: str, value: str = "") -> dict:
         folder = self.folder(course_id)
+        previews = getattr(self.repository, "video_previews", None)
+        if previews is not None and not value:
+            previews.enqueue_course(course_id)
         if folder["root_status"] != "ready":
             return {**folder, "path": value, "entries": []}
         root = self._root(course_id)
@@ -493,6 +654,8 @@ class CourseFileStore:
                 target = source / payload["name"]
             elif kind == "rename_course":
                 target = None  # Display alias only, never a filesystem rename.
+            elif kind == "relocate_root":
+                target = Path(payload["new_path"])
             else:
                 target = None
             planned = [
@@ -1474,6 +1637,20 @@ def install_course_file_routes(app: FastAPI) -> None:
     def bind_folder(course_id: str, value: CourseFolderInput):
         selected = [value.path] if value.path else choose_paths(directory=True)
         return store().bind(course_id, selected[0], value.title) if selected else None
+
+    @app.post("/api/v1/courses/{course_id}/root/relocate")
+    def relocate_folder(course_id: str, value: CourseRelocationInput):
+        selected = [value.path] if value.path else choose_paths(directory=True)
+        return (
+            store().relocate_root(
+                course_id,
+                selected[0],
+                expected_root=value.expected_root,
+                operation_id=value.operation_id,
+            )
+            if selected
+            else None
+        )
 
     @app.get("/api/v1/courses/{course_id}/files", response_model=CourseFileListResponse)
     def list_files(course_id: str, path: str = ""):

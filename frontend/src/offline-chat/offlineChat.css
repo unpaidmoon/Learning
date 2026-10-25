@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  color: #17202a;
+  background: #f3f5f7;
+  font-family: system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+.offline-chat {
+  max-width: 960px;
+  margin: 24px auto;
+  padding: 24px;
+  background: white;
+}
+
+.offline-message {
+  padding: 16px 0;
+  border-top: 1px solid #dde2e7;
+  overflow-wrap: anywhere;
+}
+
+.offline-message h2 {
+  font-size: 1.1rem;
+}
+
+.offline-message-status {
+  color: #56616c;
+  font-size: 0.9rem;
+}
+
+.offline-message img {
+  max-width: 100%;
+  height: auto;
+}
+
+.offline-message pre {
+  overflow-x: auto;
+}
+
+.offline-message .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}
+
+.offline-message table {
+  border-collapse: collapse;
+}
+
+.offline-message td,
+.offline-message th {
+  padding: 6px;
+  border: 1px solid #c7cdd3;
+}

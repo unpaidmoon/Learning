@@ -332,9 +332,11 @@ def click_first(browser: Browser, name: str) -> None:
 
 def manager_click(browser: Browser, name: str) -> None:
     browser.snapshot("before-manager-action")
-    browser.command("run-code", "async(page)=>{await page.getByRole('region',{name:'文件资源管理器',exact:true})"
-                    ".getByRole('button',{name:" + json.dumps(name, ensure_ascii=False)
-                    + ",exact:true}).click();}")
+    browser.command("run-code", "async(page)=>{const manager=page.getByRole('region',{name:'文件资源管理器',exact:true});"
+                    "const action=manager.getByRole('button',{name:" + json.dumps(name, ensure_ascii=False)
+                    + ",exact:true});if(await action.isVisible()){await action.click();}else{"
+                    "await manager.locator('summary[aria-label=\"更多文件操作\"]').click();"
+                    "await manager.getByRole('menuitem',{name:" + json.dumps(name, ensure_ascii=False) + ",exact:true}).click();}}")
 
 
 def manager_entry(browser: Browser, path: str, *, double: bool = False) -> None:

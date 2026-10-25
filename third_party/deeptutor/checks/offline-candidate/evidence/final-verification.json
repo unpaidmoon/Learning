@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "unpacked_files_unchanged_after_use": 75,
+  "source_blobs_verified": 17,
+  "browser": "155.0.8059.81",
+  "http_or_websocket_requests_observed": 0,
+  "storage_writes_observed": 0,
+  "application_backend_started": false,
+  "zip_sha256": "73b6da21f85515befb07bbfdb0a3f0d15cd856a1980b85b2ec5f50d95a2e82fe",
+  "model_requests": 0,
+  "not_run": [
+    "formal application export/store/API/UI",
+    "arbitrary HTML/JS visualization",
+    "all-function families/animation",
+    "user learning acceptance"
+  ]
+}

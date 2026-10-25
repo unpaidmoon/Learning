@@ -203,10 +203,11 @@ def _require_official(app: FastAPI):
 
 
 def _require_idle(app: FastAPI) -> None:
+    from learning_app.workbench.runs import TaskRunStore
     if any(
         value["state"] not in {"completed", "cancelled", "failed", "truncated"}
         for value in app.state.repository.recoverable_generations()
-    ):
+    ) or TaskRunStore(app.state.repository).has_active_runs():
         raise AppError(
             "ACCOUNT_ACTIVE_GENERATIONS",
             "请等待当前回答结束或先停止并完成对账，再切换登录方式或退出账号",

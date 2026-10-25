@@ -34,6 +34,7 @@ const capabilityNames: Record<keyof Schema<"Capabilities">, string> = {
   knowledge_base: "知识库",
 };
 const capabilityLabels = {
+  available: "可用",
   ready: "已连接",
   unavailable: "不可用",
   not_configured: "未配置",
@@ -49,6 +50,9 @@ async function loadConnection(signal?: AbortSignal) {
 }
 
 export function App() {
+  const [executionViewOnly] = useState(
+    () => new URLSearchParams(location.search).get("read_only") === "1",
+  );
   const [health, setHealth] = useState<Schema<"HealthResponse"> | null>(null);
   const [connecting, setConnecting] = useState(true);
   const [error, setError] = useState("");
@@ -184,9 +188,16 @@ export function App() {
     setError("");
     if (!id) return;
     try {
-      await newChat(id);
+      if (!executionViewOnly) await newChat(id);
       const next = await api.read<Schema<"ChatResponse">[]>(`/courses/${id}/chats`);
-      if (epoch === courseEpoch.current) setChats(next);
+      if (epoch === courseEpoch.current) {
+        setChats(next);
+        if (executionViewOnly && next.length) {
+          const chosen = courseChats.current.get(id) || next[next.length - 1].chat_id;
+          courseChats.current.set(id, chosen);
+          setChatId(chosen);
+        }
+      }
     } catch (reason) {
       if (epoch === courseEpoch.current) setError(errorMessage(reason));
     }
@@ -266,6 +277,15 @@ export function App() {
     setBusy(true);
     try {
       await chatRef.current?.saveDraft();
+      const existing = courseChats.current.get(courseId);
+      if (existing) {
+        const current = await api.read<Schema<"ChatResponse">>(`/chats/${existing}`);
+        if (!current.messages?.length && !current.generations?.length) {
+          setChatVisible(true);
+          chatRef.current?.focusInput();
+          return;
+        }
+      }
       await newChat(courseId, true);
       setCapture(undefined);
       setChatVisible(true);
@@ -340,7 +360,13 @@ export function App() {
         setExitStatus("当前后台不由统一入口管理，请在所属启动终端中退出。");
         return;
       }
-      if (runtime.active_generations.length && !confirmed) {
+      if (
+        (runtime.active_generations.length ||
+          runtime.active_tasks?.length ||
+          runtime.active_preparations?.length ||
+          runtime.active_data_operations?.length) &&
+        !confirmed
+      ) {
         setExitConfirmation(runtime);
         return;
       }
@@ -536,6 +562,23 @@ export function App() {
           </Button>
         </div>
       </header>
+      {executionViewOnly && (
+        <div className="global-notice" role="status">
+          执行层暂不可用，当前仅查看资料与历史。已有学习数据保留。
+          <a href="/desktop/">返回原生学习界面</a>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              void api
+                .write("/runtime/reconnect", {})
+                .then(() => setExitStatus("已完成连接核对，可返回原生学习界面。"))
+                .catch((reason) => setError(errorMessage(reason)));
+            }}
+          >
+            核对执行层连接
+          </Button>
+        </div>
+      )}
       {error && (
         <div className="global-error" role="alert">
           {error}
@@ -805,7 +848,7 @@ export function App() {
                   className="icon-button"
                   aria-label="新对话"
                   title="新对话"
-                  disabled={!courseId || busy || exiting}
+                  disabled={executionViewOnly || !courseId || busy || exiting}
                   onClick={() => void createChat()}
                 >
                   <Icon name="plus" size={17} />
@@ -825,7 +868,11 @@ export function App() {
                 key={chatId}
                 ref={chatRef}
                 chatId={chatId}
-                canSubmit={health?.capabilities.question_answering === "ready" && !exiting}
+                canSubmit={
+                  !executionViewOnly &&
+                  health?.capabilities.question_answering === "ready" &&
+                  !exiting
+                }
                 connected={Boolean(health?.ready)}
                 configuredModel={health?.configured_model}
                 configuredThinking={health?.configured_thinking}
@@ -1001,10 +1048,14 @@ export function App() {
             aria-modal="true"
             aria-labelledby="exit-title"
           >
-            <h2 id="exit-title">停止回答并退出后台？</h2>
+            <h2 id="exit-title">保存并退出后台？</h2>
             <p>
-              还有 {exitConfirmation.active_generations.length}{" "}
-              个回答在进行。确认后会保存已收到的内容，停止所属生成并退出。
+              还有{" "}
+              {exitConfirmation.active_generations.length +
+                (exitConfirmation.active_tasks?.length ?? 0) +
+                (exitConfirmation.active_preparations?.length ?? 0) +
+                (exitConfirmation.active_data_operations?.length ?? 0)}{" "}
+              个回答、学习任务或数据操作在进行或待核对。确认后会保存已收到的内容，停止所属执行并退出。
             </p>
             <div className="dialog-actions">
               <Button variant="ghost" onClick={() => setExitConfirmation(null)}>

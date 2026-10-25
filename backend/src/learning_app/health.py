@@ -10,8 +10,8 @@ class Capabilities(BaseModel):
     question_answering: Literal["ready", "not_configured", "unavailable"] = "not_configured"
     persistence: Literal["ready", "unavailable"] = "unavailable"
     video: Literal["ready", "unavailable", "not_implemented"] = "not_implemented"
-    transcription: Literal["not_implemented"] = "not_implemented"
-    knowledge_base: Literal["not_implemented"] = "not_implemented"
+    transcription: Literal["available", "unavailable", "not_implemented"] = "not_implemented"
+    knowledge_base: Literal["available", "unavailable", "not_implemented"] = "not_implemented"
 
 
 class HealthResponse(BaseModel):

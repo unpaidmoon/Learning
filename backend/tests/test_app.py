@@ -59,8 +59,8 @@ def test_real_health_and_private_api_capability(tmp_path):
             "question_answering": "not_configured",
             "persistence": "ready",
             "video": "ready",
-            "transcription": "not_implemented",
-            "knowledge_base": "not_implemented",
+            "transcription": "available",
+            "knowledge_base": "available",
         }
         assert client.get("/api/v1/courses").status_code == 403
         headers = connect(client)

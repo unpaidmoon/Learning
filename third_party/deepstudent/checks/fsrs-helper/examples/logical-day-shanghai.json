@@ -1,0 +1,12 @@
+{
+  "protocol_version": 1,
+  "request_id": "shanghai-before-04",
+  "operation": {
+    "type": "logical_day",
+    "timing": {
+      "now_ms": 1790884799999,
+      "timezone": "Asia/Shanghai",
+      "day_rollover_hour": 4
+    }
+  }
+}

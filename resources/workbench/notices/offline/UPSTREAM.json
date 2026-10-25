@@ -1,0 +1,20 @@
+[
+  {
+    "name": "rehype-katex",
+    "version": "7.0.1",
+    "commit": "88a9497e1ede93b958237c85edbf5651faeca7af",
+    "metadata_url": "https://registry.npmjs.org/rehype-katex/7.0.1",
+    "source_url": "https://raw.githubusercontent.com/remarkjs/remark-math/88a9497e1ede93b958237c85edbf5651faeca7af/license",
+    "upstream_source_verified": "https://raw.githubusercontent.com/remarkjs/remark-math/88a9497e1ede93b958237c85edbf5651faeca7af/packages/rehype-katex/lib/index.js",
+    "license_sha256": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983"
+  },
+  {
+    "name": "remark-math",
+    "version": "6.0.0",
+    "commit": "d5d0660b150810a535bbb07eac6cc96a4510aa24",
+    "metadata_url": "https://registry.npmjs.org/remark-math/6.0.0",
+    "source_url": "https://raw.githubusercontent.com/remarkjs/remark-math/d5d0660b150810a535bbb07eac6cc96a4510aa24/license",
+    "upstream_source_verified": "https://raw.githubusercontent.com/remarkjs/remark-math/d5d0660b150810a535bbb07eac6cc96a4510aa24/packages/remark-math/lib/index.js",
+    "license_sha256": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983"
+  }
+]

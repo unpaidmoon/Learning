@@ -14,18 +14,23 @@ from learning_app.config import AppConfig
 from learning_app.documents import expand_document_parts, requires_images, validate_document_scope
 from learning_app.drafts import (
     message_references,
+    message_selection_ids,
     submission_reference_conditions,
+    submission_selection_conditions,
     submission_source_locators,
 )
 from learning_app.errors import AppError
+from learning_app.execution.native_tools import ToolRejected
 from learning_app.execution.selection import supports_images, validate_selection
 from learning_app.execution.types import (
     ApprovedAttachment,
     ExecutionBinding,
     ExecutionError,
+    ExecutionPolicy,
     NormalizedEvent,
 )
 from learning_app.faults import Faults
+from learning_app.imported_executions import imported_executions
 from learning_app.storage import StorageError
 
 TERMINAL = {"completed", "cancelled", "failed", "truncated"}
@@ -33,11 +38,21 @@ logger = logging.getLogger(__name__)
 
 
 class GenerationService:
-    def __init__(self, repository, config: AppConfig, *, execution=None, fault_hook=None):
+    def __init__(
+        self,
+        repository,
+        config: AppConfig,
+        *,
+        execution=None,
+        fault_hook=None,
+        execution_factory=None,
+    ):
         self.repository = repository
+        self._imported = None
         self.config = config
         self.execution = execution
         self.owns_execution = execution is None
+        self.execution_factory = execution_factory
         self.execution_ready = False
         self.faults = Faults(fault_hook)
         self.tasks: dict[str, asyncio.Task] = {}
@@ -47,11 +62,25 @@ class GenerationService:
         self._binding_ids: dict[str, str] = {}
         self._binding_snapshots: dict[str, str] = {}
         self._attempt_snapshots: dict[str, tuple] = {}
+        from learning_app.workbench.translation_reuse import TranslationReuse
+
+        self.translation_reuse = TranslationReuse(repository, config, lambda: self.execution)
+
+    @property
+    def imported(self):
+        if self._imported is None:
+            if self.repository is None:
+                raise AppError("PERSISTENCE_UNAVAILABLE", "本地学习数据尚未就绪，未启动执行", 503)
+            self._imported = imported_executions(self.repository)
+        return self._imported
 
     @property
     def question_answering_ready(self) -> bool:
         """Separate an open Host from the selected route's known capability."""
         if not self.execution_ready or self.execution is None:
+            return False
+        process = getattr(getattr(self.execution, "host", None), "process", None)
+        if process is not None and process.poll() is not None:
             return False
         capability = getattr(self.execution, "question_answering_ready", None)
         if capability is not None:
@@ -61,8 +90,20 @@ class GenerationService:
         return getattr(self.execution, "mode", "fixture") == "fixture"
 
     async def open(self):
+        from learning_app.data_activation import require_active_data
+
+        if self.repository is not None:
+            require_active_data(self.repository.root)
+        # Capability predicates remain free of I/O; real startup validates the
+        # import fence before credential access, Host startup or recovery.
+        if not self.imported.ready:
+            raise AppError("IMPORTED_EXECUTION_NOT_READY", "导入执行隔离尚未完成，未启动执行", 503)
+        if self.execution is None and self.execution_factory is not None:
+            self.execution = self.execution_factory(self.repository, self.config)
         if self.execution is None and self.config.harness_enabled:
             from learning_app.execution.adapter import ExecutionAdapter
+            from learning_app.execution.native_tools import NativeCallRegistry, NativeToolTransport
+            from learning_app.workbench.native_business import NativeBusiness
 
             key = dotenv_values(self.config.secret_file).get("DEEPSEEK_API_KEY")
             route = self.config.credential_route
@@ -85,11 +126,17 @@ class GenerationService:
                 max_tokens=self.config.max_output_tokens,
                 timeout=self.config.model_timeout_seconds,
                 credential_route=route,
+                desktop_enabled=self.config.desktop_enabled,
+                native_tools=NativeToolTransport(
+                    NativeCallRegistry(self.config.data_dir / "execution/native-calls.jsonl"),
+                    NativeBusiness(self.repository),
+                ),
             )
         if self.execution is None:
             return
         try:
             if self.owns_execution:
+                self._restore_execution_policies()
                 await self.execution.open()
             self.execution_ready = True
             if (
@@ -110,8 +157,99 @@ class GenerationService:
             return
         await self.recover()
 
+    def _restore_execution_policies(self) -> None:
+        restore = getattr(self.execution, "restore_execution_policy", None)
+        if restore is None:
+            return
+        native = getattr(self.execution, "native_tools", None)
+        generations = {
+            row["generation_id"]: row
+            for row in self.repository.recoverable_generations()
+            if not self.imported.contains("generation", row["generation_id"])
+        }
+        pending_scopes = []
+        if native is not None:
+            for scope in native.port.unreleased_scopes():
+                if self.imported.contains("run", scope["run_id"]) or self.imported.contains(
+                    "generation", scope["run_id"]
+                ):
+                    continue
+                lease = {
+                    "session_id": scope["session_id"],
+                    "run_id": scope["run_id"],
+                    "request_id": scope["request_id"],
+                    "epoch": scope["native_epoch"],
+                }
+                if native.registry.retire_unstarted(lease, native.port):
+                    continue
+                released = native.registry.release_receipts.get(scope["run_id"])
+                if released is not None:
+                    native.port.mark_released(released)
+                else:
+                    pending_scopes.append(scope)
+                    if scope["owner_kind"] == "chat":
+                        generations[scope["run_id"]] = self.repository.get_generation(
+                            scope["run_id"]
+                        )
+        for generation in generations.values():
+            if generation.get("adapter_metadata"):
+                extra = {}
+                if native is not None:
+                    binding = ExecutionBinding.from_dict(generation["adapter_metadata"])
+                    extra["scope"] = native.port.restore_scope(generation["generation_id"], binding)
+                    extra["reconcile_only"] = True
+                restore(
+                    generation["adapter_metadata"],
+                    ExecutionPolicy(
+                        generation["model"],
+                        generation["thinking"],
+                        generation["max_output_tokens"],
+                        generation["timeout_seconds"],
+                        allowed_tool_names=tuple(extra.get("scope", {}).get("allowed_tools", ())),
+                    ),
+                    task_owned=False,
+                    **extra,
+                )
+        from learning_app.workbench.executor import TaskExecutor
+        from learning_app.workbench.runs import TaskRunStore
+
+        task_runs = {row["run_id"]: row for row in TaskRunStore(self.repository).recoverable()}
+        for scope in pending_scopes:
+            if scope["owner_kind"] == "task":
+                task_runs[scope["run_id"]] = TaskRunStore(self.repository).internal(scope["run_id"])
+        for run in task_runs.values():
+            if self.imported.contains("run", run["run_id"]) or self.imported.contains(
+                "task", run["task_id"]
+            ):
+                continue
+            if run["binding"]:
+                extra = {}
+                if native is not None:
+                    binding = ExecutionBinding.from_dict(run["binding"])
+                    extra["scope"] = native.port.restore_scope(run["run_id"], binding)
+                    extra["reconcile_only"] = run["state"] != "prepared"
+                restore(
+                    run["binding"],
+                    TaskExecutor._policy(TaskRunStore(self.repository).internal(run["run_id"])),
+                    task_owned=True,
+                    **extra,
+                )
+
     async def recover(self):
-        for generation in self.repository.recoverable_generations():
+        generations = {
+            row["generation_id"]: row
+            for row in self.repository.recoverable_generations()
+            if not self.imported.contains("generation", row["generation_id"])
+        }
+        native = getattr(self.execution, "native_tools", None)
+        if native is not None:
+            for scope in native.port.unreleased_scopes("chat"):
+                if self.imported.contains("run", scope["run_id"]) or self.imported.contains(
+                    "generation", scope["run_id"]
+                ):
+                    continue
+                generations[scope["run_id"]] = self.repository.get_generation(scope["run_id"])
+        for generation in generations.values():
             gid = generation["generation_id"]
             if generation["state"] == "pending":
                 self._schedule(gid, self._dispatch(gid))
@@ -126,13 +264,13 @@ class GenerationService:
         task = asyncio.create_task(coroutine, name=f"generation:{generation_id}")
         self.tasks[generation_id] = task
 
-    async def close(self):
+    async def close(self, *, reason="SERVICE_SHUTDOWN"):
         # Stop only this service's readers; unknown work is never converted back to pending.
         for generation_id, task in self.tasks.items():
             if not task.done():
                 state = self.repository.get_generation(generation_id)["state"]
                 if state not in TERMINAL and state != "pending":
-                    self.repository.mark_unknown(generation_id, "SERVICE_SHUTDOWN")
+                    self.repository.mark_unknown(generation_id, reason)
                 task.cancel()
         await asyncio.gather(*self.tasks.values(), return_exceptions=True)
         if self.execution is not None and self.owns_execution:
@@ -142,6 +280,11 @@ class GenerationService:
     async def submit(self, value: dict) -> dict:
         if not self.execution_ready:
             raise AppError("EXECUTION_UNAVAILABLE", "Harness尚未连接，未提交问题", 503)
+        process = getattr(getattr(self.execution, "host", None), "process", None)
+        if process is not None and process.poll() is not None:
+            raise AppError(
+                "EXECUTION_UNAVAILABLE", "执行层已退出，原请求未重发；可查看已有资料", 503
+            )
         if not value["text"].strip() and not value.get("attachment_ids"):
             raise AppError("INPUT_EMPTY", "请输入问题或确认图片", 422)
         async with self.locks[value["chat_id"]]:
@@ -152,6 +295,8 @@ class GenerationService:
                 if exc.code != "SUBMISSION_NOT_FOUND":
                     raise
                 existing_submission = False
+            if not existing_submission and (value.get("conditions") or value.get("corrections")):
+                raise AppError("SEPARATE_CONTEXT_REMOVED", "请通过普通消息补充条件或更正内容", 422)
             if not existing_submission:
                 try:
                     validator = getattr(self.execution, "validate_choice", None)
@@ -198,20 +343,34 @@ class GenerationService:
                     value["chat_id"],
                     [self.repository.resolve_attachment(aid) for aid in unique_documents],
                 )
-            conditions = list(value.get("conditions", ())) + submission_reference_conditions(
+            conditions = (
+                list(value.get("conditions", ())) if existing_submission else []
+            ) + submission_reference_conditions(
                 self.repository, value["chat_id"], value.get("references", ())
+            )
+            conditions += submission_selection_conditions(
+                self.repository, value["chat_id"], value.get("source_snapshot_ids", ())
             )
             source_locators = submission_source_locators(
                 self.repository, value["chat_id"], value.get("attachment_ids", ())
             )
+            if value.get("question_video") is not None:
+                from learning_app.workbench.question_context import question_video_locator
+
+                source_locators.append(
+                    question_video_locator(
+                        self.repository, value["chat_id"], value["question_video"]
+                    )
+                )
             result = self.repository.publish_submission(
                 value["chat_id"],
                 value["text"],
                 value["submission_id"],
                 attachment_ids=value.get("attachment_ids", ()),
                 conditions=conditions,
-                corrections=value.get("corrections", ()),
+                corrections=value.get("corrections", ()) if existing_submission else (),
                 source_locators=source_locators,
+                read_course_ids=value.get("read_course_ids", ()),
                 model=value["model"],
                 thinking=value["thinking"],
                 max_output_tokens=self.config.max_output_tokens,
@@ -223,8 +382,35 @@ class GenerationService:
             return result
 
     async def _dispatch(self, generation_id: str):
+        self.imported.require_fresh("generation", generation_id)
         generation = self.repository.get_generation(generation_id)
         chat_id = generation["chat_id"]
+        native = getattr(self.execution, "native_tools", None)
+        if native is not None:
+            for scope in native.port.unreleased_scopes("chat"):
+                if self.imported.contains("run", scope["run_id"]) or self.imported.contains(
+                    "generation", scope["run_id"]
+                ):
+                    continue
+                if (
+                    scope["business_binding"]["conversation_id"] != chat_id
+                    or scope["run_id"] == generation_id
+                ):
+                    continue
+                previous = self.tasks.get(scope["run_id"])
+                if (
+                    previous is not None
+                    and previous is not asyncio.current_task()
+                    and not previous.done()
+                ):
+                    await asyncio.shield(previous)
+                if not await self.release_native_execution(
+                    ExecutionBinding.from_dict(
+                        {**scope["business_binding"], "native_lease_epoch": scope["native_epoch"]}
+                    )
+                ):
+                    self.repository.fail_pending(generation_id, "NATIVE_PREVIOUS_NOT_RELEASED")
+                    return
         async with self.locks[chat_id]:
             generation = self.repository.get_generation(generation_id)
             if generation["state"] != "pending":
@@ -240,11 +426,27 @@ class GenerationService:
                     generation["submission_id"],
                     generation_id,
                     epoch,
+                    **(
+                        {"session_id": current["session_id"]}
+                        if native is not None and current and not rebuild
+                        else {}
+                    ),
                 )
                 db_binding = self.repository.bind_execution(
                     chat_id,
                     binding.session_id,
-                    adapter_metadata={"history_revision": revision},
+                    adapter_metadata={
+                        "history_revision": revision,
+                        **(
+                            {
+                                key: value
+                                for key, value in current.get("adapter_metadata", {}).items()
+                                if key.startswith("desktop_") and key != "desktop_pending_history"
+                            }
+                            if current
+                            else {}
+                        ),
+                    },
                 )
                 binding.epoch = db_binding["epoch"]
                 self.faults.hit("before_dispatch_claim", {"generation_id": generation_id})
@@ -262,6 +464,18 @@ class GenerationService:
                 self._binding_snapshots[generation_id] = json.dumps(
                     binding.to_dict(), sort_keys=True
                 )
+                native = getattr(self.execution, "native_tools", None)
+                execution_arguments = {}
+                if native is not None:
+                    scope = native.port.ensure_chat_scope(generation_id, binding)
+                    self.execution.configure_business_scope(binding, scope)
+                    execution_arguments["policy"] = ExecutionPolicy(
+                        generation["model"],
+                        generation["thinking"],
+                        generation["max_output_tokens"],
+                        generation["timeout_seconds"],
+                        allowed_tool_names=tuple(scope["allowed_tools"]),
+                    )
                 prepared_images, document_text = await asyncio.to_thread(
                     expand_document_parts,
                     self.repository,
@@ -280,7 +494,10 @@ class GenerationService:
                 prompt = context.get("prompt", generation.get("text", ""))
                 if document_text:
                     prompt += "\n\n" + document_text
-                history = context.get("history_context") if rebuild else None
+                needs_history = rebuild or bool(
+                    current and current.get("adapter_metadata", {}).get("desktop_pending_history")
+                )
+                history = context.get("history_context") if needs_history else None
                 if isinstance(history, (list, dict)):
                     history = json.dumps(history, ensure_ascii=False)
                 binding = await self.execution.start(
@@ -290,6 +507,7 @@ class GenerationService:
                     model=generation["model"],
                     thinking=generation["thinking"],
                     history_context=history,
+                    **execution_arguments,
                 )
                 self.faults.hit("after_host_accept_before_bind_ack", binding.to_dict())
                 self._persist_binding(binding)
@@ -361,11 +579,36 @@ class GenerationService:
                 await asyncio.sleep(0)
             if deferred_error is not None:
                 raise deferred_error
-        except (ExecutionError, StorageError, OSError, TimeoutError):
+        except (ExecutionError, StorageError, OSError, TimeoutError) as exc:
+            logger.warning(
+                "Execution observation remains unknown: %s",
+                getattr(exc, "code", type(exc).__name__),
+            )
             self.repository.mark_unknown(binding.generation_id, "OBSERVATION_DISCONNECTED")
         finally:
             reader.cancel()
             await asyncio.gather(reader, return_exceptions=True)
+        await self.release_native_execution(binding)
+
+    async def release_native_execution(self, binding: ExecutionBinding) -> bool:
+        if getattr(self.execution, "native_tools", None) is None:
+            return True
+        try:
+            await self.execution.release_execution(binding)
+            return True
+        except (
+            ExecutionError,
+            ToolRejected,
+            AppError,
+            httpx.HTTPError,
+            OSError,
+            TimeoutError,
+        ) as exc:
+            logger.warning(
+                "Native execution remains reserved: %s",
+                getattr(exc, "code", "NATIVE_RELEASE_UNCONFIRMED"),
+            )
+            return False
 
     def _ingest(self, binding, event):
         self._ingest_batch(binding, [event])
@@ -382,22 +625,37 @@ class GenerationService:
         rows = []
         for event in events:
             kind = {
-                "text_delta": "body", "reasoning_delta": "reasoning", "accepted": "receipt",
-                "activity": "activity", "snapshot": "snapshot", "terminal": "terminal",
-                "usage": "usage", "unknown": "unknown",
+                "text_delta": "body",
+                "reasoning_delta": "reasoning",
+                "accepted": "receipt",
+                "activity": "activity",
+                "snapshot": "snapshot",
+                "terminal": "terminal",
+                "usage": "usage",
+                "unknown": "unknown",
             }[event.kind]
-            rows.append({
-                "generation_id": binding.generation_id, "binding_id": binding_id,
-                "epoch": event.epoch, "event_id": event.event_id, "seq": event.seq,
-                "kind": kind, "text": event.text, "status": event.status,
-                "raw_usage": event.raw_usage, "usage_source": "provider_boundary",
-                "usage_fields": event.usage_presence,
-                "settlement_id": event.data.get("settlement_id", event.event_id),
-                "data": {
-                    **event.data, **({"body": event.text} if kind == "snapshot" else {}),
-                    "native_seq": event.native_seq, "attempt_id": event.attempt_id,
-                },
-            })
+            rows.append(
+                {
+                    "generation_id": binding.generation_id,
+                    "binding_id": binding_id,
+                    "epoch": event.epoch,
+                    "event_id": event.event_id,
+                    "seq": event.seq,
+                    "kind": kind,
+                    "text": event.text,
+                    "status": event.status,
+                    "raw_usage": event.raw_usage,
+                    "usage_source": "provider_boundary",
+                    "usage_fields": event.usage_presence,
+                    "settlement_id": event.data.get("settlement_id", event.event_id),
+                    "data": {
+                        **event.data,
+                        **({"body": event.text} if kind == "snapshot" else {}),
+                        "native_seq": event.native_seq,
+                        "attempt_id": event.attempt_id,
+                    },
+                }
+            )
         self.repository.ingest_events(rows)
         self._persist_binding(binding)
 
@@ -429,6 +687,7 @@ class GenerationService:
                 self._attempt_snapshots[attempt["attempt_id"]] = identity
 
     async def cancel(self, generation_id: str):
+        self.imported.require_fresh("generation", generation_id)
         generation = self.repository.get_generation(generation_id)
         if generation["state"] in TERMINAL:
             return
@@ -455,6 +714,7 @@ class GenerationService:
             await self.reconcile(generation_id, resume_observer=True)
 
     async def reconcile(self, generation_id: str, *, resume_observer: bool = True):
+        self.imported.require_fresh("generation", generation_id)
         if not self.execution_ready:
             return
         binding = self._binding_for(generation_id)
@@ -477,6 +737,8 @@ class GenerationService:
             self._persist_binding(result["binding"])
             if result["status"] == "unknown":
                 self.repository.mark_unknown(generation_id, "RECONCILIATION_UNKNOWN")
+        if result["status"] in TERMINAL:
+            await self.release_native_execution(result["binding"])
         if resume_observer and result["status"] in {"active", "accepted"}:
             if asyncio.current_task() is self.tasks.get(generation_id):
                 await self._observe(result["binding"])
@@ -550,6 +812,7 @@ class GenerationService:
         indexed = {item["generation_id"]: item for item in value["generations"]}
         for message in value.get("messages", []):
             message["references"] = message_references(message.get("conditions", ()))
+            message["source_snapshot_ids"] = message_selection_ids(message.get("conditions", ()))
             generation = indexed.get(message.get("generation_id"))
             if generation:
                 message["reasoning"] = generation.get("reasoning", "")

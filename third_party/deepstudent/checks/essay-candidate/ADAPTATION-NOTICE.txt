@@ -1,0 +1,36 @@
+Source: https://github.com/helixnow/deep-student
+Commit: 635216503c0b34bdf812e17942e0f09f51872e6f
+
+Seven original files from src/essay-grading are archived byte-for-byte in
+upstream/. source-manifest.json records SHA-256 and fixed-commit Git blob IDs.
+build.cjs transpiles the unchanged files using TypeScript 5.9.3 to CommonJS
+ES2022 JavaScript. No Tauri, VFS, provider, UI, npm runtime dependency or
+upstream application entry point is included.
+
+The upstream root license is GNU AGPLv3; the upstream third-party licensing
+document states AGPL-3.0-or-later. The original root license and original
+third-party notices are retained unchanged. Their full inventory describes
+the upstream application, not this candidate's actual dependency closure.
+The candidate has only local JavaScript modules and Node 24.14.0 builtins.
+
+New project-owned wrapper: raw UTF-8 draft SHA-256/revision/role binding,
+Unicode scalar length and codepoint bounds, strict rubric/raw score and
+terminal-event validation, exact and unique annotation context guards,
+single XML transport decoding, reference-only typed results and a bounded
+single-request JSON stdin+EOF/stdout helper. It retains upstream parser
+results as diagnostic candidates while refusing silent score adjustment or
+ambiguous anchors as reliable evaluation. It never overwrites a draft.
+
+Only validate_feedback is exposed by helper.cjs. The pure revision proposal,
+round-switch/fingerprint and immutable assessment fixture functions are
+investigation fixtures, not an authoritative business store or public RPC.
+Formal Artifact revision, operation identity, persistence, CAS, cancellation,
+late callback admission, user self-assessment/override and model execution
+remain the owning project's responsibility.
+
+Original trim/truncation, image reads, dynamic latest-round lookup, database
+transactions, retry/provider pipeline and treating an incomplete response as
+complete merely because it contains a score end tag are not migrated.
+
+This notice records provenance and changes. It does not establish that this
+candidate passed product, real-model or user-experience acceptance.

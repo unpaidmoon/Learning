@@ -1,0 +1,20 @@
+{
+  "protocol_version": 1,
+  "request_id": "shanghai-before-04",
+  "ok": true,
+  "result": {
+    "type": "logical_day",
+    "logical_day": "2026-10-01",
+    "start_ms": 1790798400000,
+    "end_ms": 1790884800000,
+    "timezone": "Asia/Shanghai",
+    "day_rollover_hour": 4,
+    "engine": {
+      "helper_version": "0.2.0",
+      "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+      "scheduler_sha256": "62aad68b7b4a2fe1f0d43d5f2059acc35970c5a30ff6672a434be310f85c6686",
+      "fsrs_version": "6.6.2",
+      "timezone_data_version": "chrono-tz-0.10.4"
+    }
+  }
+}

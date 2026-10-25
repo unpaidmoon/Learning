@@ -1,0 +1,189 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+  color: #182334;
+  background: #f5f6f8;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.offline-reader {
+  max-width: 1240px;
+  margin: auto;
+  padding: 24px;
+}
+.offline-reader header,
+.offline-reader article {
+  background: #fff;
+  border: 1px solid #dce1e8;
+  border-radius: 12px;
+  padding: 24px;
+}
+.offline-reader header {
+  margin-bottom: 20px;
+}
+.offline-reader h1 {
+  font-size: 28px;
+}
+.offline-reader h2 {
+  font-size: 21px;
+}
+.offline-reader p {
+  line-height: 1.7;
+}
+.offline-reader button {
+  border: 1px solid #b9c6d6;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 4px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.offline-reader button:focus-visible,
+.offline-reader input:focus-visible,
+.offline-reader textarea:focus-visible {
+  outline: 3px solid #3470bf;
+  outline-offset: 2px;
+}
+.offline-reader button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.offline-reader button[aria-current] {
+  background: #dbe9fc;
+  border-color: #3470bf;
+}
+.offline-reader textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  font: inherit;
+  border: 1px solid #b9c6d6;
+  border-radius: 6px;
+}
+.offline-reader details {
+  margin: 12px 0;
+}
+.offline-reader summary {
+  cursor: pointer;
+  color: #244d7e;
+}
+.offline-reader img {
+  max-width: 100%;
+  height: auto;
+}
+.offline-reader pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.offline-reader table {
+  border-collapse: collapse;
+  display: block;
+  overflow: auto;
+}
+.offline-reader th,
+.offline-reader td {
+  border: 1px solid #dce1e8;
+  padding: 8px;
+}
+.offline-reader .katex-display {
+  overflow-x: auto;
+  padding: 4px 0;
+}
+.offline-book {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 20px;
+}
+.offline-book nav {
+  position: sticky;
+  top: 12px;
+  align-self: start;
+  max-height: 90vh;
+  overflow: auto;
+}
+.offline-book nav h2 {
+  font-size: 17px;
+}
+.offline-book nav button {
+  display: block;
+  text-align: left;
+  width: calc(100% - 8px);
+}
+.offline-book nav p,
+.offline-muted {
+  color: #5c6d80;
+  font-size: 13px;
+}
+.offline-block {
+  padding: 16px 0;
+  border-bottom: 1px solid #e1e6ed;
+  overflow-wrap: anywhere;
+}
+.offline-source {
+  background: #f6f8fb;
+  border-radius: 6px;
+  padding: 10px;
+}
+.offline-scope-note {
+  padding: 10px;
+  border-left: 3px solid #b58134;
+  background: #fff8e8;
+  color: #634a25;
+}
+.offline-option {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+.offline-option input {
+  flex: none;
+}
+.offline-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.offline-reader footer {
+  margin: 24px 0;
+  color: #52657c;
+}
+@media (max-width: 760px) {
+  .offline-reader {
+    padding: 10px;
+  }
+  .offline-book {
+    display: block;
+  }
+  .offline-book nav {
+    position: static;
+    max-height: none;
+  }
+  .offline-reader article {
+    padding: 16px;
+  }
+}
+@media print {
+  .offline-reader {
+    max-width: none;
+    padding: 0;
+  }
+  .offline-book {
+    display: block;
+  }
+  .offline-book nav,
+  .offline-pagination {
+    display: none;
+  }
+  .offline-reader button,
+  .offline-reader textarea {
+    display: none;
+  }
+}

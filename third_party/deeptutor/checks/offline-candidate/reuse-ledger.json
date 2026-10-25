@@ -1,0 +1,236 @@
+{
+  "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "source_files": [
+    {
+      "path": "upstream/deeptutor/book/blocks/base.py",
+      "sha256": "c21a9f3beb83002eb073282c0e525c907c6f183a586e57b6da4cf958cd3ad373",
+      "bytes": 8113,
+      "git_blob_sha1": "9f66d9863cdeed9cb7bf6248a0f820e6ab32210e",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/callout.py",
+      "sha256": "c6d77ea54f8fc3c10f600a7e06aa4bd03eccb7eaafc0229549b09c369212a1fd",
+      "bytes": 2226,
+      "git_blob_sha1": "e9878f7bd05659a9c40bfdbc879a244e85408509",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/interactive.py",
+      "sha256": "3c41f17e3de6ba57648587164f3614ea5753891bbc9b4a065ed23977a3669bf3",
+      "bytes": 4211,
+      "git_blob_sha1": "17a99bc26b947a38481ac57284bab4ee80f3a751",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/quiz.py",
+      "sha256": "ce16447f37039d81e5a169741c9d6b8398ae4cf78436a8ee9f5b443d683b655b",
+      "bytes": 5155,
+      "git_blob_sha1": "f24d78dba29a70b74f145722e12c20936c917902",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/compiler.py",
+      "sha256": "5c3dfe108f51b717f4b73d69a6f1f36cf959bfc29a4978493d6c4f1d03717899",
+      "bytes": 16717,
+      "git_blob_sha1": "686882e474bc79b841f43a545a667355774b7350",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/export.py",
+      "sha256": "b185f72d4dc166ae5e6b90a0033e98a4f7bba3b372e840c1b70bb06e2ddcc70b",
+      "bytes": 11047,
+      "git_blob_sha1": "f9df1e8f6a7d5a09904ce42a79615056e4a3bcf5",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/models.py",
+      "sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3",
+      "bytes": 22670,
+      "git_blob_sha1": "a58d37447907de042d201319a4a1c6ab2d6e4d2a",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/book/progress.py",
+      "sha256": "93b9f95ca676b5db33b9e7be3ec723b7329b4bbcc075ffd6132c6357a043cbfc",
+      "bytes": 5170,
+      "git_blob_sha1": "8d2c8e7af99e2511e195b7416b655748a35a76e1",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/deeptutor/visualizers/protocol.py",
+      "sha256": "3992d7d372577c778c0d7880e26a7cda6e64db3cb5f94d57d1a4194d1b3b9621",
+      "bytes": 7949,
+      "git_blob_sha1": "4306f32e4496d83cb379b42903399e6bb36dfc7a",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/BlockRenderer.tsx",
+      "sha256": "afb27a6b8e6c77813a3d49b517482895373a4d71ec42ec85530141f8c65ebc07",
+      "bytes": 13288,
+      "git_blob_sha1": "2fc629f8a79bbce9436beaa2eb7c689dad21311b",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/FigureBlock.tsx",
+      "sha256": "a0d8e92919dd2d9f2690b34f37a1cdccc502c99bfb02f94159f2fc9de3880aa9",
+      "bytes": 2953,
+      "git_blob_sha1": "a1c66584b2545ba309ee77dd600fe6f67872c7fe",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/InteractiveBlock.tsx",
+      "sha256": "50057d611175259cb29f5a866615be2070688d4cd8c793fd4ac15b4fcfbb67e8",
+      "bytes": 2342,
+      "git_blob_sha1": "d130c1d01302f270f518d07f03ce062050c68df9",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/QuizBlock.tsx",
+      "sha256": "ccf14e5a8199d085a6aff53b741842d1b6abc9589e9945f99407ccc15c7def18",
+      "bytes": 13423,
+      "git_blob_sha1": "c9f9e3a49ca94525b55dafce8fc9f6ad9c184e95",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/components/visualize/VisualizationViewer.tsx",
+      "sha256": "db039deb92ff468912d818ae1640acc40efc30131655ed78b0614be6ef24686f",
+      "bytes": 23588,
+      "git_blob_sha1": "29cfe057bc1a2a8cae1f13e647e77deda3318ccc",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/lib/book-reader-navigation.ts",
+      "sha256": "13be567541f09d80827add967f953a346907acc6e0af1123a1449f59a546ea0a",
+      "bytes": 1854,
+      "git_blob_sha1": "ebb504523612006b8e7a0176a10a43ba43dfb6a6",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/lib/quiz-judge.ts",
+      "sha256": "9e84c0392d464857b28cea2570015ac2ae7285aa846ad90048dbdc80b13f96a8",
+      "bytes": 3809,
+      "git_blob_sha1": "f2cd88f4c3ff267e23439b06283d776155dafcdd",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    },
+    {
+      "path": "upstream/web/lib/quiz-question-type.ts",
+      "sha256": "27fb40aba840650cc6af5835a586b67a47612c33ca8ae85b07c5a50162231358",
+      "bytes": 2939,
+      "git_blob_sha1": "e5d34b0cc4b760bbf72f85ce29e6e6e408412646",
+      "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383"
+    }
+  ],
+  "target_files": [
+    {
+      "path": "tools/compiler_core.py",
+      "sha256": "5eb6fd2998876ad77949ca153cbc21b30cbfd492e66ce1c19b7816b7563b6a4b"
+    },
+    {
+      "path": "tools/book_export.py",
+      "sha256": "3d2e98fa4e383d929b7869de96a0978c69b84352971b0056dfd2440fe62cc443"
+    },
+    {
+      "path": "tools/progress_core.py",
+      "sha256": "252f7118644bae55697cecf6c1c4964b7c34ff5ba7a7586d89e6ecf3197678f6"
+    },
+    {
+      "path": "package/runtime/upstream.js",
+      "sha256": "2bbcbd4348c832a5f3d2a5a285a5cdf9c1e17d84e83fa7b1de7df6da9b0c6433"
+    },
+    {
+      "path": "package/runtime/reader.js",
+      "sha256": "075fad2f95a06c866b98f5bc1ea3a144506b165adf37276dfbf7492fbe56243a"
+    },
+    {
+      "path": "package/runtime/reader.css",
+      "sha256": "75a80e69739e01697657c977691ae88eb9d68855f65474d6206125b03cd0e456"
+    }
+  ],
+  "actual_reuse": [
+    {
+      "candidate": "C10",
+      "symbols": [
+        "Page (BookPage alias)",
+        "Block (LearningBlock alias)",
+        "Book",
+        "Spine",
+        "Chapter"
+      ],
+      "mode": "R",
+      "evidence": "Original loaded model file bytes match fixed source; used to compile/validate six actual blocks and two pages"
+    },
+    {
+      "candidate": "C10",
+      "symbols": [
+        "BlockContext",
+        "BlockGenerator.generate",
+        "_failure_metadata"
+      ],
+      "mode": "A",
+      "changes": "Original prefix retained; model import rewritten; default AI registry excluded",
+      "evidence": "Success/error/CancelledError executed in pure fixture compiler"
+    },
+    {
+      "candidate": "C10",
+      "symbols": [
+        "BookCompiler._finalize_page_status"
+      ],
+      "mode": "A-existing-wrapper",
+      "changes": "Existing isolated reuse wrapper accepts terminal blocks only",
+      "evidence": "Both compiled pages reach ready"
+    },
+    {
+      "candidate": "C10",
+      "symbols": [
+        "render_block",
+        "render_book_markdown"
+      ],
+      "mode": "A",
+      "changes": "Whole original export.py retained; one model import rewritten",
+      "evidence": "Produces accompanying package/book.md"
+    },
+    {
+      "candidate": "C10",
+      "symbols": [
+        "record_attempt",
+        "recompute_score",
+        "recompute_weak_chapters"
+      ],
+      "mode": "A-check-only",
+      "changes": "Whole original progress.py retained; one model import rewritten",
+      "evidence": "Ungraded attempt remains score0 and weak_chapters empty; browser does not persist formal progress"
+    },
+    {
+      "candidate": "C10-renderer",
+      "symbols": [
+        "normalizeQuizQuestionType",
+        "isChoiceQuizQuestion",
+        "resolveChoiceAnswerKey",
+        "sequentialReadTarget",
+        "chapterReadingPercent"
+      ],
+      "mode": "R-transpile",
+      "changes": "Original TypeScript files unchanged; type erasure and classic-script exports wrapper only",
+      "evidence": "Actual browser choice grading and reading scroll use compiled original functions"
+    },
+    {
+      "candidate": "C11/C12",
+      "symbols": [
+        "VisualizationEnvelope",
+        "RendererRef",
+        "stripCodeFence",
+        "parseChartConfigStrict"
+      ],
+      "mode": "R-excerpt/A",
+      "changes": "Original envelope DTO excerpt; existing attributed strict-JSON adapter excludes upstream repair fallback",
+      "evidence": "Typed envelope serialized; actual browser plot decoder uses strict parser"
+    }
+  ],
+  "new_implementation": [
+    "Bounded pure-data payload schema",
+    "Synthetic fixture generator",
+    "DOM/SVG offline renderer",
+    "Local asset collector and ZIP packer"
+  ]
+}

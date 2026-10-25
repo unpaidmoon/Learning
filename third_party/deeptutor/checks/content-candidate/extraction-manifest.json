@@ -1,0 +1,68 @@
+{
+  "deeptutor_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "deepstudent_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "C06_sources": [
+    {
+      "path": "upstream/deepstudent/src/features/media-handout/ir.ts",
+      "source_path": "src/features/media-handout/ir.ts",
+      "sha256": "9f6e31a9c1d5d2b099eeb690d317d869bc8291f9d1fb910fb9928bfad6d7e381",
+      "git_blob_sha1": "7530fd94f4cb7ef541f8ae96e2f710e27f335fe7"
+    },
+    {
+      "path": "upstream/deepstudent/src/features/media-handout/markdown.ts",
+      "source_path": "src/features/media-handout/markdown.ts",
+      "sha256": "6360e692b6811fdca644b91e66cdbfe9c41897c9e34dce9405d6efd4f20a6431",
+      "git_blob_sha1": "fd08bb74a5d4d470c3f8778c2cf3cb192a485750"
+    },
+    {
+      "path": "upstream/deepstudent/src/features/media-handout/windowing.ts",
+      "source_path": "src/features/media-handout/windowing.ts",
+      "sha256": "b84e36c4b3d9bba1c6ef1ac8d53641a87fb8ae9770c664fce130309ec97691ec",
+      "git_blob_sha1": "a89c4d9b6b0a8f5a22d3090b4539be4d9d7b195a"
+    }
+  ],
+  "C08_matching": {
+    "path": "deeptutor/services/rag/eval/matching.py",
+    "git_blob_sha1": "cab037804947fbd7b9eb82b197951818e920d3ec",
+    "sha256": "19ae5bde484b6b76f594aa0cac1c6574f82b00d8374c013da94159637bf28c76"
+  },
+  "C13": {
+    "source": "deeptutor/agents/research/data_structures.py",
+    "source_sha256": "980e21a90e9c33b32d822b296ec4b4da6db6a7b2e07978dd3b32cb03cf64b46b",
+    "original_query_methods": [
+      "has_topic",
+      "find_similar",
+      "list_topics",
+      "get_pending_block",
+      "get_block_by_id",
+      "get_all_completed_blocks",
+      "get_all_pending_blocks",
+      "is_all_completed",
+      "get_statistics"
+    ],
+    "adaptations": [
+      "UTC timestamps",
+      "TraceReference replaces truncating raw answers",
+      "No mutating queue or file IO methods"
+    ]
+  },
+  "C06_runtime": [
+    {
+      "path": "retained/handout_types.ts",
+      "sha256": "13777d5fc4d2f39864c1188c48e4b73b600d35bedc2257a5084c250ec1b86250"
+    },
+    {
+      "path": "retained/ir.ts",
+      "sha256": "a308742eab7b88de4f2c3a6ecc1f43ed26600797bf9b9d5323f16a5e4c57e0fc"
+    },
+    {
+      "path": "retained/markdown.ts",
+      "sha256": "499d069d77a846f48c0b348075796aabfa9ba665e093467f3c64ceee2999acf1"
+    }
+  ],
+  "C06_runtime_changes": [
+    "Original IR prefix retained, excluding salvage and frame-timestamp collector.",
+    "Original Markdown method bodies retained; type-only prompts import redirected to local type alias.",
+    "Public wrapper imports retained closure; no windowing/frame/prompt runtime modules."
+  ]
+}

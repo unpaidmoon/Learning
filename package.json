@@ -10,6 +10,8 @@
   "scripts": {
     "dev": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py dev",
     "start": ".\\backend\\.venv\\Scripts\\python.exe scripts/app.py start",
+    "desktop": ".\\backend\\.venv\\Scripts\\python.exe scripts/desktop/run.py",
+    "desktop:prepare": ".\\backend\\.venv\\Scripts\\python.exe scripts/desktop/bootstrap.py --build-native",
     "build": "pnpm --filter @learning/frontend build",
     "check": "pnpm --filter @learning/frontend check && .\\backend\\.venv\\Scripts\\python.exe -m ruff check backend scripts/app.py scripts/check_docs.py scripts/export_openapi.py tests/e2e scripts/harness scripts/validation tests/fixtures/v3 tests/fixtures/mvp_a tests/fixtures/redesign tests/fixtures/workspace_v2 && pnpm contracts:check && pnpm docs:check",
     "test": "pnpm --filter @learning/frontend test && .\\backend\\.venv\\Scripts\\python.exe -m pytest backend/tests --basetemp=.runtime/tests/backend-latest",

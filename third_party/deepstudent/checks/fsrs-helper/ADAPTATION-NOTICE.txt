@@ -1,0 +1,45 @@
+Learning FSRS helper adapter, 2026-10-23.
+
+Upstream: https://github.com/helixnow/deep-student
+Commit: 635216503c0b34bdf812e17942e0f09f51872e6f
+Unmodified source: ../../upstream/src-tauri/src/fsrs_scheduler.rs
+SHA-256: 62aad68b7b4a2fe1f0d43d5f2059acc35970c5a30ff6672a434be310f85c6686
+Upstream root license text: ../../notices/LICENSE.AGPL-3.0
+Upstream license statement: AGPL-3.0-or-later.
+
+The helper compiles the original scheduler through a path module. It does not
+depend on the separate original-check crate and does not rewrite FSRS.
+
+New adaptation: bounded one-request UTF-8 JSON stdin/stdout protocol, typed
+validation, explicit rating instead of the upstream invalid-rating fallback,
+explicit IANA timezone supplied by the caller instead of process-local time,
+strict memory/configuration errors instead of silent state resets, output
+provenance, and passive project-owned suspension/removal eligibility checks.
+
+The strict FSRS-6 parameter acceptance ranges are taken from the fixed fsrs
+6.6.2 crate src/parameter_clipper.rs. FSRS::new uses ModelConfig::default
+(one relearning step) and enable_short_term=false. Out-of-range inputs are
+rejected before entering the unmodified library, instead of silently clipping
+values while reporting the original inputs as effective parameters. Relevant
+crate source hashes are recorded in dependency-manifest.json. FSRS itself is
+BSD-3-Clause; its original notice is archived under notices/rust/fsrs-6.6.2/.
+
+The due-time adapter is adapted from the fixed upstream
+src-tauri/src/fsrs_review_service.rs::schedule_all_ratings, lines 5280-5356:
+learning/relearning minutes call original learning_due_ms; review days use
+now_ms + days * 86400000, preserving that upstream conversion semantics.
+
+No Tauri, VFS, database, chat session, provider credentials, model invocation,
+queue, daily limit, system clock, automatic resume, or persistence is exposed.
+The project owns all scheduling records, user actions, CAS, deduplication,
+pause/removal state and the unified daily review queue.
+
+The adapter is distributed with the AGPL-3.0-or-later candidate source; actual
+dependency license texts and checksums are separately archived under notices/.
+Candidate checks do not establish product acceptance or final distribution
+license compatibility.
+
+R2 helper0.2.0 adds card-free logical_day using the original logical_day and
+logical_day_bounds_ms functions. No scheduler changes or new dependencies.
+R1 source/metadata archive remains in history/r1; the original R1 binary cache
+is not overwritten. Output boundaries are [start_ms,end_ms).

@@ -54,6 +54,36 @@ export class ApiClient {
     });
   }
 
+  async download(path: string, body: unknown): Promise<Blob> {
+    let response: Response;
+    try {
+      response = await fetch(`/api/v1${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Learning-CSRF": this.csrf || "" },
+        body: JSON.stringify(body),
+        credentials: "same-origin",
+        cache: "no-store",
+        signal: AbortSignal.timeout(180_000),
+      });
+    } catch {
+      throw new ApiError("OFFLINE_DOWNLOAD_UNAVAILABLE", "导出连接中断，请核对后重新导出本版本");
+    }
+    if (!response.ok) {
+      const detail = (await response.json().catch(() => null)) as Partial<
+        Schema<"ErrorResponse">
+      > | null;
+      throw new ApiError(
+        detail?.code || "OFFLINE_EXPORT_FAILED",
+        detail?.message || "此版本未能导出",
+        response.status,
+      );
+    }
+    if (response.headers.get("content-type")?.split(";")[0] !== "application/zip") {
+      throw new ApiError("OFFLINE_EXPORT_TYPE_INVALID", "导出内容类型不符，未保存文件");
+    }
+    return response.blob();
+  }
+
   private async request<T>(path: string, options: RequestInit): Promise<T> {
     let response: Response;
     try {

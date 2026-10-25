@@ -1,0 +1,23 @@
+Selected DeepTutor reuse for the standalone offline candidate
+
+Source: https://github.com/HKUDS/DeepTutor
+Commit: a31d82624c27d75f4e771d4fcb78dce16470b383
+License: Apache-2.0, original text in DeepTutor-LICENSE.
+
+Build-time code retains the original Book/Page/Block models. The selected
+BlockGenerator/BlockContext prefix, book/export.py and book/progress.py change
+only model imports to the isolated reuse package. The default agent registry,
+providers, storage, retries and live services are excluded.
+
+runtime/upstream.js compiles unmodified quiz-question-type.ts and
+book-reader-navigation.ts with TypeScript 5.9.3, using a classic-script exports
+wrapper. The selected VisualizationViewer stripCodeFence/splitSvgBlocks bodies
+are retained through the attributed visualizationParsers adapter; chart parsing
+removes the upstream JSON-repair fallback and uses JSON.parse only.
+
+runtime/reader.js and reader.css are new candidate implementations. They render
+bounded data using DOM APIs and a fixed quadratic function, without evaluating
+arbitrary scripts/expressions or embedding the upstream React/Next viewers.
+
+KaTeX 0.16.22 script/CSS/fonts are copied unchanged from the project's pinned
+package; its original license is in KaTeX-LICENSE. All material is synthetic.

@@ -1,0 +1,119 @@
+{
+  "source_repository": "HKUDS/DeepTutor",
+  "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "acquisition": "GitHub connector; fixed-commit recursive Git tree and base64 blobs",
+  "tree_entry_count": 4407,
+  "tree_truncated": false,
+  "files": [
+    {
+      "path": "LICENSE",
+      "git_blob_sha1": "ae1dbfc5e74c6c9ebb3e46ea9ea8dde8a4a04ed8",
+      "bytes": 11408
+    },
+    {
+      "path": "deeptutor/agents/research/data_structures.py",
+      "git_blob_sha1": "7066883ec650b64a9332dfc3f0a25448a172db57",
+      "bytes": 19281
+    },
+    {
+      "path": "deeptutor/book/compiler.py",
+      "git_blob_sha1": "686882e474bc79b841f43a545a667355774b7350",
+      "bytes": 16717
+    },
+    {
+      "path": "deeptutor/book/models.py",
+      "git_blob_sha1": "a58d37447907de042d201319a4a1c6ab2d6e4d2a",
+      "bytes": 22670
+    },
+    {
+      "path": "deeptutor/knowledge/indexing_run.py",
+      "git_blob_sha1": "8a3a737747a97ecb28570707ccb65fa27d431d07",
+      "bytes": 15794
+    },
+    {
+      "path": "deeptutor/learning/models.py",
+      "git_blob_sha1": "33ac04b03cde27a1a30714308cdb36e41c197a68",
+      "bytes": 26051
+    },
+    {
+      "path": "deeptutor/learning/pending.py",
+      "git_blob_sha1": "362ba5b33c0be7b303039f33bf77a98ab5603b3e",
+      "bytes": 10793
+    },
+    {
+      "path": "deeptutor/services/file_io.py",
+      "git_blob_sha1": "4ada6ae3563ebd600d65f9daaefe29902c04cdbe",
+      "bytes": 4541
+    },
+    {
+      "path": "deeptutor/services/parsing/cache.py",
+      "git_blob_sha1": "10876b9c0b2265a32c8a280f2e8976340659151b",
+      "bytes": 7272
+    },
+    {
+      "path": "deeptutor/services/parsing/engines/mineru/checkpoints.py",
+      "git_blob_sha1": "75acf6fb8fc33f2bee26f1fa289e644e77909210",
+      "bytes": 3482
+    },
+    {
+      "path": "deeptutor/services/rag/eval/dataset.py",
+      "git_blob_sha1": "f22d04c935e9309bed92cb40783d6b7cf00aa4c7",
+      "bytes": 9082
+    },
+    {
+      "path": "deeptutor/services/rag/eval/metrics.py",
+      "git_blob_sha1": "21579c1c04f2cae42ad6ba03058ece3dbc4b6da2",
+      "bytes": 7332
+    },
+    {
+      "path": "deeptutor/services/rag/index_versioning.py",
+      "git_blob_sha1": "644e314d27dc0c35da0447fffcf7182bb719a8b8",
+      "bytes": 14029
+    },
+    {
+      "path": "deeptutor/services/rag/pipelines/llamaindex/pipeline.py",
+      "git_blob_sha1": "e7b0628a66fb70564435ee1d248ea5b6de53b749",
+      "bytes": 21320
+    },
+    {
+      "path": "deeptutor/services/rag/pipelines/llamaindex/storage.py",
+      "git_blob_sha1": "36d34fd124703c90dca1f073542761caf9a3fd11",
+      "bytes": 12545
+    },
+    {
+      "path": "deeptutor/services/rag/source_pages.py",
+      "git_blob_sha1": "e5056d5ec09ca09552aced9abc5c836ce1ffa254",
+      "bytes": 11600
+    },
+    {
+      "path": "deeptutor/utils/json_parser.py",
+      "git_blob_sha1": "06f43a183c288b854763436cb43c8f0ebd70c842",
+      "bytes": 7138
+    },
+    {
+      "path": "deeptutor/visualizers/protocol.py",
+      "git_blob_sha1": "4306f32e4496d83cb379b42903399e6bb36dfc7a",
+      "bytes": 7949
+    },
+    {
+      "path": "docs/INDEXING_RECOVERY.md",
+      "git_blob_sha1": "7e3e71117e8798d38c68bea65a5767049969de86",
+      "bytes": 2428
+    },
+    {
+      "path": "web/components/visualize/VisualizationViewer.tsx",
+      "git_blob_sha1": "29cfe057bc1a2a8cae1f13e647e77deda3318ccc",
+      "bytes": 23588
+    },
+    {
+      "path": "web/features/chat/transport/TurnRuntimeClient.ts",
+      "git_blob_sha1": "72e2e2300f71bc31a2092ed326ea9e2fef3618bb",
+      "bytes": 15055
+    },
+    {
+      "path": "web/hooks/useChatAutoScroll.ts",
+      "git_blob_sha1": "08db25e18e946adb29a7982dfcaa55f3b5e7201d",
+      "bytes": 5923
+    }
+  ]
+}

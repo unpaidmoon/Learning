@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/helixnow/deep-student",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "date": "2026-10-23",
+  "evidence_type": "fixed source archive; candidate and formal product evidence separated per entry",
+  "source_checkout": ".local/cache/reuse/deepstudent (ignored; not required at runtime)",
+  "files": [
+    {
+      "source_path": "src/features/chat/components/translationNdjsonParser.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/components/translationNdjsonParser.ts",
+      "target_path": "upstream/src/features/chat/components/translationNdjsonParser.ts",
+      "sha256": "86118e364aa9c87b8e285d0a8923e320e6e9f931437c85fa8e624ca774931b64",
+      "git_blob_sha1": "42a11155f2df651fd23fb1551ebb8722c498eccc",
+      "size_bytes": 5830,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/chat/components/translationCache.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/components/translationCache.ts",
+      "target_path": "upstream/src/features/chat/components/translationCache.ts",
+      "sha256": "0bbc34b989ac18f6f9fe3bb41c75fc87dde522208da5aa450b043c413e68c210",
+      "git_blob_sha1": "d9bccba0d9133ae3ba32fff0ee72163864b81371",
+      "size_bytes": 2641,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/chat/components/translationTypes.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/components/translationTypes.ts",
+      "target_path": "upstream/src/features/chat/components/translationTypes.ts",
+      "sha256": "4c1c77e6b389c7562df35d187f57be04114e8cb7c98fc7d1c974a7b43da009d8",
+      "git_blob_sha1": "adc086ccb7c801079844e44c64161c6d82f04078",
+      "size_bytes": 1033,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/media-handout/ir.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/ir.ts",
+      "target_path": "upstream/src/features/media-handout/ir.ts",
+      "sha256": "9f6e31a9c1d5d2b099eeb690d317d869bc8291f9d1fb910fb9928bfad6d7e381",
+      "git_blob_sha1": "7530fd94f4cb7ef541f8ae96e2f710e27f335fe7",
+      "size_bytes": 8241,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/media-handout/markdown.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/markdown.ts",
+      "target_path": "upstream/src/features/media-handout/markdown.ts",
+      "sha256": "6360e692b6811fdca644b91e66cdbfe9c41897c9e34dce9405d6efd4f20a6431",
+      "git_blob_sha1": "fd08bb74a5d4d470c3f8778c2cf3cb192a485750",
+      "size_bytes": 3460,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/media-handout/windowing.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/windowing.ts",
+      "target_path": "upstream/src/features/media-handout/windowing.ts",
+      "sha256": "b84e36c4b3d9bba1c6ef1ac8d53641a87fb8ae9770c664fce130309ec97691ec",
+      "git_blob_sha1": "a89c4d9b6b0a8f5a22d3090b4539be4d9d7b195a",
+      "size_bytes": 5849,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src/features/media-handout/prompts.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/prompts.ts",
+      "target_path": "upstream/src/features/media-handout/prompts.ts",
+      "sha256": "1c93b3fc8214d6e54a62381ee615d978d5d847b66bf4640b9b9528c51dcf4f12",
+      "git_blob_sha1": "bf582e4a3f7d5c97b1e15df9c5ee5e1c1a247089",
+      "size_bytes": 8459,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "src-tauri/src/fsrs_scheduler.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/fsrs_scheduler.rs",
+      "target_path": "upstream/src-tauri/src/fsrs_scheduler.rs",
+      "sha256": "62aad68b7b4a2fe1f0d43d5f2059acc35970c5a30ff6672a434be310f85c6686",
+      "git_blob_sha1": "9bc3efb3f92c40c988be3e8e76b90d4f6ce05cd9",
+      "size_bytes": 29611,
+      "modification": "none; byte-for-byte copy",
+      "role": "isolated_candidate"
+    },
+    {
+      "source_path": "LICENSE",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/LICENSE",
+      "target_path": "notices/LICENSE.AGPL-3.0",
+      "sha256": "8943429804542a78e4f48d6a7ac6323f059a5a8540200eb0a2a9b3de7c33bf1d",
+      "git_blob_sha1": "9eeed996a759eb7306fce2b2d1721a7689465a25",
+      "size_bytes": 34532,
+      "modification": "none; byte-for-byte copy",
+      "role": "notice_archive"
+    },
+    {
+      "source_path": "legal/THIRD_PARTY_NOTICES.txt",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/legal/THIRD_PARTY_NOTICES.txt",
+      "target_path": "notices/THIRD_PARTY_NOTICES.txt",
+      "sha256": "57f9e3dba3fdd2bad5d59110af24118ee71deab5c5300349dca8a3eef790ee73",
+      "git_blob_sha1": "da34af137b75fffb3b1595a559fcd1f1fc24f18d",
+      "size_bytes": 1416950,
+      "modification": "none; byte-for-byte copy",
+      "role": "notice_archive"
+    },
+    {
+      "source_path": "docs/THIRD_PARTY_LICENSES.md",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/docs/THIRD_PARTY_LICENSES.md",
+      "target_path": "notices/THIRD_PARTY_LICENSES.upstream.txt",
+      "sha256": "f995a88edcee3eaf93bbc883adb285621e3e0ae40d99468fa6cf56400ebdd6d1",
+      "git_blob_sha1": "3514976cfd8dd0f2f8ec59f00b4c20c0c8678391",
+      "size_bytes": 6906,
+      "modification": "none; byte-for-byte copy",
+      "role": "notice_archive"
+    },
+    {
+      "source_path": "src/features/chat/context/selectionRef.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/context/selectionRef.ts",
+      "target_path": "upstream/src/features/chat/context/selectionRef.ts",
+      "sha256": "56ddea18cf3ac459b348f5ed8edc8fc9c8e55f018114c7fd2779c58c88e35347",
+      "git_blob_sha1": "bf48519b81c5e8c5f728a52926c222d063747950",
+      "size_bytes": 9370,
+      "modification": "none; byte-for-byte copy",
+      "role": "formal_source_archive"
+    }
+  ],
+  "formal_extractions": [
+    {
+      "candidate": "C01",
+      "provenance": "web/selection-provenance.json",
+      "product_module": "frontend/src/workbench/sourcePresentation.ts",
+      "runtime_role": "source position display; project immutable snapshot is authoritative",
+      "excluded": "upstream snapshot truncation and all upstream app/IO imports"
+    },
+    {
+      "candidate": "C02",
+      "original_path": "upstream/src/features/chat/components/translationCache.ts",
+      "product_module": "frontend/src/reading/translationMemo.ts",
+      "runtime_role": "original browser memory LRU for verified saved translations",
+      "modification": "original file unchanged; project namespace, settlement checks and durable operation alias outside"
+    },
+    {
+      "candidate": "C06",
+      "provenance": "resources/workbench/content-runtime.lock.json",
+      "product_module": "backend/src/learning_app/workbench/content_processing.py",
+      "runtime_role": "original chunkTranscript text-range hints and original formatClock presentation",
+      "excluded": "frame window, source selection, outline truncation, tolerant IR/body cleanup are not execution entrypoints"
+    },
+    {
+      "candidate": "C02",
+      "original_path": "upstream/src/features/chat/components/translationNdjsonParser.ts",
+      "adaptation": "scripts/adapt-aligned-parser.mjs",
+      "provenance": "resources/workbench/content-runtime.lock.json",
+      "product_modules": ["backend/src/learning_app/workbench/aligned_translation.py", "frontend/src/workbench/AlignedTranslationDraft.tsx"],
+      "runtime_role": "original object scanner for unverified draft preview; narrowly audited original scan for exact-source aligned publication",
+      "modification": "original archive unchanged; eight traced AST extraction adaptations audit malformed/outside/incomplete/post-done output and exact object keys",
+      "excluded": "tolerant fallback and flushing away an incomplete tail never authorize publication"
+    }
+  ]
+}

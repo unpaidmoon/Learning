@@ -1,0 +1,24 @@
+{
+  "typescript": "5.9.3",
+  "modules": [
+    {
+      "global": "DTQuiz",
+      "source": "third_party/deeptutor/checks/offline-candidate/upstream/web/lib/quiz-question-type.ts",
+      "source_sha256": "27fb40aba840650cc6af5835a586b67a47612c33ca8ae85b07c5a50162231358",
+      "transpiled_sha256": "eee881cb0b174a4e35b9241bd225edbc02ccdc552f0f05b693672fd957c1bfe3"
+    },
+    {
+      "global": "DTNavigation",
+      "source": "third_party/deeptutor/checks/offline-candidate/upstream/web/lib/book-reader-navigation.ts",
+      "source_sha256": "13be567541f09d80827add967f953a346907acc6e0af1123a1449f59a546ea0a",
+      "transpiled_sha256": "e1bad016af94f00b7124b60c9bee9ee4e1fe6b691299953da115130a32a85bdc"
+    },
+    {
+      "global": "DTVisualization",
+      "source": "third_party/deeptutor/web/visualizationParsers.ts",
+      "source_sha256": "3db9c86def0b7819bc2e9215232bc019bbf07f2649dbd644d58c475888309126",
+      "transpiled_sha256": "b2cbc01b84c5aff1117f9f7f88001680a48e2bef548b9a6c4c7eab07cc47b06e"
+    }
+  ],
+  "bundle_sha256": "2bbcbd4348c832a5f3d2a5a285a5cdf9c1e17d84e83fa7b1de7df6da9b0c6433"
+}

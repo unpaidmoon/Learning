@@ -1,0 +1,75 @@
+- generic [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - generic [ref=f1e4]: L
+      - generic [ref=f1e5]: 学习书离线可用
+    - generic [ref=f1e6]: 完全合成示例 · 2章
+  - generic [ref=f1e7]:
+    - complementary [ref=f1e8]:
+      - paragraph [ref=f1e9]: 本书目录
+      - navigation "章节目录" [ref=f1e10]:
+        - button "01 从图像到切线" [ref=f1e11] [cursor=pointer]:
+          - generic [ref=f1e12]: "01"
+          - text: 从图像到切线
+        - button "02 自测与核对" [ref=f1e13] [cursor=pointer]:
+          - generic [ref=f1e14]: "02"
+          - text: 自测与核对
+      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。
+      - button "查看来源" [active] [ref=f1e16] [cursor=pointer]
+    - main [ref=f1e17]:
+      - generic [ref=f1e18]:
+        - paragraph [ref=f1e19]: 数学 · 概念与应用
+        - heading "二次函数：从图像到切线" [level=1] [ref=f1e20]
+        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。
+      - generic [ref=f1e22]:
+        - generic [ref=f1e23]: 自测与核对
+        - generic [ref=f1e24]:
+          - button "向上读一屏" [ref=f1e25] [cursor=pointer]: ↑ 上一屏
+          - button "向下读一屏" [ref=f1e26] [cursor=pointer]: ↓ 下一屏
+          - generic [ref=f1e27]: 89%
+      - article "章节内容" [ref=f1e28]:
+        - generic [ref=f1e270]:
+          - generic [ref=f1e271]:
+            - heading "做两道小练习" [level=2] [ref=f1e272]
+            - generic [ref=f1e273]: 合成练习
+          - generic [ref=f1e274]:
+            - heading "1. 当 a=1、x₀=2 时，切线斜率是多少？" [level=3] [ref=f1e275]
+            - generic [ref=f1e276]:
+              - generic [ref=f1e277]:
+                - radio "选项 A：2" [ref=f1e278]
+                - text: A 2
+              - generic [ref=f1e279]:
+                - radio "选项 B：4" [checked] [ref=f1e280]
+                - text: B 4
+              - generic [ref=f1e281]:
+                - radio "选项 C：8" [ref=f1e282]
+                - text: C 8
+            - button "核对选择" [ref=f1e283] [cursor=pointer]
+            - paragraph [ref=f1e303]: 回答正确。代入 k=2ax₀，得到 2×1×2=4。
+          - generic [ref=f1e284]:
+            - heading "2. 为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。" [level=3] [ref=f1e285]
+            - paragraph [ref=f1e286]: 先尝试口述或写在自己的纸上。查看参考不会自动判对错。
+            - button "收起参考答案" [ref=f1e304] [cursor=pointer]
+            - generic [ref=f1e305]:
+              - paragraph [ref=f1e306]: 读过只是接触了信息，能独立说明和应用还需要另行检验。
+              - paragraph [ref=f1e307]: 这是主观表达题。离线包只提供参考，揭示答案不产生对错或掌握判定。
+        - generic [ref=f1e288]:
+          - generic [ref=f1e289]:
+            - heading "记住关键关系" [level=2] [ref=f1e290]
+            - generic [ref=f1e291]: 合成练习
+          - generic [ref=f1e292]:
+            - group [ref=f1e293]:
+              - generic "二次函数 ax² 的导数是什么？" [ref=f1e294] [cursor=pointer]
+              - paragraph [ref=f1e308]: 2ax。
+            - group [ref=f1e295]:
+              - generic "切点移动时，切线斜率由什么决定？" [ref=f1e296] [cursor=pointer]
+        - generic [ref=f1e297]:
+          - generic [ref=f1e298]:
+            - heading "继续学习" [level=2] [ref=f1e299]
+            - generic [ref=f1e300]: 补充解释
+          - generic [ref=f1e301]:
+            - strong [ref=f1e302]: 练习建议
+            - text: 回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。
+      - generic [ref=f1e204]:
+        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。
+        - button "重置本次自测" [ref=f1e206] [cursor=pointer]

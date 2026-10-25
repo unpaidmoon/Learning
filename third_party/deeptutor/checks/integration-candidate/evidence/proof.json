@@ -1,0 +1,142 @@
+{
+  "status": "passed",
+  "commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "wheel_sha256": "f7b0b7360eab9a277537128bc6d12706144f082a3241c4d0e3cbc6d363599265",
+  "retained_originals": [
+    {
+      "upstream": "deeptutor/book/blocks/base.py",
+      "upstream_sha256": "c21a9f3beb83002eb073282c0e525c907c6f183a586e57b6da4cf958cd3ad373",
+      "target": "book_block_compiler.py",
+      "target_sha256": "5eb6fd2998876ad77949ca153cbc21b30cbfd492e66ce1c19b7816b7563b6a4b",
+      "retained_function_bodies": 6,
+      "verified_diff": "only model import; base excludes default registry prefix remainder"
+    },
+    {
+      "upstream": "deeptutor/book/progress.py",
+      "upstream_sha256": "93b9f95ca676b5db33b9e7be3ec723b7329b4bbcc075ffd6132c6357a043cbfc",
+      "target": "book_progress.py",
+      "target_sha256": "252f7118644bae55697cecf6c1c4964b7c34ff5ba7a7586d89e6ecf3197678f6",
+      "retained_function_bodies": 8,
+      "verified_diff": "only model import; base excludes default registry prefix remainder"
+    },
+    {
+      "upstream": "deeptutor/book/export.py",
+      "upstream_sha256": "b185f72d4dc166ae5e6b90a0033e98a4f7bba3b372e840c1b70bb06e2ddcc70b",
+      "target": "book_export.py",
+      "target_sha256": "3d2e98fa4e383d929b7869de96a0978c69b84352971b0056dfd2440fe62cc443",
+      "retained_function_bodies": 12,
+      "verified_diff": "only model import; base excludes default registry prefix remainder"
+    }
+  ],
+  "wheel_modules_verified": [
+    {
+      "path": "deeptutor_reuse/eval_dataset.py",
+      "sha256": "1d2dd5c25f946e78df2bc2cbd286cc72e9dc6f12384d33dc04c08e62565e893f"
+    },
+    {
+      "path": "deeptutor_reuse/eval_metrics.py",
+      "sha256": "4082684a67eb9a3c43cbc818f2aa93c77d1a1b330e96f5f96e7aa6b2303932de"
+    },
+    {
+      "path": "deeptutor_reuse/book_models.py",
+      "sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3"
+    },
+    {
+      "path": "deeptutor_reuse/visualization_protocol.py",
+      "sha256": "3992d7d372577c778c0d7880e26a7cda6e64db3cb5f94d57d1a4194d1b3b9621"
+    },
+    {
+      "path": "deeptutor_reuse/file_io.py",
+      "sha256": "942e4ed3197ccc1e3417f72befcc6236a15eb049304f44b17a9fa4a59adad21f"
+    },
+    {
+      "path": "deeptutor_reuse/source_digest.py",
+      "sha256": "2b37b793c25a7ebf0174cac2a21048aafb29e2fbc2c789463112fe78876c8d95"
+    },
+    {
+      "path": "deeptutor_reuse/source_ref.py",
+      "sha256": "41aca1f6cbae7fcace624f7110ff97239edea5f7cc0142345efb51aec3881398"
+    },
+    {
+      "path": "deeptutor_reuse/learning_transactions.py",
+      "sha256": "cfe7c498fafd989c2b8c9e3241bcd1853c8f0fe93d464970fb61a8f87199aa9e"
+    },
+    {
+      "path": "deeptutor_reuse/book_compiler_state.py",
+      "sha256": "bfebab5c1c39e27a8764b6649831a46246d8638f246546f9261bd5f4fe35c458"
+    },
+    {
+      "path": "deeptutor_reuse/visualization_models.py",
+      "sha256": "a51c2f45ccc64db9f2d0ef7508115d0e01dec109c5bb1415fcce838d749b148d"
+    },
+    {
+      "path": "deeptutor_reuse/visualization_refs.py",
+      "sha256": "e107bdcb920b5efe83ad2dec6e48627ad9dddee06527549eb7a29082951755be"
+    },
+    {
+      "path": "deeptutor_reuse/research_similarity.py",
+      "sha256": "327dc16c8beed3cb1483f017d863a05e32e04882ec438e751688d0a7b87547cf"
+    },
+    {
+      "path": "deeptutor_reuse/parser_cache.py",
+      "sha256": "cab5efaceb50d66f65ffbf6bf8c98c7557354b5f7aec5ab9a38445c623fa2b5d"
+    },
+    {
+      "path": "deeptutor_reuse/book_block_compiler.py",
+      "sha256": "5eb6fd2998876ad77949ca153cbc21b30cbfd492e66ce1c19b7816b7563b6a4b"
+    },
+    {
+      "path": "deeptutor_reuse/book_progress.py",
+      "sha256": "252f7118644bae55697cecf6c1c4964b7c34ff5ba7a7586d89e6ecf3197678f6"
+    },
+    {
+      "path": "deeptutor_reuse/book_export.py",
+      "sha256": "3d2e98fa4e383d929b7869de96a0978c69b84352971b0056dfd2440fe62cc443"
+    },
+    {
+      "path": "deeptutor_reuse/book_resume.py",
+      "sha256": "ab131cffacf009becac08503122d5ad7cdd37e78ae7d3aab7bc8917a411a367f"
+    },
+    {
+      "path": "deeptutor_reuse/learning_actions.py",
+      "sha256": "c14608083f64a3fcd57bd031bf498ddc2026342495ae6044297a9630c356a728"
+    },
+    {
+      "path": "deeptutor_reuse/offline_data.py",
+      "sha256": "d5dfe6c7245bade6312bfb2deee2f8e361db41b23f2febeeed7b079d2a3d7200"
+    }
+  ],
+  "wheel_notices_verified": [
+    "deeptutor_reuse/dependency-licenses/annotated-types-0.8.0/LICENSE",
+    "deeptutor_reuse/dependency-licenses/attrs-26.1.0/LICENSE",
+    "deeptutor_reuse/dependency-licenses/pydantic-2.11.7/LICENSE",
+    "deeptutor_reuse/dependency-licenses/pydantic_core-2.33.2/LICENSE",
+    "deeptutor_reuse/dependency-licenses/rpds-py-2026.9.1/LICENSE",
+    "deeptutor_reuse/dependency-licenses/typing-inspection-0.4.4/LICENSE",
+    "deeptutor_reuse/dependency-licenses/typing_extensions-4.16.0/LICENSE",
+    "learning_deeptutor_reuse-0.1.0.dist-info/licenses/LICENSE",
+    "learning_deeptutor_reuse-0.1.0.dist-info/licenses/UPSTREAM.md"
+  ],
+  "installed_evidence": ".local/cache/workbench/deeptutor-c09-c13/wheel-r3/summary.json",
+  "checks_passed": 8,
+  "model_calls": 0,
+  "product_status": "not_certified",
+  "verification_sources": [
+    {
+      "path": "freeze_proof.py",
+      "sha256": "6166fef6a470d92bda5b705711fc53ce04c189034d323c032103698f7f53220c"
+    },
+    {
+      "path": "minimal_example.py",
+      "sha256": "f3bd54e163d42b1611c70044f25e1bcc066ee20a849a3cb2fe780a63e03c8c8a"
+    },
+    {
+      "path": "verify_integration.py",
+      "sha256": "3bd452e4c3e57481d8cdd18b9d2266ee186d0f6a56051c892b1fb6aecc1ea4be"
+    },
+    {
+      "path": "verify_wheel.py",
+      "sha256": "ad8f767b72d28a4d36eeed21862e2480240b4623ec9da757e20ebe92be143baf"
+    }
+  ]
+}

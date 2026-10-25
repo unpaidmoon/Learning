@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { VideoControls } from "../src/media/VideoControls";
 
@@ -24,10 +24,49 @@ const controls = () => ({
 });
 
 describe("进度条拖动", () => {
-  it("鼠标悬停只更新预览，连续移动的预览目标不改变播放进度", () => {
+  it("鼠标悬停使用预载邻近图片，连续移动目标不改变主播放进度", async () => {
     vi.stubGlobal("PointerEvent", MouseEvent);
     vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {});
     vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
+    const thumbnails: { onload: (() => void) | null; src: string }[] = [];
+    vi.stubGlobal(
+      "Image",
+      class {
+        onload: (() => void) | null = null;
+        src = "";
+        constructor() {
+          thumbnails.push(this);
+        }
+      },
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async (_url, init?: RequestInit) =>
+          new Response(
+            JSON.stringify(
+              init?.method === "POST"
+                ? {}
+                : {
+                    status: "ready",
+                    frames: [
+                      {
+                        index: 1,
+                        time_ms: 30000,
+                        url: "/api/v1/videos/asset-one/previews/1.jpg?source_version=version-one",
+                      },
+                      {
+                        index: 2,
+                        time_ms: 80000,
+                        url: "/api/v1/videos/asset-one/previews/2.jpg?source_version=version-one",
+                      },
+                    ],
+                  },
+            ),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+      ),
+    );
     const props = controls();
     render(
       <VideoControls
@@ -36,15 +75,24 @@ describe("进度条拖动", () => {
         sourceKey="asset-one:version-one"
       />,
     );
+    await act(async () => {});
+    expect(thumbnails).toHaveLength(2);
+    act(() => {
+      for (const image of thumbnails) image.onload?.();
+    });
     const range = screen.getByRole("slider", { name: "视频播放进度" });
     const box = { left: 10, width: 214, right: 224, top: 0, height: 14, bottom: 14 };
     vi.spyOn(range, "getBoundingClientRect").mockReturnValue(box as DOMRect);
     vi.spyOn(range.parentElement!, "getBoundingClientRect").mockReturnValue(box as DOMRect);
     fireEvent.pointerMove(range, { clientX: 67 });
     expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-time", "25");
+    expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-frame-time", "30");
     expect(range).toHaveValue("10");
     fireEvent.pointerMove(range, { clientX: 167 });
     expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-time", "75");
+    expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-frame-time", "80");
+    expect(screen.getByTestId("video-preview-image")).toHaveAttribute("src", thumbnails[1].src);
+    expect(screen.queryByText(/正在预览/)).not.toBeInTheDocument();
     expect(range).toHaveValue("10");
     expect(props.onSeek).not.toHaveBeenCalled();
   });

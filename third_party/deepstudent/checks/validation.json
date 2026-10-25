@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "scope": "isolated upstream candidates; not product acceptance",
+  "environment": {
+    "rustc": "1.96.0 (ac68faa20 2026-05-25)",
+    "cargo": "1.96.0 (30a34c682 2026-05-25)",
+    "rust_target": "x86_64-pc-windows-msvc",
+    "typescript": "5.9.3 from frontend/node_modules",
+    "dumpbin": "14.44.35228.0",
+    "toolchain_installed_by_this_task": false
+  },
+  "checks": [
+    {
+      "command": "git -C .local/cache/reuse/deepstudent rev-parse HEAD; git -C .local/cache/reuse/deepstudent status --short",
+      "status": "passed",
+      "observed": "HEAD exactly matches source_commit; working tree clean"
+    },
+    {
+      "command": "node --test third_party/deepstudent/checks/candidates.test.mjs",
+      "status": "passed",
+      "passed_tests": 16,
+      "failed_tests": 0,
+      "note": "Characterization includes known upstream deficiencies; does not assert product completeness or permission enforcement."
+    },
+    {
+      "command": "node frontend/node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution bundler --lib ES2022,DOM third_party/deepstudent/upstream/src/features/chat/components/translationNdjsonParser.ts third_party/deepstudent/upstream/src/features/chat/components/translationCache.ts third_party/deepstudent/upstream/src/features/media-handout/ir.ts third_party/deepstudent/upstream/src/features/media-handout/markdown.ts third_party/deepstudent/upstream/src/features/media-handout/windowing.ts",
+      "status": "passed",
+      "exit_code": 0,
+      "note": "Type-only translationTypes and prompts dependencies also resolved; no application runtime imported."
+    },
+    {
+      "command": "cargo test --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --target-dir .local/cache/reuse/deepstudent-fsrs-target",
+      "status": "passed",
+      "passed_upstream_tests": 19,
+      "failed_upstream_tests": 0,
+      "note": "Cargo normalized the initial trimmed lock; all final registry versions/checksums were subsequently compared to the fixed upstream lock."
+    },
+    {
+      "command": "cargo test --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --locked --target-dir .local/cache/reuse/deepstudent-fsrs-target",
+      "status": "passed",
+      "passed_upstream_tests": 19,
+      "failed_upstream_tests": 0,
+      "output_file": "fsrs-locked-output.txt"
+    },
+    {
+      "command": "cargo metadata --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --locked --filter-platform x86_64-pc-windows-msvc --format-version 1",
+      "status": "passed",
+      "all_target_registry_packages": 89,
+      "windows_normal_build_registry_packages": 40,
+      "all_final_versions_and_checksums_match_upstream": true,
+      "note": "No Tauri, VFS, React or LLM provider dependency in this scheduler candidate closure."
+    },
+    {
+      "command": "cargo run --locked --release --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --target-dir .local/cache/reuse/deepstudent-fsrs-target --bin deepstudent-scheduler-check",
+      "status": "passed",
+      "observed": "scheduler_candidate_again=Minutes(1.0);hard=Minutes(5.5);good=Minutes(10.0);easy=Days(8)",
+      "artifact_size_bytes": 164864,
+      "artifact_sha256": "3f0e1ad6634f7911adc2d52820d70f89a2d57577667f16d8ab8e7aa9ffa5a5cc",
+      "dumpbin_imports": [
+        "api-ms-win-core-synch-l1-2-0.dll",
+        "KERNEL32.dll",
+        "ntdll.dll",
+        "VCRUNTIME140.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll"
+      ]
+    },
+    {
+      "command": "cargo rustc --release --locked --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --target-dir .local/cache/reuse/deepstudent-fsrs-static-target --bin deepstudent-scheduler-check -- -C target-feature=+crt-static",
+      "followup_action": "Ran the resulting owned executable, then Microsoft dumpbin /DEPENDENTS and SHA-256 on it.",
+      "status": "passed",
+      "observed": "scheduler_candidate_again=Minutes(1.0);hard=Minutes(5.5);good=Minutes(10.0);easy=Days(8)",
+      "artifact_size_bytes": 287744,
+      "artifact_sha256": "483610e13213cc9ce2f11845aa3f4dac28b26039bf6566054dcd215f29a34d6f",
+      "dumpbin_imports": [
+        "api-ms-win-core-synch-l1-2-0.dll",
+        "KERNEL32.dll",
+        "ntdll.dll"
+      ],
+      "note": "Fixed-input check executable only; not a production JSON helper or clean-machine deployment test."
+    }
+  ],
+  "historical_failures": [
+    {
+      "command": "cargo test --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --locked --target-dir .local/cache/reuse/deepstudent-fsrs-target",
+      "status": "failed",
+      "observation": "Initial manually trimmed upstream lock required normalization and --locked refused the update.",
+      "resolution": "Normal Cargo test retained upstream versions/checksums, removed unused entries, and normalized the lock; final --locked test passed."
+    },
+    {
+      "command": "cargo generate-lockfile --manifest-path third_party/deepstudent/checks/fsrs/Cargo.toml --offline",
+      "status": "failed",
+      "observation": "Offline re-resolution reported chacha20 ^0.10.0 with 0.10.1 yanked.",
+      "resolution": "Did not replace pinned fsrs or manually bypass yanking. Cargo test using the existing locked upstream versions fetched chacha20 0.10.2 and succeeded."
+    },
+    {
+      "command": "node --test third_party/deepstudent/checks/candidates.test.mjs",
+      "status": "failed",
+      "passed_tests": 15,
+      "failed_tests": 1,
+      "observation": "The authored ragged-table fixture had malformed literal JSON, so it failed before reaching the expected row-length rejection.",
+      "resolution": "Fixed the fixture with JSON.stringify; no upstream code change; final 16 tests passed."
+    }
+  ],
+  "product_checks": {
+    "C01_draft_integration": "not_run",
+    "C02_real_translation_stream_and_active_cancel": "not_run",
+    "C03_answer_regrade_review_transactions": "not_run",
+    "C04_production_helper_persistence_today_queue_and_undo": "not_run",
+    "C05_two_round_real_essay_and_annotation_anchors": "not_run",
+    "C06_authorized_complete_handout_and_source_mapping": "not_run",
+    "harness_model_usage_and_outbound_attempts": "not_run",
+    "clean_machine_and_offline_product_package": "not_run",
+    "user_learning_experience": "not_run"
+  },
+  "model_calls": 0,
+  "user_materials_read": false,
+  "running_product_instance_modified": false
+}

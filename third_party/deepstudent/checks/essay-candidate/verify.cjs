@@ -1,0 +1,42 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const project=path.resolve(__dirname,'../../../..'),root=path.join(project,'.local/cache/workbench/ds-essay-candidate'),dist=path.join(root,'dist'),standalone=path.join(root,'standalone');
+const sha=raw=>crypto.createHash('sha256').update(raw).digest('hex'),relative=file=>path.relative(project,file).replaceAll('\\','/');
+fs.mkdirSync(root,{recursive:true});
+const commands=[];
+function run(args,extra={},expected=0){
+ const r=spawnSync(process.execPath,args,{cwd:project,windowsHide:true,encoding:'utf8',timeout:20000,maxBuffer:4*1024*1024,env:{...process.env,NODE_OPTIONS:'',NODE_PATH:''},...extra});
+ commands.push({executable:process.execPath,args,cwd:extra.cwd||project,expected_exit:expected,exit:r.status,stdout:r.stdout,stderr:r.stderr,error:r.error?.code??null});
+ if(r.status!==expected)throw Error('ESSAY_CANDIDATE_CHECK_FAILED:'+JSON.stringify(commands.at(-1)));return r;
+}
+function fileRecord(file,base){const raw=fs.readFileSync(file);return{path:path.relative(base,file).replaceAll('\\','/'),bytes:raw.length,sha256:sha(raw)}}
+function inventory(folder){return fs.readdirSync(folder,{withFileTypes:true}).flatMap(e=>e.isDirectory()?inventory(path.join(folder,e.name)):[fileRecord(path.join(folder,e.name),standalone)]).sort((a,b)=>a.path.localeCompare(b.path))}
+run([path.join(__dirname,'build.cjs'),dist]);
+run(['--test','--test-reporter=tap',path.join(__dirname,'candidate.test.cjs')]);
+const build=JSON.parse(fs.readFileSync(path.join(dist,'build-manifest.json'),'utf8'));
+const runtimeNames=['candidate.cjs','helper.cjs',...build.outputs.map(x=>'dist/'+x.path),'dist/package.json','dist/build-manifest.json',...['LICENSE.AGPL-3.0','THIRD_PARTY_NOTICES.txt','THIRD_PARTY_LICENSES.upstream.txt','ADAPTATION-NOTICE.txt'].map(x=>'dist/notices/'+x)];
+for(const name of runtimeNames){const dest=path.join(standalone,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(name.startsWith('dist/')?path.join(dist,name.slice(5)):path.join(__dirname,name),dest)}
+const draft={draft_id:'essay_1',revision_id:'draft_r1',content_hash:sha(Buffer.from('前🙂 bad 后 bad 末')),content_role:'user_note',text:'前🙂 bad 后 bad 末'};
+const rubric={max_total:100,aggregation:'sum',dimensions:[{name:'表达 & 文法',max_score:60},{name:'内容',max_score:40}]};
+const feedback={draft_revision_id:draft.revision_id,draft_content_hash:draft.content_hash,body:'<score max="100" total="70"><dim score="40" name="表达 &amp; 文法" max="60">评语</dim><dim name="内容" max="40" score="30">评语</dim></score>',annotated_text:'前🙂 bad 后 <err type="grammar" explanation="可改进">bad</err> 末',host_terminal:'completed',cancel_requested:false,origin:'ai_reference'};
+const request={protocol_version:1,request_id:'fixture_round_1',operation:'validate_feedback',payload:{draft,feedback,rubric}};
+const argv=[path.join(standalone,'helper.cjs'),'--compiled-root',path.join(standalone,'dist')],before=inventory(standalone),cases=[];
+function call(name,input,exit,status){const r=run(argv,{cwd:standalone,input:typeof input==='object'&&!Buffer.isBuffer(input)?JSON.stringify(input):input},exit);const reply=JSON.parse(r.stdout);assert.equal(reply.ok,exit===0);if(status)assert.equal(reply.result.status,status);assert.equal(r.stderr,'');cases.push({name,expected_exit:exit,reply});return reply}
+const reply=call('complete-frozen-draft',request,0,'reference_ready');assert.equal(reply.result.annotations[0].start,9);assert.equal(reply.result.annotations[0].end,12);assert.equal(reply.result.reference_evaluation.total,70);
+for(const [name,delta,status] of [['cancelled',{host_terminal:'cancelled',cancel_requested:true},'pending'],['unknown',{host_terminal:'unknown'},'pending'],['stale-revision',{draft_revision_id:'draft_r0'},'stale_reference'],['over-range',{body:feedback.body.replace('total="70"','total="170"')},'pending'],['unfinished-marker',{annotated_text:'前🙂 bad 后 <err type="grammar">bad'},'pending']])call(name,{...request,payload:{...request.payload,feedback:{...feedback,...delta}}},0,status);
+call('unsupported-operation',{...request,operation:'append_assessment'},2);
+call('unknown-envelope-field',{...request,source_file:'not-accepted'},2);
+call('two-json-values',JSON.stringify(request)+JSON.stringify(request),2);
+call('invalid-utf8',Buffer.from([0xc3,0x28]),2);
+call('oversize-input','x'.repeat(2*1024*1024+1),2);
+const missing=run([path.join(standalone,'helper.cjs')],{cwd:standalone,input:''},3);assert.equal(JSON.parse(missing.stdout).error.code,'ESSAY_COMPILED_ROOT_REQUIRED');cases.push({name:'startup-argv-failure',expected_exit:3,reply:JSON.parse(missing.stdout)});
+assert.deepEqual(inventory(standalone),before,'Runtime must not create or modify package files');
+const examples=path.join(__dirname,'examples');fs.mkdirSync(examples,{recursive:true});
+fs.writeFileSync(path.join(examples,'request.json'),JSON.stringify(request,null,2)+'\n');fs.writeFileSync(path.join(examples,'response.json'),JSON.stringify(reply,null,2)+'\n');
+fs.writeFileSync(path.join(root,'standalone-fixture.json'),JSON.stringify({request,cases,package_unchanged:true},null,2)+'\n');
+const validation={status:'passed',source_commit:build.source_commit,node:process.version,typescript:build.typescript,scope:'candidate only; no product/Host/model/DB integration',strict_typecheck:true,test_groups:11,standalone_process_cases:cases.length,standalone_runtime:'Copied helper/candidate/dist/notices only; no compiler or app source imports; unchanged runtime package',commands,actual_model_calls:0,history:[{status:'fixed',observation:'An early test had an extra closing parenthesis.',resolution:'Correct test syntax; upstream originals unchanged.'},{status:'fixed',observation:'An early test expected original dim score Infinity to remain nonfinite with max60, but original clamp makes it60.',resolution:'Assert clamp+raw-invalid separately, then test Infinity max to verify JSON-safe diagnostic projection.'}],not_run:['Formal Artifact/Task persistence, migration and transaction/CAS admission','Actual Harness/model response formatting and active cancellation','Product UI annotation selection, accept/undo, draft comparison','Real user material, screenshots/video and image input','Full13-scenario acceptance']};
+fs.writeFileSync(path.join(root,'validation.json'),JSON.stringify(validation,null,2)+'\n');
+const source=JSON.parse(fs.readFileSync(path.join(__dirname,'source-manifest.json'),'utf8'));
+const manifest={schema_version:1,candidate_id:'ds-essay-6352165-node24-20261023-r1',candidate_version:'0.1.0',source:{repository:'https://github.com/helixnow/deep-student',commit:source.source_commit,license:'Upstream root GNU AGPLv3; upstream licensing document states AGPL-3.0-or-later',files:source.files},runtime:{node_version:'24.14.0',verified_node_executable_sha256:sha(fs.readFileSync(process.execPath)),operations:['validate_feedback'],stdin:'One UTF-8 JSON value then EOF; at most2097152 bytes',stdout:'One UTF-8 JSON value plus LF; at most2097152 bytes',exit_codes:{0:'valid response, including pending/stale_reference',2:'input/protocol/output bound error',3:'runtime deployment/version/argv failure'},dependencies:'Only local CJS and Node builtins; no npm runtime package',required_files:before},build:{node:'24.14.0',typescript:'5.9.3',inputs:['build.cjs','candidate.cjs','helper.cjs','source-manifest.json','ADAPTATION-NOTICE.txt','verify.cjs'].map(name=>fileRecord(path.join(__dirname,name),__dirname))},bundle:{prepared_path:relative(standalone),install_contract:'Owner copies every required_file to a versioned formal runtime root and verifies SHA-256. Pass its dist subdirectory via fixed argv; never use an audit cache in formal runtime.'},evidence:{validation:relative(path.join(root,'validation.json')),standalone_fixture:relative(path.join(root,'standalone-fixture.json')),example_request:relative(path.join(examples,'request.json')),example_response:relative(path.join(examples,'response.json')),actual_model_calls:0,product_acceptance:'not_run'}};
+fs.writeFileSync(path.join(__dirname,'deployment-manifest.json'),JSON.stringify(manifest,null,2)+'\n');fs.writeFileSync(path.join(root,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+console.log(JSON.stringify({status:'passed',test_groups:11,standalone_process_cases:cases.length,runtime_files:before.length,actual_model_calls:0,manifest:path.join(__dirname,'deployment-manifest.json'),bundle:standalone}));
