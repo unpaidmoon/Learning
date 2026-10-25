@@ -1,0 +1,7 @@
+{
+  "name": "learning-harness-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI 辅助学习桌面试用；沿用固定 Harness 客户端",
+  "main": "main.cjs"
+}

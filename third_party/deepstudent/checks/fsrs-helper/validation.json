@@ -1,0 +1,58 @@
+{
+  "helper_version": "0.2.0",
+  "protocol_version": 1,
+  "scope": "candidate only; no product/DB/runtime writes",
+  "checks": [
+    {
+      "command": [
+        "rustup",
+        "run",
+        "stable",
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "third_party\\deepstudent\\checks\\fsrs-helper\\Cargo.toml",
+        "--target-dir",
+        ".local\\cache\\workbench\\fsrs-helper-r2\\target"
+      ],
+      "status": "passed",
+      "total_tests": 43,
+      "original_scheduler_tests": 19,
+      "prior_protocol_and_process_tests": 18,
+      "logical_day_tests": 6
+    },
+    {
+      "command": "Build-FsrsHelper.ps1",
+      "status": "passed",
+      "static_crt": true
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe -B third_party/deepstudent/checks/fsrs-helper/verify_logical_day.py",
+      "status": "passed",
+      "release_logical_day_cases": 13,
+      "legacy_comparisons": 2,
+      "r1_binary_unchanged": true,
+      "scheduler_unchanged": true,
+      "new_dependencies": 0
+    }
+  ],
+  "r1_history": "third_party/deepstudent/checks/fsrs-helper/history/r1/validation.json",
+  "history": [
+    {
+      "status": "fixed",
+      "finding": "New test assert message lacked format literal."
+    },
+    {
+      "status": "fixed",
+      "finding": "R1 build-script regex had extra escaping and incorrectly rejected installedRust1.96; corrected script validation forR2."
+    }
+  ],
+  "not_run": [
+    "Root formal deployment and daily business transactions",
+    "Clean Windows installer",
+    "User learning experience"
+  ],
+  "actual_model_calls": 0
+}

@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-22",
+  "scope": "Harness native UI with project course/material/AI layout; video screenshot QA trial",
+  "fixture": {
+    "run_id": "desktop-native-20261022-r8",
+    "status": "passed",
+    "assertions": 21,
+    "source_changed_during_run": [],
+    "actual_model_forwarding": 0,
+    "local_messages": 3,
+    "business_attempts": 3
+  },
+  "real": {
+    "run_id": "desktop-real-native-20261022-r1",
+    "status": "passed",
+    "assertions": 15,
+    "route": "api_key",
+    "model": "deepseek-flash",
+    "thinking": "high",
+    "max_output_tokens": 8192,
+    "timeout_seconds": 240,
+    "counts": {
+      "local_messages": 3,
+      "real_provider_attempts": 3,
+      "business_attempts": 3,
+      "submissions": 3
+    },
+    "source_changed_during_run": [],
+    "cases": [
+      {
+        "id": "confirmed-image",
+        "state": "completed",
+        "body_characters": 415,
+        "input_tokens": 726,
+        "output_tokens": 402
+      },
+      {
+        "id": "active-stop",
+        "state": "cancelled",
+        "body_characters": 666,
+        "provider_cancel_observed": true,
+        "host_alive": true,
+        "final_usage": "unknown"
+      },
+      {
+        "id": "same-session-follow-up",
+        "state": "completed",
+        "body_characters": 122,
+        "input_tokens": 841,
+        "output_tokens": 188
+      }
+    ],
+    "same_native_session": true,
+    "confirmed_image_dimensions": [
+      320,
+      180
+    ],
+    "published_and_outbound_hash_match": true
+  },
+  "regression": {
+    "frontend_passed": 141,
+    "backend_and_desktop_tools_passed": 223,
+    "skipped": 1,
+    "guard_passed": 3,
+    "root_check": "passed",
+    "frontend_build": "passed",
+    "native_workspace_reproducibility": "passed"
+  },
+  "electron": {
+    "native_client_window": "passed",
+    "default_launcher": "passed",
+    "source": "separate real Electron checks, not a combined real-provider-in-Electron claim",
+    "node_in_renderer": false,
+    "context_isolation": true,
+    "sandbox": true,
+    "caption_height_px": 40,
+    "close_hides_window": true,
+    "owned_process_cleanup": "passed"
+  },
+  "limitations": [
+    "Desktop account login not exercised against the real service in this run.",
+    "Confirmed historical images may appear again on later native user rows.",
+    "Other document and file management modules are not fully migrated.",
+    "Human learning and visual acceptance remain pending."
+  ]
+}

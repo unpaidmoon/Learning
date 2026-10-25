@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import { api, ApiError, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
@@ -12,7 +13,7 @@ type OpenFile = Schema<"CourseFileOpenResponse">;
 type FileOperation = Schema<"CourseFileOperationResponse">;
 type OperationStatus = Schema<"CourseOperationStatusResponse">;
 type Action = "rename-course" | "detach" | "root";
-type Pending = { operationId: string; action: Action };
+type Pending = { operationId: string; action: Action | "relocate" };
 const pendingKey = (courseId: string) => `learning.course-operation.${courseId}`;
 const legacyPendingKey = (courseId: string) => `learning.course-file-operation.${courseId}`;
 
@@ -27,7 +28,7 @@ function readPending(courseId: string): Pending | null {
         !/^[A-Za-z0-9_-]{1,160}$/.test(value.operationId)
       )
         continue;
-      if (["rename-course", "detach", "root"].includes(String(value.action)))
+      if (["rename-course", "detach", "root", "relocate"].includes(String(value.action)))
         return value as Pending;
     }
   } catch {
@@ -54,6 +55,9 @@ export function CourseExplorer({
   onLegacyVideo,
   onDirectorySelect,
   revision = 0,
+  rootLabel,
+  headerContainer,
+  compact = false,
 }: {
   courseId: string;
   connected: boolean;
@@ -63,6 +67,9 @@ export function CourseExplorer({
   onLegacyVideo?: (asset: Schema<"MediaAssetResponse">) => void;
   onDirectorySelect?: (path: string) => void;
   revision?: number;
+  rootLabel?: string;
+  headerContainer?: HTMLElement | null;
+  compact?: boolean;
 }) {
   const [root, setRoot] = useState<Listing | null>(null);
   const [children, setChildren] = useState<Record<string, Entry[]>>({});
@@ -70,6 +77,7 @@ export function CourseExplorer({
   const [selectedPath, setSelectedPath] = useState("");
   const [legacyVideos, setLegacyVideos] = useState<Schema<"MediaAssetResponse">[]>([]);
   const [error, setError] = useState("");
+  const [readError, setReadError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [action, setAction] = useState<Exclude<Action, "root"> | null>(null);
@@ -90,7 +98,7 @@ export function CourseExplorer({
       else {
         localStorage.removeItem(pendingKey(courseId));
         const legacy = readPending(courseId);
-        if (legacy && ["rename-course", "detach", "root"].includes(legacy.action))
+        if (legacy && ["rename-course", "detach", "root", "relocate"].includes(legacy.action))
           localStorage.removeItem(legacyPendingKey(courseId));
       }
     } catch {
@@ -108,6 +116,7 @@ export function CourseExplorer({
       const version = ++listingVersion.current;
       const listing = await readDirectory("", signal);
       if (at !== epoch.current || version !== listingVersion.current) return;
+      setReadError("");
       setRoot(listing);
       setChildren({ "": listing.entries });
       if (listing.legacy_asset_count && listing.root_status !== "ready") {
@@ -139,7 +148,7 @@ export function CourseExplorer({
     const abort = new AbortController();
     const at = ++epoch.current;
     void refresh(abort.signal).catch((reason) => {
-      if (!abort.signal.aborted && at === epoch.current) setError(errorMessage(reason));
+      if (!abort.signal.aborted && at === epoch.current) setReadError(errorMessage(reason));
     });
     return () => {
       epoch.current += 1;
@@ -154,12 +163,12 @@ export function CourseExplorer({
     const abort = new AbortController();
     const at = epoch.current;
     void refresh(abort.signal).catch((reason) => {
-      if (!abort.signal.aborted && at === epoch.current) setError(errorMessage(reason));
+      if (!abort.signal.aborted && at === epoch.current) setReadError(errorMessage(reason));
     });
     return () => abort.abort();
   }, [refresh, revision]);
 
-  const finish = async (kind: Action, at: number) => {
+  const finish = async (kind: Pending["action"], at: number) => {
     if (at !== epoch.current) return;
     checkpoint(null);
     setPending(null);
@@ -188,14 +197,26 @@ export function CourseExplorer({
   const bindRoot = async () => {
     if (busy || pending || !connected) return;
     const at = epoch.current;
-    const next: Pending = { operationId: crypto.randomUUID(), action: "root" };
+    const relocation = Boolean(root?.root_path);
+    const next: Pending = {
+      operationId: crypto.randomUUID(),
+      action: relocation ? "relocate" : "root",
+    };
     setBusy(true);
     setError("");
     setNotice("");
     checkpoint(next);
     try {
-      await api.write(`/courses/${courseId}/root`, {}, { timeoutMs: 180_000 });
-      await finish("root", at);
+      const result = await api.write<{ unavailable_versions?: unknown[] } | null>(
+        `/courses/${courseId}/root${relocation ? "/relocate" : ""}`,
+        relocation ? { operation_id: next.operationId, expected_root: root?.root_path } : {},
+        { timeoutMs: 180_000 },
+      );
+      await finish(next.action, at);
+      if (at === epoch.current && result?.unavailable_versions?.length)
+        setNotice(
+          `已重新定位；${result.unavailable_versions.length} 个旧版本仍不可用，旧引用没有替换为同名新版。`,
+        );
     } catch (reason) {
       if (at === epoch.current) mutationFailed(reason, next);
     } finally {
@@ -353,41 +374,90 @@ export function CourseExplorer({
       </li>
     ));
   const ready = root?.course_id === courseId && root.root_status === "ready";
+  const heading = (
+    <div className="explorer-heading">
+      <span>文件</span>
+      <div>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          aria-label="刷新文件"
+          title="刷新文件"
+          disabled={!connected || busy}
+          onClick={() => {
+            setError("");
+            void refresh().catch((reason) => setError(errorMessage(reason)));
+          }}
+        >
+          <Icon name="refresh" size={16} />
+        </Button>
+        <details
+          className="explorer-menu sidebar-course-menu"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              event.currentTarget.removeAttribute("open");
+          }}
+          onClick={(event) => {
+            if ((event.target as Element).closest("button"))
+              event.currentTarget.removeAttribute("open");
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              event.stopPropagation();
+              event.currentTarget.removeAttribute("open");
+              event.currentTarget.querySelector<HTMLElement>("summary")?.focus();
+            }
+          }}
+        >
+          <summary aria-label="课程设置" title="课程设置">
+            <Icon name="more" size={17} />
+          </summary>
+          <div className="file-actions-menu">
+            <button disabled={!connected || busy || !!pending} onClick={() => void bindRoot()}>
+              重新定位课程原件…
+            </button>
+            {compact && (
+              <>
+                <button
+                  disabled={!connected || busy || !!pending}
+                  onClick={() => {
+                    setError("");
+                    setName(root?.title || "");
+                    setAction("rename-course");
+                  }}
+                >
+                  重命名课程…
+                </button>
+                <button
+                  disabled={!ready}
+                  onClick={() => {
+                    setSelectedPath("");
+                    onDirectorySelect?.("");
+                  }}
+                >
+                  返回课程根目录
+                </button>
+              </>
+            )}
+            <button
+              disabled={!connected || busy || !!pending}
+              onClick={() => {
+                setError("");
+                setAction("detach");
+              }}
+            >
+              移除课程…
+            </button>
+          </div>
+        </details>
+      </div>
+    </div>
+  );
   return (
     <section className="course-explorer" aria-label="课程文件">
-      <div className="explorer-heading">
-        <span>文件</span>
-        <div>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label="刷新文件"
-            title="刷新文件"
-            disabled={!connected || busy}
-            onClick={() => {
-              setError("");
-              void refresh().catch((reason) => setError(errorMessage(reason)));
-            }}
-          >
-            ↻
-          </Button>
-          <details className="explorer-menu sidebar-course-menu">
-            <summary aria-label="课程设置">···</summary>
-            <div className="file-actions-menu">
-              <button
-                disabled={!connected || busy || !!pending}
-                onClick={() => {
-                  setError("");
-                  setAction("detach");
-                }}
-              >
-                移除课程…
-              </button>
-            </div>
-          </details>
-        </div>
-      </div>
-      {root?.course_id === courseId && (
+      {headerContainer ? createPortal(heading, headerContainer) : heading}
+      {!compact && root?.course_id === courseId && (
         <div className="course-root-heading">
           <button
             className="course-root-row"
@@ -397,7 +467,7 @@ export function CourseExplorer({
               onDirectorySelect?.("");
             }}
           >
-            <span aria-hidden="true">⌄</span> {root.title}
+            <span aria-hidden="true">⌄</span> {rootLabel || root.title}
           </button>
           <button
             type="button"
@@ -446,7 +516,7 @@ export function CourseExplorer({
             disabled={!connected || busy || !!pending}
             onClick={() => void bindRoot()}
           >
-            选择课程文件夹
+            {root?.root_path ? "重新定位课程原件" : "选择课程文件夹"}
           </Button>
           {legacyVideos.length > 0 && (
             <details className="legacy-videos">
@@ -462,9 +532,9 @@ export function CourseExplorer({
       ) : (
         <p className="explorer-empty">正在读取课程文件…</p>
       )}
-      {error && (
+      {(error || readError) && (
         <p className="explorer-error" role="alert">
-          {error}
+          {error || readError}
         </p>
       )}
       {notice && (

@@ -1,0 +1,563 @@
+{
+  "run_id": "native-skill-20261023-r4",
+  "status": "passed",
+  "evidence_level": "fixed SEA runtime with deterministic local Messages; not a real model or product permissions acceptance",
+  "artifact_sha256": "f9ed01f241df37c50c702d81b6c226d576210b8f3947699735ca90285ea13365",
+  "probe_plugin_sha256": "745422ea824aed960477aee0973ea8eed53e7455ab01a1ff11e2056f66cbbf23",
+  "source_snapshot_sha256": {
+    "learning_app/__init__.py": "8364b7e64e40dc6bb35eb2b082e3bab87458bf0b00cc74b56a446ff8bd94ef75",
+    "learning_app/processes.py": "9b2b1702531ba5071e0027113a82ef60ed3c54cf316bbd66d9e08d5f90187dc7",
+    "learning_app/execution/__init__.py": "225e8ac92fb07b7663ec56bc06aa17236d00fd72ecd17aadf54dd7217f4ab195",
+    "learning_app/execution/types.py": "68209fe03a15800f44a932e1b0f93ac2d0ca92ff3b329641f6052c4c140de6fc",
+    "learning_app/execution/selection.py": "0c31c3ecbd39ccfcd3949b0c79f843e13a20e7a35a37b0c6a59bb04dc4e44154",
+    "learning_app/execution/host.py": "fe521f5e59e07891b8d2c387f154e76740f56ffee96ea8e74b17455a041bf45f",
+    "learning_app/execution/boundary.py": "fd8fec1331e7c69d79d911b515c86a0412c747f6e4490902d960a2f28129ed5f",
+    "learning_app/execution/remote.py": "21ba560e29d49375b81031bbaa9b6fd24ddd55d1cac68d7f1d3b079808dbe15c"
+  },
+  "profile_seed_sha256": "c49bc39b366b989e5f3424535cccecb1b427257a4a72c796e6579922a043e3da",
+  "skills_list_response": {
+    "skills": [
+      {
+        "name": "workbench-probe",
+        "description": "Synthetic artifact proof. Load for the explicitly named probe; use only workbench_echo.",
+        "modelInvocable": true
+      }
+    ]
+  },
+  "tool_names": [
+    "skill",
+    "workbench_echo"
+  ],
+  "cases": [
+    {
+      "case": "proof-model-skill",
+      "session_id": "skill-proof-model-skill",
+      "messages_requests": 3,
+      "terminal": {
+        "kind": "completed"
+      },
+      "request_accepted": true
+    },
+    {
+      "case": "proof-explicit-skill",
+      "session_id": "skill-proof-explicit-skill",
+      "messages_requests": 2,
+      "terminal": {
+        "kind": "completed"
+      },
+      "request_accepted": true
+    },
+    {
+      "case": "proof-direct-echo",
+      "session_id": "skill-proof-direct-echo",
+      "messages_requests": 2,
+      "terminal": {
+        "kind": "completed"
+      },
+      "request_accepted": true
+    },
+    {
+      "case": "proof-denied-tool",
+      "session_id": "skill-proof-denied-tool",
+      "messages_requests": 2,
+      "terminal": {
+        "kind": "completed"
+      },
+      "request_accepted": true
+    }
+  ],
+  "synthetic_messages_requests": 9,
+  "real_model_attempts": 0,
+  "actual_requests": [
+    {
+      "request_id": "boundary-5754f1e5aeef4ba5bb10f236f44cc122",
+      "run_id": "proof-model-skill",
+      "body_sha256": "e9748307df3202758f2e310c7918fb1d0c1fdb2556c4d201ee844a655a7c7c46",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-ee7bf5b13e094a30b3db3d689ed3cd1b",
+      "run_id": "proof-model-skill",
+      "body_sha256": "9d9d02566ff7996f73393f56d1a53b4c3d18db28d574b77fc1d08e2d625fb61a",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-36e9c77a8e9640019e0484d7ded30b5a",
+      "run_id": "proof-model-skill",
+      "body_sha256": "5afafca3d2ac0f8dd9217f23358a152c80992091cf105cb172d4b953f33945e7",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-6a35985e88fd4edb88fc215b0fea6406",
+      "run_id": "proof-explicit-skill",
+      "body_sha256": "25f7ce7d38e929bb61ca84c8e2e698e576a3362caf49e6a5c5442fc37bf40438",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-64660b1a9de443adaddb9519f6a9f610",
+      "run_id": "proof-explicit-skill",
+      "body_sha256": "d42f1533fab233e2c71157a867b8807b1e0e5f2dd716e8d21b74dd85fdc06536",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-d10783e715ca4083b368071fc304aeaf",
+      "run_id": "proof-direct-echo",
+      "body_sha256": "0d55d0253b469ec9eca31274341c1a0079c139b00191a1188bbd4fd3034fc5b3",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-8a721b6f1ef440dbb0834ac734adbff9",
+      "run_id": "proof-direct-echo",
+      "body_sha256": "481a822e709f23fb8b5366ca58ec2c425e38633d83adfb9818d70a810cbcfa73",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-31ee0daab4024bd0918fc44e445b2add",
+      "run_id": "proof-denied-tool",
+      "body_sha256": "e82e08e4add8329517c85072d04526d9557b747ed6769a8585e86d5f5fb078ef",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    },
+    {
+      "request_id": "boundary-64918774709d4e34b10152bfd85cc606",
+      "run_id": "proof-denied-tool",
+      "body_sha256": "7c22ad5a70d825e1e6cadd7a61d6bb6af344af4d701fa45e80a03eb5d959dad7",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "thinking": {
+        "type": "disabled"
+      },
+      "tools": [
+        "skill",
+        "workbench_echo"
+      ],
+      "usage_source": "synthetic fixture, not billed model usage"
+    }
+  ],
+  "cleanup": {
+    "owned_pids_before": [
+      400,
+      4472
+    ],
+    "remaining_pids": [],
+    "method": "windows_job",
+    "host_port_closed": true,
+    "control_port_closed": true,
+    "boundary_port_closed": true
+  },
+  "temporary_resource_limits": {
+    "r1_implicit_acl_resource_directory_identity": "not retained; no guessed or global Temp cleanup",
+    "r2_implicit_acl_resource_copy_survived_job_cleanup": true,
+    "r3_r4_child_temp_and_native_cache": "owned run cache only; implicit ACL provider disabled"
+  },
+  "checks": [
+    {
+      "name": "fixed_executable_hash",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "runner_completed",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "only_project_runtime_skill",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "no_filesystem_skill_provider",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "native_registry_and_loader_active",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "implicit_windows_acl_provider_disabled",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "exact_tool_surface",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "nine_local_messages",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_terminal",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_step_count",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_skills_list",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_terminal",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_step_count",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_skills_list",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_terminal",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_step_count",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_skills_list",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-denied-tool_terminal",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-denied-tool_step_count",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-denied-tool_skills_list",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "model_first_request_has_catalog",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "model_first_request_has_no_full_skill_body",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "native_skill_tool_result",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_echo_result",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_echo_result",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_echo_result",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "user_name_injects_before_first_model_request",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "unregistered_video_tool_denied",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "three_echo_bodies_only",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "only_expected_guard_denial",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "actual_model_selection_and_budget",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "no_outbound_images",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-5754f1e5aeef4ba5bb10f236f44cc122",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-ee7bf5b13e094a30b3db3d689ed3cd1b",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-36e9c77a8e9640019e0484d7ded30b5a",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-6a35985e88fd4edb88fc215b0fea6406",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-64660b1a9de443adaddb9519f6a9f610",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-d10783e715ca4083b368071fc304aeaf",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-8a721b6f1ef440dbb0834ac734adbff9",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-31ee0daab4024bd0918fc44e445b2add",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "raw_hash_boundary-64918774709d4e34b10152bfd85cc606",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "zero_real_model_attempts",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "no_owned_processes_remain",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "all_three_ports_closed",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "formal_source_snapshot_stable_during_run",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "same_source_snapshot_as_r3",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "same_profile_seed_as_r3",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "scoped_empty_context_enabled",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "no_working_directory_label_in_any_request",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "no_owned_workspace_path_in_any_request",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_no_runtime_context_event",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-model-skill_original_user_input_preserved",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_no_runtime_context_event",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-explicit-skill_original_user_input_preserved",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_no_runtime_context_event",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-direct-echo_original_user_input_preserved",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-denied-tool_no_runtime_context_event",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "proof-denied-tool_original_user_input_preserved",
+      "status": "passed",
+      "detail": null
+    },
+    {
+      "name": "model_loader_and_explicit_name_have_identical_skill_body",
+      "status": "passed",
+      "detail": null
+    }
+  ],
+  "historical_runs": [
+    {
+      "run_id": "native-skill-20261023-r1",
+      "status": "failed_runner_finalization",
+      "cause": "runner used nonexistent boundary.port after Host/Boundary stop; original evidence and cleanup preserved"
+    },
+    {
+      "run_id": "native-skill-20261023-r2",
+      "status": "completed_with_catalog_scope_gap",
+      "cause": "filesystem discovery disabled but sandbox-local independently provided bundled Windows ACL skill; no diagnostic script invoked"
+    },
+    {
+      "run_id": "native-skill-20261023-r3",
+      "status": "passed_native_skill_with_required_directory_context",
+      "cause": "45 retained-evidence checks passed; all four chains succeeded; required working-directory contribution still in model input"
+    }
+  ],
+  "observed_api_details": {
+    "skills_register_type": "function",
+    "skills_register_provider_type": "function",
+    "skills_list_remote": "skills/list",
+    "skills_list_request": {
+      "request": {
+        "sessionId": "<owned-session-id>"
+      }
+    },
+    "r3_required_runtime_context_with_optional_flag_disabled": true,
+    "r4_agent_scoped_empty_working_directory_context": true,
+    "r4_model_input_contains_working_directory_path": false,
+    "pending_entries": [
+      "settings waits for configEditor",
+      "permission waits for shell"
+    ]
+  },
+  "uncovered": [
+    "real-model skill matching/selection and output quality",
+    "course read/write permission integration",
+    "task pipeline, activity cancellation and recovery",
+    "actual desktop/Windows learning flow",
+    "dynamic catalog updates mixed with tool results",
+    "scoped tool shadow guard negative in this new composition"
+  ]
+}

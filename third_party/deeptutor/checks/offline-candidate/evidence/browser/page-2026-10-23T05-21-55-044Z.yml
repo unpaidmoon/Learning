@@ -1,0 +1,172 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - generic [ref=f1e4]: L
+      - generic [ref=f1e5]: 学习书离线可用
+    - generic [ref=f1e6]: 完全合成示例 · 2章
+  - generic [ref=f1e7]:
+    - complementary [ref=f1e8]:
+      - paragraph [ref=f1e9]: 本书目录
+      - navigation "章节目录" [ref=f1e10]:
+        - button "01 从图像到切线" [ref=f1e11] [cursor=pointer]:
+          - generic [ref=f1e12]: "01"
+          - text: 从图像到切线
+        - button "02 自测与核对" [ref=f1e13] [cursor=pointer]:
+          - generic [ref=f1e14]: "02"
+          - text: 自测与核对
+      - generic [ref=f1e15]: 先预测，再动手核对。这份学习书可断网独立使用。
+      - button "查看来源" [ref=f1e16] [cursor=pointer]
+    - main [ref=f1e17]:
+      - generic [ref=f1e18]:
+        - paragraph [ref=f1e19]: 数学 · 概念与应用
+        - heading "二次函数：从图像到切线" [level=1] [ref=f1e20]
+        - paragraph [ref=f1e21]: 从一幅图出发，把公式、变化和自己的理解连接起来。
+      - generic [ref=f1e22]:
+        - generic [ref=f1e23]: 从图像到切线
+        - generic [ref=f1e24]:
+          - button "向上读一屏" [ref=f1e25] [cursor=pointer]: ↑ 上一屏
+          - button "向下读一屏" [ref=f1e26] [cursor=pointer]: ↓ 下一屏
+          - generic [ref=f1e27]: 0%
+      - article "章节内容" [ref=f1e28]:
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - heading "从图像理解瞬时变化" [level=2] [ref=f1e31]
+            - generic [ref=f1e32]: 来源内容
+          - paragraph [ref=f1e33]:
+            - text: 从最简单的二次函数出发，看看曲线怎样随参数变化。设
+            - generic [ref=f1e35]:
+              - math [ref=f1e37]:
+                - generic [ref=f1e39]:
+                  - generic [ref=f1e40]: f
+                  - generic [ref=f1e41]: (
+                  - generic [ref=f1e42]: x
+                  - generic [ref=f1e43]: )
+                  - generic [ref=f1e44]: =
+                  - generic [ref=f1e45]: a
+                  - generic [ref=f1e46]:
+                    - generic [ref=f1e47]: x
+                    - generic [ref=f1e48]: "2"
+              - generic [aria-hidden] [ref=f1e49]:
+                - generic [ref=f1e50]: f(x) =
+                - generic [ref=f1e51]:
+                  - text: a
+                  - generic [ref=f1e52]:
+                    - text: x
+                    - generic [ref=f1e53]: "2"
+            - text: ，其中
+            - generic [ref=f1e59]:
+              - math [ref=f1e61]:
+                - generic [ref=f1e63]:
+                  - generic [ref=f1e64]: a
+                  - generic [ref=f1e65]: ">"
+                  - generic [ref=f1e66]: "0"
+              - generic [aria-hidden] [ref=f1e67]:
+                - generic [ref=f1e68]: a >
+                - generic [ref=f1e69]: "0"
+            - text: 。
+          - paragraph [ref=f1e70]: 曲线上一点附近的变化率，由导数刻画。切线斜率由同一条公式确定；改变参数后，图像和数值应一起更新。
+          - generic [ref=f1e73]:
+            - math [ref=f1e75]:
+              - generic [ref=f1e77]:
+                - generic [ref=f1e78]:
+                  - generic [ref=f1e79]: f
+                  - generic [ref=f1e80]: ′
+                - generic [ref=f1e81]: (
+                - generic [ref=f1e82]: x
+                - generic [ref=f1e83]: )
+                - generic [ref=f1e84]: =
+                - generic [ref=f1e85]: "2"
+                - generic [ref=f1e86]: a
+                - generic [ref=f1e87]: x
+            - generic [aria-hidden] [ref=f1e88]:
+              - generic [ref=f1e89]:
+                - generic [ref=f1e90]:
+                  - text: f
+                  - generic [ref=f1e91]: ′
+                - text: (x) =
+              - generic [ref=f1e97]: 2ax
+          - generic [ref=f1e100]:
+            - math [ref=f1e102]:
+              - generic [ref=f1e104]:
+                - generic [ref=f1e105]: k
+                - generic [ref=f1e106]: =
+                - generic [ref=f1e107]:
+                  - generic [ref=f1e108]: f
+                  - generic [ref=f1e109]: ′
+                - generic [ref=f1e110]: (
+                - generic [ref=f1e111]:
+                  - generic [ref=f1e112]: x
+                  - generic [ref=f1e113]: "0"
+                - generic [ref=f1e114]: )
+                - generic [ref=f1e115]: =
+                - generic [ref=f1e116]: "2"
+                - generic [ref=f1e117]: a
+                - generic [ref=f1e118]:
+                  - generic [ref=f1e119]: x
+                  - generic [ref=f1e120]: "0"
+            - generic [aria-hidden] [ref=f1e121]:
+              - generic [ref=f1e122]: k =
+              - generic [ref=f1e123]:
+                - generic [ref=f1e124]:
+                  - text: f
+                  - generic [ref=f1e125]: ′
+                - text: (
+                - generic [ref=f1e131]:
+                  - text: x
+                  - generic [ref=f1e132]: "0"
+                - text: ) =
+              - generic [ref=f1e140]:
+                - text: 2a
+                - generic [ref=f1e141]:
+                  - text: x
+                  - generic [ref=f1e142]: "0"
+        - generic [ref=f1e150]:
+          - generic [ref=f1e151]:
+            - heading "先看两个点之间的割线" [level=2] [ref=f1e152]
+            - generic [ref=f1e153]: 补充解释
+          - figure "两点割线只是平均变化率。下方参数图展示切点处的瞬时变化率。" [ref=f1e154]:
+            - img "合成图：y等于x平方，标注A点1、1和B点2、4。" [ref=f1e155]
+        - generic [ref=f1e157]:
+          - generic [ref=f1e158]:
+            - heading "动手改变系数与切点" [level=2] [ref=f1e159]
+            - generic [ref=f1e160]: 补充解释
+          - generic [ref=f1e161]:
+            - img "二次函数与切线参数图" [ref=f1e162]:
+              - generic [ref=f1e167]:
+                - generic [ref=f1e168]: −2
+                - generic [ref=f1e169]: "0"
+                - generic [ref=f1e170]: "2"
+            - generic [ref=f1e171]:
+              - generic [ref=f1e172]:
+                - generic [ref=f1e173]:
+                  - text: 系数 a
+                  - status [ref=f1e174]: "1.00"
+                - slider "系数 a" [ref=f1e175]: "1"
+              - generic [ref=f1e176]:
+                - generic [ref=f1e177]:
+                  - text: 切点 x₀
+                  - status [ref=f1e178]: "1.00"
+                - slider "切点 x₀" [ref=f1e179]: "1"
+            - generic [ref=f1e180]:
+              - strong [ref=f1e181]: 斜率 2.00 · 切点 (1.00, 1.00)
+              - generic [ref=f1e184]:
+                - math [ref=f1e186]:
+                  - generic [ref=f1e188]:
+                    - generic [ref=f1e189]: k
+                    - generic [ref=f1e190]: =
+                    - generic [ref=f1e191]: "2"
+                    - generic [ref=f1e192]: ×
+                    - generic [ref=f1e193]: "1.00"
+                    - generic [ref=f1e194]: ×
+                    - generic [ref=f1e195]: "1.00"
+                    - generic [ref=f1e196]: =
+                    - generic [ref=f1e197]: "2.00"
+                - generic [aria-hidden] [ref=f1e198]:
+                  - generic [ref=f1e199]: k =
+                  - generic [ref=f1e200]: 2 ×
+                  - generic [ref=f1e201]: 1.00 ×
+                  - generic [ref=f1e202]: 1.00 =
+                  - generic [ref=f1e203]: "2.00"
+      - generic [ref=f1e204]:
+        - generic [ref=f1e205]: 自测状态仅在本次打开期间保留，不会回传正式记录。
+        - button "重置本次自测" [ref=f1e206] [cursor=pointer]

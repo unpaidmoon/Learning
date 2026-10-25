@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-10-23T13:44:59.992434+00:00",
+  "scope": "candidate only; no product DB/runtime writes",
+  "release_cases": 24,
+  "status": "passed",
+  "fsrs_recheck_cases": 3,
+  "actual_model_calls": 0,
+  "history": [
+    {
+      "status": "fixed",
+      "finding": "First extraction omitted two original check/check_structured test helper functions; next test-boundary probe included VFS setup helpers.",
+      "resolution": "Use precise original3572-3585 slice only; no VFS dependency added, all original grader functions/tests unchanged."
+    }
+  ],
+  "not_run": [
+    "Project append-only assessment/operation-hash/CAS transactions, owned by root",
+    "Real model reference evaluation",
+    "User materials",
+    "Clean-machine installer",
+    "Paused unified-review queue arbitration"
+  ]
+}

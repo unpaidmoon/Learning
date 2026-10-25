@@ -7,6 +7,7 @@ Uncropped capture originals stay in the browser and are never accepted here.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Literal
@@ -82,21 +83,40 @@ class DraftContent(BaseModel):
     conditions: list[str] = Field(default_factory=list, max_length=100)
     corrections: list[str] = Field(default_factory=list, max_length=100)
     references: list[DraftReference] = Field(default_factory=list, max_length=100)
+    source_snapshot_ids: list[str] = Field(default_factory=list, max_length=100)
+    read_course_ids: list[str] = Field(default_factory=list, max_length=4)
     model: str | None = Field(default=None, min_length=1, max_length=200)
     thinking: Thinking | None = None
 
     @model_validator(mode="after")
     def validate_content(self):
+        if len(set(self.read_course_ids)) != len(self.read_course_ids) or any(
+            not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", value) for value in self.read_course_ids
+        ):
+            raise ValueError("Invalid explicit read course scope")
         if len(set(self.attachment_ids)) != len(self.attachment_ids):
             raise ValueError("Duplicate attachment identities")
         if any(len(value) > 100_000 for value in self.conditions + self.corrections):
             raise ValueError("Condition or correction too long")
         if len({value.reference_id for value in self.references}) != len(self.references):
             raise ValueError("Duplicate reference identities")
+        if len(set(self.source_snapshot_ids)) != len(self.source_snapshot_ids) or any(
+            not value.startswith("selection_") or len(value) > 160
+            for value in self.source_snapshot_ids
+        ):
+            raise ValueError("Invalid source snapshot identities")
         return self
 
 
 class DraftInput(DraftContent):
+    # Earlier persisted drafts remain readable through DraftContent/Response.
+    # New edits express additions and corrections as ordinary user text.
+    conditions: list[str] = Field(
+        default_factory=list, max_length=0, json_schema_extra={"deprecated": True}
+    )
+    corrections: list[str] = Field(
+        default_factory=list, max_length=0, json_schema_extra={"deprecated": True}
+    )
     expected_revision: int = Field(ge=0)
 
 
@@ -188,6 +208,57 @@ def _view(row) -> dict:
 
 
 REFERENCE_CONDITION_PREFIX = "用户选区引用（只读来源）：\n"
+SOURCE_CONDITION_PREFIX = "资料选区（只读快照）：\n"
+
+
+def source_selection_conditions(
+    conn, course_id: str, snapshot_ids: Iterable[str], *, declare_foreign=False
+) -> list[str]:
+    from learning_app.workbench.source_grants import declare_snapshot
+    from learning_app.workbench.sources import SourceStore
+
+    identities = list(snapshot_ids)
+    if len(identities) > 100 or len(identities) != len(set(identities)):
+        raise AppError("SOURCE_SELECTION_INVALID", "资料选区重复或过多", 422)
+    return [
+        SOURCE_CONDITION_PREFIX
+        + json.dumps(
+            (
+                declare_snapshot(conn, course_id, identity, authority={"kind": "user_selection"})
+                if declare_foreign
+                else SourceStore.in_transaction(conn, course_id, identity)
+            ).model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        for identity in identities
+    ]
+
+
+def submission_selection_conditions(
+    repository: Repository, chat_id: str, snapshot_ids
+) -> list[str]:
+    with repository._lock, repository.engine.begin() as conn:
+        chat = _chat(conn, chat_id)
+        return source_selection_conditions(
+            conn, chat["course_id"], snapshot_ids, declare_foreign=True
+        )
+
+
+def message_selection_ids(conditions: Iterable[str]) -> list[str]:
+    result = []
+    for condition in conditions:
+        if not condition.startswith(SOURCE_CONDITION_PREFIX):
+            continue
+        try:
+            value = json.loads(condition[len(SOURCE_CONDITION_PREFIX) :])
+            identity = value["snapshot_id"]
+            if isinstance(identity, str) and identity.startswith("selection_"):
+                result.append(identity)
+        except (ValueError, KeyError, TypeError):
+            continue
+    return result
 
 
 def _unwrapped_math(value: str) -> str:
@@ -314,6 +385,8 @@ def save_draft(repository: Repository, chat_id: str, value: DraftInput) -> dict:
         if not attachment["confirmed"]:
             raise AppError("ATTACHMENT_NOT_CONFIRMED", "只能保存已确认的附件")
     payload = value.model_dump(exclude={"expected_revision"})
+    if not value.read_course_ids:
+        payload.pop("read_course_ids", None)
     with repository.engine.begin() as conn:
         chat = _chat(conn, chat_id)
         previous = _draft(conn, chat_id)
@@ -321,6 +394,12 @@ def save_draft(repository: Repository, chat_id: str, value: DraftInput) -> dict:
         if revision != value.expected_revision:
             raise AppError("DRAFT_REVISION_CONFLICT", "草稿已有较新版本，请先核对已保存内容")
         _validate_reference_sources(conn, chat_id, value.references)
+        from learning_app.workbench.source_grants import course_scope
+
+        course_scope(conn, chat["course_id"], value.read_course_ids)
+        source_selection_conditions(
+            conn, chat["course_id"], value.source_snapshot_ids, declare_foreign=True
+        )
         for attachment_id in value.attachment_ids:
             source = (
                 conn.execute(
@@ -340,12 +419,12 @@ def save_draft(repository: Repository, chat_id: str, value: DraftInput) -> dict:
             conn.execute(sql_update(drafts).where(drafts.c.chat_id == chat_id).values(**values))
         else:
             conn.execute(insert(drafts).values(chat_id=chat_id, **values))
-        return {"revision": revision + 1, **payload}
+        return _view(values)
 
 
 def clear_draft(repository: Repository, chat_id: str, value: DraftClearInput) -> dict:
     with repository.engine.begin() as conn:
-        _chat(conn, chat_id)
+        chat = _chat(conn, chat_id)
         submission = (
             conn.execute(
                 select(business.submissions).where(
@@ -371,15 +450,24 @@ def clear_draft(repository: Repository, chat_id: str, value: DraftClearInput) ->
             )
         ).scalar_one()
         expected_conditions = payload["conditions"] + reference_conditions(payload["references"])
+        expected_conditions += source_selection_conditions(
+            conn, chat["course_id"], payload["source_snapshot_ids"]
+        )
         if (
             any(payload[key] != submitted[key] for key in ("text", "attachment_ids", "corrections"))
             or expected_conditions != submitted["conditions"]
+            or payload.get("read_course_ids", []) != submitted.get("read_course_ids", [])
         ):
             raise AppError("DRAFT_SUBMISSION_MISMATCH", "草稿与已提交内容不同，保留草稿以便核对")
         cleared = {
             **DraftContent().model_dump(),
             "model": payload["model"],
             "thinking": payload["thinking"],
+            **(
+                {"read_course_ids": payload["read_course_ids"]}
+                if payload.get("read_course_ids")
+                else {}
+            ),
         }
         values = {
             "revision": revision + 1,
@@ -391,7 +479,7 @@ def clear_draft(repository: Repository, chat_id: str, value: DraftClearInput) ->
             conn.execute(sql_update(drafts).where(drafts.c.chat_id == chat_id).values(**values))
         else:
             conn.execute(insert(drafts).values(chat_id=chat_id, **values))
-        return {"revision": revision + 1, **cleared}
+        return _view(values)
 
 
 def read_attachment_source(repository: Repository, attachment_id: str) -> dict:

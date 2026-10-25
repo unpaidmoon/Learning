@@ -6,6 +6,8 @@ import { Button } from "../components/ui/button";
 import type { CaptureSource } from "./capture";
 import { usePlaybackControls } from "./usePlaybackControls";
 import { VideoControls } from "./VideoControls";
+import { SubtitlePanel } from "./SubtitlePanel";
+import type { SubtitleActionHandler } from "../reading/actions";
 import "./VideoWorkspace.css";
 
 type VideoAsset = Schema<"MediaAssetResponse">;
@@ -28,6 +30,7 @@ export function VideoWorkspace({
   onOpenChat,
   onImmersiveChange,
   onAssetChange,
+  onSubtitleAction,
   workspaceRef,
   active = true,
   minimal = false,
@@ -41,6 +44,7 @@ export function VideoWorkspace({
   onOpenChat: () => void;
   onImmersiveChange: (immersive: boolean) => void;
   onAssetChange?: (asset: VideoAsset | null) => void;
+  onSubtitleAction?: SubtitleActionHandler;
   workspaceRef?: RefObject<HTMLElement | null>;
   active?: boolean;
   minimal?: boolean;
@@ -253,6 +257,14 @@ export function VideoWorkspace({
     identity: asset ? `${asset.asset_id}:${asset.source_version}` : undefined,
     toggleFullscreen,
   });
+  const seekBound = (seconds: number) => {
+    if (
+      asset &&
+      current.current?.asset_id === asset.asset_id &&
+      current.current.source_version === asset.source_version
+    )
+      playback.seekTo(seconds);
+  };
 
   useEffect(() => {
     mounted.current = true;
@@ -429,7 +441,7 @@ export function VideoWorkspace({
 
   return (
     <section
-      className={`video-workspace${minimal ? " video-workspace-minimal" : ""}`}
+      className={`video-workspace${minimal ? " video-workspace-minimal" : ""}${asset?.media_type.startsWith("audio/") ? " video-workspace-audio" : ""}`}
       aria-label="视频学习区"
       hidden={!active}
     >
@@ -467,7 +479,7 @@ export function VideoWorkspace({
         </p>
       )}
       <div
-        className={`video-stage redesigned-video-stage${playing ? "" : " video-paused"}`}
+        className={`video-stage redesigned-video-stage${playing ? "" : " video-paused"}${asset?.media_type.startsWith("audio/") ? " video-stage-audio" : ""}`}
         ref={stage}
         aria-label="视频画面"
         tabIndex={0}
@@ -476,7 +488,7 @@ export function VideoWorkspace({
           <video
             ref={video}
             key={`${asset.asset_id}:${asset.source_version}`}
-            aria-label="课程视频"
+            aria-label={asset.media_type.startsWith("audio/") ? "课程录音" : "课程视频"}
             data-primary-video="true"
             preload="metadata"
             playsInline
@@ -509,15 +521,25 @@ export function VideoWorkspace({
             <p>从当前课程目录选择视频。打开后恢复播放进度；截图快捷键可框选软件内可见内容。</p>
           </div>
         )}
+        {asset?.media_type.startsWith("audio/") && (
+          <div className="audio-recording-title">
+            <span aria-hidden="true">♫</span>
+            <p>{asset.display_name}</p>
+          </div>
+        )}
         {asset && (
           <VideoControls
             key={`${asset.asset_id}:${asset.source_version}`}
             playing={playing}
             {...playback}
-            previewSrc={`/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`}
+            previewSrc={
+              asset.media_type.startsWith("audio/")
+                ? undefined
+                : `/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`
+            }
             sourceKey={`${asset.asset_id}:${asset.source_version}`}
             onFullscreen={toggleFullscreen}
-            onSeek={playback.seekTo}
+            onSeek={seekBound}
             onTogglePlay={() => {
               if (video.current?.paused) void play();
               else video.current?.pause();
@@ -536,6 +558,17 @@ export function VideoWorkspace({
           />
         )}
       </div>
+      {asset && connected && (
+        <SubtitlePanel
+          key={`${asset.asset_id}:${asset.source_version}`}
+          courseId={courseId}
+          asset={asset}
+          positionMs={Math.round(playback.elapsed * 1000)}
+          active={active}
+          onSeek={seekBound}
+          onAction={onSubtitleAction}
+        />
+      )}
       {playBlocked && (
         <p className="playback-notice" role="status">
           浏览器已阻止自动播放，单击视频画面继续。

@@ -146,8 +146,7 @@ def test_clear_requires_frozen_references_and_preserves_new_cards(tmp_path):
     reference = _reference(_answer(repository, chat_id, source), source)
     draft = DraftInput(
         expected_revision=0,
-        text="解释选区",
-        conditions=["保留原条件"],
+        text="解释选区\n保留原条件",
         references=[reference],
     )
     save_draft(repository, chat_id, draft)
@@ -242,14 +241,12 @@ async def test_service_freezes_reference_and_restores_history_without_dispatch(t
     value = SubmissionInput(
         chat_id=chat_id,
         submission_id="reference_publish_once",
-        text="说明这一项",
+        text="说明这一项\n其他条件",
         references=[reference],
-        conditions=["其他条件"],
     ).model_dump()
     result = await service.submit(value)
     generation = repository.get_generation(result["generation_id"])
     assert generation["context_snapshot"]["conditions"] == [
-        "其他条件",
         *reference_conditions([reference]),
     ]
     view = ChatResponse.model_validate(service.chat_view(chat_id))

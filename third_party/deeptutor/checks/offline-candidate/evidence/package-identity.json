@@ -1,0 +1,98 @@
+{
+  "fixture_id": "offline-quadratic-book-r1",
+  "zip_path": "artifacts/learning-book-candidate.zip",
+  "zip_sha256": "73b6da21f85515befb07bbfdb0a3f0d15cd856a1980b85b2ec5f50d95a2e82fe",
+  "zip_bytes": 988614,
+  "asset_manifest_sha256": "c8a1b9eeb0bbc1f62617f6de5e00b000b6fcb72ad822205bb158327c2db1c06a",
+  "entrypoint": "verification/unpacked-r1/index.html",
+  "file_url": "file:///D:/Codex/Learning/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/index.html",
+  "file_count_including_manifest": 75,
+  "all_unpacked_file_hashes_verified": true,
+  "upstream_files": [
+    {
+      "path": "upstream/deeptutor/book/blocks/base.py",
+      "sha256": "c21a9f3beb83002eb073282c0e525c907c6f183a586e57b6da4cf958cd3ad373",
+      "bytes": 8113
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/callout.py",
+      "sha256": "c6d77ea54f8fc3c10f600a7e06aa4bd03eccb7eaafc0229549b09c369212a1fd",
+      "bytes": 2226
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/interactive.py",
+      "sha256": "3c41f17e3de6ba57648587164f3614ea5753891bbc9b4a065ed23977a3669bf3",
+      "bytes": 4211
+    },
+    {
+      "path": "upstream/deeptutor/book/blocks/quiz.py",
+      "sha256": "ce16447f37039d81e5a169741c9d6b8398ae4cf78436a8ee9f5b443d683b655b",
+      "bytes": 5155
+    },
+    {
+      "path": "upstream/deeptutor/book/compiler.py",
+      "sha256": "5c3dfe108f51b717f4b73d69a6f1f36cf959bfc29a4978493d6c4f1d03717899",
+      "bytes": 16717
+    },
+    {
+      "path": "upstream/deeptutor/book/export.py",
+      "sha256": "b185f72d4dc166ae5e6b90a0033e98a4f7bba3b372e840c1b70bb06e2ddcc70b",
+      "bytes": 11047
+    },
+    {
+      "path": "upstream/deeptutor/book/models.py",
+      "sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3",
+      "bytes": 22670
+    },
+    {
+      "path": "upstream/deeptutor/book/progress.py",
+      "sha256": "93b9f95ca676b5db33b9e7be3ec723b7329b4bbcc075ffd6132c6357a043cbfc",
+      "bytes": 5170
+    },
+    {
+      "path": "upstream/deeptutor/visualizers/protocol.py",
+      "sha256": "3992d7d372577c778c0d7880e26a7cda6e64db3cb5f94d57d1a4194d1b3b9621",
+      "bytes": 7949
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/BlockRenderer.tsx",
+      "sha256": "afb27a6b8e6c77813a3d49b517482895373a4d71ec42ec85530141f8c65ebc07",
+      "bytes": 13288
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/FigureBlock.tsx",
+      "sha256": "a0d8e92919dd2d9f2690b34f37a1cdccc502c99bfb02f94159f2fc9de3880aa9",
+      "bytes": 2953
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/InteractiveBlock.tsx",
+      "sha256": "50057d611175259cb29f5a866615be2070688d4cd8c793fd4ac15b4fcfbb67e8",
+      "bytes": 2342
+    },
+    {
+      "path": "upstream/web/app/(workspace)/learning/books/components/blocks/QuizBlock.tsx",
+      "sha256": "ccf14e5a8199d085a6aff53b741842d1b6abc9589e9945f99407ccc15c7def18",
+      "bytes": 13423
+    },
+    {
+      "path": "upstream/web/components/visualize/VisualizationViewer.tsx",
+      "sha256": "db039deb92ff468912d818ae1640acc40efc30131655ed78b0614be6ef24686f",
+      "bytes": 23588
+    },
+    {
+      "path": "upstream/web/lib/book-reader-navigation.ts",
+      "sha256": "13be567541f09d80827add967f953a346907acc6e0af1123a1449f59a546ea0a",
+      "bytes": 1854
+    },
+    {
+      "path": "upstream/web/lib/quiz-judge.ts",
+      "sha256": "9e84c0392d464857b28cea2570015ac2ae7285aa846ad90048dbdc80b13f96a8",
+      "bytes": 3809
+    },
+    {
+      "path": "upstream/web/lib/quiz-question-type.ts",
+      "sha256": "27fb40aba840650cc6af5835a586b67a47612c33ca8ae85b07c5a50162231358",
+      "bytes": 2939
+    }
+  ]
+}

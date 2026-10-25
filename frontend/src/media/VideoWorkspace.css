@@ -29,6 +29,31 @@
   max-height: 100%;
   object-fit: contain;
 }
+.video-stage-audio {
+  flex: none;
+  min-height: 180px;
+  height: 180px;
+  color: white;
+}
+.video-stage-audio video {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.audio-recording-title {
+  text-align: center;
+}
+.audio-recording-title > span {
+  font-size: 32px;
+}
+.audio-recording-title p {
+  margin: 6px 0 20px;
+}
+.video-workspace-audio .subtitle-panel {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
 .redesigned-video-stage .player-toolbar {
   position: absolute;
   inset: auto 0 0;

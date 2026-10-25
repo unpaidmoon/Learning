@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">
+  <title>二次函数：从图像到切线 · 离线学习书</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="runtime/reader.css">
+  <script defer src="vendor/katex/katex.min.js"></script>
+  <script defer src="runtime/upstream.js"></script>
+  <script defer src="runtime/reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><div class="wordmark"><span class="mark">L</span><span>学习书<span class="offline-label">离线可用</span></span></div><span class="fixture-label">完全合成示例 · 2章</span></header>
+  <div class="workspace">
+    <aside class="sidebar"><p class="eyebrow">本书目录</p><nav id="chapters" aria-label="章节目录"></nav><div class="sidebar-note">先预测，再动手核对。<br>这份学习书可断网独立使用。</div><button id="source-open" class="source-button">查看来源</button></aside>
+    <main class="book-area"><div class="book-heading"><p class="eyebrow">数学 · 概念与应用</p><h1 id="book-title"></h1><p class="lead">从一幅图出发，把公式、变化和自己的理解连接起来。</p></div><div class="reading-tools"><span id="chapter-title"></span><div><button id="screen-previous" aria-label="向上读一屏">↑ 上一屏</button><button id="screen-next" aria-label="向下读一屏">↓ 下一屏</button><span id="reading-percent">0%</span></div></div><article id="reader" tabindex="0" aria-label="章节内容"></article><footer class="book-footer"><span>自测状态仅在本次打开期间保留，不会回传正式记录。</span><button id="reset-checks">重置本次自测</button></footer></main>
+  </div>
+  <dialog id="sources"><div class="dialog-heading"><h2>本包来源</h2><button id="source-close" aria-label="关闭来源">×</button></div><div id="source-content"></div></dialog>
+  <script id="book-data" type="application/json">{
+  "schema_version": "learning.offline-candidate/v1",
+  "book": {
+    "id": "fixture-book",
+    "revision": 1,
+    "title": "二次函数：从图像到切线",
+    "description": "完全合成的离线阅读、参数交互与自测包",
+    "status": "ready",
+    "proposal": null,
+    "knowledge_bases": [],
+    "language": "zh",
+    "depth": "standard",
+    "page_count": 2,
+    "chapter_count": 2,
+    "created_at": 0.0,
+    "updated_at": 0.0,
+    "metadata": {},
+    "kb_fingerprints": {},
+    "kb_document_fingerprints": {},
+    "stale_page_ids": [],
+    "stale_detected_at": 0.0
+  },
+  "spine": {
+    "book_id": "fixture-book",
+    "chapters": [
+      {
+        "id": "chapter-graph",
+        "title": "从图像到切线",
+        "learning_objectives": [],
+        "content_type": "theory",
+        "source_anchors": [],
+        "prerequisites": [],
+        "page_ids": [
+          "page-graph"
+        ],
+        "summary": "",
+        "order": 0
+      },
+      {
+        "id": "chapter-practice",
+        "title": "自测与核对",
+        "learning_objectives": [],
+        "content_type": "theory",
+        "source_anchors": [],
+        "prerequisites": [],
+        "page_ids": [
+          "page-practice"
+        ],
+        "summary": "",
+        "order": 1
+      }
+    ],
+    "version": 1,
+    "updated_at": 0.0,
+    "concept_graph": {
+      "nodes": [],
+      "edges": []
+    },
+    "exploration_summary": ""
+  },
+  "pages": [
+    {
+      "id": "page-graph",
+      "book_id": "fixture-book",
+      "chapter_id": "chapter-graph",
+      "title": "从图像到切线",
+      "learning_objectives": [],
+      "content_type": "theory",
+      "status": "ready",
+      "order": 0,
+      "blocks": [
+        {
+          "id": "b-text",
+          "type": "text",
+          "status": "ready",
+          "title": "从图像理解瞬时变化",
+          "params": {
+            "fixture_payload": {
+              "body": "设 $f(x)=ax^2$，其中 $a>0$。切线斜率为 $f'(x_0)=2ax_0$。",
+              "paragraphs": [
+                [
+                  {
+                    "kind": "text",
+                    "value": "从最简单的二次函数出发，看看曲线怎样随参数变化。设 "
+                  },
+                  {
+                    "kind": "math",
+                    "value": "f(x)=ax^2"
+                  },
+                  {
+                    "kind": "text",
+                    "value": "，其中 "
+                  },
+                  {
+                    "kind": "math",
+                    "value": "a>0"
+                  },
+                  {
+                    "kind": "text",
+                    "value": "。"
+                  }
+                ],
+                [
+                  {
+                    "kind": "text",
+                    "value": "曲线上一点附近的变化率，由导数刻画。切线斜率由同一条公式确定；改变参数后，图像和数值应一起更新。"
+                  }
+                ]
+              ],
+              "display_math": [
+                "f'(x)=2ax",
+                "k=f'(x_0)=2ax_0"
+              ]
+            }
+          },
+          "payload": {
+            "body": "设 $f(x)=ax^2$，其中 $a>0$。切线斜率为 $f'(x_0)=2ax_0$。",
+            "paragraphs": [
+              [
+                {
+                  "kind": "text",
+                  "value": "从最简单的二次函数出发，看看曲线怎样随参数变化。设 "
+                },
+                {
+                  "kind": "math",
+                  "value": "f(x)=ax^2"
+                },
+                {
+                  "kind": "text",
+                  "value": "，其中 "
+                },
+                {
+                  "kind": "math",
+                  "value": "a>0"
+                },
+                {
+                  "kind": "text",
+                  "value": "。"
+                }
+              ],
+              [
+                {
+                  "kind": "text",
+                  "value": "曲线上一点附近的变化率，由导数刻画。切线斜率由同一条公式确定；改变参数后，图像和数值应一起更新。"
+                }
+              ]
+            ],
+            "display_math": [
+              "f'(x)=2ax",
+              "k=f'(x_0)=2ax_0"
+            ]
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "source_content",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        },
+        {
+          "id": "b-figure",
+          "type": "figure",
+          "status": "ready",
+          "title": "先看两个点之间的割线",
+          "params": {
+            "fixture_payload": {
+              "description": "合成抛物线与两个点，用于辅助解释，非原材料图片。",
+              "asset_path": "assets/parabola-secant.svg",
+              "asset_sha256": "f9a5142c63bed2269eb8d5d4689adc73edfce0115f57d938ba4902263984a22f",
+              "alt": "合成图：y等于x平方，标注A点1、1和B点2、4。",
+              "caption": "两点割线只是平均变化率。下方参数图展示切点处的瞬时变化率。"
+            }
+          },
+          "payload": {
+            "description": "合成抛物线与两个点，用于辅助解释，非原材料图片。",
+            "asset_path": "assets/parabola-secant.svg",
+            "asset_sha256": "f9a5142c63bed2269eb8d5d4689adc73edfce0115f57d938ba4902263984a22f",
+            "alt": "合成图：y等于x平方，标注A点1、1和B点2、4。",
+            "caption": "两点割线只是平均变化率。下方参数图展示切点处的瞬时变化率。"
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "ai_supplement",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        },
+        {
+          "id": "b-plot",
+          "type": "interactive",
+          "status": "ready",
+          "title": "动手改变系数与切点",
+          "params": {
+            "fixture_payload": {
+              "description": "仅由有界数值参数绘图；所有计算在当前文件内完成。",
+              "visualization_id": "viz-quadratic"
+            }
+          },
+          "payload": {
+            "description": "仅由有界数值参数绘图；所有计算在当前文件内完成。",
+            "visualization_id": "viz-quadratic"
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "ai_supplement",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        }
+      ],
+      "links": [],
+      "parent_page_id": "",
+      "error": "",
+      "created_at": 0.0,
+      "updated_at": 0.0
+    },
+    {
+      "id": "page-practice",
+      "book_id": "fixture-book",
+      "chapter_id": "chapter-practice",
+      "title": "自测与核对",
+      "learning_objectives": [],
+      "content_type": "theory",
+      "status": "ready",
+      "order": 1,
+      "blocks": [
+        {
+          "id": "b-quiz",
+          "type": "quiz",
+          "status": "ready",
+          "title": "做两道小练习",
+          "params": {
+            "fixture_payload": {
+              "questions": [
+                {
+                  "question_id": "q-choice",
+                  "question_type": "multiple_choice",
+                  "question": "当 a=1、x₀=2 时，切线斜率是多少？",
+                  "options": {
+                    "A": "2",
+                    "B": "4",
+                    "C": "8"
+                  },
+                  "correct_answer": "4",
+                  "explanation": "代入 k=2ax₀，得到 2×1×2=4。"
+                },
+                {
+                  "question_id": "q-written",
+                  "question_type": "written",
+                  "question": "为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。",
+                  "correct_answer": "读过只是接触了信息，能独立说明和应用还需要另行检验。",
+                  "explanation": "这是主观表达题。离线包只提供参考，揭示答案不产生对错或掌握判定。"
+                }
+              ]
+            }
+          },
+          "payload": {
+            "questions": [
+              {
+                "question_id": "q-choice",
+                "question_type": "multiple_choice",
+                "question": "当 a=1、x₀=2 时，切线斜率是多少？",
+                "options": {
+                  "A": "2",
+                  "B": "4",
+                  "C": "8"
+                },
+                "correct_answer": "4",
+                "explanation": "代入 k=2ax₀，得到 2×1×2=4。"
+              },
+              {
+                "question_id": "q-written",
+                "question_type": "written",
+                "question": "为什么“读过解析”不能直接说明已经掌握？请用自己的话说明。",
+                "options": null,
+                "correct_answer": "读过只是接触了信息，能独立说明和应用还需要另行检验。",
+                "explanation": "这是主观表达题。离线包只提供参考，揭示答案不产生对错或掌握判定。"
+              }
+            ]
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "synthetic_example",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        },
+        {
+          "id": "b-cards",
+          "type": "flash_cards",
+          "status": "ready",
+          "title": "记住关键关系",
+          "params": {
+            "fixture_payload": {
+              "cards": [
+                {
+                  "front": "二次函数 ax² 的导数是什么？",
+                  "back": "2ax。"
+                },
+                {
+                  "front": "切点移动时，切线斜率由什么决定？",
+                  "back": "由系数 a 和切点 x₀ 共同决定：k=2ax₀。"
+                }
+              ]
+            }
+          },
+          "payload": {
+            "cards": [
+              {
+                "front": "二次函数 ax² 的导数是什么？",
+                "back": "2ax。"
+              },
+              {
+                "front": "切点移动时，切线斜率由什么决定？",
+                "back": "由系数 a 和切点 x₀ 共同决定：k=2ax₀。"
+              }
+            ]
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "synthetic_example",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        },
+        {
+          "id": "b-note",
+          "type": "callout",
+          "status": "ready",
+          "title": "继续学习",
+          "params": {
+            "fixture_payload": {
+              "label": "练习建议",
+              "body": "回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。"
+            }
+          },
+          "payload": {
+            "label": "练习建议",
+            "body": "回到参数图，先预测斜率，再拖动参数核对。这里只保留本次打开期间的自测状态，不会回传正式学习记录。"
+          },
+          "source_anchors": [
+            {
+              "kind": "manual",
+              "kb_name": "",
+              "ref": "fixture-source:lines-2-4",
+              "snippet": "f(x)=ax^2；f'(x)=2ax。"
+            }
+          ],
+          "metadata": {
+            "content_role": "ai_supplement",
+            "source_ids": [
+              "fixture-source"
+            ],
+            "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+            "compiled_from_pure_fixture": true
+          },
+          "error": "",
+          "created_at": 0.0,
+          "updated_at": 0.0
+        }
+      ],
+      "links": [],
+      "parent_page_id": "",
+      "error": "",
+      "created_at": 0.0,
+      "updated_at": 0.0
+    }
+  ],
+  "visualizations": {
+    "viz-quadratic": {
+      "schema_version": "deeptutor.visualization/v1",
+      "render_type": "quadratic_tangent",
+      "renderer": {
+        "id": "offline.function-plot",
+        "version": "1.0.0",
+        "target": "native",
+        "native_renderer": "quadratic_tangent",
+        "entry_url": ""
+      },
+      "payload": {
+        "format": "learning.parameter-plot/v1",
+        "data": {
+          "kind": "quadratic_tangent",
+          "a": {
+            "label": "系数 a",
+            "min": 0.5,
+            "max": 3.0,
+            "step": 0.5,
+            "initial": 1.0
+          },
+          "x0": {
+            "label": "切点 x₀",
+            "min": -2.0,
+            "max": 2.0,
+            "step": 0.25,
+            "initial": 1.0
+          }
+        }
+      },
+      "presentation": {
+        "title": "",
+        "description": "",
+        "alt_text": "",
+        "aspect_ratio": ""
+      },
+      "interaction": {
+        "events": []
+      },
+      "fallback": {}
+    }
+  },
+  "source_catalog": [
+    {
+      "id": "fixture-source",
+      "title": "二次函数合成材料",
+      "source_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69",
+      "path": "sources/fixture-source.txt",
+      "text": "合成材料（非用户资料）\n定义：二次函数 f(x)=ax^2，其中 a>0。\n导数：f'(x)=2ax。切点 x0 处斜率为 2ax0。\n例：a=1，x0=2 时，切线斜率为4。\n",
+      "origin": "synthetic_fixture"
+    }
+  ]
+}</script>
+  <noscript>本地交互需要浏览器启用JavaScript。书内另附book.md，可直接阅读文字投影。</noscript>
+</body>
+</html>

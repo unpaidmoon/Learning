@@ -44,6 +44,7 @@ class MessageResponse(BaseModel):
     status: str = "completed"
     attachment_ids: list[str] = Field(default_factory=list)
     references: list[DraftReference] = Field(default_factory=list)
+    source_snapshot_ids: list[str] = Field(default_factory=list)
     generation_id: str | None = None
 
 
@@ -66,11 +67,26 @@ class SubmissionInput(InputDTO):
     submission_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9_-]+$")
     text: str = Field(max_length=100_000)
     attachment_ids: list[str] = Field(default_factory=list, max_length=8)
-    conditions: list[str] = Field(default_factory=list)
-    corrections: list[str] = Field(default_factory=list)
+    conditions: list[str] = Field(
+        default_factory=list, max_length=0, json_schema_extra={"deprecated": True}
+    )
+    corrections: list[str] = Field(
+        default_factory=list, max_length=0, json_schema_extra={"deprecated": True}
+    )
     references: list[DraftReference] = Field(default_factory=list, max_length=100)
+    source_snapshot_ids: list[str] = Field(default_factory=list, max_length=100)
+    read_course_ids: list[str] = Field(default_factory=list, max_length=4)
+    question_video: "QuestionVideoContext | None" = None
     model: str = "deepseek-flash"
     thinking: Literal["none", "low", "medium", "high", "xhigh", "max"] = "high"
+
+
+class QuestionVideoContext(InputDTO):
+    """A submitted time anchor grants no image or arbitrary time-range access."""
+
+    asset_id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,160}$")
+    source_version: str = Field(pattern=r"^[A-Za-z0-9_-]{1,160}$")
+    time_ms: int = Field(ge=0, le=315_360_000_000, strict=True)
 
 
 class SubmissionResponse(BaseModel):

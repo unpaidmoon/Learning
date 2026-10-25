@@ -1,0 +1,78 @@
+.subtitle-panel {
+  flex: none;
+  max-height: 32%;
+  min-height: 58px;
+  overflow: auto;
+  border-top: 1px solid var(--border);
+  padding: 8px 12px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 14px;
+}
+.subtitle-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.subtitle-heading > span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.subtitle-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.subtitle-line {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  padding: 6px 4px;
+  border-radius: 6px;
+}
+.subtitle-line[data-current="true"] {
+  background: var(--secondary);
+}
+.subtitle-line > span {
+  flex: 1;
+  white-space: pre-wrap;
+}
+.subtitle-line small {
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.subtitle-time {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+.subtitle-actions {
+  display: flex;
+  gap: 4px;
+  visibility: hidden;
+}
+.subtitle-line:hover .subtitle-actions,
+.subtitle-line:focus-within .subtitle-actions {
+  visibility: visible;
+}
+.subtitle-actions button,
+.subtitle-heading button {
+  height: 28px;
+  font-size: 12px;
+}
+.subtitle-editor {
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+.subtitle-editor textarea {
+  width: 100%;
+  min-height: 90px;
+  font: inherit;
+  resize: vertical;
+}
+.subtitle-editor button {
+  margin-right: 6px;
+}

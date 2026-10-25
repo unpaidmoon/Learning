@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "scope": "bounded scheduler helper candidate; not product acceptance",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "original_scheduler_sha256": "62aad68b7b4a2fe1f0d43d5f2059acc35970c5a30ff6672a434be310f85c6686",
+  "checks": [
+    {
+      "command": "rustup run stable cargo test --locked --manifest-path third_party/deepstudent/checks/fsrs-helper/Cargo.toml --target-dir .local/cache/workbench/fsrs-helper/target",
+      "status": "passed",
+      "exit_code": 0,
+      "upstream_tests": 19,
+      "protocol_tests": 15,
+      "actual_child_process_tests": 3,
+      "total_passed": 37,
+      "total_failed": 0,
+      "coverage": [
+        "new-card four ratings and absolute due conversion",
+        "preview equals explicit review with the same frozen snapshot",
+        "logical-day elapsed time and learning rollover",
+        "named IANA timezone and DST boundary",
+        "deterministic fuzz and repeated stateless computation",
+        "due versus eligibility for project-owned suspended/removed flags",
+        "suspended/removed preview and review rejected without applyable outcomes",
+        "invalid rating does not become Good",
+        "strict parameters, retention, steps and memory state",
+        "extreme weights rejected before upstream internal clipping",
+        "unknown fields, invalid UTF-8, multiple JSON values and byte limits",
+        "actual binary stdin EOF, stdout JSON, exit status and no arguments"
+      ]
+    },
+    {
+      "command": "rustup run stable cargo clippy --locked --manifest-path third_party/deepstudent/checks/fsrs-helper/Cargo.toml --target-dir .local/cache/workbench/fsrs-helper/target --all-targets --no-deps -- -D warnings",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "command": "rustup run stable rustfmt --edition 2021 --config skip_children=true --emit stdout (stdin for helper sources only)",
+      "status": "passed",
+      "note": "Only adapter/test source was formatted. The path-linked original scheduler was not written and its SHA-256 stayed unchanged."
+    },
+    {
+      "command": "third_party/deepstudent/checks/fsrs-helper/Build-FsrsHelper.ps1",
+      "status": "passed",
+      "rustc": "1.96.0 (ac68faa20 2026-05-25)",
+      "cargo": "1.96.0 (30a34c682 2026-05-25)",
+      "target": "x86_64-pc-windows-msvc",
+      "static_crt": true,
+      "toolchain_installed_or_upgraded": false,
+      "binary_sha256": "5ecc69a620b6b951d22243aa0da9ee75b0b46ab632ac3640f0c643d2b8ec286a",
+      "binary_size_bytes": 1697280,
+      "dumpbin": "14.44.35228.0",
+      "imports": [
+        "api-ms-win-core-synch-l1-2-0.dll",
+        "KERNEL32.dll",
+        "ntdll.dll"
+      ],
+      "note": "No VCRUNTIME or external Rust/library DLL import; clean-machine deployment remains untested."
+    },
+    {
+      "command": "backend/.venv/Scripts/python.exe .local/cache/workbench/fsrs-helper/verify_release.py",
+      "status": "passed",
+      "release_executable_cases": 8,
+      "timeout_seconds_per_process": 5,
+      "stdout_limit_bytes": 65536,
+      "runtime_directory_unchanged": true,
+      "raw_results": ".local/cache/workbench/fsrs-helper/release-fixtures.json"
+    },
+    {
+      "command": "rustup run stable cargo metadata --locked --filter-platform x86_64-pc-windows-msvc --format-version 1 (with helper manifest)",
+      "status": "passed",
+      "all_target_locked_registry_packages": 71,
+      "windows_normal_build_registry_packages": 47,
+      "all_registry_versions_checksums_match_fixed_upstream_lock": true,
+      "missing_archived_dependency_notices": 0
+    }
+  ],
+  "historical_failures_or_superseded_evidence": [
+    {
+      "status": "failed",
+      "observation": "First test compilation used unsupported json!([1.0;17]) syntax in an authored fixture.",
+      "resolution": "Changed fixture to json!(vec![1.0;17]); final test run passed. No original scheduler change."
+    },
+    {
+      "status": "superseded",
+      "observation": "Initial adapter accepted arbitrary finite 21-parameter weights while the fixed FSRS constructor clips parameters internally.",
+      "resolution": "Added acceptance guards from the fixed crate ranges, recorded source hashes and added two negative/positive tests. Out-of-range weights now return FSRS_PARAMETERS_OUT_OF_RANGE. Final artifact was rebuilt and rechecked.",
+      "initial_artifact_sha256": "4f38d2e67ab26eaae8cb4dde05faf0c57ef417df9eb47d730d431e7be19e716f",
+      "initial_artifact_size_bytes": 1696768
+    }
+  ],
+  "not_run": [
+    "formal project installer and resource lock integration",
+    "ReviewStore database CAS, persisted user grading and duplicate event prevention",
+    "authoritative suspension/removal guards and unified today quota",
+    "undo, regrade and revision persistence",
+    "Harness tool integration or real user learning flow",
+    "clean Windows user-machine install and offline product package"
+  ],
+  "llm_or_cloud_model_calls": 0,
+  "private_user_materials_read": false,
+  "product_source_or_lock_files_modified": false
+}

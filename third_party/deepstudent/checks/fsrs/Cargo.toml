@@ -1,0 +1,16 @@
+[package]
+name = "deepstudent-scheduler-candidate"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "../../upstream/src-tauri/src/fsrs_scheduler.rs"
+
+[dependencies]
+chrono = "=0.4.41"
+fsrs = "=6.6.2"
+
+[[bin]]
+name = "deepstudent-scheduler-check"
+path = "main.rs"

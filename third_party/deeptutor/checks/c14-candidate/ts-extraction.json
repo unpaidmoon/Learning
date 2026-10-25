@@ -1,0 +1,27 @@
+{
+  "typescript": "5.9.3",
+  "original_cursor_methods": [
+    "setResumeCursor",
+    "acceptStreamEvent",
+    "emitInOrder"
+  ],
+  "original_handleScroll_sha256": "5a2fe3509de4ff062f8afbd4080abb2935cee8438b9439a1052930007dfa407f",
+  "target_files": [
+    {
+      "path": "cursor_probe.ts",
+      "sha256": "0c0fa1da411f6b3763ff256e1ab6c9847a733bf18986767785a1d1a3007367af"
+    },
+    {
+      "path": "scroll_probe.ts",
+      "sha256": "14460534ba546f1822fabbf4250492ca954414b7a241ca3b1a27513768eb0681"
+    },
+    {
+      "path": "project_jump_probe.ts",
+      "sha256": "72a8bfb0474171f0472c03287c816188d13f4e2072b2e04bfa8585fcfc249110"
+    }
+  ],
+  "changes": [
+    "Probe shells supply state/layout ports only; extracted bodies unchanged.",
+    "No socket, command resend, React hook or PDF application runtime copied."
+  ]
+}

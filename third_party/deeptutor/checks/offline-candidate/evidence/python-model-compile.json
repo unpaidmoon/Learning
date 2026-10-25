@@ -1,0 +1,39 @@
+{
+  "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "active_original_model_sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3",
+  "original_model_identity_passed": true,
+  "compiled_block_count": 6,
+  "page_statuses": [
+    "ready",
+    "ready"
+  ],
+  "actual_model_requests": 0,
+  "original_compiler_success_error_cancel_used": true,
+  "negative_fixtures": [
+    {
+      "fixture": "external_image",
+      "status": "rejected"
+    },
+    {
+      "fixture": "traversal_image",
+      "status": "rejected"
+    },
+    {
+      "fixture": "html_math",
+      "status": "rejected"
+    },
+    {
+      "fixture": "code_expression",
+      "status": "rejected"
+    },
+    {
+      "fixture": "compiler_cancel",
+      "status": "propagated",
+      "upstream_block_state": "generating"
+    }
+  ],
+  "ungraded_not_wrong_passed": true,
+  "retained_export_module_used": true,
+  "katex_version": "0.16.22",
+  "source_fixture_version": "9f77be4dca78192717bba349ff6d1906d612c9cb0b2bba6a84e6fcd395764f69"
+}

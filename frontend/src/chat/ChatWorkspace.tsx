@@ -291,6 +291,10 @@ export function ChatWorkspace({
     } else onCaptureConsumed?.();
   };
   const send = async (submission: Schema<"SubmissionInput">) => {
+    if (!canSubmit) {
+      setError("执行层暂不可用，原问题保留，请先核对连接。");
+      return;
+    }
     setBusy(true);
     setError("");
     setRetryAllowed(false);
@@ -357,8 +361,7 @@ export function ChatWorkspace({
       text: value.text,
       attachment_ids: value.attachment_ids,
       references: value.references,
-      conditions: value.conditions,
-      corrections: value.corrections,
+      source_snapshot_ids: value.source_snapshot_ids || [],
       model,
       thinking,
     });
@@ -956,33 +959,6 @@ export function ChatWorkspace({
               }
             }}
           />
-          <details className="input-context">
-            <summary>题目条件与更正（按需填写）</summary>
-            <div className="context-fields">
-              <label>
-                当前题目条件（每行一项）
-                <textarea
-                  rows={2}
-                  value={value.conditions.join("\n")}
-                  onChange={(event) =>
-                    controller.update({ conditions: event.target.value.split("\n") })
-                  }
-                  disabled={!editable}
-                />
-              </label>
-              <label>
-                对前文的更正（每行一项）
-                <textarea
-                  rows={2}
-                  value={value.corrections.join("\n")}
-                  onChange={(event) =>
-                    controller.update({ corrections: event.target.value.split("\n") })
-                  }
-                  disabled={!editable}
-                />
-              </label>
-            </div>
-          </details>
           <div className="composer-toolbar">
             <label className="file-picker" title="添加附件">
               <Icon name="plus" />

@@ -16,6 +16,7 @@ import re
 import sqlite3
 import threading
 from collections.abc import Callable, Iterable, Mapping
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -23,17 +24,20 @@ from uuid import uuid4
 
 from alembic import command
 from alembic.config import Config
+from deeptutor_reuse.source_digest import source_digest
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy import and_, create_engine, event, exists, func, insert, or_, select, update
 from sqlalchemy.engine import Connection
 from sqlalchemy.pool import NullPool
+
+from learning_app.execution.usage import usage_is_settled, usage_projection
 
 from . import schema as s
 
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0006_course_visibility"
+SCHEMA_REVISION = "0034_data_import_fences"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -64,8 +68,8 @@ def _hash(value: Any) -> str:
 
 
 def _file_hash(path: Path) -> str:
-    with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+    # Fixed DeepTutor C07 excerpt; the project still owns authorization/version rules.
+    return source_digest(path)
 
 
 def _one(conn: Connection, table: Any, condition: Any, code: str) -> dict[str, Any]:
@@ -143,7 +147,7 @@ class Repository:
         previous: str | None = None
         existing = self.db_path.exists() and self.db_path.stat().st_size > 0
         if existing:
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn:
                 has_version = conn.execute(
                     "SELECT 1 FROM sqlite_master WHERE name='alembic_version'"
                 ).fetchone()
@@ -157,7 +161,7 @@ class Repository:
             backups = self.root / "migration-recovery"
             backups.mkdir(exist_ok=True)
             backup = backups / f"before-{SCHEMA_REVISION}-{uuid4().hex}.sqlite3"
-            with sqlite3.connect(self.db_path) as source, sqlite3.connect(backup) as dest:
+            with closing(sqlite3.connect(self.db_path)) as source, closing(sqlite3.connect(backup)) as dest:
                 source.backup(dest)
                 if dest.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                     raise StorageError("MIGRATION_BACKUP_INVALID")
@@ -209,10 +213,15 @@ class Repository:
                 for row in conn.execute(
                     select(s.courses)
                     .outerjoin(course_roots, course_roots.c.course_id == s.courses.c.course_id)
-                    .outerjoin(course_visibility, course_visibility.c.course_id == s.courses.c.course_id)
+                    .outerjoin(
+                        course_visibility, course_visibility.c.course_id == s.courses.c.course_id
+                    )
                     .where(
                         or_(course_roots.c.state.is_(None), course_roots.c.state != "detached"),
-                        or_(course_visibility.c.hidden.is_(None), course_visibility.c.hidden.is_(False)),
+                        or_(
+                            course_visibility.c.hidden.is_(None),
+                            course_visibility.c.hidden.is_(False),
+                        ),
                     )
                 ).mappings()
             ]
@@ -483,6 +492,10 @@ class Repository:
     def _validate_payload(
         self, conn: Connection, chat: Mapping[str, Any], payload: Mapping[str, Any]
     ) -> None:
+        if payload.get("read_course_ids"):
+            from learning_app.workbench.source_grants import course_scope
+
+            course_scope(conn, chat["course_id"], payload["read_course_ids"])
         for attachment_id in payload["attachment_ids"]:
             attachment = self._attachment(conn, attachment_id)
             if not attachment["confirmed"]:
@@ -568,14 +581,18 @@ class Repository:
         conditions: Iterable[str] = (),
         corrections: Iterable[str] = (),
         source_locators: Iterable[dict[str, Any]] = (),
+        read_course_ids: Iterable[str] = (),
     ) -> dict[str, Any]:
-        return {
+        result = {
             "text": text,
             "attachment_ids": list(dict.fromkeys(attachment_ids)),
             "conditions": list(conditions),
             "corrections": list(corrections),
             "source_locators": list(source_locators),
         }
+        if read_course_ids:
+            result["read_course_ids"] = list(read_course_ids)
+        return result
 
     def _messages(self, conn: Connection, chat_id: str) -> list[dict[str, Any]]:
         result = []
@@ -671,6 +688,7 @@ class Repository:
         conditions: Iterable[str] = (),
         corrections: Iterable[str] = (),
         source_locators: Iterable[dict[str, Any]] = (),
+        read_course_ids: Iterable[str] = (),
         model: str = "deepseek-flash",
         thinking: str = "high",
         max_output_tokens: int = 8192,
@@ -680,7 +698,9 @@ class Repository:
         _checked_id(submission_id)
         if max_output_tokens < 1 or timeout_seconds <= 0:
             raise StorageError("MODEL_LIMITS_INVALID")
-        payload = self._payload(text, attachment_ids, conditions, corrections, source_locators)
+        payload = self._payload(
+            text, attachment_ids, conditions, corrections, source_locators, read_course_ids
+        )
         payload_hash = _hash(
             {
                 "chat_id": chat_id,
@@ -896,6 +916,8 @@ class Repository:
 
     def execution_context(self, generation_id: str) -> dict[str, Any]:
         """Private adapter input, frozen when this submission was committed."""
+        from learning_app.drafts import REFERENCE_CONDITION_PREFIX
+
         generation = self.get_generation(generation_id)
         snapshot = generation["context_snapshot"]
         current = next(
@@ -908,13 +930,31 @@ class Repository:
         )
         if current is None:
             raise StorageError("CURRENT_INPUT_NOT_IN_SNAPSHOT")
-        prompt = current["text"]
-        if snapshot["conditions"]:
-            prompt += "\n\n用户已确认的题目条件：\n" + "\n".join(snapshot["conditions"])
-        if snapshot["corrections"]:
-            prompt += "\n\n用户修正（优先于较早表述）：\n" + "\n".join(snapshot["corrections"])
+
+        def message_text(message):
+            # Old condition/correction assets are kept losslessly, but no
+            # longer acquire a separate priority channel in new requests.
+            ordinary = [
+                value
+                for value in message.get("conditions", ())
+                if not value.startswith(REFERENCE_CONDITION_PREFIX)
+            ]
+            ordinary.extend(message.get("corrections", ()))
+            text = message["text"]
+            if ordinary:
+                text += "\n\n" + "\n".join(ordinary)
+            references = [
+                value
+                for value in message.get("conditions", ())
+                if value.startswith(REFERENCE_CONDITION_PREFIX)
+            ]
+            if references:
+                text += "\n\n用户选取的引用：\n" + "\n".join(references)
+            return text
+
+        prompt = message_text(current)
         history = [
-            message
+            {**message, "text": message_text(message), "conditions": [], "corrections": []}
             for message in snapshot["messages"]
             if message["message_id"] != generation["user_message_id"]
         ]
@@ -1005,6 +1045,39 @@ class Repository:
                 conn.execute(
                     select(s.execution_bindings)
                     .where(s.execution_bindings.c.chat_id == chat_id)
+                    .order_by(s.execution_bindings.c.epoch.desc())
+                )
+                .mappings()
+                .first()
+            )
+            return dict(row) if row else None
+
+    def chat_for_session(self, session_id: str) -> str:
+        """Resolve native desktop identity without promoting it to business identity."""
+        with self.engine.connect() as conn:
+            row = conn.execute(
+                select(s.execution_bindings.c.chat_id)
+                .where(
+                    s.execution_bindings.c.session_id == session_id,
+                    s.execution_bindings.c.state.not_in(["stale", "retired"]),
+                )
+                .order_by(s.execution_bindings.c.epoch.desc())
+            ).first()
+            if row is None:
+                raise StorageError("CHAT_NOT_FOUND")
+            return row[0]
+
+    def desktop_creation_for_seed(self, session_id: str) -> dict[str, Any] | None:
+        """Durable receipt for a named native Session creation replay."""
+        with self.engine.connect() as conn:
+            row = (
+                conn.execute(
+                    select(s.execution_bindings)
+                    .where(
+                        s.execution_bindings.c.adapter_metadata["desktop_create_seed"].as_string()
+                        == session_id,
+                        s.execution_bindings.c.state.not_in(["stale", "retired"]),
+                    )
                     .order_by(s.execution_bindings.c.epoch.desc())
                 )
                 .mappings()
@@ -1251,63 +1324,15 @@ class Repository:
             .first()
         )
         raw = raw_usage
-        presence = (
-            dict(fields) if fields is not None else dict((raw or {}).get("field_presence", {}))
-        )
-        if not presence:
-            presence = {
-                key: key in (raw or {})
-                for key in (
-                    "input_tokens",
-                    "output_tokens",
-                    "prompt_tokens",
-                    "completion_tokens",
-                    "cached_input_tokens",
-                    "cache_read_input_tokens",
-                    "reasoning_tokens",
-                )
-            }
-
-        def known(*keys: str) -> int | None:
-            if raw and "normalized" in raw:
-                if not raw.get("settled", False):
-                    return None
-                for key in keys:
-                    value = raw["normalized"].get(key)
-                    if isinstance(value, int) and not isinstance(value, bool):
-                        return value
-                return None
-            for key in keys:
-                value = raw.get(key) if raw else None
-                if (
-                    presence.get(key, False)
-                    and isinstance(value, int)
-                    and not isinstance(value, bool)
-                ):
-                    return value
-            return None
-
-        normalized = {
-            "input_tokens": known("input_tokens", "prompt_tokens"),
-            "output_tokens": known("output_tokens", "completion_tokens"),
-            "cached_input_tokens": known("cached_input_tokens", "cache_read_input_tokens"),
-            "reasoning_tokens": known("reasoning_tokens"),
-        }
+        presence, normalized = usage_projection(raw, fields)
         if existing:
             if existing["source"] != source:
                 raise StorageError("USAGE_SETTLEMENT_CONFLICT")
             if existing["raw_usage"] == raw and existing["field_presence"] == presence:
                 return False
 
-            def settled(value: dict[str, Any] | None) -> bool:
-                if value is None:
-                    return False
-                # The boundary envelope explicitly distinguishes observation
-                # from settlement. Flat protocol fixtures are final snapshots.
-                return bool(value["settled"]) if "settled" in value else True
-
-            if settled(existing["raw_usage"]):
-                if settled(raw):
+            if usage_is_settled(existing["raw_usage"]):
+                if usage_is_settled(raw):
                     raise StorageError("USAGE_SETTLEMENT_CONFLICT")
                 # An earlier, unsettled observation may arrive after the final
                 # record. Its immutable execution_event is still retained.
@@ -1351,12 +1376,25 @@ class Repository:
         settlement_id: str | None = None,
         data: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        return self.ingest_events([{
-            "generation_id": generation_id, "binding_id": binding_id, "epoch": epoch,
-            "event_id": event_id, "seq": seq, "kind": kind, "text": text,
-            "status": status, "raw_usage": raw_usage, "usage_source": usage_source,
-            "usage_fields": usage_fields, "settlement_id": settlement_id, "data": data,
-        }])[0]
+        return self.ingest_events(
+            [
+                {
+                    "generation_id": generation_id,
+                    "binding_id": binding_id,
+                    "epoch": epoch,
+                    "event_id": event_id,
+                    "seq": seq,
+                    "kind": kind,
+                    "text": text,
+                    "status": status,
+                    "raw_usage": raw_usage,
+                    "usage_source": usage_source,
+                    "usage_fields": usage_fields,
+                    "settlement_id": settlement_id,
+                    "data": data,
+                }
+            ]
+        )[0]
 
     def ingest_events(self, events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         """Atomically persist a bounded stream burst, retaining every event identity.
@@ -1376,8 +1414,10 @@ class Repository:
         for item, result in zip(items, results, strict=True):
             if result["accepted"]:
                 self._hook(
-                    "event_after_commit", generation_id=item["generation_id"],
-                    event_id=item["event_id"], kind=aliases.get(item["kind"], item["kind"]),
+                    "event_after_commit",
+                    generation_id=item["generation_id"],
+                    event_id=item["event_id"],
+                    kind=aliases.get(item["kind"], item["kind"]),
                 )
         return results
 
@@ -1857,15 +1897,29 @@ class Repository:
         conditions: Iterable[str] = (),
         corrections: Iterable[str] = (),
         source_locators: Iterable[dict[str, Any]] = (),
+        read_course_ids: Iterable[str] | None = None,
     ) -> dict[str, Any]:
         """Append a new revision; an existing generation's snapshot stays fixed."""
-        payload = self._payload(text, attachment_ids, conditions, corrections, source_locators)
         with self._lock, self.engine.begin() as conn:
             message = _one(
                 conn, s.messages, s.messages.c.message_id == message_id, "MESSAGE_NOT_FOUND"
             )
             if message["role"] != "user":
                 raise StorageError("INPUT_REVISION_ROLE_INVALID")
+            original = _one(
+                conn,
+                s.input_revisions,
+                s.input_revisions.c.revision_id == message["revision_id"],
+                "REVISION_NOT_FOUND",
+            )
+            selected_courses = (
+                original["payload"].get("read_course_ids", ())
+                if read_course_ids is None
+                else read_course_ids
+            )
+            payload = self._payload(
+                text, attachment_ids, conditions, corrections, source_locators, selected_courses
+            )
             chat = _one(conn, s.chats, s.chats.c.chat_id == message["chat_id"], "CHAT_NOT_FOUND")
             self._validate_payload(conn, chat, payload)
             revision_id = _id("revision")

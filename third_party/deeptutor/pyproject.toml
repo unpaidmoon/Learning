@@ -1,0 +1,26 @@
+[project]
+name = "learning-deeptutor-reuse"
+version = "0.1.0"
+description = "Selected, attributed DeepTutor pure modules for the Learning workbench"
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic==2.11.7"]
+license = "Apache-2.0"
+license-files = ["LICENSE", "UPSTREAM.md"]
+
+[project.optional-dependencies]
+visualization = ["jsonschema==4.25.1"]
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deeptutor_reuse"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "upstream", "web", "scripts", "tests", "dependency-licenses", "uv.lock", "pyproject.toml", "LICENSE", "UPSTREAM.md", "upstream-lock.json", "reuse-manifest.json", "README.md"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"reuse-manifest.json" = "deeptutor_reuse/reuse-manifest.json"
+"upstream-lock.json" = "deeptutor_reuse/upstream-lock.json"
+"dependency-licenses" = "deeptutor_reuse/dependency-licenses"

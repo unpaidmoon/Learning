@@ -1,0 +1,1722 @@
+{
+  "manifest_version": 1,
+  "release_id": "asr-win-amd64-cp312-20261023-r1",
+  "platform": {
+    "os": "windows",
+    "arch": "amd64",
+    "python_implementation": "cpython",
+    "python_tested_version": "3.12.5",
+    "python_abi": "cp312"
+  },
+  "scope": "Versioned installation data only; application owns tasks, execution and verification.",
+  "python": {
+    "installation_root": "python",
+    "install_policy": {
+      "allow_source_builds": false,
+      "allow_unpinned_versions": false,
+      "require_archive_hashes": true,
+      "install_dependencies_implicitly": false,
+      "enable_conversion_or_torch_extras": false
+    },
+    "requirements_file": {
+      "path": "asr-requirements.windows.txt",
+      "sha256": "0038f18981c1b161a261915e53c20fa24ac5035828b58f47ac97499ef57173b1"
+    },
+    "package_count": 32,
+    "packages": [
+      {
+        "id": "python:annotated-doc",
+        "name": "annotated-doc",
+        "version": "0.0.5",
+        "filename": "annotated_doc-0.0.5-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/3e/30/e900b21425a860e195f32e37657aa1f7c7f2b1bfb26f03ca209b90933c06/annotated_doc-0.0.5-py3-none-any.whl",
+        "sha256": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+        "bytes": 5302,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/annotated-doc-0.0.5/wheel/annotated_doc-0.0.5.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:anyio",
+        "name": "anyio",
+        "version": "4.15.1",
+        "filename": "anyio-4.15.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/12/b8/4bd346e22b28902df4d651910f5242c28d84e4a5c2435ca5c3f797ed7e2e/anyio-4.15.1-py3-none-any.whl",
+        "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+        "bytes": 132079,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "exceptiongroup>=1.0.2; python_version < \"3.11\"",
+          "idna>=2.8",
+          "typing_extensions>=4.16.0; python_version < \"3.15\"",
+          "trio>=0.32.0; extra == \"trio\""
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/anyio-4.15.1/wheel/anyio-4.15.1.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:av",
+        "name": "av",
+        "version": "17.1.0",
+        "filename": "av-17.1.0-cp311-abi3-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/6b/f2/53a7cd34adb6a971d7e6d99663e74db286966c9db8afdca17472fdf0f98e/av-17.1.0-cp311-abi3-win_amd64.whl",
+        "sha256": "5df5c1172ef1cf65a1529d612f7da7798ce2cf82c1ff7212466b538a6cc7214c",
+        "bytes": 28036393,
+        "wheel_tags": [
+          "cp311-abi3-win_amd64"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/av-17.1.0/wheel/av-17.1.0.dist-info/licenses/LICENSE.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:certifi",
+        "name": "certifi",
+        "version": "2026.10.19",
+        "filename": "certifi-2026.10.19-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl",
+        "sha256": "42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b",
+        "bytes": 136464,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MPL-2.0",
+          "metadata_text": "MPL-2.0",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+          ],
+          "notices": [
+            "notices/asr/python/certifi-2026.10.19/wheel/certifi-2026.10.19.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:click",
+        "name": "click",
+        "version": "8.5.0",
+        "filename": "click-8.5.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl",
+        "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+        "bytes": 125251,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/click-8.5.0/wheel/click-8.5.0.dist-info/licenses/LICENSE.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:colorama",
+        "name": "colorama",
+        "version": "0.4.6",
+        "filename": "colorama-0.4.6-py2.py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl",
+        "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+        "bytes": 25335,
+        "wheel_tags": [
+          "py2-none-any",
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "notices": [
+            "notices/asr/python/colorama-0.4.6/wheel/colorama-0.4.6.dist-info/licenses/LICENSE.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:ctranslate2",
+        "name": "ctranslate2",
+        "version": "4.8.0",
+        "filename": "ctranslate2-4.8.0-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/2a/ed/2c3c7b110c48c36d024c5247195f2ad4fc1e34cbf482dab62ccb3898cb70/ctranslate2-4.8.0-cp312-cp312-win_amd64.whl",
+        "sha256": "06feaafe134aafa8cb2fb1fdb82e36f050bb05929dfde1a95f4fe4d7881dfc76",
+        "bytes": 19218985,
+        "wheel_tags": [
+          "cp312-cp312-win_amd64"
+        ],
+        "requires_dist": [
+          "setuptools",
+          "numpy",
+          "pyyaml<7,>=5.3"
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT",
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/ctranslate2-4.8.0/upstream/LICENSE",
+            "notices/asr/native/onednn-3.1.1/LICENSE",
+            "notices/asr/native/intel-openmp-2025.3.0/intel_openmp-2025.3.0.dist-info/LICENSE.txt",
+            "notices/asr/native/cudnn-9.10.2/vendor-eula.html",
+            "notices/asr/build-provenance/ct2-v4.8.0-prepare_windows.sh.source.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:faster-whisper",
+        "name": "faster-whisper",
+        "version": "1.2.1",
+        "filename": "faster_whisper-1.2.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/05/99/49ee85903dee060d9f08297b4a342e5e0bcfca2f027a07b4ee0a38ab13f9/faster_whisper-1.2.1-py3-none-any.whl",
+        "sha256": "79a66ad50688c0b794dd501dc340a736992a6342f7f95e5811be60b5224a26a7",
+        "bytes": 1118909,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "ctranslate2<5,>=4.0",
+          "huggingface-hub>=0.21",
+          "tokenizers<1,>=0.13",
+          "onnxruntime<2,>=1.14",
+          "av>=11",
+          "tqdm",
+          "transformers[torch]>=4.23; extra == \"conversion\"",
+          "black==23.*; extra == \"dev\"",
+          "flake8==6.*; extra == \"dev\"",
+          "isort==5.*; extra == \"dev\"",
+          "pytest==7.*; extra == \"dev\""
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/faster-whisper-1.2.1/wheel/faster_whisper-1.2.1.dist-info/LICENSE",
+            "notices/asr/python/faster-whisper-1.2.1/upstream/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:filelock",
+        "name": "filelock",
+        "version": "4.2.4",
+        "filename": "filelock-4.2.4-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/e0/1b/5e74289a1878e666bb4b65fe5805a04cafcac2aa5f519ef1ead67ef91c56/filelock-4.2.4-py3-none-any.whl",
+        "sha256": "301241438c57936ef93f4243a94f2559022268bfcf9b375a9a72eb0f8db8358e",
+        "bytes": 162475,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/filelock-4.2.4/wheel/filelock-4.2.4.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:flatbuffers",
+        "name": "flatbuffers",
+        "version": "25.12.19",
+        "filename": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl",
+        "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+        "bytes": 26661,
+        "wheel_tags": [
+          "py2-none-any",
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "Apache-2.0",
+          "metadata_text": "Apache 2.0",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "notices": [
+            "notices/asr/python/flatbuffers-25.12.19/upstream/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:fsspec",
+        "name": "fsspec",
+        "version": "2026.9.0",
+        "filename": "fsspec-2026.9.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/6c/c0/a98505f18594f1bce828bb159cec0fcf9860562f1a2c85913409fc8f3d9e/fsspec-2026.9.0-py3-none-any.whl",
+        "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f",
+        "bytes": 221738,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "adlfs; extra == 'abfs'",
+          "adlfs; extra == 'adl'",
+          "pyarrow>=1; extra == 'arrow'",
+          "dask; extra == 'dask'",
+          "distributed; extra == 'dask'",
+          "pre-commit; extra == 'dev'",
+          "ruff>=0.5; extra == 'dev'",
+          "numpydoc; extra == 'doc'",
+          "sphinx; extra == 'doc'",
+          "sphinx-design; extra == 'doc'",
+          "sphinx-rtd-theme; extra == 'doc'",
+          "yarl; extra == 'doc'",
+          "dropbox; extra == 'dropbox'",
+          "dropboxdrivefs; extra == 'dropbox'",
+          "requests; extra == 'dropbox'",
+          "adlfs; extra == 'full'",
+          "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'full'",
+          "dask; extra == 'full'",
+          "distributed; extra == 'full'",
+          "dropbox; extra == 'full'",
+          "dropboxdrivefs; extra == 'full'",
+          "fusepy; extra == 'full'",
+          "gcsfs>=2026.4.0; extra == 'full'",
+          "libarchive-c; extra == 'full'",
+          "ocifs; extra == 'full'",
+          "panel; extra == 'full'",
+          "paramiko; extra == 'full'",
+          "pyarrow>=1; extra == 'full'",
+          "pygit2; extra == 'full'",
+          "requests; extra == 'full'",
+          "s3fs>=2026.6.0; extra == 'full'",
+          "smbprotocol; extra == 'full'",
+          "tqdm; extra == 'full'",
+          "fusepy; extra == 'fuse'",
+          "gcsfs>=2026.4.0; extra == 'gcs'",
+          "pygit2; extra == 'git'",
+          "requests; extra == 'github'",
+          "gcsfs>=2026.4.0; extra == 'gs'",
+          "panel; extra == 'gui'",
+          "pyarrow>=1; extra == 'hdfs'",
+          "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'http'",
+          "libarchive-c; extra == 'libarchive'",
+          "ocifs; extra == 'oci'",
+          "s3fs>=2026.6.0; extra == 's3'",
+          "paramiko; extra == 'sftp'",
+          "smbprotocol; extra == 'smb'",
+          "paramiko; extra == 'ssh'",
+          "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'test'",
+          "numpy; extra == 'test'",
+          "pytest; extra == 'test'",
+          "pytest-asyncio!=0.22.0; extra == 'test'",
+          "pytest-benchmark; extra == 'test'",
+          "pytest-cov; extra == 'test'",
+          "pytest-mock; extra == 'test'",
+          "pytest-recording; extra == 'test'",
+          "pytest-rerunfailures; extra == 'test'",
+          "requests; extra == 'test'",
+          "aiobotocore<3.0.0,>=2.5.4; extra == 'test-downstream'",
+          "dask[dataframe,test]; extra == 'test-downstream'",
+          "moto[server]<5,>4; extra == 'test-downstream'",
+          "pytest-timeout; extra == 'test-downstream'",
+          "xarray; extra == 'test-downstream'",
+          "zarr; extra == 'test-downstream'",
+          "adlfs; extra == 'test-full'",
+          "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'test-full'",
+          "backports-zstd; (python_version < '3.14') and extra == 'test-full'",
+          "cloudpickle; extra == 'test-full'",
+          "dask; extra == 'test-full'",
+          "distributed; extra == 'test-full'",
+          "dropbox; extra == 'test-full'",
+          "dropboxdrivefs; extra == 'test-full'",
+          "fastparquet; extra == 'test-full'",
+          "fusepy; extra == 'test-full'",
+          "gcsfs>=2026.4.0; extra == 'test-full'",
+          "jinja2; extra == 'test-full'",
+          "kerchunk; extra == 'test-full'",
+          "libarchive-c; extra == 'test-full'",
+          "lz4; extra == 'test-full'",
+          "notebook; extra == 'test-full'",
+          "numpy; extra == 'test-full'",
+          "ocifs; extra == 'test-full'",
+          "pandas<3.0.0; extra == 'test-full'",
+          "panel; extra == 'test-full'",
+          "paramiko; extra == 'test-full'",
+          "pyarrow>=1; extra == 'test-full'",
+          "pyftpdlib; extra == 'test-full'",
+          "pygit2; extra == 'test-full'",
+          "pytest; extra == 'test-full'",
+          "pytest-asyncio!=0.22.0; extra == 'test-full'",
+          "pytest-benchmark; extra == 'test-full'",
+          "pytest-cov; extra == 'test-full'",
+          "pytest-mock; extra == 'test-full'",
+          "pytest-recording; extra == 'test-full'",
+          "pytest-rerunfailures; extra == 'test-full'",
+          "python-snappy; extra == 'test-full'",
+          "requests; extra == 'test-full'",
+          "s3fs>=2026.6.0; extra == 'test-full'",
+          "smbprotocol; extra == 'test-full'",
+          "tqdm; extra == 'test-full'",
+          "urllib3; extra == 'test-full'",
+          "zarr<3.2.0; extra == 'test-full'",
+          "zstandard; (python_version < '3.14') and extra == 'test-full'",
+          "tqdm; extra == 'tqdm'"
+        ],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/fsspec-2026.9.0/wheel/fsspec-2026.9.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:h11",
+        "name": "h11",
+        "version": "0.16.0",
+        "filename": "h11-0.16.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl",
+        "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+        "bytes": 37515,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/h11-0.16.0/wheel/h11-0.16.0.dist-info/licenses/LICENSE.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:hf-xet",
+        "name": "hf-xet",
+        "version": "1.7.0",
+        "filename": "hf_xet-1.7.0-cp38-abi3-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/4d/59/b35106dfa71b6eef605dc88bd038fe99c7f86fb132a15b60d0bf2f235b2c/hf_xet-1.7.0-cp38-abi3-win_amd64.whl",
+        "sha256": "2b7bb5727889b0f2436dbaaad8fc4c3e66b8240d992716989e0c086b4278b1bc",
+        "bytes": 3822644,
+        "wheel_tags": [
+          "cp38-abi3-win_amd64"
+        ],
+        "requires_dist": [
+          "pytest ; extra == 'tests'"
+        ],
+        "license": {
+          "expression": "Apache-2.0",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "notices": [
+            "notices/asr/python/hf-xet-1.7.0/wheel/hf_xet-1.7.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:httpcore",
+        "name": "httpcore",
+        "version": "1.0.9",
+        "filename": "httpcore-1.0.9-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl",
+        "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+        "bytes": 78784,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "certifi",
+          "h11>=0.16",
+          "anyio<5.0,>=4.0; extra == 'asyncio'",
+          "h2<5,>=3; extra == 'http2'",
+          "socksio==1.*; extra == 'socks'",
+          "trio<1.0,>=0.22.0; extra == 'trio'"
+        ],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "notices": [
+            "notices/asr/python/httpcore-1.0.9/wheel/httpcore-1.0.9.dist-info/licenses/LICENSE.md"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:httpx",
+        "name": "httpx",
+        "version": "0.28.1",
+        "filename": "httpx-0.28.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl",
+        "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+        "bytes": 73517,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "anyio",
+          "certifi",
+          "httpcore==1.*",
+          "idna",
+          "brotli; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+          "brotlicffi; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+          "click==8.*; extra == 'cli'",
+          "pygments==2.*; extra == 'cli'",
+          "rich<14,>=10; extra == 'cli'",
+          "h2<5,>=3; extra == 'http2'",
+          "socksio==1.*; extra == 'socks'",
+          "zstandard>=0.18.0; extra == 'zstd'"
+        ],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": "BSD-3-Clause",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "notices": [
+            "notices/asr/python/httpx-0.28.1/wheel/httpx-0.28.1.dist-info/licenses/LICENSE.md"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:huggingface-hub",
+        "name": "huggingface-hub",
+        "version": "1.18.0",
+        "filename": "huggingface_hub-1.18.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/0b/03/40a05316cb6616e5b7efd7773656441ab04b4b022c2199e79bb4622a92a3/huggingface_hub-1.18.0-py3-none-any.whl",
+        "sha256": "729be4a976fb706dcc02d176bcda8a3f32bdf21a294e8f4b3dda6fbcbc9c1ab1",
+        "bytes": 684411,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "click>=8.4.0",
+          "filelock>=3.10.0",
+          "fsspec>=2023.5.0",
+          "hf-xet<2.0.0,>=1.4.3; platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\"",
+          "httpx<1,>=0.23.0",
+          "packaging>=20.9",
+          "pyyaml>=5.1",
+          "tqdm>=4.42.1",
+          "typer<0.26.0,>=0.20.0",
+          "typing-extensions>=4.1.0",
+          "authlib>=1.3.2; extra == \"oauth\"",
+          "fastapi; extra == \"oauth\"",
+          "httpx; extra == \"oauth\"",
+          "itsdangerous; extra == \"oauth\"",
+          "torch; extra == \"torch\"",
+          "safetensors[torch]; extra == \"torch\"",
+          "toml; extra == \"fastai\"",
+          "fastai>=2.4; extra == \"fastai\"",
+          "fastcore>=1.3.27; extra == \"fastai\"",
+          "hf-xet<2.0.0,>=1.4.3; extra == \"hf-xet\"",
+          "mcp>=1.8.0; extra == \"mcp\"",
+          "authlib>=1.3.2; extra == \"testing\"",
+          "fastapi; extra == \"testing\"",
+          "httpx; extra == \"testing\"",
+          "itsdangerous; extra == \"testing\"",
+          "jedi; extra == \"testing\"",
+          "Jinja2; extra == \"testing\"",
+          "pytest>=8.4.2; extra == \"testing\"",
+          "pytest-cov; extra == \"testing\"",
+          "pytest-env; extra == \"testing\"",
+          "pytest-xdist; extra == \"testing\"",
+          "pytest-vcr; extra == \"testing\"",
+          "pytest-asyncio; extra == \"testing\"",
+          "pytest-rerunfailures<16.0; extra == \"testing\"",
+          "pytest-mock; extra == \"testing\"",
+          "urllib3<2.0; extra == \"testing\"",
+          "soundfile; extra == \"testing\"",
+          "Pillow; extra == \"testing\"",
+          "numpy; extra == \"testing\"",
+          "duckdb; extra == \"testing\"",
+          "fastapi; extra == \"testing\"",
+          "gradio>=5.0.0; extra == \"gradio\"",
+          "requests; extra == \"gradio\"",
+          "typing-extensions>=4.8.0; extra == \"typing\"",
+          "types-PyYAML; extra == \"typing\"",
+          "types-simplejson; extra == \"typing\"",
+          "types-toml; extra == \"typing\"",
+          "types-tqdm; extra == \"typing\"",
+          "types-urllib3; extra == \"typing\"",
+          "ruff>=0.9.0; extra == \"quality\"",
+          "mypy==1.15.0; extra == \"quality\"",
+          "libcst>=1.4.0; extra == \"quality\"",
+          "ty; extra == \"quality\"",
+          "authlib>=1.3.2; extra == \"all\"",
+          "fastapi; extra == \"all\"",
+          "httpx; extra == \"all\"",
+          "itsdangerous; extra == \"all\"",
+          "jedi; extra == \"all\"",
+          "Jinja2; extra == \"all\"",
+          "pytest>=8.4.2; extra == \"all\"",
+          "pytest-cov; extra == \"all\"",
+          "pytest-env; extra == \"all\"",
+          "pytest-xdist; extra == \"all\"",
+          "pytest-vcr; extra == \"all\"",
+          "pytest-asyncio; extra == \"all\"",
+          "pytest-rerunfailures<16.0; extra == \"all\"",
+          "pytest-mock; extra == \"all\"",
+          "urllib3<2.0; extra == \"all\"",
+          "soundfile; extra == \"all\"",
+          "Pillow; extra == \"all\"",
+          "numpy; extra == \"all\"",
+          "duckdb; extra == \"all\"",
+          "fastapi; extra == \"all\"",
+          "ruff>=0.9.0; extra == \"all\"",
+          "mypy==1.15.0; extra == \"all\"",
+          "libcst>=1.4.0; extra == \"all\"",
+          "ty; extra == \"all\"",
+          "typing-extensions>=4.8.0; extra == \"all\"",
+          "types-PyYAML; extra == \"all\"",
+          "types-simplejson; extra == \"all\"",
+          "types-toml; extra == \"all\"",
+          "types-tqdm; extra == \"all\"",
+          "types-urllib3; extra == \"all\"",
+          "authlib>=1.3.2; extra == \"dev\"",
+          "fastapi; extra == \"dev\"",
+          "httpx; extra == \"dev\"",
+          "itsdangerous; extra == \"dev\"",
+          "jedi; extra == \"dev\"",
+          "Jinja2; extra == \"dev\"",
+          "pytest>=8.4.2; extra == \"dev\"",
+          "pytest-cov; extra == \"dev\"",
+          "pytest-env; extra == \"dev\"",
+          "pytest-xdist; extra == \"dev\"",
+          "pytest-vcr; extra == \"dev\"",
+          "pytest-asyncio; extra == \"dev\"",
+          "pytest-rerunfailures<16.0; extra == \"dev\"",
+          "pytest-mock; extra == \"dev\"",
+          "urllib3<2.0; extra == \"dev\"",
+          "soundfile; extra == \"dev\"",
+          "Pillow; extra == \"dev\"",
+          "numpy; extra == \"dev\"",
+          "duckdb; extra == \"dev\"",
+          "fastapi; extra == \"dev\"",
+          "ruff>=0.9.0; extra == \"dev\"",
+          "mypy==1.15.0; extra == \"dev\"",
+          "libcst>=1.4.0; extra == \"dev\"",
+          "ty; extra == \"dev\"",
+          "typing-extensions>=4.8.0; extra == \"dev\"",
+          "types-PyYAML; extra == \"dev\"",
+          "types-simplejson; extra == \"dev\"",
+          "types-toml; extra == \"dev\"",
+          "types-tqdm; extra == \"dev\"",
+          "types-urllib3; extra == \"dev\""
+        ],
+        "license": {
+          "expression": "Apache-2.0",
+          "metadata_text": "Apache-2.0",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "notices": [
+            "notices/asr/python/huggingface-hub-1.18.0/wheel/huggingface_hub-1.18.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:idna",
+        "name": "idna",
+        "version": "3.20",
+        "filename": "idna-3.20-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+        "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+        "bytes": 69583,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "ruff >= 0.16.0 ; extra == \"all\"",
+          "mypy >= 1.11.2 ; extra == \"all\"",
+          "ty >= 0.0.37 ; extra == \"all\"",
+          "pytest >= 8.3.2 ; extra == \"all\"",
+          "hypothesis >= 6.141.1 ; extra == \"all\"",
+          "coverage >= 7.10.0 ; extra == \"all\""
+        ],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/idna-3.20/wheel/idna-3.20.dist-info/licenses/LICENSE.md"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:markdown-it-py",
+        "name": "markdown-it-py",
+        "version": "4.2.0",
+        "filename": "markdown_it_py-4.2.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/b3/81/4da04ced5a082363ecfa159c010d200ecbd959ae410c10c0264a38cac0f5/markdown_it_py-4.2.0-py3-none-any.whl",
+        "sha256": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a",
+        "bytes": 91687,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "mdurl~=0.1",
+          "psutil ; extra == \"benchmarking\"",
+          "pytest ; extra == \"benchmarking\"",
+          "pytest-benchmark ; extra == \"benchmarking\"",
+          "commonmark~=0.9 ; extra == \"compare\"",
+          "markdown~=3.4 ; extra == \"compare\"",
+          "mistletoe~=1.0 ; extra == \"compare\"",
+          "mistune~=3.0 ; extra == \"compare\"",
+          "panflute~=2.3 ; extra == \"compare\"",
+          "markdown-it-pyrs ; extra == \"compare\"",
+          "linkify-it-py>=1,<3 ; extra == \"linkify\"",
+          "mdit-py-plugins>=0.5.0 ; extra == \"plugins\"",
+          "gprof2dot ; extra == \"profiling\"",
+          "mdit-py-plugins>=0.5.0 ; extra == \"rtd\"",
+          "myst-parser ; extra == \"rtd\"",
+          "pyyaml ; extra == \"rtd\"",
+          "sphinx ; extra == \"rtd\"",
+          "sphinx-copybutton ; extra == \"rtd\"",
+          "sphinx-design ; extra == \"rtd\"",
+          "sphinx-book-theme~=1.0 ; extra == \"rtd\"",
+          "jupyter_sphinx ; extra == \"rtd\"",
+          "ipykernel ; extra == \"rtd\"",
+          "coverage ; extra == \"testing\"",
+          "pytest ; extra == \"testing\"",
+          "pytest-cov ; extra == \"testing\"",
+          "pytest-regressions ; extra == \"testing\"",
+          "pytest-timeout ; extra == \"testing\"",
+          "requests ; extra == \"testing\""
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/markdown-it-py-4.2.0/wheel/markdown_it_py-4.2.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/markdown-it-py-4.2.0/wheel/markdown_it_py-4.2.0.dist-info/licenses/LICENSE.markdown-it"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:mdurl",
+        "name": "mdurl",
+        "version": "0.1.2",
+        "filename": "mdurl-0.1.2-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl",
+        "sha256": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8",
+        "bytes": 9979,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/mdurl-0.1.2/wheel/mdurl-0.1.2.dist-info/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:numpy",
+        "name": "numpy",
+        "version": "2.4.6",
+        "filename": "numpy-2.4.6-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/ab/ca/feab00bd44aa5fe1ad2c18f08b4d3bb92e26484b0b1d1443897809ed528c/numpy-2.4.6-cp312-cp312-win_amd64.whl",
+        "sha256": "d8e8286dd7cea7895157318d1b91cdacac64c479f3cbc8dce548331728484751",
+        "bytes": 12321687,
+        "wheel_tags": [
+          "cp312-cp312-win_amd64"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/numpy-2.4.6/wheel/numpy/ma/LICENSE",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy/random/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy/_core/include/numpy/random/LICENSE.txt",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/LICENSE.txt",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/ma/LICENSE",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+            "notices/asr/python/numpy-2.4.6/wheel/numpy-2.4.6.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:onnxruntime",
+        "name": "onnxruntime",
+        "version": "1.26.0",
+        "filename": "onnxruntime-1.26.0-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/44/fc/026d0a7162b9c2153dac292baea9e027c42304dc1d9dc6f8ff5b4cfbaedd/onnxruntime-1.26.0-cp312-cp312-win_amd64.whl",
+        "sha256": "a26374dc7fbcaae593601086b242120e13f2310558df0991da6dd8b8fac00414",
+        "bytes": 13026427,
+        "wheel_tags": [
+          "cp312-cp312-win_amd64"
+        ],
+        "requires_dist": [
+          "flatbuffers",
+          "numpy>=1.21.6",
+          "packaging",
+          "protobuf",
+          "sympy; extra == \"symbolic\"",
+          "ml_dtypes; extra == \"quantization\""
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT License",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/onnxruntime-1.26.0/wheel/onnxruntime/LICENSE",
+            "notices/asr/python/onnxruntime-1.26.0/wheel/onnxruntime/ThirdPartyNotices.txt",
+            "notices/asr/python/onnxruntime-1.26.0/upstream/LICENSE",
+            "notices/asr/python/onnxruntime-1.26.0/upstream/ThirdPartyNotices.txt"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:packaging",
+        "name": "packaging",
+        "version": "26.3",
+        "filename": "packaging-26.3-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+        "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+        "bytes": 129956,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "Apache-2.0 OR BSD-2-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/packaging-26.3/wheel/packaging-26.3.dist-info/licenses/LICENSE",
+            "notices/asr/python/packaging-26.3/wheel/packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+            "notices/asr/python/packaging-26.3/wheel/packaging-26.3.dist-info/licenses/LICENSE.BSD"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:protobuf",
+        "name": "protobuf",
+        "version": "7.36.2",
+        "filename": "protobuf-7.36.2-cp310-abi3-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/8a/55/b77bda4e5e5f5971fb51b07663694690e9afdb9402136c16a522bd621cad/protobuf-7.36.2-cp310-abi3-win_amd64.whl",
+        "sha256": "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353",
+        "bytes": 456514,
+        "wheel_tags": [
+          "cp310-abi3-win_amd64"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "BSD-3-Clause",
+          "metadata_text": "3-Clause BSD License",
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/protobuf-7.36.2/wheel/protobuf-7.36.2.dist-info/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:pygments",
+        "name": "pygments",
+        "version": "2.21.0",
+        "filename": "pygments-2.21.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/71/46/17f022dd3e953bf20a04a028a21ec746d942f8d2af30fa0f124fa0e6a684/pygments-2.21.0-py3-none-any.whl",
+        "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+        "bytes": 1250147,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "colorama>=0.4.6; extra == 'windows-terminal'"
+        ],
+        "license": {
+          "expression": "BSD-2-Clause",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/pygments-2.21.0/wheel/pygments-2.21.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:pyyaml",
+        "name": "pyyaml",
+        "version": "6.0.3",
+        "filename": "pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/86/bf/899e81e4cce32febab4fb42bb97dcdf66bc135272882d1987881a4b519e9/pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
+        "sha256": "5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b",
+        "bytes": 154003,
+        "wheel_tags": [
+          "cp312-cp312-win_amd64"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/pyyaml-6.0.3/wheel/pyyaml-6.0.3.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:rich",
+        "name": "rich",
+        "version": "15.0.0",
+        "filename": "rich-15.0.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl",
+        "sha256": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+        "bytes": 310654,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "ipywidgets (>=7.5.1,<9) ; extra == \"jupyter\"",
+          "markdown-it-py (>=2.2.0)",
+          "pygments (>=2.13.0,<3.0.0)"
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": "MIT",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "notices": [
+            "notices/asr/python/rich-15.0.0/wheel/rich-15.0.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:setuptools",
+        "name": "setuptools",
+        "version": "84.2.1",
+        "filename": "setuptools-84.2.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl",
+        "sha256": "ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2",
+        "bytes": 876263,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "pytest!=8.1.*,>=6; extra == \"test\"",
+          "virtualenv>=13.0.0; extra == \"test\"",
+          "wheel>=0.44.0; extra == \"test\"",
+          "pip>=19.1; extra == \"test\"",
+          "packaging>=26.3; extra == \"test\"",
+          "jaraco.envs>=2.2; extra == \"test\"",
+          "pytest-xdist>=3; extra == \"test\"",
+          "jaraco.path>=3.7.2; extra == \"test\"",
+          "build[virtualenv]>=1.0.3; extra == \"test\"",
+          "filelock>=3.4.0; extra == \"test\"",
+          "ini2toml[lite]>=0.14; extra == \"test\"",
+          "tomli-w>=1.0.0; extra == \"test\"",
+          "pytest-timeout; extra == \"test\"",
+          "pytest-perf; sys_platform != \"cygwin\" and extra == \"test\"",
+          "jaraco.develop>=7.21; (python_version >= \"3.9\" and sys_platform != \"cygwin\") and extra == \"test\"",
+          "pytest-home>=0.5; extra == \"test\"",
+          "pytest-subprocess; extra == \"test\"",
+          "pyproject-hooks!=1.1; extra == \"test\"",
+          "jaraco.test>=5.5; extra == \"test\"",
+          "sphinx>=3.5; extra == \"doc\"",
+          "jaraco.packaging>=9.3; extra == \"doc\"",
+          "rst.linker>=1.9; extra == \"doc\"",
+          "furo; extra == \"doc\"",
+          "sphinx-lint; extra == \"doc\"",
+          "jaraco.tidelift>=1.4; extra == \"doc\"",
+          "pygments-github-lexers==0.0.5; extra == \"doc\"",
+          "sphinx-favicon; extra == \"doc\"",
+          "sphinx-inline-tabs; extra == \"doc\"",
+          "sphinx-reredirects; extra == \"doc\"",
+          "sphinxcontrib-towncrier; extra == \"doc\"",
+          "sphinx-notfound-page<2,>=1; extra == \"doc\"",
+          "pyproject-hooks!=1.1; extra == \"doc\"",
+          "towncrier<24.7; extra == \"doc\"",
+          "packaging>=26.3; extra == \"core\"",
+          "more_itertools>=8.8; extra == \"core\"",
+          "jaraco.text>=3.7; extra == \"core\"",
+          "importlib_metadata>=6; python_version < \"3.10\" and extra == \"core\"",
+          "tomli>=2.0.1; python_version < \"3.11\" and extra == \"core\"",
+          "wheel>=0.43.0; extra == \"core\"",
+          "jaraco.functools>=4; extra == \"core\"",
+          "more_itertools; extra == \"core\"",
+          "pytest-checkdocs>=2.14; extra == \"check\"",
+          "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+          "ruff>=0.13.0; sys_platform != \"cygwin\" and extra == \"check\"",
+          "pytest-cov; extra == \"cover\"",
+          "pytest-enabler>=3.4; extra == \"enabler\"",
+          "pytest-mypy>=1.0.1; platform_python_implementation != \"PyPy\" and extra == \"type\"",
+          "mypy==1.18.*; extra == \"type\"",
+          "importlib_metadata>=7.0.2; python_version < \"3.10\" and extra == \"type\"",
+          "jaraco.develop>=7.21; sys_platform != \"cygwin\" and extra == \"type\""
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE.BSD",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/config/NOTICE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/config/_validate_pyproject/NOTICE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools-84.2.1.dist-info/licenses/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+            "notices/asr/python/setuptools-84.2.1/wheel/setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:shellingham",
+        "name": "shellingham",
+        "version": "1.5.4",
+        "filename": "shellingham-1.5.4-py2.py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/e0/f9/0595336914c5619e5f28a1fb793285925a8cd4b432c9da0a987836c7f822/shellingham-1.5.4-py2.py3-none-any.whl",
+        "sha256": "7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686",
+        "bytes": 9755,
+        "wheel_tags": [
+          "py2-none-any",
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "ISC",
+          "metadata_text": "ISC License",
+          "metadata_classifiers": [
+            "License :: OSI Approved :: ISC License (ISCL)"
+          ],
+          "notices": [
+            "notices/asr/python/shellingham-1.5.4/wheel/shellingham-1.5.4.dist-info/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:tokenizers",
+        "name": "tokenizers",
+        "version": "0.23.1",
+        "filename": "tokenizers-0.23.1-cp310-abi3-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/97/c9/2553f72aaf65a2797d4229e37fa7fbe38ffbf3e32912d31bdd78b3323e59/tokenizers-0.23.1-cp310-abi3-win_amd64.whl",
+        "sha256": "e7bfaf995c1bdbbd21d13539decb6650967013759318627d85daeb7881af16b7",
+        "bytes": 2798223,
+        "wheel_tags": [
+          "cp310-abi3-win_amd64"
+        ],
+        "requires_dist": [
+          "huggingface-hub>=0.16.4,<2.0",
+          "tokenizers[testing] ; extra == 'dev'",
+          "sphinx ; extra == 'docs'",
+          "sphinx-rtd-theme ; extra == 'docs'",
+          "setuptools-rust ; extra == 'docs'",
+          "pytest ; extra == 'testing'",
+          "pytest-asyncio ; extra == 'testing'",
+          "requests ; extra == 'testing'",
+          "numpy ; extra == 'testing'",
+          "datasets ; extra == 'testing'",
+          "ruff ; extra == 'testing'",
+          "ty ; extra == 'testing'"
+        ],
+        "license": {
+          "expression": "Apache-2.0",
+          "metadata_text": null,
+          "metadata_classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "notices": [
+            "notices/asr/python/tokenizers-0.23.1/upstream/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:tqdm",
+        "name": "tqdm",
+        "version": "4.70.1",
+        "filename": "tqdm-4.70.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl",
+        "sha256": "c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73",
+        "bytes": 80199,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "colorama; platform_system == \"Windows\"",
+          "requests; extra == \"discord\"",
+          "envwrap; extra == \"discord\"",
+          "slack-sdk; extra == \"slack\"",
+          "envwrap; extra == \"slack\"",
+          "requests; extra == \"telegram\"",
+          "envwrap; extra == \"telegram\"",
+          "ipywidgets>=6; extra == \"notebook\""
+        ],
+        "license": {
+          "expression": "MPL-2.0 AND MIT",
+          "metadata_text": "MPL-2.0 AND MIT",
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/tqdm-4.70.1/wheel/tqdm-4.70.1.dist-info/licenses/LICENCE",
+            "notices/asr/python/tqdm-4.70.1/upstream/LICENCE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:typer",
+        "name": "typer",
+        "version": "0.25.1",
+        "filename": "typer-0.25.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/3f/f9/2b3ff4e56e5fa7debfaf9eb135d0da96f3e9a1d5b27222223c7296336e5f/typer-0.25.1-py3-none-any.whl",
+        "sha256": "75caa44ed46a03fb2dab8808753ffacdbfea88495e74c85a28c5eefcf5f39c89",
+        "bytes": 58409,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [
+          "click>=8.2.1",
+          "shellingham>=1.3.0",
+          "rich>=13.8.0",
+          "annotated-doc>=0.0.2"
+        ],
+        "license": {
+          "expression": "MIT",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/typer-0.25.1/wheel/typer-0.25.1.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "python:typing-extensions",
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+        "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "bytes": 45571,
+        "wheel_tags": [
+          "py3-none-any"
+        ],
+        "requires_dist": [],
+        "license": {
+          "expression": "PSF-2.0",
+          "metadata_text": null,
+          "metadata_classifiers": [],
+          "notices": [
+            "notices/asr/python/typing-extensions-4.16.0/wheel/typing_extensions-4.16.0.dist-info/licenses/LICENSE"
+          ],
+          "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+        },
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      }
+    ],
+    "active_dependency_edges": [
+      {
+        "from": "python:anyio",
+        "to": "python:idna",
+        "declared_requirement": "idna>=2.8"
+      },
+      {
+        "from": "python:anyio",
+        "to": "python:typing-extensions",
+        "declared_requirement": "typing_extensions>=4.16.0; python_version < \"3.15\""
+      },
+      {
+        "from": "python:ctranslate2",
+        "to": "python:setuptools",
+        "declared_requirement": "setuptools"
+      },
+      {
+        "from": "python:ctranslate2",
+        "to": "python:numpy",
+        "declared_requirement": "numpy"
+      },
+      {
+        "from": "python:ctranslate2",
+        "to": "python:pyyaml",
+        "declared_requirement": "pyyaml<7,>=5.3"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:ctranslate2",
+        "declared_requirement": "ctranslate2<5,>=4.0"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:huggingface-hub",
+        "declared_requirement": "huggingface-hub>=0.21"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:tokenizers",
+        "declared_requirement": "tokenizers<1,>=0.13"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:onnxruntime",
+        "declared_requirement": "onnxruntime<2,>=1.14"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:av",
+        "declared_requirement": "av>=11"
+      },
+      {
+        "from": "python:faster-whisper",
+        "to": "python:tqdm",
+        "declared_requirement": "tqdm"
+      },
+      {
+        "from": "python:httpcore",
+        "to": "python:certifi",
+        "declared_requirement": "certifi"
+      },
+      {
+        "from": "python:httpcore",
+        "to": "python:h11",
+        "declared_requirement": "h11>=0.16"
+      },
+      {
+        "from": "python:httpx",
+        "to": "python:anyio",
+        "declared_requirement": "anyio"
+      },
+      {
+        "from": "python:httpx",
+        "to": "python:certifi",
+        "declared_requirement": "certifi"
+      },
+      {
+        "from": "python:httpx",
+        "to": "python:httpcore",
+        "declared_requirement": "httpcore==1.*"
+      },
+      {
+        "from": "python:httpx",
+        "to": "python:idna",
+        "declared_requirement": "idna"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:click",
+        "declared_requirement": "click>=8.4.0"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:filelock",
+        "declared_requirement": "filelock>=3.10.0"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:fsspec",
+        "declared_requirement": "fsspec>=2023.5.0"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:hf-xet",
+        "declared_requirement": "hf-xet<2.0.0,>=1.4.3; platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\""
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:httpx",
+        "declared_requirement": "httpx<1,>=0.23.0"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:packaging",
+        "declared_requirement": "packaging>=20.9"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:pyyaml",
+        "declared_requirement": "pyyaml>=5.1"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:tqdm",
+        "declared_requirement": "tqdm>=4.42.1"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:typer",
+        "declared_requirement": "typer<0.26.0,>=0.20.0"
+      },
+      {
+        "from": "python:huggingface-hub",
+        "to": "python:typing-extensions",
+        "declared_requirement": "typing-extensions>=4.1.0"
+      },
+      {
+        "from": "python:markdown-it-py",
+        "to": "python:mdurl",
+        "declared_requirement": "mdurl~=0.1"
+      },
+      {
+        "from": "python:onnxruntime",
+        "to": "python:flatbuffers",
+        "declared_requirement": "flatbuffers"
+      },
+      {
+        "from": "python:onnxruntime",
+        "to": "python:numpy",
+        "declared_requirement": "numpy>=1.21.6"
+      },
+      {
+        "from": "python:onnxruntime",
+        "to": "python:packaging",
+        "declared_requirement": "packaging"
+      },
+      {
+        "from": "python:onnxruntime",
+        "to": "python:protobuf",
+        "declared_requirement": "protobuf"
+      },
+      {
+        "from": "python:rich",
+        "to": "python:markdown-it-py",
+        "declared_requirement": "markdown-it-py (>=2.2.0)"
+      },
+      {
+        "from": "python:rich",
+        "to": "python:pygments",
+        "declared_requirement": "pygments (>=2.13.0,<3.0.0)"
+      },
+      {
+        "from": "python:tokenizers",
+        "to": "python:huggingface-hub",
+        "declared_requirement": "huggingface-hub>=0.16.4,<2.0"
+      },
+      {
+        "from": "python:tqdm",
+        "to": "python:colorama",
+        "declared_requirement": "colorama; platform_system == \"Windows\""
+      },
+      {
+        "from": "python:typer",
+        "to": "python:click",
+        "declared_requirement": "click>=8.2.1"
+      },
+      {
+        "from": "python:typer",
+        "to": "python:shellingham",
+        "declared_requirement": "shellingham>=1.3.0"
+      },
+      {
+        "from": "python:typer",
+        "to": "python:rich",
+        "declared_requirement": "rich>=13.8.0"
+      },
+      {
+        "from": "python:typer",
+        "to": "python:annotated-doc",
+        "declared_requirement": "annotated-doc>=0.0.2"
+      }
+    ]
+  },
+  "native": {
+    "installation_root": "native",
+    "source_archives": [
+      {
+        "id": "native-source:nvidia-cublas-cu12",
+        "name": "nvidia-cublas-cu12",
+        "version": "12.9.2.10",
+        "filename": "nvidia_cublas_cu12-12.9.2.10-py3-none-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/20/e2/fc9a0e985249d873150276d5afb02e39a66817fedbf1a385724393e505ed/nvidia_cublas_cu12-12.9.2.10-py3-none-win_amd64.whl",
+        "sha256": "623f43027d40d44ceadf0043f002bd25cf353e8f13ce90b9a87057019f560661",
+        "bytes": 553162896,
+        "install_method": "extract_only_named_dll_members",
+        "requires_dist": [
+          "nvidia-cuda-nvrtc-cu12"
+        ],
+        "license": "LicenseRef-NVIDIA-Proprietary",
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      },
+      {
+        "id": "native-source:nvidia-cuda-nvrtc-cu12",
+        "name": "nvidia-cuda-nvrtc-cu12",
+        "version": "12.9.86",
+        "filename": "nvidia_cuda_nvrtc_cu12-12.9.86-py3-none-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/52/de/823919be3b9d0ccbf1f784035423c5f18f4267fb0123558d58b813c6ec86/nvidia_cuda_nvrtc_cu12-12.9.86-py3-none-win_amd64.whl",
+        "sha256": "72972ebdcf504d69462d3bcd67e7b81edd25d0fb85a2c46d3ea3517666636349",
+        "bytes": 76408187,
+        "install_method": "extract_only_named_dll_members",
+        "requires_dist": [],
+        "license": "LicenseRef-NVIDIA-Proprietary",
+        "archive_verification": "sha256_recomputed_on_complete_archive"
+      }
+    ],
+    "extract_files": [
+      {
+        "source_id": "native-source:nvidia-cublas-cu12",
+        "archive_member": "nvidia/cublas/bin/cublas64_12.dll",
+        "destination": "native/nvidia/cublas/bin/cublas64_12.dll",
+        "bytes": 102518272,
+        "sha256": "52ce5ba0ec5327d39be6021f0f9362d2ed4d64d7206f9b5afc06398d827b8e82",
+        "requirement_kind": "required_observed",
+        "verification": "archive_member_matches_previous_installed_RECORD_and_local_copy"
+      },
+      {
+        "source_id": "native-source:nvidia-cublas-cu12",
+        "archive_member": "nvidia/cublas/bin/cublasLt64_12.dll",
+        "destination": "native/nvidia/cublas/bin/cublasLt64_12.dll",
+        "bytes": 668673536,
+        "sha256": "71705a7cf0923f4ab034d0d2620bbfc989ff669ac3d79f868b7a7c597ca559c5",
+        "requirement_kind": "required_observed",
+        "verification": "archive_member_matches_previous_installed_RECORD_and_local_copy"
+      },
+      {
+        "source_id": "native-source:nvidia-cuda-nvrtc-cu12",
+        "archive_member": "nvidia/cuda_nvrtc/bin/nvrtc-builtins64_129.dll",
+        "destination": "native/nvidia/cuda_nvrtc/bin/nvrtc-builtins64_129.dll",
+        "bytes": 7217664,
+        "sha256": "c405226b0b394ed8bdc593bb1419b94a989f93248ed2873e8f2e0e27c1688ca1",
+        "requirement_kind": "declared_transitive_jit_support",
+        "verification": "archive_member_matches_previous_installed_RECORD_and_local_copy"
+      },
+      {
+        "source_id": "native-source:nvidia-cuda-nvrtc-cu12",
+        "archive_member": "nvidia/cuda_nvrtc/bin/nvrtc64_120_0.alt.dll",
+        "destination": "native/nvidia/cuda_nvrtc/bin/nvrtc64_120_0.alt.dll",
+        "bytes": 89899520,
+        "sha256": "ac56a4d3b5a99f294523abec28b8f648b96324a9277622a450ec20ddb9e2c47d",
+        "requirement_kind": "declared_transitive_jit_support",
+        "verification": "archive_member_matches_previous_installed_RECORD_and_local_copy"
+      },
+      {
+        "source_id": "native-source:nvidia-cuda-nvrtc-cu12",
+        "archive_member": "nvidia/cuda_nvrtc/bin/nvrtc64_120_0.dll",
+        "destination": "native/nvidia/cuda_nvrtc/bin/nvrtc64_120_0.dll",
+        "bytes": 89832960,
+        "sha256": "0cc63349fedffeec1660b30955e8028b6e4e4c26cf1e41c56dc4569fd5eca82c",
+        "requirement_kind": "declared_transitive_jit_support",
+        "verification": "archive_member_matches_previous_installed_RECORD_and_local_copy"
+      }
+    ],
+    "bundled_ct2_files": [
+      {
+        "relative_path": "python/Lib/site-packages/ctranslate2/_ext.cp312-win_amd64.pyd",
+        "bytes": 715776,
+        "sha256": "d5547dcb4962b409af9e6f66048d78f2e1162ae0b2b20115179459dc4ecd56d1",
+        "source_python_wheel": "python:ctranslate2"
+      },
+      {
+        "relative_path": "python/Lib/site-packages/ctranslate2/ctranslate2.dll",
+        "bytes": 59292672,
+        "sha256": "60e536c0801432cde4a105aeebbca35fbf228aa3e901807b2310b02676c2f140",
+        "source_python_wheel": "python:ctranslate2"
+      },
+      {
+        "relative_path": "python/Lib/site-packages/ctranslate2/cudnn64_9.dll",
+        "bytes": 266288,
+        "sha256": "9edbcdff73b0af070eb160b2ce66e59feca04aa017351d8eedcc5e8e149967d2",
+        "source_python_wheel": "python:ctranslate2"
+      },
+      {
+        "relative_path": "python/Lib/site-packages/ctranslate2/libiomp5md.dll",
+        "bytes": 1614192,
+        "sha256": "982233366b0afcda1e0f55a0b134097e35b779613f54ddb69e685e6cd06b755f",
+        "source_python_wheel": "python:ctranslate2"
+      }
+    ],
+    "dll_search_directories": [
+      "native/nvidia/cublas/bin",
+      "native/nvidia/cuda_nvrtc/bin"
+    ],
+    "preload_libraries": [
+      "native/nvidia/cublas/bin/cublas64_12.dll"
+    ],
+    "keep_dll_directory_handles_alive": true,
+    "forbid_external_cudnn": true,
+    "cudnn_dispatcher": {
+      "source": "python:ctranslate2",
+      "version": "9.10.2.21",
+      "relative_path": "python/Lib/site-packages/ctranslate2/cudnn64_9.dll",
+      "sha256": "9edbcdff73b0af070eb160b2ce66e59feca04aa017351d8eedcc5e8e149967d2",
+      "upstream_build_flag": "WITH_CUDNN=OFF (source fact; dispatcher still bundled and mapped)",
+      "allow_extra_cudnn_packages": false
+    },
+    "omitted_components": [
+      {
+        "name": "nvidia-cuda-runtime-cu12",
+        "reason": "Registered in prior smoke but not mapped; not a declared requirement of selected native archives."
+      },
+      {
+        "name": "nvidia-cudnn-cu12",
+        "reason": "No external cuDNN component installation; retain only fixed CT2 bundled dispatcher."
+      },
+      {
+        "name": "nvblas64_12.dll",
+        "reason": "Not referenced by the selected ASR interface or observed in its smoke."
+      }
+    ],
+    "embedded_vendor_notices": {
+      "intel_openmp": [
+        "notices/asr/native/intel-openmp-2025.3.0/intel_openmp-2025.3.0.dist-info/LICENSE.txt"
+      ],
+      "cudnn": [
+        "notices/asr/native/cudnn-9.10.2/vendor-eula.html"
+      ],
+      "onednn": [
+        "notices/asr/native/onednn-3.1.1/LICENSE"
+      ]
+    }
+  },
+  "model": {
+    "id": "whisper-large-v3-turbo",
+    "publisher_repository": "dropbox-dash/faster-whisper-large-v3-turbo",
+    "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+    "stored_weight_type": "float16",
+    "license": "MIT (fixed publisher model card)",
+    "installation_root": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+    "files": [
+      {
+        "name": "config.json",
+        "destination": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf/config.json",
+        "bytes": 2263,
+        "sha256": "b0253ea6c0d3bea6b1e19e91a02acfd3b53f4467362efcb5a3e6b16c9b3a9b7e"
+      },
+      {
+        "name": "model.bin",
+        "destination": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf/model.bin",
+        "bytes": 1617884929,
+        "sha256": "e76620f83d5f5b69efd3d87e3dc180c1bd21df9fbebacfd4335e5e1efcc018da"
+      },
+      {
+        "name": "preprocessor_config.json",
+        "destination": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf/preprocessor_config.json",
+        "bytes": 340,
+        "sha256": "7ccc62c6f2765af1f3b46c00c9b5894426835a05021c8b9c01eecb6dfb542711"
+      },
+      {
+        "name": "tokenizer.json",
+        "destination": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf/tokenizer.json",
+        "bytes": 2710337,
+        "sha256": "297b13372ac43916285644fb9687add3cc62ee2a1adb60da3dc25cc94c1871fd"
+      },
+      {
+        "name": "vocabulary.json",
+        "destination": "models/whisper-large-v3-turbo/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf/vocabulary.json",
+        "bytes": 1068114,
+        "sha256": "c69260f2ab26d659b7c398f9a2b2b48ed0df16c3b47d7326782fd9cba71690c1"
+      }
+    ],
+    "provisioning": {
+      "automatic_download": false,
+      "allowed_methods": [
+        "import_matching_existing_local_files",
+        "application_bundled_exact_files"
+      ],
+      "scan_scope": "explicitly configured model cache roots only",
+      "existing_huggingface_cache_repository_names": [
+        "models--mobiuslabsgmbh--faster-whisper-large-v3-turbo",
+        "models--dropbox-dash--faster-whisper-large-v3-turbo"
+      ],
+      "preserve_original_files": true,
+      "require_all_file_hashes": true
+    },
+    "notices": [
+      "notices/asr/model-whisper-turbo/Whisper-UPSTREAM-LICENSE",
+      "notices/asr/model-whisper-turbo/fixed-model-card.md"
+    ]
+  },
+  "bundled_vad": {
+    "source_python_wheel": "python:faster-whisper",
+    "relative_path": "python/Lib/site-packages/faster_whisper/assets/silero_vad_v6.onnx",
+    "bytes": 1245151,
+    "sha256": "4cbf549b8326f60f80f2536d9eefeb450a9abe83365a098031c89719f1be17d2",
+    "separate_download": false
+  },
+  "worker_launch_contract": {
+    "use_argument_list": true,
+    "hidden_window": true,
+    "process_priority_candidate": "below_normal",
+    "absolute_paths_resolved_from_install_root": true,
+    "environment_policy": "Windows essentials allowlist; no API or HF credentials",
+    "environment": {
+      "HF_HUB_OFFLINE": "1",
+      "TRANSFORMERS_OFFLINE": "1",
+      "HF_HUB_DISABLE_TELEMETRY": "1",
+      "HF_HUB_DISABLE_XET": "1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0",
+      "PYTHONUNBUFFERED": "1"
+    },
+    "path_policy": "Only manifest native directories, owned Python Scripts and System32; do not modify global PATH",
+    "model_options_tested": {
+      "device": "cuda",
+      "device_index": 0,
+      "compute_type": "int8_float16",
+      "cpu_threads": 2,
+      "num_workers": 1,
+      "local_files_only": true
+    },
+    "transcription_input": "authorized bounded audio window; 16000 Hz mono; no video/frame acquisition",
+    "vad_candidate": {
+      "enabled": true,
+      "min_silence_duration_ms": 2000,
+      "speech_pad_ms": 400
+    },
+    "ownership": "application owns worker entry point, finite inference output/deadline, checkpoints and manual edits"
+  },
+  "external_prerequisites": {
+    "python_runtime": "Provided by application; tested CPython 3.12.5, no developer toolchain required",
+    "nvidia_driver": {
+      "tested_version": "610.74",
+      "tested_gpu": "RTX 4060 Laptop 8GB (compute capability 8.9)",
+      "minimum_version_not_established": true,
+      "actual_device_probe_required": true
+    },
+    "msvc_runtime": {
+      "tested_msvcp140": "14.44.35211.0",
+      "tested_vcruntime140": "14.38.33126.1",
+      "clean_machine_validation": "not_run",
+      "install_system_tools_automatically": false
+    },
+    "media_preparation": "Application supplies finite audio windows; no FFmpeg global-path dependency in this ASR manifest"
+  },
+  "notices_index": {
+    "path": "asr-notices.files.json",
+    "sha256": "787f82548f4a2a39a0f95d0061fae702ce8c866bb98439da910cb824b8c3db9d",
+    "file_count": 83
+  },
+  "verification": {
+    "python_wheel_archives": "passed_32_complete_archives_sha256",
+    "active_python_dependency_closure": "passed_windows_cp312_without_extras",
+    "native_source_archives": "passed_2_complete_archives_sha256",
+    "native_selected_members": "passed_5_match_audited_RECORD_and_archive_members",
+    "model": "five_existing_local_files_hashed_in_prior_audit; installer_must_recheck_import",
+    "runtime_gpu_and_cancel": "prior_synthetic_silence_smoke_only; see audit report",
+    "product_asr_acceptance": "not_run",
+    "speech_correctness": "not_run",
+    "clean_windows_package": "not_run",
+    "reports": [
+      "research/reports/workbench/asr-engine-audit.md",
+      "research/reports/workbench/asr-deployment-closure.md"
+    ]
+  }
+}

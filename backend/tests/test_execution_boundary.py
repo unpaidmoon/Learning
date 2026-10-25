@@ -259,6 +259,28 @@ class UsageObserverTests(unittest.TestCase):
 
 
 class BoundaryTests(unittest.TestCase):
+    def test_exact_document_image_policy_rejects_silently_missing_page(self):
+        from learning_app.execution.types import ExecutionPolicy
+
+        boundary = self.boundary()
+        boundary.bind(
+            "missing_document_page",
+            policy=ExecutionPolicy(
+                "deepseek-flash",
+                "high",
+                16384,
+                60,
+                allowed_image_sha256=("b" * 64,),
+                exact_image_sequence=True,
+            ),
+        )
+        result = RunningRequest(
+            boundary, request_body(generation_id="missing_document_page")
+        ).join()
+        self.assertEqual(result.status, 403)
+        self.assertEqual(boundary.records[-1]["status"], "execution_policy_blocked")
+        self.assertIsNone(boundary.records[-1]["actual_outbound_attempt"])
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory(prefix="learning-boundary-test-")
         self.addCleanup(self.directory.cleanup)
@@ -553,6 +575,46 @@ class BoundaryTests(unittest.TestCase):
         self.assertNotIn(b"synthetic-provider-secret", boundary.ledger.path.read_bytes())
         self.assertNotIn(b"caller-secret", boundary.ledger.path.read_bytes())
 
+    def test_provider_terminal_closes_without_reading_a_missing_http_chunk_trailer(self):
+        boundary = self.boundary(mode="official", api_key="synthetic-key")
+        boundary.bind("provider-terminal-before-http-eof")
+        terminal = (
+            frame(
+                {
+                    "type": "message_start",
+                    "message": {"id": "terminal", "usage": {"input_tokens": 11}},
+                }
+            )
+            + frame({"type": "message_delta", "usage": {"output_tokens": 7}})
+            + frame({"type": "message_stop"})
+        )
+        transport = ProviderConnection(chunks=[terminal])
+        reads = []
+
+        def read_one(size):
+            reads.append(size)
+            if len(reads) == 1:
+                return terminal
+            raise http.client.IncompleteRead(b"")
+
+        transport.response.read1 = read_one
+        with patch(
+            "learning_app.execution.boundary.http.client.HTTPSConnection", return_value=transport
+        ):
+            result = RunningRequest(
+                boundary, request_body(generation_id="provider-terminal-before-http-eof")
+            ).join()
+            boundary.wait_for_event("request_finished")
+        row = boundary.records[0]
+        self.assertEqual(row["status"], "completed")
+        self.assertEqual(result.body, terminal)
+        self.assertEqual(len(reads), 1)
+        self.assertEqual(len(transport.requests), 1)
+        self.assertEqual(row["usage"]["normalized"]["output_tokens"], 7)
+        self.assertTrue(row["usage"]["settled"])
+        self.assertTrue(row["upstream_watcher_closed"])
+        self.assertEqual(transport.response.closed_on, "learning-messages-request")
+
     def test_configuration_mismatch_blocks_before_outbound(self):
         boundary = self.boundary(mode="official", api_key="synthetic-key")
         boundary.bind("configuration")
@@ -572,8 +634,12 @@ class BoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "GENERATION_SELECTION_IMMUTABLE"):
             boundary.bind("course-a", model="deepseek-flash", thinking="low")
         requests = [
-            request_body(generation_id="course-a", model="deepseek-v4-pro",
-                         thinking={"type": "disabled"}, output_config={}),
+            request_body(
+                generation_id="course-a",
+                model="deepseek-v4-pro",
+                thinking={"type": "disabled"},
+                output_config={},
+            ),
             request_body(generation_id="course-b", output_config={"effort": "low"}),
         ]
         transports = []
@@ -583,14 +649,20 @@ class BoundaryTests(unittest.TestCase):
             transports.append(transport)
             return transport
 
-        with patch("learning_app.execution.boundary.http.client.HTTPSConnection",
-                   side_effect=factory):
+        with patch(
+            "learning_app.execution.boundary.http.client.HTTPSConnection", side_effect=factory
+        ):
             for request in reversed(requests):
                 self.assertEqual(RunningRequest(boundary, request).join().status, 200)
             # The first generation must keep its own disabled-thinking contract.
-            result = RunningRequest(boundary, request_body(
-                generation_id="course-a", model="deepseek-v4-pro",
-                output_config={"effort": "low"})).join()
+            result = RunningRequest(
+                boundary,
+                request_body(
+                    generation_id="course-a",
+                    model="deepseek-v4-pro",
+                    output_config={"effort": "low"},
+                ),
+            ).join()
             self.assertEqual(result.status, 403)
         self.assertEqual(len(transports), 2)
         self.assertEqual(boundary.actual_outbound_attempts, 2)

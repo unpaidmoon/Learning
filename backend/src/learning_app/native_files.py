@@ -7,11 +7,105 @@ uses IFileOperation's Windows 8+ FOFX_RECYCLEONDELETE contract.
 from __future__ import annotations
 
 import ctypes
+import json
 import os
 import uuid
 from pathlib import Path
 
 from learning_app.errors import AppError
+
+
+def desktop_picker_owner(owner_path: Path | None = None) -> int | None:
+    """Resolve only this launch's private Electron owner, never a renderer HWND.
+
+    The desktop runner supplies the private file path to both owned processes.
+    A browser-only launch has no such file and keeps its existing unowned flow.
+    Stale handles, PID reuse, and another executable fail before opening a UI.
+    """
+    owner_file = owner_path or os.environ.get("LEARNING_DESKTOP_OWNER_FILE")
+    if not owner_file:
+        return None
+    if os.name != "nt":
+        raise AppError("PICKER_OWNER_UNAVAILABLE", "当前系统不支持桌面窗口关联", 503)
+    from ctypes import wintypes
+
+    try:
+        value = json.loads(Path(owner_file).read_text("utf-8"))
+        hwnd, pid = int(value["hwnd"]), int(value["pid"])
+        registered_at_ms = int(value["registered_at_ms"])
+        if hwnd <= 0 or pid <= 0 or registered_at_ms <= 0:
+            raise ValueError("invalid desktop owner")
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        raise AppError(
+            "PICKER_OWNER_UNAVAILABLE", "桌面窗口尚未就绪，请重新打开窗口后选择", 503
+        ) from exc
+
+    user = ctypes.WinDLL("user32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    user.IsWindow.argtypes = [wintypes.HWND]
+    user.IsWindow.restype = wintypes.BOOL
+    user.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    user.GetWindowThreadProcessId.restype = wintypes.DWORD
+    user.IsIconic.argtypes = [wintypes.HWND]
+    user.IsIconic.restype = wintypes.BOOL
+    user.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
+    user.ShowWindow.restype = wintypes.BOOL
+    user.BringWindowToTop.argtypes = [wintypes.HWND]
+    user.BringWindowToTop.restype = wintypes.BOOL
+    user.SetForegroundWindow.argtypes = [wintypes.HWND]
+    user.SetForegroundWindow.restype = wintypes.BOOL
+    kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    kernel.OpenProcess.restype = wintypes.HANDLE
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    kernel.QueryFullProcessImageNameW.argtypes = [
+        wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR, ctypes.POINTER(wintypes.DWORD),
+    ]
+    kernel.QueryFullProcessImageNameW.restype = wintypes.BOOL
+    kernel.GetProcessTimes.argtypes = [wintypes.HANDLE, *[ctypes.POINTER(wintypes.FILETIME)] * 4]
+    kernel.GetProcessTimes.restype = wintypes.BOOL
+
+    def denied():
+        return AppError("PICKER_OWNER_UNAVAILABLE", "桌面窗口已失效，请重新打开窗口后选择", 503)
+
+    actual_pid = wintypes.DWORD()
+    if not user.IsWindow(hwnd):
+        raise denied()
+    user.GetWindowThreadProcessId(hwnd, ctypes.byref(actual_pid))
+    if actual_pid.value != pid:
+        raise denied()
+    process = kernel.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION.
+    if not process:
+        raise denied()
+    try:
+        image = ctypes.create_unicode_buffer(32768)
+        size = wintypes.DWORD(len(image))
+        created, exited, cpu_kernel, cpu_user = (wintypes.FILETIME() for _ in range(4))
+        if not kernel.QueryFullProcessImageNameW(process, 0, image, ctypes.byref(size)):
+            raise denied()
+        expected = Path(__file__).resolve().parents[3] / ".runtime/desktop/electron/electron.exe"
+        if Path(image.value).resolve() != expected.resolve():
+            raise denied()
+        if not kernel.GetProcessTimes(
+            process, ctypes.byref(created), ctypes.byref(exited),
+            ctypes.byref(cpu_kernel), ctypes.byref(cpu_user),
+        ):
+            raise denied()
+        created_ms = ((created.dwHighDateTime << 32) | created.dwLowDateTime) // 10_000 - 11_644_473_600_000
+        if created_ms > registered_at_ms:
+            raise denied()
+    finally:
+        kernel.CloseHandle(process)
+    # The Electron main process focuses the owned window before admitting the
+    # click's HTTP request. These calls also restore its minimize/hide state;
+    # IFileDialog.Show(hwnd) then gives Windows actual modal-owner semantics.
+    if user.IsIconic(hwnd):
+        user.ShowWindow(hwnd, 9)  # SW_RESTORE.
+    else:
+        user.ShowWindow(hwnd, 5)  # SW_SHOW.
+    user.BringWindowToTop(hwnd)
+    user.SetForegroundWindow(hwnd)
+    return hwnd
 
 
 class _Guid(ctypes.Structure):
@@ -89,7 +183,7 @@ def pick_paths(*, directory: bool) -> list[str]:
         check(call(dialog, 9, [wintypes.DWORD], flags))
         title = "选择课程根文件夹" if directory else "选择复制到当前课程的文件"
         check(call(dialog, 17, [wintypes.LPCWSTR], title))
-        shown = call(dialog, 3, [wintypes.HWND], None)
+        shown = call(dialog, 3, [wintypes.HWND], desktop_picker_owner())
         if shown & 0xFFFFFFFF == 0x800704C7:  # HRESULT_FROM_WIN32(ERROR_CANCELLED).
             return []
         check(shown)

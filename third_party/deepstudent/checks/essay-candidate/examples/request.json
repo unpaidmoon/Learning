@@ -1,0 +1,37 @@
+{
+  "protocol_version": 1,
+  "request_id": "fixture_round_1",
+  "operation": "validate_feedback",
+  "payload": {
+    "draft": {
+      "draft_id": "essay_1",
+      "revision_id": "draft_r1",
+      "content_hash": "00e6f9c0b235872f954d8fb310512f0bcb72970406ab0b76fb2223e42b40116d",
+      "content_role": "user_note",
+      "text": "前🙂 bad 后 bad 末"
+    },
+    "feedback": {
+      "draft_revision_id": "draft_r1",
+      "draft_content_hash": "00e6f9c0b235872f954d8fb310512f0bcb72970406ab0b76fb2223e42b40116d",
+      "body": "<score max=\"100\" total=\"70\"><dim score=\"40\" name=\"表达 &amp; 文法\" max=\"60\">评语</dim><dim name=\"内容\" max=\"40\" score=\"30\">评语</dim></score>",
+      "annotated_text": "前🙂 bad 后 <err type=\"grammar\" explanation=\"可改进\">bad</err> 末",
+      "host_terminal": "completed",
+      "cancel_requested": false,
+      "origin": "ai_reference"
+    },
+    "rubric": {
+      "max_total": 100,
+      "aggregation": "sum",
+      "dimensions": [
+        {
+          "name": "表达 & 文法",
+          "max_score": 60
+        },
+        {
+          "name": "内容",
+          "max_score": 40
+        }
+      ]
+    }
+  }
+}

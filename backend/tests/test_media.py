@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -219,21 +218,19 @@ def test_registration_rejects_nonvideo_or_relative_paths(browser):
 
 
 def test_content_detects_path_replacement_before_headers(browser, monkeypatch):
-    import learning_app.media as module
-
     client, asset, video = browser
-    original = module._read_locked
-    opens = 0
+    store = client.app.state.media_store
+    original = store._availability
 
-    # Register has verified the source; substitute it only at content handle open.
-    def replace_at_open(path: Path):
-        nonlocal opens
-        opens += 1
-        if opens == 2:
-            video.write_bytes(VIDEO + b"changed")
-        return original(path)
+    # Freeze the request's own validation-to-open window. A preview worker has
+    # its own MediaStore and must not consume a global "second open" counter.
+    def replace_after_verification(row):
+        available = original(row)
+        assert available == "available"
+        video.write_bytes(VIDEO + b"changed")
+        return available
 
-    monkeypatch.setattr(module, "_read_locked", replace_at_open)
+    monkeypatch.setattr(store, "_availability", replace_after_verification)
     response = client.get(content_url(asset))
     assert response.status_code == 409
     assert response.json()["code"] == "SOURCE_CHANGED_DURING_READ"

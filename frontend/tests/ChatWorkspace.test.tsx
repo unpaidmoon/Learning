@@ -685,7 +685,7 @@ describe("学习聊天与正式执行边界", () => {
     expect(submitted.model).toBe("deepseek-v4-pro");
     expect(submitted.thinking).toBe("low");
   });
-  it("持久保存草稿文本、条件、更正和附件，重开接回", async () => {
+  it("旧条件和更正转为普通草稿文字，附件及追加文字重开保留", async () => {
     savedDraft = {
       ...blankDraft,
       attachment_ids: ["existing-confirmed"],
@@ -696,16 +696,19 @@ describe("学习聊天与正式执行边界", () => {
     fixture(emptyChat);
     const first = render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
     await ready();
+    const migrated = "初始文字\n\n补充：\nx>0\n\n更正：\n改为x<2";
+    expect(screen.queryByLabelText("当前题目条件（每行一项）")).not.toBeInTheDocument();
     await userEvent.type(screen.getByLabelText("问题或追问"), "追加");
-    await waitFor(() => expect(savedDraft.text).toBe("初始文字追加"));
+    await waitFor(() => expect(savedDraft.text).toBe(migrated + "追加"));
+    expect(savedDraft.conditions).toEqual([]);
+    expect(savedDraft.corrections).toEqual([]);
     first.unmount();
     vi.resetModules();
     ChatWorkspace = (await import("../src/chat/ChatWorkspace")).ChatWorkspace;
     render(<ChatWorkspace chatId="chat-one" connected canSubmit />);
     await ready();
-    expect(screen.getByLabelText("问题或追问")).toHaveValue("初始文字追加");
-    expect(screen.getByLabelText("当前题目条件（每行一项）")).toHaveValue("x>0");
-    expect(screen.getByLabelText("对前文的更正（每行一项）")).toHaveValue("改为x<2");
+    expect(screen.getByLabelText("问题或追问")).toHaveValue(migrated + "追加");
+    expect(screen.queryByLabelText("对前文的更正（每行一项）")).not.toBeInTheDocument();
     expect(screen.getByAltText("待发送的确认图片 1")).toHaveAttribute(
       "src",
       "/api/v1/attachments/existing-confirmed",

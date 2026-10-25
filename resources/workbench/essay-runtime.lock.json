@@ -1,0 +1,153 @@
+{
+  "manifest_version": 1,
+  "release_id": "essay-node24-win-x64-20261023-r1",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "candidate_manifest_sha256": "ff8c36ccb9b69d679f375b28db8fae3b098a49eacc90c62732d3b940c07fc57b",
+  "node_sha256": "63c259c81e5d472b5f11c8d506070130cb04a1ecf84b80377a34ed6ec9048088",
+  "protocol": {
+    "version": 1,
+    "max_input_bytes": 2097152,
+    "max_output_bytes": 2097152,
+    "timeout_seconds": 5
+  },
+  "files": [
+    {
+      "path": "candidate.cjs",
+      "bytes": 14385,
+      "sha256": "38e2cde76bc4a90644fe4ef4e8456a2f2e44cf4a48b5780db817987b8af64d27"
+    },
+    {
+      "path": "dist/build-manifest.json",
+      "bytes": 3499,
+      "sha256": "fdd4aca69bcb96d323d59d1bb5ccd26b8874d6d2e162c496b2072f216327457b"
+    },
+    {
+      "path": "dist/essayContentState.js",
+      "bytes": 5144,
+      "sha256": "363088585e2c87fdb6be71a56d966d8fb0c298ea0b00db3672293925563ce5ae"
+    },
+    {
+      "path": "dist/markerParser.js",
+      "bytes": 7501,
+      "sha256": "40d1cbe936070547c86fcc82ca1a8e376693471b15829c918e4a981ec3fa305c"
+    },
+    {
+      "path": "dist/markerTypes.js",
+      "bytes": 119,
+      "sha256": "574a1908770c3e47efb5d7b61650046c58bd6baec799efe911f6558e367fe093"
+    },
+    {
+      "path": "dist/notices/ADAPTATION-NOTICE.txt",
+      "bytes": 2125,
+      "sha256": "e1e78ac79df4277bf31549917745d35a7634bd0b6da5b056501a192f87e4dd8d"
+    },
+    {
+      "path": "dist/notices/LICENSE.AGPL-3.0",
+      "bytes": 34532,
+      "sha256": "8943429804542a78e4f48d6a7ac6323f059a5a8540200eb0a2a9b3de7c33bf1d"
+    },
+    {
+      "path": "dist/notices/THIRD_PARTY_LICENSES.upstream.txt",
+      "bytes": 6906,
+      "sha256": "f995a88edcee3eaf93bbc883adb285621e3e0ae40d99468fa6cf56400ebdd6d1"
+    },
+    {
+      "path": "dist/notices/THIRD_PARTY_NOTICES.txt",
+      "bytes": 1416950,
+      "sha256": "57f9e3dba3fdd2bad5d59110af24118ee71deab5c5300349dca8a3eef790ee73"
+    },
+    {
+      "path": "dist/package.json",
+      "bytes": 35,
+      "sha256": "eb5f3182658b0282ad147e535c62d2b788d2baabc44448b74fe5dc1f66821fad"
+    },
+    {
+      "path": "dist/streamingMarkerParser.js",
+      "bytes": 27838,
+      "sha256": "b567421b968684a2ff4126b744d09d837f2686d9569485b350edca6b8f612a6a"
+    },
+    {
+      "path": "dist/suggestionAnchors.js",
+      "bytes": 6919,
+      "sha256": "a1eac5b292f73575b62dcac9b7f71ab00cdd01ae2e291e35ac99403dcc767cbb"
+    },
+    {
+      "path": "dist/textStats.js",
+      "bytes": 2444,
+      "sha256": "b178c346b5d2489e1ea4d6960525a100565d5f4bfee24ae47ac2b6f40ba02f3b"
+    },
+    {
+      "path": "dist/types.js",
+      "bytes": 115,
+      "sha256": "3596b999f3c9b1853eceb4db309dbbdc5203f13fae9fed72cfd508e80ca03232"
+    },
+    {
+      "path": "helper.cjs",
+      "bytes": 2316,
+      "sha256": "55247e6335da6f0d5833ab113f9f7e24f67d4156dee932d51a92bd859a266021"
+    }
+  ],
+  "source_files": [
+    {
+      "source_path": "src/essay-grading/types.ts",
+      "target_path": "upstream/types.ts",
+      "sha256": "85d18a55e77d1218adb3ae94554424c4108762e0ec9ef7a875397505dffe2f30",
+      "git_blob_sha1": "158261568a0464ff631ee527bde82a5c523b6328",
+      "bytes": 103,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/markerTypes.ts",
+      "target_path": "upstream/markerTypes.ts",
+      "sha256": "144c609105267503e97f7eb9905bd21062dd4def7a4c56f23f973aa3bd8c37c9",
+      "git_blob_sha1": "ba0f20f20029fc0d24642d53e64b6a9817b0345c",
+      "bytes": 1586,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/streamingMarkerParser.ts",
+      "target_path": "upstream/streamingMarkerParser.ts",
+      "sha256": "1f661d0415f7fab894812bac7d5a411f116cd473006c53449a3cedcca3abfe90",
+      "git_blob_sha1": "e3307f2a61f8dacc49f37c94eadb3af91aa46716",
+      "bytes": 29094,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/markerParser.ts",
+      "target_path": "upstream/markerParser.ts",
+      "sha256": "b6e7bf9575449ddebcb62be427ab3d4ebbd3d58ee4cacd206f873336467329b8",
+      "git_blob_sha1": "de8b4b39bc444f96860dd8e4f199732ea50385cb",
+      "bytes": 7620,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/suggestionAnchors.ts",
+      "target_path": "upstream/suggestionAnchors.ts",
+      "sha256": "99109cd4aff1789b5f014b34ede33d7cad4b7acb3d8f8f0d5932d5247edb9ea4",
+      "git_blob_sha1": "6dd4f206a71ad29d0909dae64444eacb0357c130",
+      "bytes": 7314,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/textStats.ts",
+      "target_path": "upstream/textStats.ts",
+      "sha256": "c41c5a868cc6b98a4ccb88560942e13ba60b02c9846bf76c6ca3e4ac36f46a59",
+      "git_blob_sha1": "5570f0dbfa6b1ddeb8ccf4ccd83d53cf56a9bb5f",
+      "bytes": 2433,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/essayContentState.ts",
+      "target_path": "upstream/essayContentState.ts",
+      "sha256": "e752f0a3f1f1611f7c02a319278a35cff6f715a16e7f032464557e6731361045",
+      "git_blob_sha1": "8b6935b3dfa5f457b334d3e2d84074bcc3384728",
+      "bytes": 6586,
+      "modification": "none"
+    }
+  ],
+  "install_policy": {
+    "explicit_verified_import": true,
+    "implicit_download": false,
+    "runtime_compiler": false
+  }
+}

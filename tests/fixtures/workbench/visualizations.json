@@ -1,0 +1,231 @@
+[
+  {
+    "name": "quadratic",
+    "data": {
+      "kind": "cartesian",
+      "expression": "a*x^2",
+      "parameters": [
+        {
+          "symbol": "a",
+          "label": "系数a",
+          "min": -2.0,
+          "max": 2.0,
+          "step": 0.1,
+          "initial": 1.0
+        }
+      ],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": 1.0,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "binary",
+        "op": "mul",
+        "left": {
+          "type": "variable",
+          "name": "a"
+        },
+        "right": {
+          "type": "binary",
+          "op": "pow",
+          "left": {
+            "type": "variable",
+            "name": "x"
+          },
+          "right": {
+            "type": "number",
+            "value": 2.0
+          }
+        }
+      }
+    },
+    "parameters": {
+      "a": 1.0
+    },
+    "expected": {
+      "y": 1,
+      "slope": 2
+    }
+  },
+  {
+    "name": "sine",
+    "data": {
+      "kind": "cartesian",
+      "expression": "sin(x)",
+      "parameters": [],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": 1.5707963267948966,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "unary",
+        "op": "sin",
+        "operand": {
+          "type": "variable",
+          "name": "x"
+        }
+      }
+    },
+    "parameters": {},
+    "expected": {
+      "y": 1,
+      "slope": 0
+    }
+  },
+  {
+    "name": "log_domain",
+    "data": {
+      "kind": "cartesian",
+      "expression": "log(x)",
+      "parameters": [],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": -1.0,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "unary",
+        "op": "log",
+        "operand": {
+          "type": "variable",
+          "name": "x"
+        }
+      }
+    },
+    "parameters": {},
+    "expected": {
+      "y": null,
+      "slope": null
+    }
+  },
+  {
+    "name": "absolute_cusp",
+    "data": {
+      "kind": "cartesian",
+      "expression": "abs(x)",
+      "parameters": [],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": 0.0,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "unary",
+        "op": "abs",
+        "operand": {
+          "type": "variable",
+          "name": "x"
+        }
+      }
+    },
+    "parameters": {},
+    "expected": {
+      "y": 0,
+      "slope": null
+    }
+  },
+  {
+    "name": "reciprocal_gap",
+    "data": {
+      "kind": "cartesian",
+      "expression": "1/x",
+      "parameters": [],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": 0.0,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "binary",
+        "op": "div",
+        "left": {
+          "type": "number",
+          "value": 1.0
+        },
+        "right": {
+          "type": "variable",
+          "name": "x"
+        }
+      }
+    },
+    "parameters": {},
+    "expected": {
+      "y": null,
+      "slope": null
+    }
+  },
+  {
+    "name": "variable_power",
+    "data": {
+      "kind": "cartesian",
+      "expression": "x^x",
+      "parameters": [],
+      "x_range": {
+        "min": -4.0,
+        "max": 4.0
+      },
+      "y_range": {
+        "min": -10.0,
+        "max": 10.0
+      },
+      "sample_count": 256,
+      "probe_x": 2.0,
+      "animate_parameter": null,
+      "duration_seconds": 8.0,
+      "expression_tree": {
+        "type": "binary",
+        "op": "pow",
+        "left": {
+          "type": "variable",
+          "name": "x"
+        },
+        "right": {
+          "type": "variable",
+          "name": "x"
+        }
+      }
+    },
+    "parameters": {},
+    "expected": {
+      "y": 4,
+      "slope": 6.772588722239782
+    }
+  }
+]

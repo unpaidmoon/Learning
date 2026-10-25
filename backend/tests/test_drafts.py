@@ -61,10 +61,8 @@ def test_draft_survives_repository_reopen_and_rejects_late_save(tmp_path):
     attachment_id = _image(repository)
     value = DraftInput(
         expected_revision=0,
-        text="题目条件保持原样",
+        text="题目条件保持原样\nx>0\n更正为x=2",
         attachment_ids=[attachment_id],
-        conditions=["x>0"],
-        corrections=["更正为x=2"],
         model="deepseek-flash",
         thinking="max",
     )
@@ -76,7 +74,7 @@ def test_draft_survives_repository_reopen_and_rejects_late_save(tmp_path):
     with pytest.raises(AppError) as error:
         save_draft(repository, chat_id, value.model_copy(update={"text": "旧回调"}))
     assert error.value.code == "DRAFT_REVISION_CONFLICT"
-    assert read_draft(repository, chat_id)["text"] == "题目条件保持原样"
+    assert read_draft(repository, chat_id)["text"] == "题目条件保持原样\nx>0\n更正为x=2"
     assert repository.get_chat(chat_id)["messages"] == []
     repository.close()
 

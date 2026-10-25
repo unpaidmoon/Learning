@@ -1,0 +1,15 @@
+{
+  "extends": "../frontend/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../frontend",
+    "paths": {
+      "@/*": ["src/*"],
+      "react": ["node_modules/@types/react"],
+      "react/jsx-runtime": ["node_modules/@types/react/jsx-runtime.d.ts"],
+      "react-dom": ["node_modules/@types/react-dom"]
+    },
+    "types": [],
+    "typeRoots": ["../frontend/node_modules/@types"]
+  },
+  "include": ["src/library-entry.tsx"]
+}

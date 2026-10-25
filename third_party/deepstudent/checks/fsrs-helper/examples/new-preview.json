@@ -1,0 +1,36 @@
+{
+  "protocol_version": 1,
+  "request_id": "fixture-preview",
+  "operation": {
+    "type": "preview",
+    "card": {
+      "card_state_id": "card-helper-fixture",
+      "phase": "new",
+      "memory": null,
+      "learning_step": 0,
+      "last_review_ms": null,
+      "reps": 0,
+      "lapses": 0,
+      "suspended": false,
+      "removed": false
+    },
+    "config": {
+      "parameters": [],
+      "desired_retention": 0.9,
+      "learning_steps_minutes": [
+        1,
+        10
+      ],
+      "relearning_steps_minutes": [
+        10
+      ],
+      "maximum_interval_days": 36500,
+      "enable_fuzz": false
+    },
+    "timing": {
+      "now_ms": 1790866800000,
+      "timezone": "Asia/Shanghai",
+      "day_rollover_hour": 4
+    }
+  }
+}

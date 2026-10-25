@@ -1,0 +1,39 @@
+{
+  "scope": "candidate build only; no product integration acceptance",
+  "helper_version": "0.1.0",
+  "protocol_version": 1,
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "original_scheduler_sha256": "62aad68b7b4a2fe1f0d43d5f2059acc35970c5a30ff6672a434be310f85c6686",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "target": "x86_64-pc-windows-msvc",
+  "static_crt": true,
+  "source_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "e1021e942207e898fb86bb52d82ceeba142302ec6940718f7393afa4895841b7"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "b40eb7a5bab5c0c7f52eee4231e8890fb2e19f11c20ebc1aa13951ebfb8c72cb"
+    },
+    {
+      "path": "src/lib.rs",
+      "sha256": "f6c8927af423f13665255cf154671478b5357500c838be1f1e650058e237a6ca"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "9a6445d10b83abaef4bb8c4fe5cbc00c58fd6be38c50b6db6a7e975065f87228"
+    }
+  ],
+  "binary_size_bytes": 1697280,
+  "binary_sha256": "5ecc69a620b6b951d22243aa0da9ee75b0b46ab632ac3640f0c643d2b8ec286a",
+  "dumpbin": "Microsoft (R) COFF/PE Dumper Version 14.44.35228.0",
+  "imported_dlls": [
+    "api-ms-win-core-synch-l1-2-0.dll",
+    "KERNEL32.dll",
+    "ntdll.dll"
+  ],
+  "cache_binary_path": ".local/cache/workbench/fsrs-helper/target/x86_64-pc-windows-msvc/release/learning-fsrs-helper.exe",
+  "validation": "actual release stdin/stdout fixtures passed; not product acceptance"
+}

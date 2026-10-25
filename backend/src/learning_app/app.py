@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import binascii
 import io
@@ -13,6 +14,11 @@ from learning_app import __version__
 from learning_app.accounts import install_account_routes
 from learning_app.config import AppConfig, load_config
 from learning_app.course_files import install_course_file_routes
+from learning_app.data_location import ProfileLocation
+from learning_app.data_routes import DataTransferService, install_data_routes
+from learning_app.desktop import install_desktop_routes
+from learning_app.desktop_update_routes import install_update_routes
+from learning_app.desktop_updates import DesktopUpdates
 from learning_app.documents import document_content, install_document_routes
 from learning_app.drafts import install_draft_routes
 from learning_app.dto import (
@@ -28,32 +34,125 @@ from learning_app.dto import (
     SubmissionResponse,
 )
 from learning_app.errors import AppError
+from learning_app.execution_supervisor import ExecutionSupervisor
 from learning_app.health import Capabilities, HealthResponse
 from learning_app.media import install_media_routes
 from learning_app.runtime_control import install_runtime_routes
+from learning_app.runtime_preferences import RuntimePowerKeeper, RuntimePreferences, resource_policy
+from learning_app.runtime_settings_routes import install_runtime_settings_routes
 from learning_app.security import COOKIE_NAME, BrowserSessions, LocalBoundaryMiddleware
 from learning_app.storage import StorageError
+from learning_app.video_previews import VideoPreviewCache, install_video_preview_routes
+from learning_app.workbench.reading_routes import READING_RESOURCE_CSP, install_reading_routes
+from learning_app.workbench.routes import install_workbench_routes
 
 
-def create_app(config: AppConfig | None = None, *, repository=None, execution=None) -> FastAPI:
+def create_app(
+    config: AppConfig | None = None, *, repository=None, execution=None, execution_factory=None
+) -> FastAPI:
     config = config or load_config()
+    profile = ProfileLocation(config.data_dir)
+    if repository is None:
+        config = config.model_copy(update={"data_dir": profile.current()})
     sessions = BrowserSessions()
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI):
+    async def service_lifespan(app: FastAPI):
+        from learning_app.data_activation import require_active_data
         from learning_app.service import GenerationService
         from learning_app.storage import Repository
 
+        require_active_data(repository.root if repository is not None else config.data_dir)
         app.state.repository = repository or Repository(config.data_dir)
-        app.state.service = GenerationService(app.state.repository, config, execution=execution)
+        from learning_app.data_maintenance import DataMaintenance
+
+        DataMaintenance(app.state.repository).restore_local_jobs()
+        app.state.runtime_preferences = RuntimePreferences(app.state.repository.root)
+        app.state.desktop_updates = DesktopUpdates(
+            app.state.repository.root, profile.anchor, config.project_root
+        )
+        app.state.data_transfers = DataTransferService(app)
+        app.state.service = GenerationService(
+            app.state.repository, config, execution=execution, execution_factory=execution_factory
+        )
         await app.state.service.open()
+        from learning_app.workbench.executor import TaskExecutor
+
+        app.state.task_executor = TaskExecutor(
+            app.state.repository,
+            app.state.service,
+            admission_gate=app.state.submission_gate,
+            is_stopping=lambda: app.state.exit_prepared,
+            wake_preparations=lambda: app.state.preparations.wake()
+            if hasattr(app.state, "preparations")
+            else None,
+        )
+        await app.state.task_executor.open()
+        app.state.video_previews = VideoPreviewCache(
+            app.state.repository,
+            config.project_root,
+            is_busy=lambda: any(not task.done() for task in tuple(app.state.service.tasks.values()))
+            or (
+                getattr(app.state, "preparations", None) is not None
+                and app.state.preparations.store.has_urgent()
+            ),
+        )
+        app.state.video_previews.start()
+        from learning_app.workbench.processing import PreparationService
+
+        app.state.preparations = PreparationService(
+            app.state.repository,
+            config.project_root,
+            admission_gate=app.state.submission_gate,
+            is_busy=lambda: any(not task.done() for task in tuple(app.state.service.tasks.values()))
+            or app.state.video_previews.has_active_lease("interaction"),
+            is_playing=lambda: app.state.video_previews.has_active_lease("playback"),
+            is_interacting=lambda: app.state.video_previews.has_active_lease("interaction"),
+            is_stopping=lambda: app.state.exit_prepared,
+            get_resource_policy=lambda: resource_policy(
+                app.state.runtime_preferences.effective().resource_mode
+            ),
+        )
+        await app.state.preparations.open()
+
+        def local_activity():
+            return bool(
+                app.state.preparations._active
+                or app.state.task_executor._active_run
+                or app.state.data_transfers.tasks
+            ) or any(
+                not task.done()
+                and app.state.repository.get_generation(identity)["state"]
+                in {"dispatching", "accepted", "running"}
+                for identity, task in tuple(app.state.service.tasks.items())
+            )
+
+        app.state.power_keeper = RuntimePowerKeeper(app.state.runtime_preferences, local_activity)
+        app.state.power_keeper.start()
+        app.state.desktop_updates.start()
+        app.state.execution_supervisor = ExecutionSupervisor(app)
+        app.state.execution_supervisor.start()
         app.state.ready = True
         try:
             yield
         finally:
             app.state.ready = False
+            await app.state.execution_supervisor.close()
+            await app.state.desktop_updates.close()
+            await asyncio.to_thread(app.state.power_keeper.close)
+            await app.state.data_transfers.close()
+            await app.state.preparations.close()
+            await asyncio.to_thread(app.state.video_previews.close)
+            await app.state.desktop_gateway.close()
+            await app.state.task_executor.close()
             await app.state.service.close()
             app.state.repository.close()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        with profile.lease():
+            async with service_lifespan(app):
+                yield
 
     app = FastAPI(
         title="Learning Application API",
@@ -62,6 +161,7 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
         responses={403: {"model": ErrorResponse}, 409: {"model": ErrorResponse}},
     )
     app.state.config = config
+    app.state.profile_location = profile
     app.state.ready = False
     app.add_middleware(LocalBoundaryMiddleware, config=config, sessions=sessions)
 
@@ -96,7 +196,8 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
     @app.middleware("http")
     async def browser_capability(request: Request, call_next):
         path = request.url.path
-        if path.startswith("/api/") and path not in {"/api/v1/health", "/api/v1/session"}:
+        protected = path.startswith("/api/") or path.startswith("/desktop/api/")
+        if protected and path not in {"/api/v1/health", "/api/v1/session"}:
             token = request.cookies.get(COOKIE_NAME)
             if not sessions.valid(token):
                 return JSONResponse(
@@ -112,11 +213,26 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         if config.mode == "start":
-            response.headers["Content-Security-Policy"] = (
-                "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-                "img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; "
-                "base-uri 'none'; form-action 'self'"
+            fixed_reader = (
+                path.startswith("/api/v1/reading/pdfjs/")
+                and response.status_code == 200
+                and response.headers.get("Content-Security-Policy") == READING_RESOURCE_CSP
             )
+            if not fixed_reader:
+                response.headers["Content-Security-Policy"] = (
+                    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                    "img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; "
+                    "base-uri 'none'; form-action 'self'; worker-src 'self' blob:"
+                )
+            if config.desktop_enabled and path.startswith("/desktop/"):
+                # The pinned native boot table is rendered as classic inline
+                # scripts by upstream. It carries no provider or Peer secrets.
+                response.headers["Content-Security-Policy"] = (
+                    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+                    "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
+                    "font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; "
+                    "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+                )
         response.headers["Cache-Control"] = "no-store" if path.startswith("/api/") else "no-cache"
         return response
 
@@ -134,11 +250,7 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
         question_answering = (
             "ready"
             if harness_ready and app.state.service.question_answering_ready
-            else (
-                "unavailable"
-                if harness_ready or config.harness_enabled
-                else "not_configured"
-            )
+            else ("unavailable" if harness_ready or config.harness_enabled else "not_configured")
         )
         return HealthResponse(
             instance_id=config.instance_id,
@@ -148,6 +260,8 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
             capabilities=Capabilities(
                 persistence="ready" if ready else "unavailable",
                 video="ready" if ready else "unavailable",
+                transcription="available" if ready else "unavailable",
+                knowledge_base="available" if ready else "unavailable",
                 harness=harness,
                 question_answering=question_answering,
             ),
@@ -156,7 +270,13 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
     @app.get("/api/v1/session", response_model=SessionResponse)
     async def browser_session(request: Request, response: Response):
         token, csrf = sessions.create(request.cookies.get(COOKIE_NAME))
-        response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="strict", path="/api/")
+        response.set_cookie(
+            COOKIE_NAME,
+            token,
+            httponly=True,
+            samesite="strict",
+            path="/" if config.desktop_enabled else "/api/",
+        )
         return SessionResponse(csrf_token=csrf)
 
     @app.get("/api/v1/courses", response_model=list[CourseResponse])
@@ -229,7 +349,10 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
 
     @app.get("/api/v1/submissions/{submission_id}", response_model=SubmissionResponse)
     async def lookup_submission(submission_id: str):
-        return app.state.repository.get_submission(submission_id)
+        # Do not report absence while an admitted request is still preparing
+        # its transaction under the shared submission/exit gate.
+        async with app.state.submission_gate:
+            return app.state.repository.get_submission(submission_id)
 
     @app.get("/api/v1/generations/{generation_id}", response_model=GenerationResponse)
     async def generation(generation_id: str):
@@ -268,9 +391,16 @@ def create_app(config: AppConfig | None = None, *, repository=None, execution=No
     install_account_routes(app)
     install_course_file_routes(app)
     install_media_routes(app)
+    install_video_preview_routes(app)
     install_draft_routes(app)
     install_document_routes(app)
     install_runtime_routes(app)
+    install_runtime_settings_routes(app)
+    install_update_routes(app)
+    install_data_routes(app)
+    install_workbench_routes(app)
+    install_reading_routes(app)
+    install_desktop_routes(app, sessions)
 
     if config.mode == "start":
         index = config.static_dir / "index.html"

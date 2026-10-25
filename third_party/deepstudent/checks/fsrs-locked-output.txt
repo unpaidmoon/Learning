@@ -1,0 +1,38 @@
+
+running 19 tests
+test tests::empty_relearning_steps_reschedule_lapse_in_days ... ok
+test tests::forgetting_curve_constants_follow_fsrs6_decay ... ok
+test tests::fuzz_does_not_regress_below_elapsed_days ... ok
+test tests::maximum_interval_caps_every_passing_answer ... ok
+test tests::new_card_follows_default_learning_steps ... ok
+test tests::last_learning_step_good_graduates_with_fsrs_interval ... ok
+test tests::review_on_due_day_counts_full_logical_days ... ok
+test tests::fuzz_factor_is_deterministic_and_bounded ... ok
+test tests::missing_memory_on_learning_card_reinitializes_like_new ... ok
+test tests::fuzz_matches_anki_ranges ... ok
+test tests::relearning_good_graduates_back_to_review ... ok
+test tests::review_again_enters_relearning_and_counts_a_lapse ... ok
+test tests::learning_step_crossing_rollover_is_due_at_next_logical_day_start ... ok
+test tests::review_intervals_are_strictly_increasing ... ok
+test tests::rollover_hour_moves_the_day_boundary ... ok
+test tests::same_logical_day_reviews_use_short_term_stability ... ok
+test tests::sanitize_steps_drops_invalid_entries ... ok
+test tests::single_learning_step_good_on_new_card_graduates ... ok
+test tests::single_step_hard_is_one_and_a_half_times_capped_at_one_extra_day ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests ..\..\upstream\src-tauri\src\fsrs_scheduler.rs (.local/cache/reuse/deepstudent-fsrs-target\debug\deps\deepstudent_scheduler_candidate-0c4ec09e4363db87.exe)
+     Running unittests main.rs (.local/cache/reuse/deepstudent-fsrs-target\debug\deps\deepstudent_scheduler_check-28739f0b9745d797.exe)
+   Doc-tests deepstudent_scheduler_candidate

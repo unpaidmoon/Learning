@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "files": [
+    {
+      "candidate": "C01",
+      "source_path": "src/features/chat/context/selectionRef.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/context/selectionRef.ts",
+      "sha256": "56ddea18cf3ac459b348f5ed8edc8fc9c8e55f018114c7fd2779c58c88e35347",
+      "git_blob_sha1": "bf48519b81c5e8c5f728a52926c222d063747950",
+      "size_bytes": 9370,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C01",
+      "source_path": "src/features/chat/context/definitions/selection.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/context/definitions/selection.ts",
+      "sha256": "78fa5dcc3b3c052e22306e1ac635eae73de1ea295dcaa63f71e18474c8827af6",
+      "git_blob_sha1": "c444eeff16c7a148323c121cb134c57a8bfa397c",
+      "size_bytes": 3804,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C01",
+      "source_path": "src/features/pdf/components/PdfSelectionActions.tsx",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/pdf/components/PdfSelectionActions.tsx",
+      "sha256": "6bb02af7131ff7aa66d6f86c046109c26ac68f2c842799af4cf0e48b8f7cb00c",
+      "git_blob_sha1": "0f2fe9aca393ed084997eadddc35967d4a26d893",
+      "size_bytes": 14887,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C02",
+      "source_path": "src/features/chat/components/TranslationPopover.tsx",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/chat/components/TranslationPopover.tsx",
+      "sha256": "d0c13f849b937c8112b5b1c066b70e43609da4b5e1b0d99dff86471f19e48106",
+      "git_blob_sha1": "bd6b65b4134c591cc6f942b4a05342f2c5bb3200",
+      "size_bytes": 39614,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C02",
+      "source_path": "src-tauri/src/translation/chat_popover.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/translation/chat_popover.rs",
+      "sha256": "2f01bed056f002db00ca9c656fb858445fe8d6737c6cd7057e3b08b1df96a9a3",
+      "git_blob_sha1": "3898d725e313f2f7bfccd196b42619a34d7b1feb",
+      "size_bytes": 14775,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C03",
+      "source_path": "src-tauri/src/question_bank_service.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/question_bank_service.rs",
+      "sha256": "fa7357428b9a2fdea0692cc241802a42e62cef56b0f99d69335c1422c2152060",
+      "git_blob_sha1": "ac7d07f548930c3e7129d8582356bb5fdb3cb3da",
+      "size_bytes": 178089,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C03",
+      "source_path": "src-tauri/src/vfs/repos/question_repo.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/vfs/repos/question_repo.rs",
+      "sha256": "465ba3dd7c3cef9722dbdbb2e1b2c3f66b950812851331db5daf006d228cc4c3",
+      "git_blob_sha1": "88f634f9cc4e9f1404f1bf85605995bc3473e928",
+      "size_bytes": 121756,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C03",
+      "source_path": "src-tauri/src/chat_v2/tools/qbank_executor.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/chat_v2/tools/qbank_executor.rs",
+      "sha256": "1d167c3cf648f85200c8cf038866dd00b25c496779e8797e3106ce4bcbd1c024",
+      "git_blob_sha1": "74fdb9b6b316aa32f2df9df1851312c1d2af888e",
+      "size_bytes": 233607,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C03",
+      "source_path": "src-tauri/src/qbank_generation/types.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/qbank_generation/types.rs",
+      "sha256": "2713f1eb4667ee2403c39d8458f52222152e82ad1b865cc9febaf85829c716b0",
+      "git_blob_sha1": "0d76bdb76c112484dede9f88f60ba1a1ad00d65c",
+      "size_bytes": 42450,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C03",
+      "source_path": "src-tauri/src/qbank_generation/pipeline.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/qbank_generation/pipeline.rs",
+      "sha256": "425cf69272620f1f4d4e0ee525282463cc9b2d1f8b512867155c0ac1c120524e",
+      "git_blob_sha1": "1eb94322290983619d69f8c24a3a817c56b539f3",
+      "size_bytes": 23682,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C04",
+      "source_path": "src-tauri/src/chat_v2/tools/chatanki_executor.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/chat_v2/tools/chatanki_executor.rs",
+      "sha256": "79d5412a70ca8636bd1c11d602b1140d088f2aafaf2ec91cd40498c5a6c8338f",
+      "git_blob_sha1": "9f70796d49bf5a14232356681f205c3d1087be97",
+      "size_bytes": 824435,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C04",
+      "source_path": "src-tauri/src/fsrs_review_service.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/fsrs_review_service.rs",
+      "sha256": "c40ece5127f459a96bce4413b83b6d2b00ab50aff10de2bec6b6dd411e58b0b2",
+      "git_blob_sha1": "a9a96b366495aa3f1c1bdd8be484b24ccbbc3df3",
+      "size_bytes": 408181,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C05",
+      "source_path": "src-tauri/src/chat_v2/tools/essay_grading_executor.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/chat_v2/tools/essay_grading_executor.rs",
+      "sha256": "e707994e0a7c28733b8e774a37fd25160f21e3dd8d3307d4ffe43ec6e5ef6f04",
+      "git_blob_sha1": "98245f938139ba168e8efc9ba6cafb9d32a0cb3f",
+      "size_bytes": 46243,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C05",
+      "source_path": "src-tauri/src/essay_grading/pipeline.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/essay_grading/pipeline.rs",
+      "sha256": "f3471b7bbc057f3b243b5c6b6016c7857a3b9387cd38b538906baead78bcd71f",
+      "git_blob_sha1": "31271bcfc84ef9e84e9977093c544018828d793e",
+      "size_bytes": 82894,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C05",
+      "source_path": "src-tauri/src/essay_grading/types.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/essay_grading/types.rs",
+      "sha256": "eb97ad00364019187c6891f691292e9c482b74b5f37dc06742e44d108c34d305",
+      "git_blob_sha1": "7b874740826259d0fba8229dccd90142c53a4b0b",
+      "size_bytes": 61925,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C05",
+      "source_path": "src-tauri/src/essay_grading/text_stats.rs",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/src/essay_grading/text_stats.rs",
+      "sha256": "c038e0c0c3661e8524bba9e0b0653e778386026bf85f9ff0920096c96fd46453",
+      "git_blob_sha1": "70fedd02c52446f72d6de0945b2df468110b44f9",
+      "size_bytes": 10708,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C06",
+      "source_path": "src/features/media-handout/pipeline.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/pipeline.ts",
+      "sha256": "a7696ca45c55bb9c879396d36f8794e46e7dd926a891774918ba51c057df48d5",
+      "git_blob_sha1": "70b036bffd9f892b01b6399552d0333e8b1b615a",
+      "size_bytes": 14320,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C06",
+      "source_path": "src/features/media-handout/frames.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/frames.ts",
+      "sha256": "13544a26d5ac7aabf022c9c087da867edbc61ab88ad5dd2589691b9caa783b97",
+      "git_blob_sha1": "31c8a0ad00fc07c7285fe3ef1b8f1ef379620d4c",
+      "size_bytes": 9595,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "C06",
+      "source_path": "src/features/media-handout/api.ts",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src/features/media-handout/api.ts",
+      "sha256": "3f657b273ee682eb5d89d713b2f4ac22684c0a09e4115c43c21460e59e9b1bf8",
+      "git_blob_sha1": "e65b0ee1925be1fd3187c5a631b6d32542ba3639",
+      "size_bytes": 2330,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "locks",
+      "source_path": "src-tauri/Cargo.toml",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/Cargo.toml",
+      "sha256": "73ded7e2af35e564f73590659e46581618e70290d0af53d3ba66be4bf28a207f",
+      "git_blob_sha1": "fb0bffb5385f95aceb691b48e1e890d9cd08b6d1",
+      "size_bytes": 18995,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "locks",
+      "source_path": "src-tauri/Cargo.lock",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/src-tauri/Cargo.lock",
+      "sha256": "ff6d38f17e070818cd6d6ca9ccfef448e2559f067f7c8d50e7624f2ec9af20ba",
+      "git_blob_sha1": "7a4bbb82dad7a2a5f36ca4ec2386ac8a626c503f",
+      "size_bytes": 361245,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "locks",
+      "source_path": "package.json",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/package.json",
+      "sha256": "7eadcddba1d1ac94ee88eda0967020c81e3dc51bcc86d1412cba6129fbf5cdd8",
+      "git_blob_sha1": "8f4ae00f23f0b1046b3de04c386f5d21fa2fb479",
+      "size_bytes": 10175,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    },
+    {
+      "candidate": "locks",
+      "source_path": "package-lock.json",
+      "source_url": "https://github.com/helixnow/deep-student/blob/635216503c0b34bdf812e17942e0f09f51872e6f/package-lock.json",
+      "sha256": "1e644695f45ce50d92c6de0729141404bce9858ba627e3e27bb1b164e72f5381",
+      "git_blob_sha1": "a0ff5bb19dbc5f9cb008bb7c9a4528a0a5492bb5",
+      "size_bytes": 690366,
+      "retained_in_runtime": false,
+      "evidence_type": "static source read only; selected source locations, not whole app validation"
+    }
+  ]
+}

@@ -28,6 +28,11 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from .continuation_routing import resolve_tool_result_continuation
+from .native_tools import NativeCallRegistry, ToolRejected
+from .provider_tool_calls import ProviderToolCalls
+from .types import ExecutionPolicy
+
 OFFICIAL_HOST = "api.deepseek.com"
 OFFICIAL_PATH = "/anthropic/v1/messages"
 USAGE_FIELDS = (
@@ -49,7 +54,7 @@ def _image_summary(value: Any) -> list[dict[str, Any]]:
     """Inspect supplied bytes only; no path, URL, file-id or frame resolution."""
     found: list[dict[str, Any]] = []
     if isinstance(value, dict):
-        if value.get("type") in {"image", "document"}:
+        if isinstance(value.get("type"), str) and value["type"] in {"image", "document"}:
             source = value.get("source")
             if not isinstance(source, dict) or source.get("type") != "base64":
                 raise ValueError("INLINE_CONTENT_REQUIRED")
@@ -262,6 +267,7 @@ class MessagesBoundary:
         timeout: float = 240.0,
         credential_route: str = "api_key",
         account_enabled: bool = False,
+        native_registry: NativeCallRegistry | None = None,
     ):
         if mode not in {"fixture", "official"}:
             raise ValueError("INVALID_BOUNDARY_MODE")
@@ -269,8 +275,11 @@ class MessagesBoundary:
             raise ValueError("FIXTURE_MUST_NOT_LOAD_PROVIDER_KEY")
         if credential_route not in {"account", "api_key"}:
             raise ValueError("INVALID_CREDENTIAL_ROUTE")
-        if mode == "official" and credential_route == "api_key" and not account_enabled and (
-            not isinstance(api_key, str) or not api_key.strip()
+        if (
+            mode == "official"
+            and credential_route == "api_key"
+            and not account_enabled
+            and (not isinstance(api_key, str) or not api_key.strip())
         ):
             raise ValueError("OFFICIAL_KEY_REQUIRED")
         if not isinstance(model, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", model):
@@ -286,6 +295,7 @@ class MessagesBoundary:
         self.private.mkdir(parents=True, exist_ok=True)
         self.mode, self.model, self.thinking = mode, model, thinking
         self.max_tokens, self.timeout = max_tokens, float(timeout)
+        self.native_registry = native_registry
         self._api_key = api_key
         self.credential_route = credential_route
         self.account_enabled = mode == "official" and account_enabled
@@ -298,7 +308,7 @@ class MessagesBoundary:
         self._condition = threading.Condition(self._lock)
         previous: dict[str, dict[str, Any]] = {}
         for entry in self.ledger.entries:
-            if entry.get("event") in {"request_received", "request_finished"}:
+            if entry.get("event") in {"request_received", "request_finished", "request_reconciled"}:
                 previous[entry["request_id"]] = {
                     key: value for key, value in entry.items() if key not in {"event", "at_ns"}
                 }
@@ -323,9 +333,44 @@ class MessagesBoundary:
                         observer.feed(chunk)
             row["usage"] = observer.result()
         self._records = list(previous.values())
+        if self.native_registry is not None:
+            for row in self._records:
+                if row["status"] != "upstream_unknown":
+                    continue
+                raw_path = self.private / f"{row['request_id']}.response.sse"
+                if not raw_path.is_file():
+                    continue
+                observer, parser = UsageObserver(row["request_id"]), ProviderToolCalls()
+                response_hash = hashlib.sha256()
+                try:
+                    with raw_path.open("rb") as raw:
+                        while chunk := raw.read(65536):
+                            response_hash.update(chunk)
+                            observer.feed(chunk)
+                            parser.feed(chunk)
+                    if parser.open or parser.pending.strip() or parser.data:
+                        continue
+                except (OSError, ValueError, KeyError, UnicodeError):
+                    continue
+                proof = self.native_registry.reconcile_provider_terminal(
+                    row,
+                    response_sha256=response_hash.hexdigest(),
+                    calls=parser.calls,
+                    usage=observer.result(),
+                )
+                if proof:
+                    row.update(
+                        status_before_reconciliation=row["status"],
+                        status="completed",
+                        provider_terminal_reconciliation=proof,
+                        usage=observer.result(),
+                    )
+                    self.ledger.append({"event": "request_reconciled", **copy.deepcopy(row)})
         self._bindings: deque[str] = deque()
         self._bound_generations: set[str] = set()
         self._generation_selections: dict[str, tuple[str, str]] = {}
+        self._generation_policies: dict[str, ExecutionPolicy] = {}
+        self._continuation_sessions: dict[str, dict[str, Any]] = {}
         self._scenario: dict[str, Any] = {}
         self._events: list[dict[str, Any]] = []
         self._gates: dict[str, threading.Event] = {}
@@ -334,6 +379,7 @@ class MessagesBoundary:
         self._server_thread: threading.Thread | None = None
         self._requests: set[threading.Thread] = set()
         self._sockets: set[socket.socket] = set()
+        self._native_connections: dict[socket.socket, dict] = {}
         self._stopped = False
         owner = self
 
@@ -358,9 +404,7 @@ class MessagesBoundary:
                     else:
                         owner._reject(self, 403, "UNAPPROVED_ENDPOINT")
 
-            do_DELETE = do_PUT = do_PATCH = do_OPTIONS = do_CONNECT = do_HEAD = (
-                _unsupported
-            )
+            do_DELETE = do_PUT = do_PATCH = do_OPTIONS = do_CONNECT = do_HEAD = _unsupported
 
         class OwnedServer(http.server.ThreadingHTTPServer):
             daemon_threads = True
@@ -374,6 +418,11 @@ class MessagesBoundary:
                         with owner._lock:
                             owner._requests.discard(threading.current_thread())
                             owner._sockets.discard(request)
+                            row = owner._native_connections.pop(request, None)
+                            if row is not None and owner.native_registry is not None:
+                                owner.native_registry.network_closed(
+                                    row, downstream_closed=request.fileno() == -1
+                                )
 
                 worker = threading.Thread(
                     target=execute, name="learning-messages-request", daemon=True
@@ -409,6 +458,15 @@ class MessagesBoundary:
         return bool(self._api_key)
 
     @property
+    def provider_scope_fingerprint(self) -> str | None:
+        """Opaque process-local reuse partition; credentials never leave the boundary."""
+        if self.credential_route != "api_key" or (self.mode == "official" and not self._api_key):
+            return None
+        return hashlib.sha256(
+            (self.mode + "\0" + (self._api_key or "explicit-fixture")).encode()
+        ).hexdigest()
+
+    @property
     def events(self) -> list[dict[str, Any]]:
         with self._lock:
             return copy.deepcopy(self._events)
@@ -426,22 +484,197 @@ class MessagesBoundary:
         return self
 
     def bind(
-        self, generation_id: str, *, model: str | None = None, thinking: str | None = None
+        self,
+        generation_id: str,
+        *,
+        model: str | None = None,
+        thinking: str | None = None,
+        policy: ExecutionPolicy | None = None,
+        session_id: str | None = None,
+        request_id: str | None = None,
+        epoch: int | None = None,
+        scope: dict | None = None,
     ) -> None:
         if not isinstance(generation_id, str) or not generation_id or len(generation_id) > 256:
             raise ValueError("INVALID_GENERATION_ID")
+        route_values = (session_id, request_id, epoch)
+        routed = any(value is not None for value in route_values)
+        if routed and (
+            not isinstance(session_id, str)
+            or not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", session_id)
+            or not isinstance(request_id, str)
+            or not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", request_id)
+            or type(epoch) is not int
+            or epoch < 1
+        ):
+            raise ValueError("CONTINUATION_BINDING_INVALID")
+        route_binding = {
+            "session_id": session_id,
+            "generation_id": generation_id,
+            "request_id": request_id,
+            "epoch": epoch,
+        }
         with self._lock:
             if self._stopped:
                 raise RuntimeError("BOUNDARY_ALREADY_STOPPED")
+            previous_binding = self._continuation_sessions.get(session_id) if routed else None
+            if previous_binding is not None and previous_binding != route_binding:
+                if (
+                    self.native_registry is None
+                    or previous_binding["generation_id"] not in self.native_registry.released
+                    or epoch <= previous_binding["epoch"]
+                ):
+                    raise ValueError("CONTINUATION_BINDING_IMMUTABLE")
+            if scope is not None:
+                if (
+                    self.native_registry is None
+                    or not routed
+                    or any(
+                        scope.get(key) != value
+                        for key, value in (
+                            ("session_id", session_id),
+                            ("run_id", generation_id),
+                            ("request_id", request_id),
+                            ("epoch", epoch),
+                        )
+                    )
+                ):
+                    raise ValueError("NATIVE_SCOPE_BINDING_CONFLICT")
+                self.native_registry.bind(scope)
             selection = (model or self.model, thinking or self.thinking)
+            if policy is not None:
+                if policy.max_output_tokens < 1 or not 0 < policy.timeout_seconds <= 3600:
+                    raise ValueError("EXECUTION_POLICY_INVALID")
+                if (model is not None and model != policy.model) or (
+                    thinking is not None and thinking != policy.thinking
+                ):
+                    raise ValueError("EXECUTION_POLICY_SELECTION_CONFLICT")
+                selection = (policy.model, policy.thinking)
+                previous_policy = self._generation_policies.get(generation_id)
+                if previous_policy is not None and previous_policy != policy:
+                    raise ValueError("EXECUTION_POLICY_IMMUTABLE")
             previous = self._generation_selections.get(generation_id)
             if previous is not None and previous != selection:
                 raise ValueError("GENERATION_SELECTION_IMMUTABLE")
+            if policy is not None:
+                self._generation_policies[generation_id] = policy
             self._generation_selections[generation_id] = selection
             self._bindings.append(generation_id)
             self._bound_generations.add(generation_id)
+            if routed:
+                self._continuation_sessions[session_id] = route_binding
 
-    def _resolve_generation(self, request: dict[str, Any]) -> str | None:
+    def release_execution(self, receipt: dict, business_port) -> None:
+        with self._lock:
+            binding = self._continuation_sessions.get(receipt.get("session_id"))
+            if (
+                self.native_registry is None
+                or binding is None
+                or any(
+                    receipt.get(k) != binding[v]
+                    for k, v in (
+                        ("run_id", "generation_id"),
+                        ("request_id", "request_id"),
+                        ("epoch", "epoch"),
+                    )
+                )
+            ):
+                raise ValueError("NATIVE_RELEASE_BINDING_CONFLICT")
+            self.native_registry.release(receipt, business_port)
+
+    def _resolve_generation(
+        self, request: dict[str, Any], *, session_id: str | None = None
+    ) -> str | None:
+        binding = self._continuation_sessions.get(session_id)
+        if (
+            binding is not None
+            and self.native_registry is not None
+            and binding["generation_id"] in self.native_registry.released
+        ):
+            raise ValueError("NATIVE_LEASE_RELEASED")
+        require_marker = self.mode == "official" or binding is not None
+        try:
+            # Native serialization preserves text blocks while coalescing
+            # adjacent users after a failed attempt. The source gate validates
+            # the real latest user's rpcId and exact program marker before HTTP.
+            # In that native-routed composition select its latest standalone
+            # program block, retaining every older user/history block unchanged.
+            standalone = []
+            if binding is not None and self.native_registry is not None:
+                latest = next(
+                    (
+                        m
+                        for m in reversed(request.get("messages", []))
+                        if isinstance(m, dict) and m.get("role") == "user"
+                    ),
+                    None,
+                )
+                blocks = latest.get("content", []) if latest else []
+                if isinstance(blocks, list):
+                    for block in blocks:
+                        value = (
+                            block.get("text")
+                            if isinstance(block, dict) and block.get("type") == "text"
+                            else None
+                        )
+                        match = (
+                            GENERATION_MARKER.fullmatch(value[:-1])
+                            if isinstance(value, str) and value.endswith("\n")
+                            else None
+                        )
+                        if match:
+                            standalone.append(match.group(1))
+            if standalone:
+                generation_id = standalone[-1]
+                if generation_id not in self._bound_generations:
+                    raise ValueError("UNBOUND_GENERATION_MARKER")
+                try:
+                    self._bindings.remove(generation_id)
+                except ValueError:
+                    pass
+            else:
+                generation_id = self._resolve_marker_generation(
+                    request, require_marker=require_marker
+                )
+        except ValueError as error:
+            if str(error) != "GENERATION_MARKER_REQUIRED" or binding is None:
+                raise
+            try:
+                generation_id = resolve_tool_result_continuation(
+                    request,
+                    self._bound_generations,
+                    session_id,
+                    {session_id: binding["generation_id"]},
+                    lambda view: self._resolve_marker_generation(view, require_marker=True),
+                )
+            except ValueError as route_error:
+                self.ledger.append(
+                    {
+                        "event": "continuation_route_rejected",
+                        "session_id": session_id,
+                        "generation_id": binding["generation_id"],
+                        "code": str(route_error),
+                    }
+                )
+                raise
+            self.ledger.append(
+                {
+                    "event": "continuation_routed",
+                    "session_id": session_id,
+                    "generation_id": generation_id,
+                    "request_id": binding["request_id"],
+                    "epoch": binding["epoch"],
+                }
+            )
+        if binding is not None and generation_id != binding["generation_id"]:
+            raise ValueError("CONTINUATION_SESSION_RUN_CONFLICT")
+        return generation_id
+
+    def _resolve_marker_generation(
+        self, request: dict[str, Any], *, require_marker: bool | None = None
+    ) -> str | None:
+        if require_marker is None:
+            require_marker = self.mode == "official"
         messages = request.get("messages", [])
         if not isinstance(messages, list):
             raise ValueError("INVALID_MESSAGES")
@@ -481,10 +714,10 @@ class MessagesBoundary:
                 )
             )
             if not tool_results_only:
-                if self.mode == "official":
+                if require_marker:
                     raise ValueError("GENERATION_MARKER_REQUIRED")
                 return self._bindings.popleft() if self._bindings else None
-        if self.mode == "official":
+        if require_marker:
             raise ValueError("GENERATION_MARKER_REQUIRED")
         return self._bindings.popleft() if self._bindings else None
 
@@ -601,6 +834,10 @@ class MessagesBoundary:
         handler.send_response(status)
         handler.send_header("Content-Type", "application/json")
         handler.send_header("Content-Length", str(len(body)))
+        row = getattr(handler, "native_row", None)
+        if row and row.get("host_dispatch_id"):
+            handler.send_header("x-learning-attempt-id", row["request_id"])
+            handler.send_header("x-learning-dispatch-id", row["host_dispatch_id"])
         handler.send_header("Connection", "close")
         handler.end_headers()
         handler.wfile.write(body)
@@ -655,7 +892,8 @@ class MessagesBoundary:
                         self.account_model_modalities = {
                             row["id"]: row.get("input_modalities", ["text"])
                             for row in data
-                            if isinstance(row, dict) and isinstance(row.get("id"), str)
+                            if isinstance(row, dict)
+                            and isinstance(row.get("id"), str)
                             and isinstance(row.get("input_modalities", ["text"]), list)
                         }
                         self.account_catalog_observed = True
@@ -680,7 +918,10 @@ class MessagesBoundary:
     def _account_headers(handler: http.server.BaseHTTPRequestHandler) -> dict[str, str]:
         # Header values live only for the current HTTPS request. They never enter
         # records, diagnostics, public DTOs or request-body evidence.
-        headers = {"x-dsh-auth-token": handler.headers["x-dsh-auth-token"], "Accept": "application/json"}
+        headers = {
+            "x-dsh-auth-token": handler.headers["x-dsh-auth-token"],
+            "Accept": "application/json",
+        }
         for name in ("user-agent", "x-dsh-version", "x-dsh-client", "x-dsh-product"):
             value = handler.headers.get(name)
             if value is not None and len(value) <= 512:
@@ -723,7 +964,11 @@ class MessagesBoundary:
             return self._reject(handler, 400, "INVALID_REQUEST_OR_INLINE_CONTENT")
         with self._lock:
             try:
-                generation_id = self._resolve_generation(request)
+                session_headers = handler.headers.get_all("x-deepseek-harness-session-id", [])
+                if len(session_headers) > 1:
+                    raise ValueError("CONTINUATION_SESSION_HEADER_AMBIGUOUS")
+                native_session_id = session_headers[0] if session_headers else None
+                generation_id = self._resolve_generation(request, session_id=native_session_id)
             except ValueError:
                 self.ledger.append({"event": "generation_binding_rejected"})
                 return self._reject(handler, 403, "GENERATION_BINDING_REJECTED")
@@ -736,6 +981,9 @@ class MessagesBoundary:
             row: dict[str, Any] = {
                 "request_id": f"boundary-{uuid.uuid4().hex}",
                 "generation_id": generation_id,
+                "native_session_id": native_session_id
+                if native_session_id in self._continuation_sessions
+                else None,
                 "mode": self.mode,
                 "credential_route": self.credential_route if self.mode == "official" else "fixture",
                 "received_ns": time.time_ns(),
@@ -753,18 +1001,49 @@ class MessagesBoundary:
                 "status": "received",
             }
             self._records.append(row)
+            self._native_connections[handler.connection] = row
+            handler.native_row = row
         observer = UsageObserver(row["request_id"])
         try:
+            if self.native_registry is not None:
+                supplied = handler.headers.get_all("x-learning-dispatch-id", [])
+                if len(supplied) != 1:
+                    self._update(row, status="native_attribution_denied")
+                    return self._reject(handler, 403, "NATIVE_DISPATCH_REQUIRED")
+                row["host_dispatch_id"] = supplied[0]
+                self.native_registry.begin_attempt(row, supplied[0])
             with (self.private / f"{row['request_id']}.request.json").open("xb") as raw:
                 raw.write(body)
                 raw.flush()
                 os.fsync(raw.fileno())
             self.ledger.append({"event": "request_received", **row})
             self._event("request_received", row)
+            if self.native_registry is not None:
+                validator = getattr(self.native_registry.business_port, "validate_model_images", None)
+                if validator is not None:
+                    validator(generation_id, request, _image_summary)
+            policy = self._generation_policies.get(generation_id)
+            if policy is not None and (
+                not self._configuration_matches(request, generation_id)
+                or not set(row["tools"]).issubset(policy.allowed_tool_names)
+                or (
+                    policy.allowed_image_sha256 is not None
+                    and any(image["sha256"] not in policy.allowed_image_sha256 for image in images)
+                )
+                or (
+                    policy.exact_image_sequence
+                    and tuple(image["sha256"] for image in images) != policy.allowed_image_sha256
+                )
+            ):
+                self._update(row, status="execution_policy_blocked")
+                return self._reject(handler, 403, "EXECUTION_POLICY_MISMATCH")
             if self.mode == "fixture":
                 self._fixture(handler, request, scenario, row, observer)
             else:
                 self._forward(handler, request, body, row, observer)
+        except ToolRejected as error:
+            self._update(row, status="native_attribution_denied", error_code=error.code)
+            self._reject(handler, error.status, error.code)
         except (http.client.HTTPException, OSError, ValueError) as error:
             controlled = (
                 isinstance(error, ConnectionAbortedError) and str(error) == "CONTROLLED_TRUNCATION"
@@ -777,6 +1056,13 @@ class MessagesBoundary:
                 cancel_observed=not controlled and not self._stop.is_set(),
             )
         finally:
+            if self.native_registry is not None:
+                self.native_registry.finish_attempt(
+                    row,
+                    "completed"
+                    if observer.complete and row["status"] == "completed"
+                    else "unknown",
+                )
             self._update(row, finished_ns=time.time_ns(), usage=observer.result())
             self.ledger.append({"event": "request_finished", **copy.deepcopy(row)})
             self._event("request_finished", row, status=row["status"])
@@ -802,6 +1088,8 @@ class MessagesBoundary:
 
     def _observe(self, observer: UsageObserver, chunk: bytes, row: dict[str, Any]) -> list[str]:
         names: list[str] = []
+        if self.native_registry is not None:
+            self.native_registry.feed(row, chunk)
         for event in observer.feed(chunk):
             name = event.get("type", "unknown_provider_event")
             names.append(name)
@@ -837,6 +1125,9 @@ class MessagesBoundary:
         handler.send_response(200)
         handler.send_header("Content-Type", "text/event-stream")
         handler.send_header("Cache-Control", "no-cache")
+        if row.get("host_dispatch_id"):
+            handler.send_header("x-learning-attempt-id", row["request_id"])
+            handler.send_header("x-learning-dispatch-id", row["host_dispatch_id"])
         handler.send_header("Connection", "close")
         handler.end_headers()
         self._event("response_headers", row, status=200)
@@ -959,13 +1250,15 @@ class MessagesBoundary:
             model, effort = self._generation_selections.get(
                 generation_id, (self.model, self.thinking)
             )
+            policy = self._generation_policies.get(generation_id)
+            max_tokens = policy.max_output_tokens if policy is not None else self.max_tokens
         disabled = effort in {"disabled", "off", "none"}
         thinking = request.get("thinking")
         output = request.get("output_config")
         return (
             request.get("model") == model
             and type(request.get("max_tokens")) is int
-            and request["max_tokens"] == self.max_tokens
+            and request["max_tokens"] == max_tokens
             and isinstance(thinking, dict)
             and thinking.get("type") == ("disabled" if disabled else "enabled")
             and (disabled or (isinstance(output, dict) and output.get("effort") == effort))
@@ -985,12 +1278,14 @@ class MessagesBoundary:
         if row.get("credential_route") != "account" and not self._api_key:
             self._update(row, status="credential_missing")
             return self._reject(handler, 401, "MODEL_KEY_NOT_CONFIGURED")
-        upstream = http.client.HTTPSConnection(OFFICIAL_HOST, 443, timeout=min(15.0, self.timeout))
+        policy = self._generation_policies.get(row.get("generation_id"))
+        timeout = policy.timeout_seconds if policy is not None else self.timeout
+        upstream = http.client.HTTPSConnection(OFFICIAL_HOST, 443, timeout=min(15.0, timeout))
         upstream.auto_open = 0
         transport_socket: socket.socket | None = None
         response: http.client.HTTPResponse | None = None
         done, cancelled = threading.Event(), threading.Event()
-        deadline = time.monotonic() + self.timeout
+        deadline = time.monotonic() + timeout
 
         def interrupt_io() -> None:
             while not done.wait(0.025):
@@ -1022,7 +1317,7 @@ class MessagesBoundary:
             if cancelled.is_set() or self._stop.is_set():
                 raise ConnectionAbortedError("CANCELLED_BEFORE_DISPATCH")
             if upstream.sock is not None:
-                upstream.sock.settimeout(self.timeout)
+                upstream.sock.settimeout(timeout)
             headers = {
                 "Content-Type": "application/json",
                 "Accept": "text/event-stream",
@@ -1060,6 +1355,9 @@ class MessagesBoundary:
                 "Content-Type", response.getheader("Content-Type", "application/octet-stream")
             )
             handler.send_header("Connection", "close")
+            if row.get("host_dispatch_id"):
+                handler.send_header("x-learning-attempt-id", row["request_id"])
+                handler.send_header("x-learning-dispatch-id", row["host_dispatch_id"])
             handler.end_headers()
             with (self.private / f"{row['request_id']}.response.sse").open("xb") as raw:
                 while not self._stop.is_set():
@@ -1069,8 +1367,15 @@ class MessagesBoundary:
                     raw.write(chunk)
                     raw.flush()
                     self._observe(observer, chunk, row)
+                    if observer.complete:
+                        # The provider's explicit SSE terminal settles this
+                        # attempt. Do not wait for an HTTP chunk trailer after
+                        # Harness has already consumed and closed the stream.
+                        done.set()
                     handler.wfile.write(chunk)
                     handler.wfile.flush()
+                    if observer.complete:
+                        break
             self._update(row, status="completed" if observer.complete else "upstream_unsettled")
         except (http.client.HTTPException, OSError) as error:
             self._update(row, status="upstream_unknown", error_type=type(error).__name__)
@@ -1096,3 +1401,15 @@ class MessagesBoundary:
                 response.close()
             upstream.close()
             watcher.join(timeout=1)
+            descriptor = getattr(transport_socket, "fileno", None)
+            try:
+                descriptor_value = descriptor() if callable(descriptor) else None
+            except (OSError, ValueError):
+                descriptor_value = None
+            self._update(
+                row,
+                upstream_transport_closed=(descriptor_value == -1)
+                if type(descriptor_value) is int
+                else None,
+                upstream_watcher_closed=not watcher.is_alive(),
+            )

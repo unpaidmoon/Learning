@@ -1,0 +1,2467 @@
+{
+  "manifest_version": 1,
+  "release_id": "ocr-node24-win-x64-20261023-r1",
+  "scope": "Fixed runtime resources and explicit import candidate only; application owns Node worker, page permissions, tasks, cancellation settlement and queue.",
+  "platform": {
+    "os": "windows",
+    "arch": "x64",
+    "node_tested_version": "24.14.0",
+    "node_policy": "Use project-owned fixed Node executable; do not download or require global installation at runtime."
+  },
+  "library": {
+    "name": "tesseract.js",
+    "version": "6.0.1",
+    "core_version": "6.0.0",
+    "observed_engine_version": "5.1.0-284-g9c08",
+    "entrypoint": "node_modules/tesseract.js/src/index.js",
+    "worker_entrypoint": "node_modules/tesseract.js/src/worker-script/node/index.js",
+    "oem": 1,
+    "languages": [
+      "chi_sim",
+      "eng"
+    ]
+  },
+  "package_lock": {
+    "path": "ocr-package-lock.json",
+    "sha256": "1faada74b7ed6090ad5a63a706554739619bae2cb4874f5fdeb13eb466a5b789",
+    "origin": "byte-for-byte verified reading-audit package lock; internal root package name retained; product pnpm lock not modified"
+  },
+  "install_policy": {
+    "download_implicitly": false,
+    "allow_unpinned_versions": false,
+    "execute_npm_scripts": false,
+    "read_audit_cache_at_runtime": false,
+    "overwrite_mismatched_files": false,
+    "delete_existing_files_or_directories": false,
+    "model_download_at_runtime": false
+  },
+  "caller_requirements": {
+    "lang_path": "absolute installed models directory",
+    "cache_method": "none or separately owned writable cache outside immutable runtime",
+    "worker_and_core": "Node platform uses copied fixed package modules, not browser CDN defaults",
+    "suspended_tasks": "application owns state and must settle pending recognition on owned-worker termination"
+  },
+  "package_count": 13,
+  "packages": [
+    {
+      "id": "npm:bmp-js",
+      "name": "bmp-js",
+      "version": "0.1.0",
+      "url": "https://registry.npmjs.org/bmp-js/-/bmp-js-0.1.0.tgz",
+      "integrity": "sha512-vHdS19CnY3hwiNdkaqk93DvjVLfbEcI8mys4UjuWrlX1haDmroo8o4xCzh4wD6DGV6HxRCyauwhHRqMTfERtjw==",
+      "sha256": "2fcd95c52df269b230ee622cbae00ed1d576b6bbc15af7042ce7ca7600efdd89",
+      "archive_bytes": 43502,
+      "archive_filename": "bmp-js-0.1.0.tgz",
+      "install_path": "node_modules/bmp-js",
+      "source_repository": {
+        "type": "git",
+        "url": "https://github.com/shaozilee/bmp-js"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/bmp-js-0.1.0/LICENSE"
+      ],
+      "installed_file_count": 35,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:idb-keyval",
+      "name": "idb-keyval",
+      "version": "6.3.0",
+      "url": "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.3.0.tgz",
+      "integrity": "sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==",
+      "sha256": "ad954ae198923389ec250e730ba776d4eccc4d4c9acf6fd5a7114c0c80c43112",
+      "archive_bytes": 8152,
+      "archive_filename": "idb-keyval-6.3.0.tgz",
+      "install_path": "node_modules/idb-keyval",
+      "source_repository": {
+        "type": "git",
+        "url": "git+https://github.com/jakearchibald/idb-keyval.git"
+      },
+      "declared_license": "Apache-2.0",
+      "notice_paths": [
+        "notices/ocr/npm/idb-keyval-6.3.0/LICENCE"
+      ],
+      "installed_file_count": 12,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:is-url",
+      "name": "is-url",
+      "version": "1.2.4",
+      "url": "https://registry.npmjs.org/is-url/-/is-url-1.2.4.tgz",
+      "integrity": "sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==",
+      "sha256": "405c35f4f482de299df33c8d0169f454f77e92be69cd8a6521c64977bf2398f9",
+      "archive_bytes": 2466,
+      "archive_filename": "is-url-1.2.4.tgz",
+      "install_path": "node_modules/is-url",
+      "source_repository": "https://github.com/segmentio/is-url",
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/is-url-1.2.4/LICENSE-MIT"
+      ],
+      "installed_file_count": 7,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:node-fetch",
+      "name": "node-fetch",
+      "version": "2.7.0",
+      "url": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz",
+      "integrity": "sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==",
+      "sha256": "a70348669b01db602faf140e984e61b01c4380f9b4bf5e460b7960902412832b",
+      "archive_bytes": 44644,
+      "archive_filename": "node-fetch-2.7.0.tgz",
+      "install_path": "node_modules/node-fetch",
+      "source_repository": {
+        "type": "git",
+        "url": "https://github.com/bitinn/node-fetch.git"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/node-fetch-2.7.0/LICENSE.md"
+      ],
+      "installed_file_count": 7,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:opencollective-postinstall",
+      "name": "opencollective-postinstall",
+      "version": "2.0.3",
+      "url": "https://registry.npmjs.org/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz",
+      "integrity": "sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==",
+      "sha256": "865d0227a25d1f944edfc4fa7d32eebd8ebdbd70c1ac2f64363e5bb16dd1bf35",
+      "archive_bytes": 1947,
+      "archive_filename": "opencollective-postinstall-2.0.3.tgz",
+      "install_path": "node_modules/opencollective-postinstall",
+      "source_repository": {
+        "type": "git",
+        "url": "git+https://github.com/opencollective/opencollective-postinstall.git"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/opencollective-postinstall-2.0.3/LICENSE"
+      ],
+      "installed_file_count": 4,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:regenerator-runtime",
+      "name": "regenerator-runtime",
+      "version": "0.13.11",
+      "url": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz",
+      "integrity": "sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==",
+      "sha256": "96a0a849ceb83d2cd717d775dc60ddb7c2384564f76a75d0d1e6849af04c2b8c",
+      "archive_bytes": 8520,
+      "archive_filename": "regenerator-runtime-0.13.11.tgz",
+      "install_path": "node_modules/regenerator-runtime",
+      "source_repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/regenerator/tree/main/packages/runtime"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/regenerator-runtime-0.13.11/LICENSE"
+      ],
+      "installed_file_count": 5,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:tesseract.js",
+      "name": "tesseract.js",
+      "version": "6.0.1",
+      "url": "https://registry.npmjs.org/tesseract.js/-/tesseract.js-6.0.1.tgz",
+      "integrity": "sha512-/sPvMvrCtgxnNRCjbTYbr7BRu0yfWDsMZQ2a/T5aN/L1t8wUQN6tTWv6p6FwzpoEBA0jrN2UD2SX4QQFRdoDbA==",
+      "sha256": "4a208f2560a527ea9fc339ba2fdf125c13bca6638c194a149379601a1418d0ed",
+      "archive_bytes": 616142,
+      "archive_filename": "tesseract.js-6.0.1.tgz",
+      "install_path": "node_modules/tesseract.js",
+      "source_repository": {
+        "type": "git",
+        "url": "https://github.com/naptha/tesseract.js.git"
+      },
+      "declared_license": "Apache-2.0",
+      "notice_paths": [
+        "notices/ocr/npm/tesseract.js-6.0.1/LICENSE.md"
+      ],
+      "installed_file_count": 79,
+      "install_scripts_executed": false,
+      "source_git_commit": "9d9b666ad5d253451857f4085763e2a9586e984f"
+    },
+    {
+      "id": "npm:tesseract.js-core",
+      "name": "tesseract.js-core",
+      "version": "6.0.0",
+      "url": "https://registry.npmjs.org/tesseract.js-core/-/tesseract.js-core-6.0.0.tgz",
+      "integrity": "sha512-1Qncm/9oKM7xgrQXZXNB+NRh19qiXGhxlrR8EwFbK5SaUbPZnS5OMtP/ghtqfd23hsr1ZvZbZjeuAGcMxd/ooA==",
+      "sha256": "197b53b6bc42b7270c99b079e438992096d71a2b9b8237c6349491bd22fbd5a0",
+      "archive_bytes": 11339836,
+      "archive_filename": "tesseract.js-core-6.0.0.tgz",
+      "install_path": "node_modules/tesseract.js-core",
+      "source_repository": {
+        "type": "git",
+        "url": "https://github.com/naptha/tesseract.js-core.git"
+      },
+      "declared_license": "Apache-2.0",
+      "notice_paths": [
+        "notices/ocr/npm/tesseract.js-core-6.0.0/LICENSE"
+      ],
+      "installed_file_count": 16,
+      "install_scripts_executed": false,
+      "source_git_commit": "8135c61fadee753821cb6a9916e17e1309a6bbf7"
+    },
+    {
+      "id": "npm:tr46",
+      "name": "tr46",
+      "version": "0.0.3",
+      "url": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
+      "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==",
+      "sha256": "164ae1eb32cea353551bbc7f9358dcaae4ffabbe65ec37a92ca464a9570a2a0a",
+      "archive_bytes": 64681,
+      "archive_filename": "tr46-0.0.3.tgz",
+      "install_path": "node_modules/tr46",
+      "source_repository": {
+        "type": "git",
+        "url": "git+https://github.com/Sebmaster/tr46.js.git"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/tr46-0.0.3/LICENSE.upstream-20160802.txt"
+      ],
+      "installed_file_count": 5,
+      "install_scripts_executed": false,
+      "source_git_commit": "a8009f9ce80ff5dbe71dd71e203afe4e4c878d28",
+      "license_text_note": "tarball and original source commit omitted license body; supplemental original upstream MIT file was first added at 3a6f29721e7063b9ffd421e461a54beae6170001 on 2016-08-02; not claimed contemporaneous with 0.0.3"
+    },
+    {
+      "id": "npm:wasm-feature-detect",
+      "name": "wasm-feature-detect",
+      "version": "1.9.0",
+      "url": "https://registry.npmjs.org/wasm-feature-detect/-/wasm-feature-detect-1.9.0.tgz",
+      "integrity": "sha512-zonE+xlIIYtxPy++L24ow0hAD8CICb4+FgPyROd3buyXIqsJvUEDkBgfCCoXOd1Hu3DUr0GOfnPIdcGV+YpNaA==",
+      "sha256": "c56c60a94f74cde3fd08abc609fc9ef97683b501acd40c2bc7eaf5ad2632c5b3",
+      "archive_bytes": 8247,
+      "archive_filename": "wasm-feature-detect-1.9.0.tgz",
+      "install_path": "node_modules/wasm-feature-detect",
+      "source_repository": "GoogleChromeLabs/wasm-feature-detect",
+      "declared_license": "Apache-2.0",
+      "notice_paths": [
+        "notices/ocr/npm/wasm-feature-detect-1.9.0/LICENSE"
+      ],
+      "installed_file_count": 9,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:webidl-conversions",
+      "name": "webidl-conversions",
+      "version": "3.0.1",
+      "url": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
+      "integrity": "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==",
+      "sha256": "e4dfc34b40947c2cf0038cd95fa6de21f4dac93224a7ad8e169205f5c2e22da8",
+      "archive_bytes": 4727,
+      "archive_filename": "webidl-conversions-3.0.1.tgz",
+      "install_path": "node_modules/webidl-conversions",
+      "source_repository": "jsdom/webidl-conversions",
+      "declared_license": "BSD-2-Clause",
+      "notice_paths": [
+        "notices/ocr/npm/webidl-conversions-3.0.1/LICENSE.md"
+      ],
+      "installed_file_count": 4,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:whatwg-url",
+      "name": "whatwg-url",
+      "version": "5.0.0",
+      "url": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
+      "integrity": "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==",
+      "sha256": "b09dc471f573a876eeac3902b8c1da62af5cdbbca2c6fba4a06f119f89cb7ed3",
+      "archive_bytes": 11073,
+      "archive_filename": "whatwg-url-5.0.0.tgz",
+      "install_path": "node_modules/whatwg-url",
+      "source_repository": "jsdom/whatwg-url",
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/whatwg-url-5.0.0/LICENSE.txt"
+      ],
+      "installed_file_count": 8,
+      "install_scripts_executed": false
+    },
+    {
+      "id": "npm:zlibjs",
+      "name": "zlibjs",
+      "version": "0.3.1",
+      "url": "https://registry.npmjs.org/zlibjs/-/zlibjs-0.3.1.tgz",
+      "integrity": "sha512-+J9RrgTKOmlxFSDHo0pI1xM6BLVUv+o0ZT9ANtCxGkjIVCCUdx9alUF8Gm+dGLKbkkkidWIHFDZHDMpfITt4+w==",
+      "sha256": "f0f47a703ce0ec4f254c1ae5da122cb02cc8048088d8064eb793a1c60d78521b",
+      "archive_bytes": 1119325,
+      "archive_filename": "zlibjs-0.3.1.tgz",
+      "install_path": "node_modules/zlibjs",
+      "source_repository": {
+        "type": "git",
+        "url": "git://github.com/imaya/zlib.js.git"
+      },
+      "declared_license": "MIT",
+      "notice_paths": [
+        "notices/ocr/npm/zlibjs-0.3.1/LICENSE"
+      ],
+      "installed_file_count": 34,
+      "install_scripts_executed": false
+    }
+  ],
+  "models": [
+    {
+      "id": "eng",
+      "npm_package": "@tesseract.js-data/eng",
+      "npm_version": "1.0.0",
+      "url": "https://registry.npmjs.org/@tesseract.js-data/eng/-/eng-1.0.0.tgz",
+      "integrity": "sha512-mbTumm6KQPUHyzTPQaF3ObXYnx0SqqfV2nabqFVQBwD6Kl7PhGSLSzOlfFTWy0P3BjghaSKA2W9GB19Jk+ZcTg==",
+      "archive_sha256": "c9bddf2e2f0a214ac7918f3f4a3caf45e09ce8674fe26662ae7787ac8927f7bb",
+      "archive_bytes": 13839644,
+      "archive_member": "package/4.0.0_best_int/eng.traineddata.gz",
+      "install_path": "models/eng.traineddata.gz",
+      "sha256": "45b4cb346724ac1774f1c36f42f182b887bcdb28ebe63e6fff90ac41f3fcff91",
+      "bytes": 2952873,
+      "uncompressed_sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "packaging_repository": "https://github.com/naptha/tessdata",
+      "packaging_commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+      "packaging_git_path": "4.0.0_best_int/eng.traineddata.gz",
+      "packaging_git_blob_sha1": "730a6a59010b9440e38dd85f9fe6b6bf0637e6eb",
+      "raw_model_url": "https://raw.githubusercontent.com/naptha/tessdata/b86746569320a6103cea84cc2b8d9ee74f0f45d3/4.0.0_best_int/eng.traineddata.gz",
+      "source_model_repository": "https://github.com/tesseract-ocr/tessdata_best",
+      "source_model_commit": "e9f15884bc503cf905c8a1dbbc9cb14458152628",
+      "source_model_path": "eng.traineddata",
+      "training_data_upstream_license": "Apache-2.0",
+      "npm_metadata_license": "MIT",
+      "no_relicensing_assumption": true,
+      "generation_script": "notices/ocr/models/gzip-integerize-traineddata.sh.upstream.txt",
+      "source_license": "notices/ocr/models/tessdata_best-LICENSE.Apache-2.0.txt",
+      "provenance_note": "Exact packaged gzip matches the fixed public packaging-repository Git blob. Its pinned submodule points at tessdata_best and its script documents integerization/gzip; transformation was not rerun."
+    },
+    {
+      "id": "chi_sim",
+      "npm_package": "@tesseract.js-data/chi_sim",
+      "npm_version": "1.0.0",
+      "url": "https://registry.npmjs.org/@tesseract.js-data/chi_sim/-/chi_sim-1.0.0.tgz",
+      "integrity": "sha512-iuErURkPbECDUazgsLn/r3c+tU2y5o5S/w14d0A/YiagfsjYyZKgTo75RUpsGJ311qtu0dIX4hqnXAAjmqf2CA==",
+      "archive_sha256": "850d4a217c87808ef765385cbe5825f4ae99047a49b17e024069ceb663f01c33",
+      "archive_bytes": 21809859,
+      "archive_member": "package/4.0.0_best_int/chi_sim.traineddata.gz",
+      "install_path": "models/chi_sim.traineddata.gz",
+      "sha256": "b8a23f10c7de500891eb458a8adc9cc58ab7f242f08b7d149f5e9aea4ad5db7c",
+      "bytes": 1718768,
+      "uncompressed_sha256": "9784f7c917c546424b690fcde708ce1f604a4393d08bb51ddab146d7d7c794e6",
+      "packaging_repository": "https://github.com/naptha/tessdata",
+      "packaging_commit": "b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+      "packaging_git_path": "4.0.0_best_int/chi_sim.traineddata.gz",
+      "packaging_git_blob_sha1": "7defede2087a726a0f01a8f9b3b9c092c12160cc",
+      "raw_model_url": "https://raw.githubusercontent.com/naptha/tessdata/b86746569320a6103cea84cc2b8d9ee74f0f45d3/4.0.0_best_int/chi_sim.traineddata.gz",
+      "source_model_repository": "https://github.com/tesseract-ocr/tessdata_best",
+      "source_model_commit": "e9f15884bc503cf905c8a1dbbc9cb14458152628",
+      "source_model_path": "chi_sim.traineddata",
+      "training_data_upstream_license": "Apache-2.0",
+      "npm_metadata_license": "MIT",
+      "no_relicensing_assumption": true,
+      "generation_script": "notices/ocr/models/gzip-integerize-traineddata.sh.upstream.txt",
+      "source_license": "notices/ocr/models/tessdata_best-LICENSE.Apache-2.0.txt",
+      "provenance_note": "Exact packaged gzip matches the fixed public packaging-repository Git blob. Its pinned submodule points at tessdata_best and its script documents integerization/gzip; transformation was not rerun."
+    }
+  ],
+  "files": [
+    {
+      "install_path": "node_modules/bmp-js/package.json",
+      "sha256": "78f3eefd21ab427f9085270917585c39f3b110c321b3ddbb5a210abfab0c9bdb",
+      "bytes": 546,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/package.json",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/.npmignore",
+      "sha256": "71f4f69e377d643123dcac91d29005d50d0d70d29237bb44731f402927bd6298",
+      "bytes": 18,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/.npmignore",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/README.md",
+      "sha256": "a00f9076ed7ec0a0cd535b5f978894e8c24a3147a684cff461b1981289c5174e",
+      "bytes": 862,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/README.md",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/LICENSE",
+      "sha256": "9f165f5bd2b462122cacb8c6dc32028be1abb4d8ad0322e9a332f30b2ebdb833",
+      "bytes": 1077,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/LICENSE",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/index.js",
+      "sha256": "77ab01e2cb073a3a5d60d3f2ef1ed9ffd67d27985f03e528767dfb80dcf95aa8",
+      "bytes": 233,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/index.js",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/bmp-js.iml",
+      "sha256": "3e424157a615b6a6912a9a510f0c3ef2045ebb77996a7018687a21d225fed1a4",
+      "bytes": 335,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/bmp-js.iml",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/lib/decoder.js",
+      "sha256": "4e941bb5d1b3ce9c67165fc98adc3dfe1850b0dc92b541c4e50862b6015d7ea5",
+      "bytes": 14445,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/lib/decoder.js",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/lib/encoder.js",
+      "sha256": "54c54b0043868c436048ee5405d87956370acc0a9356811f50a123812735bef5",
+      "bytes": 2429,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/lib/encoder.js",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/test.js",
+      "sha256": "f9c1d3230388c57111b6fc4d3d787a60a1444cf29236ab1603fc7977f3e83dcb",
+      "bytes": 801,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/test.js",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit1.bmp",
+      "sha256": "972bf08afeaac8883efd1327369ae2ff99d422a06765b99004de127a82588df9",
+      "bytes": 1664,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit1.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_565_out.bmp",
+      "sha256": "d8307f907031a65b4384099021db72df3f22a2bb47174206b775a78624d756d6",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_565_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_a444.bmp",
+      "sha256": "a92072fcfa9bcb3b251d6fb7d45d02fbd561f13fb341417f9f91df8b9f321066",
+      "bytes": 20072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_a444.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_a444_out.bmp",
+      "sha256": "798810a5f1d2ca0b59d3f3c61b41a6c94beca8a01437025e424911a435599490",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_a444_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_a555.bmp",
+      "sha256": "abfc6723e7a2682fcc73b4b6fe535fafd2c1b29e84ce5c28dcff13c41fcc5817",
+      "bytes": 20072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_a555.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_a555_out.bmp",
+      "sha256": "64806e3bbd7a6ea88b2d1f98f9fb321086742aeb92bdc66b58c8c21007c72e40",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_a555_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_x444.bmp",
+      "sha256": "ea0560ae3429d37bf70e5baa4bd84c37425b93ef1c4390a530c82cd1e89438d7",
+      "bytes": 20072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_x444.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_x444_out.bmp",
+      "sha256": "798810a5f1d2ca0b59d3f3c61b41a6c94beca8a01437025e424911a435599490",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_x444_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_x555.bmp",
+      "sha256": "8bcd820884bf94d0d2101c4be0655649a098d671ead027f33bed155658955f03",
+      "bytes": 20056,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_x555.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_x555_out.bmp",
+      "sha256": "64806e3bbd7a6ea88b2d1f98f9fb321086742aeb92bdc66b58c8c21007c72e40",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_x555_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit1_out.bmp",
+      "sha256": "c7069de1e72a6bb249cd2b87e8b290489c3c5a62e78f4657f9a215c67dd28c3e",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit1_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit24.bmp",
+      "sha256": "39ecec524ba6b6c3a612f5cb98663348f31be3af577f4d95f93873940d03e521",
+      "bytes": 30056,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit24.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit16_565.bmp",
+      "sha256": "5f6442fc05e22a1bdf937bde933d21c0f55f56f8ab82a642854549750887be4c",
+      "bytes": 20072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit16_565.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit32.bmp",
+      "sha256": "1c24cd51e65a752a0d4728f0d7d5646b7b7516fc62ce3d53b64d08b9be98c04f",
+      "bytes": 40072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit32.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit32_alpha.bmp",
+      "sha256": "2260f925924c46d31db7bbd804c28562de4b41de7a4ef405fe8364383370b403",
+      "bytes": 40056,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit32_alpha.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit32_alpha_out.bmp",
+      "sha256": "b2348e7be0f01e79ffdc15b334792aa71ff06d64fed5cac20b705b0f39a0b6be",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit32_alpha_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit32_out.bmp",
+      "sha256": "b2348e7be0f01e79ffdc15b334792aa71ff06d64fed5cac20b705b0f39a0b6be",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit32_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit4.bmp",
+      "sha256": "15bacc7226e74b57cc5f3bbf0140fc557e528843a951f476e93250f5f11ea180",
+      "bytes": 5288,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit4.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit4_RLE.bmp",
+      "sha256": "6126e65d41169c1e223283c8176f849bc99b0c358c11c03838ced5d4c316df8e",
+      "bytes": 2708,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit4_RLE.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit4_RLE_out.bmp",
+      "sha256": "62cd1f4e7331f2ae91efae1a8ea2a54987e05b30ffc1a152b72d3c5d81cc85fe",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit4_RLE_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit4_out.bmp",
+      "sha256": "bcc8c3b00e04b7f2585aec43d83f111090bdd6879c055982fc2495c22ff8aff8",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit4_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit8.bmp",
+      "sha256": "7a4c7da4420f721f46bb72ce2bd7097ab5a1afc9b6efd9b2e868964686941d6e",
+      "bytes": 10556,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit8.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit8_RLE.bmp",
+      "sha256": "316e4b16707a3264b0126cf79b66eccca58831c17948b0d4086f183c7069e78c",
+      "bytes": 3528,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit8_RLE.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit8_RLE_out.bmp",
+      "sha256": "0e959767d2fb8107c941fcf34178b04cdaf2a7c228c47bd408469754a8e1ef24",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit8_RLE_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit8_out.bmp",
+      "sha256": "f63fd4875207adbe71b27f336205d628dd382c056c7abea359e79cb69fdae47f",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit8_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/bmp-js/test/bit24_out.bmp",
+      "sha256": "b2348e7be0f01e79ffdc15b334792aa71ff06d64fed5cac20b705b0f39a0b6be",
+      "bytes": 30054,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/bmp-js/test/bit24_out.bmp",
+      "package": "bmp-js"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/LICENCE",
+      "sha256": "20c27d6339619eeb3113cb865d4e98a3f559e52964fc75caea9cb5fa72674565",
+      "bytes": 555,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/LICENCE",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/compat.cjs",
+      "sha256": "d763b899ef7529b714ddeecd5415e2a0bfadf1ead24e0138449d77aaef84f491",
+      "bytes": 9866,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/compat.cjs",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/index.cjs",
+      "sha256": "b10a7be0906f392b84e36b5bad32484d3d6869f9ef926439905825d428246f78",
+      "bytes": 7175,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/index.cjs",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/umd.cjs",
+      "sha256": "1d5aefa0c1cc78962ef116f11b7608dafeabf4950f71cb99fdab410422921d52",
+      "bytes": 4815,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/umd.cjs",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/compat.js",
+      "sha256": "1a4c388de8b7d2bbbe049098b57feb132f6d65d6a525d73d6effbba9b562a5d7",
+      "bytes": 9634,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/compat.js",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/index.js",
+      "sha256": "480f1d31a40b5720fbaaee44c1a21d83392c6cf9516672007813a1824483a058",
+      "bytes": 6943,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/index.js",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/umd.js",
+      "sha256": "1d5aefa0c1cc78962ef116f11b7608dafeabf4950f71cb99fdab410422921d52",
+      "bytes": 4815,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/umd.js",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/package.json",
+      "sha256": "28c6f3816282c710a8f67021422939cbff9a440ebadd67f083292da6edaf6648",
+      "bytes": 2256,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/package.json",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/README.md",
+      "sha256": "4274e16e46dfa5d4db79ae5f8ce8d2acf81294502d2eb26b3e4444a3c59a4e91",
+      "bytes": 6373,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/README.md",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/compat.d.ts",
+      "sha256": "315394566cd879a2c3af92cc691d1ac76b7a0cf7c5f3b980b450a557d71862ce",
+      "bytes": 19,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/compat.d.ts",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/index.d.ts",
+      "sha256": "783a36e6a2d7f172437b5a7988430cca01fd87dd2c11d3b9b79a938600b4a637",
+      "bytes": 3379,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/index.d.ts",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/idb-keyval/dist/umd.d.ts",
+      "sha256": "315394566cd879a2c3af92cc691d1ac76b7a0cf7c5f3b980b450a557d71862ce",
+      "bytes": 19,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/idb-keyval/dist/umd.d.ts",
+      "package": "idb-keyval"
+    },
+    {
+      "install_path": "node_modules/is-url/package.json",
+      "sha256": "215ed6a491b1ac845b556de17f46075897e084c7c9f6018bde7150017da34817",
+      "bytes": 274,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/package.json",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/.travis.yml",
+      "sha256": "d9fc251db24a95f9ab69ebe704b0546819669b7c3909b5bc17c4026fc516013f",
+      "bytes": 32,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/.travis.yml",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/History.md",
+      "sha256": "e61a5e9320737b793e379319270032ab99ad1fe6e396ca9cf97e908222eba0ae",
+      "bytes": 503,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/History.md",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/index.js",
+      "sha256": "c7cb9f56300321d104c9772c054144d75e3bf280d184d547fab525f9fbf16e5c",
+      "bytes": 856,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/index.js",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/LICENSE-MIT",
+      "sha256": "80957b522b0ea4ce24290953d74d818220c804d1f42cad02b8d7da1c12ce1fc1",
+      "bytes": 1036,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/LICENSE-MIT",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/Readme.md",
+      "sha256": "72cb0a1cdd26a2a16c8c2be75b5440c7c7de94142d41092f183052792d6b73fc",
+      "bytes": 193,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/Readme.md",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/is-url/test/index.js",
+      "sha256": "ac53796f4aaf8474830eec375f929b0269c2811eb2e7abf9cfdd87b793ee7f5b",
+      "bytes": 3688,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/is-url/test/index.js",
+      "package": "is-url"
+    },
+    {
+      "install_path": "node_modules/node-fetch/browser.js",
+      "sha256": "2f59898f0efeaf430d2277e2519819e8e4fd365cb27f9d88d275cf43e1b1344f",
+      "bytes": 781,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/browser.js",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/lib/index.es.js",
+      "sha256": "f786ccb522a08d5296a808bd0aef4bcfb8d9c9b4347e874fbbf6a64c6c1f8b97",
+      "bytes": 45346,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/lib/index.es.js",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/lib/index.js",
+      "sha256": "79541f01338e70f4ff6f8a1d12f5c2914d4c6ab2ba96b7ddf48d2add01c13813",
+      "bytes": 45775,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/lib/index.js",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/package.json",
+      "sha256": "000a0b3b037d4e3e211e7b7ca559a5a62a39b96ca2c6bcdaed3aba0a545eedba",
+      "bytes": 2668,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/package.json",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/LICENSE.md",
+      "sha256": "84eaa985e1ef71b8c630e8aba73404c219ff425c6fdb45c62e998b58d4fbdc8e",
+      "bytes": 1079,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/LICENSE.md",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/README.md",
+      "sha256": "53ca2fdf67a57f9b26b19cb198f62aeaa2de9371992b2b54845aac5b6dc0f65d",
+      "bytes": 21332,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/README.md",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/node-fetch/lib/index.mjs",
+      "sha256": "751ad19bb1be0a02e9d453eedd4a034e68b433bfbf4789c1645ab058882d11f6",
+      "bytes": 45272,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/node-fetch/lib/index.mjs",
+      "package": "node-fetch"
+    },
+    {
+      "install_path": "node_modules/opencollective-postinstall/LICENSE",
+      "sha256": "86641df2e1c0c0e655d7eb9962a28e850e80c97c62a29500f2f93ab142c3c8f2",
+      "bytes": 1072,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/opencollective-postinstall/LICENSE",
+      "package": "opencollective-postinstall"
+    },
+    {
+      "install_path": "node_modules/opencollective-postinstall/index.js",
+      "sha256": "8bdb30e5e56e9466eb8ceb1e02337e3512c330a39b107870ddac10dfad1a8fba",
+      "bytes": 793,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/opencollective-postinstall/index.js",
+      "package": "opencollective-postinstall"
+    },
+    {
+      "install_path": "node_modules/opencollective-postinstall/package.json",
+      "sha256": "8e0dab770014766c637d3f7679bdb6837b313b8d9847d0e36936250120cfbc52",
+      "bytes": 787,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/opencollective-postinstall/package.json",
+      "package": "opencollective-postinstall"
+    },
+    {
+      "install_path": "node_modules/opencollective-postinstall/README.md",
+      "sha256": "7cb566430ed3107a170e16f6077e696e584743110ca4947b5b2993503e72b45e",
+      "bytes": 1035,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/opencollective-postinstall/README.md",
+      "package": "opencollective-postinstall"
+    },
+    {
+      "install_path": "node_modules/regenerator-runtime/LICENSE",
+      "sha256": "51887a3d47051ac2fce1210562e5b9fe0830a8a8fabeb272c2d586eeb18a05fd",
+      "bytes": 1080,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/regenerator-runtime/LICENSE",
+      "package": "regenerator-runtime"
+    },
+    {
+      "install_path": "node_modules/regenerator-runtime/path.js",
+      "sha256": "29c3a3cc09287a723eb6b9452a8175ebfbad00f96f47939ae0709906f7b7a1ee",
+      "bytes": 252,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/regenerator-runtime/path.js",
+      "package": "regenerator-runtime"
+    },
+    {
+      "install_path": "node_modules/regenerator-runtime/runtime.js",
+      "sha256": "e4fa2bcc7507e23fb226bad104bd3c526149ebc9891afbc4bb3a4a0c88afded3",
+      "bytes": 25202,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/regenerator-runtime/runtime.js",
+      "package": "regenerator-runtime"
+    },
+    {
+      "install_path": "node_modules/regenerator-runtime/package.json",
+      "sha256": "438ba14ad7859f5e16914e174e425afa8f5d9c21cf5ab208699a28454c4618ee",
+      "bytes": 464,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/regenerator-runtime/package.json",
+      "package": "regenerator-runtime"
+    },
+    {
+      "install_path": "node_modules/regenerator-runtime/README.md",
+      "sha256": "6de6513adde7d09bd2c06075ef11f809ea70d0005b2e402ab8cfd06052127015",
+      "bytes": 761,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/regenerator-runtime/README.md",
+      "package": "regenerator-runtime"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/images/demo.gif",
+      "sha256": "6d05c954f32ed01263043cfe32fad2c1dd45410a74dc83c4070764cfb175bad9",
+      "bytes": 99283,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/images/demo.gif",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/images/video-demo.gif",
+      "sha256": "277b8c6a2c72863a7d0c5c2e5204c2b6fc5084535c244e4a26810aa1e2fa29d3",
+      "bytes": 242376,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/images/video-demo.gif",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/browser/basic-efficient.html",
+      "sha256": "2b60ee641b1961509f6b2719b18185d146816812ddac554ff29f6af5ac9da05c",
+      "bytes": 874,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/browser/basic-efficient.html",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/browser/basic-scheduler.html",
+      "sha256": "9dc798b250d12c4eb4af6938ac68be894573c5c008a45a43278b136c674b32d9",
+      "bytes": 1463,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/browser/basic-scheduler.html",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/browser/download-pdf.html",
+      "sha256": "69885a3b50b5ddfdc1ac37ec860d80c1fc1eae18c0ff3c2148021fd97aa65418",
+      "bytes": 1916,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/browser/download-pdf.html",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/browser/image-processing.html",
+      "sha256": "47a027da4938f1f908bc44333c01abc5a48f4bd231b3658095ea00857c9f6a40",
+      "bytes": 1486,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/browser/image-processing.html",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/utils/arrayBufferToBase64.js",
+      "sha256": "b8ef005b926588a88dbe3d7f61a2d00c817842578131c180ee1e9c5ada8d4ae1",
+      "bytes": 1857,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/utils/arrayBufferToBase64.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/browser/cache.js",
+      "sha256": "7d6355676f282e48ba6c95242880ec6131570e21258f2cb7b8d23a1406b8247b",
+      "bytes": 227,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/browser/cache.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/node/cache.js",
+      "sha256": "815947619b583b3bbe91cab4aa9825db0987e26f8dc762e14a11c592eb70dbbd",
+      "bytes": 410,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/node/cache.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/createJob.js",
+      "sha256": "e96d0edb2d5fe1011f31f135518f0e79d934c6c3a512e66e87c4a3c4cfc601a1",
+      "bytes": 306,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/createJob.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/createScheduler.js",
+      "sha256": "2f456f3ec13e5c89f32b52f5cef69ad3aa5bcb7af6e4a3d72997f57f054c7532",
+      "bytes": 1986,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/createScheduler.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/createWorker.js",
+      "sha256": "730c82036c801416256cdbf4bf36df934b0f25f2dcb3913454bccd9e2cfdb857",
+      "bytes": 6672,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/createWorker.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/constants/defaultOptions.js",
+      "sha256": "c133a00e603dde9ae7aa2b5a59fa3ded7cdd5c1846af1c36940bd866c7f09d1b",
+      "bytes": 172,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/constants/defaultOptions.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/defaultOptions.js",
+      "sha256": "66a296b99446fdf1bc80004f601e17c2d1f77861874091923eb3d92c079c082f",
+      "bytes": 318,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/defaultOptions.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/defaultOptions.js",
+      "sha256": "da02fc10c3545154ae143d0cc762b2493cde4207272ee0f5ab5da6bea67249e7",
+      "bytes": 282,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/defaultOptions.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/constants/defaultOutput.js",
+      "sha256": "0bbce30ab5af59468849e19fa3ec01caf93e7a0760cb69b2a8955ee6d17d3909",
+      "bytes": 307,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/constants/defaultOutput.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/node/download-pdf.js",
+      "sha256": "1e900e3f2d0c006e371acf027afec8f0a53eb39e737aa64d56a0e68f628b0d9a",
+      "bytes": 647,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/node/download-pdf.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/utils/dump.js",
+      "sha256": "09a7e2585627056d48e5ae0facf77cd21a97fcd8219f0ca6abd21065d157ad9f",
+      "bytes": 2972,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/utils/dump.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/browser/getCore.js",
+      "sha256": "6b106c359eb1828132f572d963f1807495e289af18cd04d54ba25f511eadc465",
+      "bytes": 2308,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/browser/getCore.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/node/getCore.js",
+      "sha256": "458a649b67e9db838af4cb98826a444cfff72da8d0673ae4f3ef9b78a872b62c",
+      "bytes": 986,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/node/getCore.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/utils/getEnvironment.js",
+      "sha256": "90867901571990b7b8665567a81e10c827da9a1d2642328a619f9704f0a7eaef",
+      "bytes": 395,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/utils/getEnvironment.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/utils/getId.js",
+      "sha256": "f27f8c6c0bbe48cb49dcd73afa4c3797c9701fce0d1e63a09185b3c1267cfe55",
+      "bytes": 117,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/utils/getId.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/browser/gunzip.js",
+      "sha256": "91228afc0954f53c64e4428017dd0764ae51435164c17dcf4098e2b077431789",
+      "bytes": 62,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/browser/gunzip.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/node/gunzip.js",
+      "sha256": "aa725afcefa41fd181f6ddf9e1d228c5174e1e40c87c2c359b0b35b3d4b58f98",
+      "bytes": 60,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/node/gunzip.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/node/image-processing.js",
+      "sha256": "06843300f2924cbd5b5cafaabc923385547a28039d0b357614d199f873819b80",
+      "bytes": 1183,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/node/image-processing.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/constants/imageType.js",
+      "sha256": "64df6196df12df3b9cd2009556d21c9da421cf6f8d6960f05ece04cf6963280f",
+      "bytes": 73,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/constants/imageType.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/index.js",
+      "sha256": "882360f8435a9f2b80265fffc5df2a7c849c39afd05c36ffd89db9d1024979d0",
+      "bytes": 754,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/browser/index.js",
+      "sha256": "ed824cc16d15782a2764cb6264fb5f677c60d5bde92d03f7ab0537b3d818027c",
+      "bytes": 676,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/browser/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/index.js",
+      "sha256": "a5759d6d3d8beda31134dd041e2d3482b3adf26b6da4a3e7da9b1c5379114268",
+      "bytes": 18777,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/node/index.js",
+      "sha256": "a973c23ce067bc752c0bf602297eac843098e531ac03f3ea34cdf694326a6d02",
+      "bytes": 771,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/node/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/index.js",
+      "sha256": "0886ce2448b0634a83eb15fbf2feb9db9d140ab1c68c5c87f5ecf4b82c40cec6",
+      "bytes": 633,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/index.js",
+      "sha256": "edc9de52fb13bba841158741c883a68f8adea9d2505869dfc63266a623ee38bd",
+      "bytes": 645,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/index.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/karma.conf.js",
+      "sha256": "9d2c5648c81e632608b47ded3617ebf8e4bcd45637f8d0212a3e2479f6bbd8b2",
+      "bytes": 1390,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/karma.conf.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/constants/languages.js",
+      "sha256": "c1de5ac399d8dd62e6763ee7936b2e6241a05abac11e8925414386b1cc0bc4f8",
+      "bytes": 5559,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/constants/languages.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/loadImage.js",
+      "sha256": "7c4a6b296aa741c6a4425b56570774c73125726ed7ffb5bba9645837fc814157",
+      "bytes": 1844,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/loadImage.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/loadImage.js",
+      "sha256": "fe47eb386a2a802b2621abec973e191fb9a0d9609dcf633dce085f82621d287f",
+      "bytes": 1028,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/loadImage.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/utils/log.js",
+      "sha256": "979b83c424ee6440894c51b0b0a41629f67e130d721fc33d2c703e60203fc3ad",
+      "bytes": 205,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/utils/log.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/constants/OEM.js",
+      "sha256": "01235a54415543fddf2c8c114328500fe6027e5ff5c084fe9d9a491c7895a442",
+      "bytes": 237,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/constants/OEM.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/onMessage.js",
+      "sha256": "ac93c361f5b181668e49b2270f37f03a6b84cd43a76289e8c69223b1ced69634",
+      "bytes": 142,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/onMessage.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/onMessage.js",
+      "sha256": "f6a148f1ec9c175fcdee8565b82b8c5edc3058c69df644dedda7b422a9112b64",
+      "bytes": 91,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/onMessage.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/constants/PSM.js",
+      "sha256": "3780ffd6bcd377d943546d42d3b00221d2d62f9a1c1f1df2bc8aed98ed48c3f3",
+      "bytes": 360,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/constants/PSM.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/node/recognize.js",
+      "sha256": "58645c0019ea89289add9ae4d6e85120573aac831c001e26b1b9d7bbba9eb590",
+      "bytes": 499,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/node/recognize.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/utils/resolvePaths.js",
+      "sha256": "55333a374178c5c4ba30200a5f0471fb3523575062436cb9ca215fc19e7a7686",
+      "bytes": 413,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/utils/resolvePaths.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/examples/node/scheduler.js",
+      "sha256": "1eaf031d544112da2ebd1186051c6710bdc35e303135b5d2f84c77893b5cd861",
+      "bytes": 1166,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/examples/node/scheduler.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/send.js",
+      "sha256": "d07042e9f38faff1cf37dd3e51ec7cd24e7fcf27b244184320949254608cbc34",
+      "bytes": 196,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/send.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/send.js",
+      "sha256": "d07042e9f38faff1cf37dd3e51ec7cd24e7fcf27b244184320949254608cbc34",
+      "bytes": 196,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/send.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/scripts/server.js",
+      "sha256": "5cd640b147b7d29d5dbb7924eb6c8a4d84ca2894a15912b8f6222e4287adf754",
+      "bytes": 874,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/scripts/server.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker-script/utils/setImage.js",
+      "sha256": "608f928a37d0c456ef60ec3a6b1e9b17acc14ce3363fb39fed138aba7208490c",
+      "bytes": 1188,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker-script/utils/setImage.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/spawnWorker.js",
+      "sha256": "39a3b5dcb28a649111974ba97d14c6651ab4a48696034727cb8cc2706501b84f",
+      "bytes": 466,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/spawnWorker.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/spawnWorker.js",
+      "sha256": "0f1dc3715aa3abeb3ec28865a64c526d1cf5436c836aae53098201064f54c929",
+      "bytes": 228,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/spawnWorker.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/browser/terminateWorker.js",
+      "sha256": "2924d34de86a287933d54e4494248e2caa16277d0d5b53630dae0d2b06be03fb",
+      "bytes": 174,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/browser/terminateWorker.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/worker/node/terminateWorker.js",
+      "sha256": "264591091b8ab0bf015fc015e5e2d514917f3ead561668a0932efadc3508f4aa",
+      "bytes": 169,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/worker/node/terminateWorker.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/tesseract.esm.min.js",
+      "sha256": "da6267cfe5036ae718a59eece3b5744a4655b0b8faa9f16259362b783d74c9bb",
+      "bytes": 63220,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/tesseract.esm.min.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/Tesseract.js",
+      "sha256": "5eddc3f16fb0643f9cd4b7f1f8fd71316c262a0d2c29a5ac2ff9d6f5f2c03f7b",
+      "bytes": 522,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/Tesseract.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/tesseract.min.js",
+      "sha256": "10fff78484067759c43028a02a72d76d0b90eb17302bb23b58a9ec5410bc928b",
+      "bytes": 62961,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/tesseract.min.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/scripts/webpack.config.common.js",
+      "sha256": "d333039f12d485b2a54fcdb1aa6d6cd459148f01f1d66359b607eff1898f1a30",
+      "bytes": 539,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/scripts/webpack.config.common.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/scripts/webpack.config.prod.js",
+      "sha256": "e6134fed4003abedac5316df0ad2b8b9e25cda9e9779bc7b8e74a10e84ba371c",
+      "bytes": 814,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/scripts/webpack.config.prod.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/worker.min.js",
+      "sha256": "38645599043239c0eb6db08a6504a92dcdc292200535f3e9339cd77c4443b842",
+      "bytes": 111162,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/worker.min.js",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/package.json",
+      "sha256": "b5c3e647996bca7619fa248ed36b85492ef8b6e9342dd46c824f811173e92b85",
+      "bytes": 2915,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/package.json",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/tesseract.esm.min.js.map",
+      "sha256": "b90e6734b6f835d5b619236e1d40b61accafe5b03cae5b813f0fec263ce6239e",
+      "bytes": 185596,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/tesseract.esm.min.js.map",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/tesseract.min.js.map",
+      "sha256": "a9478825f264a19344d379784f5211aa805d3cd020bdd8f7b35051dd20105d1f",
+      "bytes": 131627,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/tesseract.min.js.map",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/worker.min.js.map",
+      "sha256": "51ea3f21d9c0ed195e7de3c4ac493dbb208368162f2674aa2286265495ec7377",
+      "bytes": 341644,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/worker.min.js.map",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/api.md",
+      "sha256": "f80c9ef846140d795942ba173a9478d563ae597ad2d3697fcf1437a8ab0ed55e",
+      "bytes": 14857,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/api.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/examples.md",
+      "sha256": "156ba01e230a92d3bba7f5c20f50e68d1380ca2ed286240899c9ff3de0415302",
+      "bytes": 4670,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/examples.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/faq.md",
+      "sha256": "8051e19e3b0b9061791bc436bb7c9203f6dbb1681952b7a379e542c01b2fe273",
+      "bytes": 7870,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/faq.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/image-format.md",
+      "sha256": "1eaed7f999cd1b8728c80897b89048170b2c499c24e4cc0f03d0d86bb5bb0b3e",
+      "bytes": 743,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/image-format.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/LICENSE.md",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "bytes": 11357,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/LICENSE.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/local-installation.md",
+      "sha256": "6db027a844b206f42e844508cff6b5d576dccdb12b5ed67a3587d4fa010652da",
+      "bytes": 2511,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/local-installation.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/performance.md",
+      "sha256": "63fa4136795fae2575987fd761d81da27db178ea5d22cbbbd657a94db93d5c40",
+      "bytes": 4659,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/performance.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/README.md",
+      "sha256": "30e642ec6d95e527e4322f66813db55af9cb52be08cbc0388604cf3394bd13a0",
+      "bytes": 11098,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/README.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/tesseract_lang_list.md",
+      "sha256": "7289527329c8b17cf50041826504b86b807bf28fd96a09e9d0662ec2df5484e5",
+      "bytes": 163,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/tesseract_lang_list.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/workers_vs_schedulers.md",
+      "sha256": "baf3a442abdfa67e1fb4deef2f458d6a14e1798fdacb6417a53957cc490b1943",
+      "bytes": 3991,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/workers_vs_schedulers.md",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/scripts/rollup.esm.mjs",
+      "sha256": "ef7d5a2644b2c4605e85bf416b93a5516b7de4fe4df8e30db2d63074ed7529c2",
+      "bytes": 350,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/scripts/rollup.esm.mjs",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/scripts/test-helper.mjs",
+      "sha256": "cc69ece57fb789a7e2505940e16904d851ed39ebe46a23104c2d9d8d30ca512e",
+      "bytes": 211,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/scripts/test-helper.mjs",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/images/tesseract_dark.png",
+      "sha256": "577bb023914aada203f5d665bf2e5b4ba93b9301f64eeffa2e12abf6e9d050ef",
+      "bytes": 7916,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/images/tesseract_dark.png",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/docs/images/tesseract.png",
+      "sha256": "6154b2d3637dc1642a975c5947237ca6f343a826f70b5f12e3e5ce0412592c6e",
+      "bytes": 23940,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/docs/images/tesseract.png",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/src/index.d.ts",
+      "sha256": "6bd6a86c2233e2ece7b22c2b7908bd53da81376d9aae630f706f8305489e8c66",
+      "bytes": 5938,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/src/index.d.ts",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/tesseract.min.js.LICENSE.txt",
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2",
+      "bytes": 149,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/tesseract.min.js.LICENSE.txt",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js/dist/worker.min.js.LICENSE.txt",
+      "sha256": "45f54171aeaa1d10c0c1a66f374b7bba1f02472b1487fbe892eec04f840002ac",
+      "bytes": 466,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js/dist/worker.min.js.LICENSE.txt",
+      "package": "tesseract.js"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/LICENSE",
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "bytes": 11358,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/LICENSE",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/index.js",
+      "sha256": "cc5d319080bc2ef3c288128690ea598c8cbc1d1f2f13a6a750c0ba344ff5a162",
+      "bytes": 118,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/index.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-lstm.js",
+      "sha256": "48a3ee8e00924cb8c7f0cc0d099b1318fea120af56b3ee8fb3a70dd2311806c2",
+      "bytes": 124747,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-lstm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-lstm.wasm.js",
+      "sha256": "775a35df6f2ae100e02609443e6bd5cafcd07983dd6175454ca4a432a7730687",
+      "bytes": 3954181,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-lstm.wasm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd-lstm.js",
+      "sha256": "be3504705d7111d1d1f3f7f9dff326c26d334031ede36e31c4d3cf883027e982",
+      "bytes": 124752,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd-lstm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
+      "sha256": "9d7c43fb206dc9f48475228b46bf35f888fa9e6259da2e67d5a75c77049f2dc7",
+      "bytes": 3954569,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd.js",
+      "sha256": "85762abcc52bc6f4762b1429e2986c8ea963db76632770970c0485fb6d6aa820",
+      "bytes": 124435,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd.wasm.js",
+      "sha256": "3b0678c47a8dea6abb931b214171c08b742a5b9a9fcbbb1a028a08d5de6e9d4c",
+      "bytes": 4751193,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd.wasm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core.js",
+      "sha256": "8d7d9776c8552951f8d3bb903dafb22d4e2e065564d7e1b3d523383670a94ecd",
+      "bytes": 124430,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core.wasm.js",
+      "sha256": "e66872f6a76f5ad414d73d21512245df0de3060ad4871a97c47efceaab27b955",
+      "bytes": 4750805,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core.wasm.js",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/package.json",
+      "sha256": "b60deb039e4d86ee25d67efc842e6df8e10014df43bff1f6ef09e69788fd82b3",
+      "bytes": 1576,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/package.json",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/README.md",
+      "sha256": "eeded06fd8119d0a7ef2372486908aa4d9ee020a013c590d4c562d5c22fd0cc7",
+      "bytes": 4296,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/README.md",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-lstm.wasm",
+      "sha256": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b",
+      "bytes": 2871085,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-lstm.wasm",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm",
+      "sha256": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d",
+      "bytes": 2871377,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core-simd.wasm",
+      "sha256": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b",
+      "bytes": 3469078,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core-simd.wasm",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tesseract.js-core/tesseract-core.wasm",
+      "sha256": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106",
+      "bytes": 3468788,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tesseract.js-core/tesseract-core.wasm",
+      "package": "tesseract.js-core"
+    },
+    {
+      "install_path": "node_modules/tr46/package.json",
+      "sha256": "615087f58ee138fd35c2b414c355b72e36e5919725b8aecc1c34f6a5585b9779",
+      "bytes": 732,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tr46/package.json",
+      "package": "tr46"
+    },
+    {
+      "install_path": "node_modules/tr46/.npmignore",
+      "sha256": "220244e94c71eccaccee66cac3ccd592f503f4a21caabbde6b92d16ce4434ba1",
+      "bytes": 40,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tr46/.npmignore",
+      "package": "tr46"
+    },
+    {
+      "install_path": "node_modules/tr46/index.js",
+      "sha256": "8194f9425ce9ab06ea9aebcd64a85ec064d95d61bb349f8f1c98762ad256638e",
+      "bytes": 7567,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tr46/index.js",
+      "package": "tr46"
+    },
+    {
+      "install_path": "node_modules/tr46/lib/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tr46/lib/.gitkeep",
+      "package": "tr46"
+    },
+    {
+      "install_path": "node_modules/tr46/lib/mappingTable.json",
+      "sha256": "b6b39724dca9011113a08d9d6910204062b58169e98952acdfbd19bf2c31bbff",
+      "bytes": 260049,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/tr46/lib/mappingTable.json",
+      "package": "tr46"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/LICENSE",
+      "sha256": "bcf29b4fd3ec2cb5f9d40a0866da446f6da62170d2ccedf4aeca9cf9406dd20c",
+      "bytes": 11341,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/LICENSE",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/dist/cjs/index.cjs",
+      "sha256": "cb1e224af96ecc6e5532a3d2bf99389c7a9b1780d08a6f7bb54814eb98e75b5f",
+      "bytes": 3408,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/dist/cjs/index.cjs",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/dist/index.d.cts",
+      "sha256": "10159985f77367c75afc87799eb9f8c6cacb083f32012b1683a4c85168dfa098",
+      "bytes": 877,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/dist/index.d.cts",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/README.md.ejs",
+      "sha256": "5e4263cad319dd5b7a7dee9af0cddd6e888ea96daef3bfa405dff7c5988be3c9",
+      "bytes": 2728,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/README.md.ejs",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/dist/esm/index.js",
+      "sha256": "871246e709a8564b583265a37df4b90bebf6aabea6e7b86a41ab6ed986651154",
+      "bytes": 3381,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/dist/esm/index.js",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/dist/umd/index.js",
+      "sha256": "8b7b26f39778601a2e53320064b3e788ebe3c03799eaa3de9a015ced866e8cc9",
+      "bytes": 3621,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/dist/umd/index.js",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/package.json",
+      "sha256": "7049a061b59dc1cbfc8dedf7e5f0ab23e14c1624f27d3bab2272d54de941483f",
+      "bytes": 1856,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/package.json",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/README.md",
+      "sha256": "2f3c2cacb937ce8a0cbdbacf2ba34428104d8245b4d7b12512afa7a44b9aa784",
+      "bytes": 6111,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/README.md",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/wasm-feature-detect/dist/index.d.ts",
+      "sha256": "10159985f77367c75afc87799eb9f8c6cacb083f32012b1683a4c85168dfa098",
+      "bytes": 877,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/wasm-feature-detect/dist/index.d.ts",
+      "package": "wasm-feature-detect"
+    },
+    {
+      "install_path": "node_modules/webidl-conversions/package.json",
+      "sha256": "e26568c06b82596d754c7490fd568b4b3f970b3b97c55020d42f65990d0c86af",
+      "bytes": 511,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/webidl-conversions/package.json",
+      "package": "webidl-conversions"
+    },
+    {
+      "install_path": "node_modules/webidl-conversions/README.md",
+      "sha256": "fd9075b4186b3167c44b00eb92d95971b3d36ed6cf10ace990afcadf5f52f08a",
+      "bytes": 5480,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/webidl-conversions/README.md",
+      "package": "webidl-conversions"
+    },
+    {
+      "install_path": "node_modules/webidl-conversions/LICENSE.md",
+      "sha256": "a889cc4dbee2ae172c179856b25d75b0b7a5a136e1b97109b9b590b2ff1a879c",
+      "bytes": 1323,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/webidl-conversions/LICENSE.md",
+      "package": "webidl-conversions"
+    },
+    {
+      "install_path": "node_modules/webidl-conversions/lib/index.js",
+      "sha256": "0b29621626c38ddda2a8e20787c32d09db10dd031ea743c5e270b59d46754a84",
+      "bytes": 5056,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/webidl-conversions/lib/index.js",
+      "package": "webidl-conversions"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/package.json",
+      "sha256": "05a015c4176246f051bbaa3a543ed82480a4a4d85360283e049f159ba014b008",
+      "bytes": 886,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/package.json",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/README.md",
+      "sha256": "f60e4cb8275e281590d826da8a1a3134367c5a8fa6c514d4440075f6b00a0b19",
+      "bytes": 5136,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/README.md",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/LICENSE.txt",
+      "sha256": "6b7a1792144374d84dc5ed3655b8bbe2754d06f4f1f64a9fb8b9de2d6f448b85",
+      "bytes": 1088,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/LICENSE.txt",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/lib/URL-impl.js",
+      "sha256": "e60103ff74b8bfc4001f5c05eea482f554de610cb5fc4e7ccbfc5aef9e443706",
+      "bytes": 3804,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/lib/URL-impl.js",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/lib/URL.js",
+      "sha256": "3bd67335fc72b50924fa35523c2b0b73dce9cb814f6bae82644ccb1f22560706",
+      "bytes": 4212,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/lib/URL.js",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/lib/public-api.js",
+      "sha256": "0cbda6401c6179c4fb2ef0cebeccfb127485fee6f0ed5c129a8a539d4cd29018",
+      "bytes": 625,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/lib/public-api.js",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/lib/url-state-machine.js",
+      "sha256": "e038db71d8a2313d7d20ad6dd1116a2fcb34b41e39f7a2364c70ff1aff548850",
+      "bytes": 33573,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/lib/url-state-machine.js",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/whatwg-url/lib/utils.js",
+      "sha256": "96b941934b9050815f9397bc6796ea8611bfa00c5886587d81da64a23841e3b9",
+      "bytes": 562,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/whatwg-url/lib/utils.js",
+      "package": "whatwg-url"
+    },
+    {
+      "install_path": "node_modules/zlibjs/package.json",
+      "sha256": "5a087e0b211482ab3ab1de0ede25efe4296f77830ec5b7ec6fea357d68af9ede",
+      "bytes": 1387,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/package.json",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/README.md",
+      "sha256": "c65f2d2e0dcff8f2c185036a737eb1b59667b9c56b8a6ec920bfc2a16bbb3a4d",
+      "bytes": 9668,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/README.md",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/LICENSE",
+      "sha256": "131afe3f7bdce1698beb292fb8de1a968de01bce876122a60ef5db230471c866",
+      "bytes": 1222,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/LICENSE",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib_and_gzip.min.js",
+      "sha256": "95eba9c13bcf7a0446d55ae26df993932352bf6a467e2d2fefe311495621add1",
+      "bytes": 24502,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib_and_gzip.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/inflate_stream.dev.min.js",
+      "sha256": "3f133a6add5fd28894f59686a118aaadb434fcbfc02ff79e94e3996371ef501c",
+      "bytes": 137921,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/inflate_stream.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/inflate_stream.min.js",
+      "sha256": "5072a18cb8c1d10536e7947e3550b6b1007bee60074d5970b708c88d7fdf0a2e",
+      "bytes": 6233,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/inflate_stream.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/node-zlib.dev.js",
+      "sha256": "262810543818eb04bb1f89a790ddf0712dce8af7a8e59180d01bdb039e608d38",
+      "bytes": 329598,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/node-zlib.dev.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/inflate.min.js",
+      "sha256": "550b17ae3db8a3dcd31e6af365e9abb7ddbcc28f798f9b0cc92c27ca237afc5b",
+      "bytes": 6980,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/inflate.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/rawdeflate.dev.min.js",
+      "sha256": "d6c81184b804ead95699f7b45b372638e01caf03dffd012826a7c3b726860fb1",
+      "bytes": 184950,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/rawdeflate.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/rawdeflate.min.js",
+      "sha256": "c679b878fdb20e0fb0e162843af12c1fedcd4db2d348565e594e299545e778ee",
+      "bytes": 10354,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/rawdeflate.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/rawinflate.dev.min.js",
+      "sha256": "95d8e29a2cb0e2a432dcca2ff37acb6e44cfa29f7d738458c8f797cb447adb1a",
+      "bytes": 134701,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/rawinflate.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/rawinflate.min.js",
+      "sha256": "ac29c00716cfb7d7b063c07702cae932505cb5753e4232d79b0b2f5a85897a24",
+      "bytes": 6049,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/rawinflate.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/unzip.dev.min.js",
+      "sha256": "a74129b6fc0bdd89c9f4d62bd3b1df45aa84aee2569a66d0fb100e14a53fc145",
+      "bytes": 280635,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/unzip.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/inflate.dev.min.js",
+      "sha256": "850cd25f382d7adf4c7d43c60c55741a64f5d4e1bb93637cef6ac06d7abaecac",
+      "bytes": 146824,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/inflate.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/unzip.min.js",
+      "sha256": "a4aa1b524ccf4ca327597e725c652de792e9ed6f696e868085a5e223f86022be",
+      "bytes": 14811,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/unzip.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/gzip.min.js",
+      "sha256": "00118a3dde872487c43763455f7c474a4571c58ce496ff66104c9bac22386816",
+      "bytes": 14671,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/gzip.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zip.dev.min.js",
+      "sha256": "555a3618512c48257d68d881cf7fe14a8744a502544ca81bcde18310f6df39a6",
+      "bytes": 246025,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zip.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/gzip.dev.min.js",
+      "sha256": "92dc7c2f5f9f41657d21dbe48895cf1246d8c0e068dfca6269b25d481ab2f641",
+      "bytes": 214483,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/gzip.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zip.min.js",
+      "sha256": "74b2c7bf87295599d5c32ca192404c2a660a943fd7e63a728aaad5b21f98864f",
+      "bytes": 17305,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zip.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/gunzip.min.js",
+      "sha256": "497ebe27be7ea1833551745e105661470c8bf1a45124935e32cdb5901bc81403",
+      "bytes": 12372,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/gunzip.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib.dev.min.js",
+      "sha256": "568ffa8b67604db0056afc7a935ce724f496e628c18fb00454eb979701bf2247",
+      "bytes": 272039,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/gunzip.dev.min.js",
+      "sha256": "5522d8355a999ad91deefdd9327db835a23f68270be9e2621fa456d9a25cbc41",
+      "bytes": 238876,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/gunzip.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib.min.js",
+      "sha256": "8b75479e72595b2a0c2c52f9a6386a2e169bd04a30fe11fce2066b7b888810f1",
+      "bytes": 17831,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/deflate.min.js",
+      "sha256": "d14d83f01b98df0ff6e858dd9ddbbb041410a5a73e16678e638ac8d0572d4370",
+      "bytes": 11601,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/deflate.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib.pretty.dev.js",
+      "sha256": "3b3d1949747d765b14adcd6afccdeb268ab943b271bacc6dad1d445e8ce815ea",
+      "bytes": 614245,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib.pretty.dev.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/deflate.dev.min.js",
+      "sha256": "0746cb5465755f2289f51b732c72c29e2169c0a84822cc57a8c26985f6e8112d",
+      "bytes": 200641,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/deflate.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib.pretty.js",
+      "sha256": "d9f2c06525d818da257c7cdc90aaf127a501b9014f6428ff2313130fff23bc2a",
+      "bytes": 124861,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib.pretty.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/crc32.min.js",
+      "sha256": "2ea4037457a57437177020b8016d105fb958d863edb33b0abcc5718b1b0fa712",
+      "bytes": 3811,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/crc32.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/zlib_and_gzip.dev.min.js",
+      "sha256": "0a48515934e35c2a9449be829a20f11eaa16703fdac5b122cd40e1b41d8892ff",
+      "bytes": 325074,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/zlib_and_gzip.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/crc32.dev.min.js",
+      "sha256": "5205307bc8a39210fdd617279e7de2fdb4b39baea7b3b939174584ee68fbb107",
+      "bytes": 87511,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/crc32.dev.min.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/node-zlib.js",
+      "sha256": "29c696dd3a05fe913959064ec64d1e5808340d390f10698632efdca506edf1e9",
+      "bytes": 24166,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/node-zlib.js",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/bin/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/bin/.gitkeep",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/ChangeLog.md",
+      "sha256": "d84bc31a9edad781315307ccb3d8116f6384a775cae0023c6a70f2c4e44eff2f",
+      "bytes": 3693,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/ChangeLog.md",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "node_modules/zlibjs/README.en.md",
+      "sha256": "1d1dd4e652133de680b32300c3c087612efb0619cfbfdcd303c65e90c759c165",
+      "bytes": 6452,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/node_modules/zlibjs/README.en.md",
+      "package": "zlibjs"
+    },
+    {
+      "install_path": "models/eng.traineddata.gz",
+      "sha256": "45b4cb346724ac1774f1c36f42f182b887bcdb28ebe63e6fff90ac41f3fcff91",
+      "bytes": 2952873,
+      "source_kind": "import_cache",
+      "source_relative": "lang/eng.traineddata.gz"
+    },
+    {
+      "install_path": "models/chi_sim.traineddata.gz",
+      "sha256": "b8a23f10c7de500891eb458a8adc9cc58ab7f242f08b7d149f5e9aea4ad5db7c",
+      "bytes": 1718768,
+      "source_kind": "import_cache",
+      "source_relative": "lang/chi_sim.traineddata.gz"
+    },
+    {
+      "install_path": "package.json",
+      "sha256": "5026dbb08000d06992c465b842447e574ee460ef791d87fabddddf5f0f3964f7",
+      "bytes": 171,
+      "source_kind": "import_cache",
+      "source_relative": "node-ocr/package.json"
+    },
+    {
+      "install_path": "notices/ocr/models/gen-pkg.js.upstream.txt",
+      "sha256": "9b83004483e6c4e214663195cbfcf4a5012dc23202332add9a1bd4447f05d945",
+      "bytes": 928,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/gen-pkg.js.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/gzip-integerize-traineddata.sh.upstream.txt",
+      "sha256": "662e3170052d9f8e23d854be24069ae94c00e4c527df7fef2f62c355294faf1e",
+      "bytes": 601,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/gzip-integerize-traineddata.sh.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/npm-chi_sim-1.0.0/package.json",
+      "sha256": "cc520ba9b3ced7b1fb69d7d4c0cea43b3dc9eb5e0814662e9be028c8a5cc36c6",
+      "bytes": 534,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/npm-chi_sim-1.0.0/package.json"
+    },
+    {
+      "install_path": "notices/ocr/models/npm-chi_sim-1.0.0/README.upstream.txt",
+      "sha256": "4a1d299c5f5713bb5e80159782b63835289ca4ca8adbfaa9164f28945d732dc5",
+      "bytes": 389,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/npm-chi_sim-1.0.0/README.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/npm-eng-1.0.0/package.json",
+      "sha256": "b603509212196b5d09e10519bf252c1e344b79704d065e0d62886846f8554c80",
+      "bytes": 530,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/npm-eng-1.0.0/package.json"
+    },
+    {
+      "install_path": "notices/ocr/models/npm-eng-1.0.0/README.upstream.txt",
+      "sha256": "adcb325473fe124291951a0a3d29fcb54b341828881570e45c42dc2a3a61a45d",
+      "bytes": 381,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/npm-eng-1.0.0/README.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/tessdata-gitmodules.upstream.txt",
+      "sha256": "c1c6ebe619292f212584a778d60891aa58ef5c8d4358955979ac3e4b9959f3d3",
+      "bytes": 432,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/tessdata-gitmodules.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/tessdata_best-LICENSE.Apache-2.0.txt",
+      "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+      "bytes": 10173,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/tessdata_best-LICENSE.Apache-2.0.txt"
+    },
+    {
+      "install_path": "notices/ocr/models/tessdata_best-README.upstream.txt",
+      "sha256": "d414e9235b9222962c3bb33864f2d4d5d6cbe3aaff5bf858ee8dd513298b27c7",
+      "bytes": 473,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/models/tessdata_best-README.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/core-build.upstream.txt",
+      "sha256": "e47ead7c2a36307bbecd859f428c1287ab991f0556a81ca61200dca28ac0293a",
+      "bytes": 696,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/core-build.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/core-gitmodules.upstream.txt",
+      "sha256": "195685b611c822eeedd422b30a9ae4f41520549a3b65e21245905f2d12f7dd88",
+      "bytes": 969,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/core-gitmodules.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/giflib/NOTICE.upstream.txt",
+      "sha256": "0c9b7990ecdca88b676db232c226548ac408b279f550d424d996f0d83591dd8e",
+      "bytes": 1088,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/giflib/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/leptonica/NOTICE.upstream.txt",
+      "sha256": "87829abb5bbb00b55a107365da89e9a33f86c4250169e5a1e5588505be7d5806",
+      "bytes": 1521,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/leptonica/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/libjpeg/NOTICE.upstream.txt",
+      "sha256": "c791da525733040e622ed257c7b096b8f5191b332604ead0c6bc2b54cbd8e0d1",
+      "bytes": 19110,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/libjpeg/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/libpng/NOTICE.upstream.txt",
+      "sha256": "33ba4e187d8b0c8d7ab2bc2e522bb095219e03089e9aa0122b4fb9eb2b7de82b",
+      "bytes": 5345,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/libpng/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/libtiff/COPYRIGHT.upstream.txt",
+      "sha256": "fbd6fed7938541d2c809c0826225fc85e551fdbfa8732b10f0c87e0847acafd7",
+      "bytes": 1146,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/libtiff/COPYRIGHT.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/libwebp-copying/NOTICE.upstream.txt",
+      "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf",
+      "bytes": 1496,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/libwebp-copying/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/libwebp-patents/NOTICE.upstream.txt",
+      "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c",
+      "bytes": 1436,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/libwebp-patents/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/openlibm/NOTICE.upstream.txt",
+      "sha256": "b1843fbf5b03f519a5f0a44fce751bdd1022ae7148614923f9d6293e17a18b17",
+      "bytes": 5857,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/openlibm/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/tesseract/NOTICE.upstream.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/tesseract/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/native/zlib/NOTICE.upstream.txt",
+      "sha256": "fc2c3368901700f0acdeb1d8afeaca5923296768ec6824ecdf627aac396001fd",
+      "bytes": 5368,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/native/zlib/NOTICE.upstream.txt"
+    },
+    {
+      "install_path": "notices/ocr/npm/bmp-js-0.1.0/LICENSE",
+      "sha256": "9f165f5bd2b462122cacb8c6dc32028be1abb4d8ad0322e9a332f30b2ebdb833",
+      "bytes": 1077,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/bmp-js-0.1.0/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/npm/idb-keyval-6.3.0/LICENCE",
+      "sha256": "20c27d6339619eeb3113cb865d4e98a3f559e52964fc75caea9cb5fa72674565",
+      "bytes": 555,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/idb-keyval-6.3.0/LICENCE"
+    },
+    {
+      "install_path": "notices/ocr/npm/is-url-1.2.4/LICENSE-MIT",
+      "sha256": "80957b522b0ea4ce24290953d74d818220c804d1f42cad02b8d7da1c12ce1fc1",
+      "bytes": 1036,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/is-url-1.2.4/LICENSE-MIT"
+    },
+    {
+      "install_path": "notices/ocr/npm/node-fetch-2.7.0/LICENSE.md",
+      "sha256": "84eaa985e1ef71b8c630e8aba73404c219ff425c6fdb45c62e998b58d4fbdc8e",
+      "bytes": 1079,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/node-fetch-2.7.0/LICENSE.md"
+    },
+    {
+      "install_path": "notices/ocr/npm/opencollective-postinstall-2.0.3/LICENSE",
+      "sha256": "86641df2e1c0c0e655d7eb9962a28e850e80c97c62a29500f2f93ab142c3c8f2",
+      "bytes": 1072,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/opencollective-postinstall-2.0.3/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/npm/regenerator-runtime-0.13.11/LICENSE",
+      "sha256": "51887a3d47051ac2fce1210562e5b9fe0830a8a8fabeb272c2d586eeb18a05fd",
+      "bytes": 1080,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/regenerator-runtime-0.13.11/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/npm/tesseract.js-6.0.1/LICENSE.md",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "bytes": 11357,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/tesseract.js-6.0.1/LICENSE.md"
+    },
+    {
+      "install_path": "notices/ocr/npm/tesseract.js-core-6.0.0/LICENSE",
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "bytes": 11358,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/tesseract.js-core-6.0.0/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/npm/wasm-feature-detect-1.9.0/LICENSE",
+      "sha256": "bcf29b4fd3ec2cb5f9d40a0866da446f6da62170d2ccedf4aeca9cf9406dd20c",
+      "bytes": 11341,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/wasm-feature-detect-1.9.0/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/npm/webidl-conversions-3.0.1/LICENSE.md",
+      "sha256": "a889cc4dbee2ae172c179856b25d75b0b7a5a136e1b97109b9b590b2ff1a879c",
+      "bytes": 1323,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/webidl-conversions-3.0.1/LICENSE.md"
+    },
+    {
+      "install_path": "notices/ocr/npm/whatwg-url-5.0.0/LICENSE.txt",
+      "sha256": "6b7a1792144374d84dc5ed3655b8bbe2754d06f4f1f64a9fb8b9de2d6f448b85",
+      "bytes": 1088,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/whatwg-url-5.0.0/LICENSE.txt"
+    },
+    {
+      "install_path": "notices/ocr/npm/zlibjs-0.3.1/LICENSE",
+      "sha256": "131afe3f7bdce1698beb292fb8de1a968de01bce876122a60ef5db230471c866",
+      "bytes": 1222,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/npm/zlibjs-0.3.1/LICENSE"
+    },
+    {
+      "install_path": "notices/ocr/README.md",
+      "sha256": "7665f7bf069d4feeafcb3e9163049a53df1a86c1b50627baf37e03a0c87243a4",
+      "bytes": 2119,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/README.md"
+    },
+    {
+      "install_path": "notices/ocr/source-provenance.json",
+      "sha256": "339bae0ca26c194cc22ec263144b67a76845c9f723dbba59c78f5ed336249669",
+      "bytes": 12826,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/source-provenance.json"
+    },
+    {
+      "install_path": "notices/ocr/tr46-0.0.3/LICENSE.upstream-20160802.txt",
+      "sha256": "eeed1ca176eebad5c73870e233cfff03981fecd319c969475dfa3633036c336b",
+      "bytes": 1081,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/tr46-0.0.3/LICENSE.upstream-20160802.txt"
+    },
+    {
+      "install_path": "notices/ocr/tr46-0.0.3/package.json",
+      "sha256": "615087f58ee138fd35c2b414c355b72e36e5919725b8aecc1c34f6a5585b9779",
+      "bytes": 732,
+      "source_kind": "resources",
+      "source_relative": "notices/ocr/tr46-0.0.3/package.json"
+    },
+    {
+      "install_path": "package-lock.json",
+      "sha256": "1faada74b7ed6090ad5a63a706554739619bae2cb4874f5fdeb13eb466a5b789",
+      "bytes": 5108,
+      "source_kind": "resources",
+      "source_relative": "ocr-package-lock.json"
+    }
+  ],
+  "file_count": 266,
+  "total_install_bytes": 41821379,
+  "known_limits": [
+    "Candidate resource integrity passed does not establish OCR accuracy or product task behavior.",
+    "tr46 full license source postdates npm0.0.3; exact distinction preserved.",
+    "Model package MIT metadata is not substituted for traineddata upstream Apache-2.0.",
+    "Compiler/toolchain and training/quantization reproduction were not run; shipped core bytes match pinned public source blobs."
+  ]
+}

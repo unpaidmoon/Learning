@@ -1,0 +1,31 @@
+{
+  "source_repository": "https://github.com/helixnow/deep-student",
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "source_path": "src/features/chat/context/selectionRef.ts",
+  "source_sha256": "56ddea18cf3ac459b348f5ed8edc8fc9c8e55f018114c7fd2779c58c88e35347",
+  "license": "AGPL-3.0-or-later",
+  "license_path": "third_party/deepstudent/notices/LICENSE.AGPL-3.0",
+  "output_path": "third_party/deepstudent/web/selectionPresentation.ts",
+  "output_sha256": "3122543a32d6ec7372fcc9901f316bced7997180748c1e75ab256efa59040922",
+  "declarations": [
+    {
+      "name": "SelectionSourceKind",
+      "unchanged_text_sha256": "8b8f9b3c05a737ee77e3a39805767052229200be652850c823d8f30bcd5367f7"
+    },
+    {
+      "name": "SelectionRefData",
+      "unchanged_text_sha256": "ff816e94fe65e7ae4e70ed166babbf4d31347fc9efbd0976efcc799d01459f40"
+    },
+    {
+      "name": "describeSelectionLocator",
+      "unchanged_text_sha256": "cf44814b3a83e8cdbdbf3623278497736632bd565dcc31ad591effb1e287bb0d"
+    },
+    {
+      "name": "buildSelectionDisplayName",
+      "unchanged_text_sha256": "6cca65458de9247532597a96fadb8e2a5a45a7274cfbf056fd61f50736ebfa03"
+    }
+  ],
+  "locale_adapter_sha256": "0e8e6af4ef876f5d2a1db347d9fbe1d743f1d85d6825d5395b2e2a37529af940",
+  "build_typescript": "5.9.3",
+  "runtime_role": "source position labels only; project immutable snapshots remain authoritative"
+}

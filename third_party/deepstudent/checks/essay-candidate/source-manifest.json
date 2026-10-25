@@ -1,0 +1,61 @@
+{
+  "source_commit": "635216503c0b34bdf812e17942e0f09f51872e6f",
+  "files": [
+    {
+      "source_path": "src/essay-grading/types.ts",
+      "target_path": "upstream/types.ts",
+      "sha256": "85d18a55e77d1218adb3ae94554424c4108762e0ec9ef7a875397505dffe2f30",
+      "git_blob_sha1": "158261568a0464ff631ee527bde82a5c523b6328",
+      "bytes": 103,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/markerTypes.ts",
+      "target_path": "upstream/markerTypes.ts",
+      "sha256": "144c609105267503e97f7eb9905bd21062dd4def7a4c56f23f973aa3bd8c37c9",
+      "git_blob_sha1": "ba0f20f20029fc0d24642d53e64b6a9817b0345c",
+      "bytes": 1586,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/streamingMarkerParser.ts",
+      "target_path": "upstream/streamingMarkerParser.ts",
+      "sha256": "1f661d0415f7fab894812bac7d5a411f116cd473006c53449a3cedcca3abfe90",
+      "git_blob_sha1": "e3307f2a61f8dacc49f37c94eadb3af91aa46716",
+      "bytes": 29094,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/markerParser.ts",
+      "target_path": "upstream/markerParser.ts",
+      "sha256": "b6e7bf9575449ddebcb62be427ab3d4ebbd3d58ee4cacd206f873336467329b8",
+      "git_blob_sha1": "de8b4b39bc444f96860dd8e4f199732ea50385cb",
+      "bytes": 7620,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/suggestionAnchors.ts",
+      "target_path": "upstream/suggestionAnchors.ts",
+      "sha256": "99109cd4aff1789b5f014b34ede33d7cad4b7acb3d8f8f0d5932d5247edb9ea4",
+      "git_blob_sha1": "6dd4f206a71ad29d0909dae64444eacb0357c130",
+      "bytes": 7314,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/textStats.ts",
+      "target_path": "upstream/textStats.ts",
+      "sha256": "c41c5a868cc6b98a4ccb88560942e13ba60b02c9846bf76c6ca3e4ac36f46a59",
+      "git_blob_sha1": "5570f0dbfa6b1ddeb8ccf4ccd83d53cf56a9bb5f",
+      "bytes": 2433,
+      "modification": "none"
+    },
+    {
+      "source_path": "src/essay-grading/essayContentState.ts",
+      "target_path": "upstream/essayContentState.ts",
+      "sha256": "e752f0a3f1f1611f7c02a319278a35cff6f715a16e7f032464557e6731361045",
+      "git_blob_sha1": "8b6935b3dfa5f457b334d3e2d84074bcc3384728",
+      "bytes": 6586,
+      "modification": "none"
+    }
+  ]
+}

@@ -2,7 +2,8 @@
 
 Only a user initiated, capability-protected registration can introduce a path.
 The playback route takes a business identity and an immutable source version.
-No endpoint extracts a frame, exposes an arbitrary path, or copies a video.
+Playback exposes neither arbitrary paths nor video copies. Explicitly authorized
+local UI thumbnail decoding lives in video_previews, outside attachments/tools.
 """
 
 from __future__ import annotations
@@ -33,6 +34,16 @@ VIDEO_TYPES = {
     ".webm": "video/webm",
     ".ogv": "video/ogg",
 }
+AUDIO_TYPES = {
+    ".wav": "audio/wav",
+    ".mp3": "audio/mpeg",
+    ".m4a": "audio/mp4",
+    ".flac": "audio/flac",
+    ".ogg": "audio/ogg",
+    ".oga": "audio/ogg",
+    ".opus": "audio/ogg",
+}
+PLAYBACK_TYPES = {**VIDEO_TYPES, **AUDIO_TYPES}
 _PICKER_LOCK = threading.Lock()
 
 
@@ -170,7 +181,7 @@ def _video_path(value: str) -> tuple[Path, str]:
         path = path.resolve(strict=True)
         if not path.is_file():
             raise AppError("VIDEO_PATH_INVALID", "请选择视频文件", 422)
-        media_type = VIDEO_TYPES.get(path.suffix.lower())
+        media_type = PLAYBACK_TYPES.get(path.suffix.lower())
         if media_type is None:
             raise AppError("VIDEO_FORMAT_UNSUPPORTED", "请选择 MP4、WebM、MOV 或 OGV 视频", 422)
         with path.open("rb") as stream:
@@ -182,6 +193,23 @@ def _video_path(value: str) -> tuple[Path, str]:
             if path.suffix.lower() == ".webm"
             else header.startswith(b"OggS")
         )
+        suffix = path.suffix.lower()
+        if suffix == ".m4a":
+            expected = header[4:8] == b"ftyp"
+        elif suffix == ".wav":
+            expected = header[:4] in {b"RIFF", b"RF64"} and header[8:12] == b"WAVE"
+        elif suffix == ".flac":
+            expected = header.startswith(b"fLaC")
+        elif suffix == ".mp3":
+            expected = header.startswith(b"ID3") or (
+                len(header) >= 4
+                and header[0] == 0xFF
+                and header[1] & 0xE0 == 0xE0
+                and (header[1] >> 3) & 3 != 1
+                and (header[1] >> 1) & 3 != 0
+                and 1 <= header[2] >> 4 <= 14
+                and (header[2] >> 2) & 3 != 3
+            )
         if not expected:
             raise AppError("VIDEO_FORMAT_INVALID", "文件内容不是支持的视频容器", 422)
     except (OSError, ValueError) as exc:
@@ -233,6 +261,9 @@ def choose_video() -> str | None:
         buffer = ctypes.create_unicode_buffer(32768)
         config = OpenFileName()
         config.lStructSize = ctypes.sizeof(config)
+        from learning_app.native_files import desktop_picker_owner
+
+        config.hwndOwner = desktop_picker_owner()
         config.lpstrFilter = "视频文件\0*.mp4;*.m4v;*.mov;*.webm;*.ogv\0\0"
         config.lpstrFile = ctypes.cast(buffer, wintypes.LPWSTR)
         config.nMaxFile = len(buffer)
@@ -339,7 +370,9 @@ class MediaStore:
             ).scalar_one_or_none()
         if root is not None and not path.is_relative_to(Path(root)):
             raise AppError(
-                "COURSE_SOURCE_OUTSIDE_ROOT", "请先将外部资料显式导入课程根目录，不能继续原地关联", 422
+                "COURSE_SOURCE_OUTSIDE_ROOT",
+                "请先将外部资料显式导入课程根目录，不能继续原地关联",
+                422,
             )
         with self._lock:
             # Reuse a previously registered file identity across courses. A
@@ -419,7 +452,11 @@ class MediaStore:
                             revision=0,
                         )
                     )
-            return self._view(self._row(source["asset_id"]))
+            result = self._view(self._row(source["asset_id"]))
+            previews = getattr(self.repository, "video_previews", None)
+            if previews is not None:
+                previews.enqueue_asset(result["asset_id"], result["source_version"])
+            return result
 
     def list(self, course_id: str) -> list[dict]:
         with self.engine.connect() as conn:
@@ -480,6 +517,9 @@ class MediaStore:
                 .values(last_opened_at=now)
             )
         row["last_opened_at"] = now
+        previews = getattr(self.repository, "video_previews", None)
+        if previews is not None:
+            previews.enqueue_asset(asset_id, version)
         return self._view(row, availability="available")
 
     @staticmethod

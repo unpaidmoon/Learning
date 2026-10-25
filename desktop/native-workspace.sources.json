@@ -1,0 +1,20 @@
+{
+  "upstream_commit": "687f282e8625c6b8d11ff58211a90524be2e4317",
+  "module_id": "@deepseek-ai/dsh-api-workspace-controller",
+  "compiler": {
+    "name": "rolldown",
+    "version": "1.2.14"
+  },
+  "input_files": {
+    "packages/api/workspace-controller/src/client/index.ts": "80ba5e3e8a1f41996e84410aef27928b8893e87aa4c1d03998f2b55e4d7d747f",
+    "packages/api/workspace-controller/src/client/model.ts": "dbc56f14f53903ce4ef2db1521d8a88fb21ae07b6899e16f0528792982b94f9b",
+    "packages/api/workspace-controller/src/client/service.ts": "aaa0356a88c3559dea28723aff5e785bbd6db2ddf9f1528acc0b4a36efc43f24"
+  },
+  "external_modules": [
+    "@deepseek-ai/cordis",
+    "@deepseek-ai/dsh-api-gateway/client",
+    "@deepseek-ai/dsh-client-store"
+  ],
+  "output": "desktop/client/native-workspace.js",
+  "output_sha256": "2c531dfef02712dc8fd24e6b07d90c34544d3056b8215fd566125e161da23b5f"
+}

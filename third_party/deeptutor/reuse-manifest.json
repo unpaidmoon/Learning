@@ -1,0 +1,618 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/HKUDS/DeepTutor",
+  "source_commit": "a31d82624c27d75f4e771d4fcb78dce16470b383",
+  "source_license": "Apache-2.0",
+  "root_notice": {
+    "status": "not_present",
+    "evidence": "Fixed-commit recursive Git tree, truncated=false; exact root NOTICE request returned 404."
+  },
+  "scope": "Selected original files and pure modules; no complete DeepTutor installation or product-level acceptance.",
+  "upstream_files": [
+    {
+      "path": "deeptutor/agents/research/data_structures.py",
+      "bytes": 19281,
+      "git_blob_sha1": "7066883ec650b64a9332dfc3f0a25448a172db57",
+      "sha256": "980e21a90e9c33b32d822b296ec4b4da6db6a7b2e07978dd3b32cb03cf64b46b",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/agents/research/data_structures.py"
+    },
+    {
+      "path": "deeptutor/book/compiler.py",
+      "bytes": 16717,
+      "git_blob_sha1": "686882e474bc79b841f43a545a667355774b7350",
+      "sha256": "5c3dfe108f51b717f4b73d69a6f1f36cf959bfc29a4978493d6c4f1d03717899",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/book/compiler.py"
+    },
+    {
+      "path": "deeptutor/book/models.py",
+      "bytes": 22670,
+      "git_blob_sha1": "a58d37447907de042d201319a4a1c6ab2d6e4d2a",
+      "sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/book/models.py"
+    },
+    {
+      "path": "deeptutor/knowledge/indexing_run.py",
+      "bytes": 15794,
+      "git_blob_sha1": "8a3a737747a97ecb28570707ccb65fa27d431d07",
+      "sha256": "e49b9489fcec696ed961456f388cf7041481ec21933fe9576c41df2ec8c039e1",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/knowledge/indexing_run.py"
+    },
+    {
+      "path": "deeptutor/learning/models.py",
+      "bytes": 26051,
+      "git_blob_sha1": "33ac04b03cde27a1a30714308cdb36e41c197a68",
+      "sha256": "da990512532bc9bbc14ada6b80b87c44ef4408efcc3b91c1a2a6688695906f55",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/learning/models.py"
+    },
+    {
+      "path": "deeptutor/learning/pending.py",
+      "bytes": 10793,
+      "git_blob_sha1": "362ba5b33c0be7b303039f33bf77a98ab5603b3e",
+      "sha256": "e24cd6ea6c5a4701592dc5c2830214d60465e76e1ec94a0112ada2cc4469e6c5",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/learning/pending.py"
+    },
+    {
+      "path": "deeptutor/services/file_io.py",
+      "bytes": 4541,
+      "git_blob_sha1": "4ada6ae3563ebd600d65f9daaefe29902c04cdbe",
+      "sha256": "942e4ed3197ccc1e3417f72befcc6236a15eb049304f44b17a9fa4a59adad21f",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/file_io.py"
+    },
+    {
+      "path": "deeptutor/services/parsing/cache.py",
+      "bytes": 7272,
+      "git_blob_sha1": "10876b9c0b2265a32c8a280f2e8976340659151b",
+      "sha256": "c1724bbe027a2c68f38c350fb11fc33df2088990c06ed3c5bb22bbb687a53c93",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/parsing/cache.py"
+    },
+    {
+      "path": "deeptutor/services/parsing/engines/mineru/checkpoints.py",
+      "bytes": 3482,
+      "git_blob_sha1": "75acf6fb8fc33f2bee26f1fa289e644e77909210",
+      "sha256": "8d9000853025b328743975a80dd4d86d69ade9a8d3c3ae724d4618d971004c08",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/parsing/engines/mineru/checkpoints.py"
+    },
+    {
+      "path": "deeptutor/services/rag/eval/dataset.py",
+      "bytes": 9082,
+      "git_blob_sha1": "f22d04c935e9309bed92cb40783d6b7cf00aa4c7",
+      "sha256": "1d2dd5c25f946e78df2bc2cbd286cc72e9dc6f12384d33dc04c08e62565e893f",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/eval/dataset.py"
+    },
+    {
+      "path": "deeptutor/services/rag/eval/metrics.py",
+      "bytes": 7332,
+      "git_blob_sha1": "21579c1c04f2cae42ad6ba03058ece3dbc4b6da2",
+      "sha256": "4082684a67eb9a3c43cbc818f2aa93c77d1a1b330e96f5f96e7aa6b2303932de",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/eval/metrics.py"
+    },
+    {
+      "path": "deeptutor/services/rag/index_versioning.py",
+      "bytes": 14029,
+      "git_blob_sha1": "644e314d27dc0c35da0447fffcf7182bb719a8b8",
+      "sha256": "5d5ecd07716b7ea81f5483a3fa62f1024aed3f01fd707f7d0b99d40aff829eeb",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/index_versioning.py"
+    },
+    {
+      "path": "deeptutor/services/rag/pipelines/llamaindex/pipeline.py",
+      "bytes": 21320,
+      "git_blob_sha1": "e7b0628a66fb70564435ee1d248ea5b6de53b749",
+      "sha256": "9e08ec97aec324f7c2cfc7da652537b75d11d28c8d3779d6436fee459c9a435c",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/pipelines/llamaindex/pipeline.py"
+    },
+    {
+      "path": "deeptutor/services/rag/pipelines/llamaindex/storage.py",
+      "bytes": 12545,
+      "git_blob_sha1": "36d34fd124703c90dca1f073542761caf9a3fd11",
+      "sha256": "5b391d1b43ee5800cf318ab1c2f1f22db332c8ae46285532d514477eda37bf74",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/pipelines/llamaindex/storage.py"
+    },
+    {
+      "path": "deeptutor/services/rag/source_pages.py",
+      "bytes": 11600,
+      "git_blob_sha1": "e5056d5ec09ca09552aced9abc5c836ce1ffa254",
+      "sha256": "51d41e4581de132137c521f86abcef5d789a8c05ef0e79845944dc1b685ee205",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/source_pages.py"
+    },
+    {
+      "path": "deeptutor/utils/json_parser.py",
+      "bytes": 7138,
+      "git_blob_sha1": "06f43a183c288b854763436cb43c8f0ebd70c842",
+      "sha256": "e2ae190ebc22d3d602e01d44784395fbb26a1798de5e183d2df0e3bf4ad0b8a5",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/utils/json_parser.py"
+    },
+    {
+      "path": "deeptutor/visualizers/protocol.py",
+      "bytes": 7949,
+      "git_blob_sha1": "4306f32e4496d83cb379b42903399e6bb36dfc7a",
+      "sha256": "3992d7d372577c778c0d7880e26a7cda6e64db3cb5f94d57d1a4194d1b3b9621",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/visualizers/protocol.py"
+    },
+    {
+      "path": "docs/INDEXING_RECOVERY.md",
+      "bytes": 2428,
+      "git_blob_sha1": "7e3e71117e8798d38c68bea65a5767049969de86",
+      "sha256": "3670d64138979e3882486c339be08e2fd80a6f9f7d9c0d9efba6c8212e0fb6e2",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/docs/INDEXING_RECOVERY.md"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 11408,
+      "git_blob_sha1": "ae1dbfc5e74c6c9ebb3e46ea9ea8dde8a4a04ed8",
+      "sha256": "cd2f54e1e5066644023203dcbd956776a9f4ef6eb8b6225afe1ffa2d380fede4",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/LICENSE"
+    },
+    {
+      "path": "web/components/visualize/VisualizationViewer.tsx",
+      "bytes": 23588,
+      "git_blob_sha1": "29cfe057bc1a2a8cae1f13e647e77deda3318ccc",
+      "sha256": "db039deb92ff468912d818ae1640acc40efc30131655ed78b0614be6ef24686f",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/web/components/visualize/VisualizationViewer.tsx"
+    },
+    {
+      "path": "web/features/chat/transport/TurnRuntimeClient.ts",
+      "bytes": 15055,
+      "git_blob_sha1": "72e2e2300f71bc31a2092ed326ea9e2fef3618bb",
+      "sha256": "1635d9006022e80a5701cf223b23f66cb1c02be838ae7e9734f5b82194d5cd25",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/web/features/chat/transport/TurnRuntimeClient.ts"
+    },
+    {
+      "path": "web/hooks/useChatAutoScroll.ts",
+      "bytes": 5923,
+      "git_blob_sha1": "08db25e18e946adb29a7982dfcaa55f3b5e7201d",
+      "sha256": "89163d909011361f38e095026b9918b504601160601e4e0b5eb03ef42df84f22",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/web/hooks/useChatAutoScroll.ts"
+    },
+    {
+      "path": "deeptutor/book/blocks/base.py",
+      "bytes": 8113,
+      "git_blob_sha1": "9f66d9863cdeed9cb7bf6248a0f820e6ab32210e",
+      "sha256": "c21a9f3beb83002eb073282c0e525c907c6f183a586e57b6da4cf958cd3ad373",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/book/blocks/base.py"
+    },
+    {
+      "path": "deeptutor/book/progress.py",
+      "bytes": 5170,
+      "git_blob_sha1": "8d2c8e7af99e2511e195b7416b655748a35a76e1",
+      "sha256": "93b9f95ca676b5db33b9e7be3ec723b7329b4bbcc075ffd6132c6357a043cbfc",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/book/progress.py"
+    },
+    {
+      "path": "deeptutor/book/export.py",
+      "bytes": 11047,
+      "git_blob_sha1": "f9df1e8f6a7d5a09904ce42a79615056e4a3bcf5",
+      "sha256": "b185f72d4dc166ae5e6b90a0033e98a4f7bba3b372e840c1b70bb06e2ddcc70b",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/book/export.py"
+    },
+    {
+      "path": "deeptutor/services/rag/eval/matching.py",
+      "bytes": 7463,
+      "git_blob_sha1": "cab037804947fbd7b9eb82b197951818e920d3ec",
+      "sha256": "19ae5bde484b6b76f594aa0cac1c6574f82b00d8374c013da94159637bf28c76",
+      "url": "https://github.com/HKUDS/DeepTutor/blob/a31d82624c27d75f4e771d4fcb78dce16470b383/deeptutor/services/rag/eval/matching.py"
+    }
+  ],
+  "migrations": [
+    {
+      "candidate": "C08",
+      "upstream": "deeptutor/services/rag/eval/dataset.py",
+      "target": "src/deeptutor_reuse/eval_dataset.py",
+      "mode": "R",
+      "symbols": [
+        "EvalCase",
+        "EvalDataset",
+        "load_dataset"
+      ],
+      "changes": [
+        "Package and module path changed; file bytes unchanged."
+      ],
+      "target_sha256": "1d2dd5c25f946e78df2bc2cbd286cc72e9dc6f12384d33dc04c08e62565e893f"
+    },
+    {
+      "candidate": "C08",
+      "upstream": "deeptutor/services/rag/eval/metrics.py",
+      "target": "src/deeptutor_reuse/eval_metrics.py",
+      "mode": "R",
+      "symbols": [
+        "recall_at_k",
+        "precision_at_k",
+        "ndcg_at_k",
+        "reciprocal_rank",
+        "average_precision",
+        "aggregate_query_metrics"
+      ],
+      "changes": [
+        "Package and module path changed; file bytes unchanged."
+      ],
+      "target_sha256": "4082684a67eb9a3c43cbc818f2aa93c77d1a1b330e96f5f96e7aa6b2303932de"
+    },
+    {
+      "candidate": "C10",
+      "upstream": "deeptutor/book/models.py",
+      "target": "src/deeptutor_reuse/book_models.py",
+      "mode": "R",
+      "symbols": [
+        "Book",
+        "Spine",
+        "Chapter",
+        "Page",
+        "Block",
+        "SourceAnchor"
+      ],
+      "changes": [
+        "Package and module path changed; file bytes unchanged."
+      ],
+      "target_sha256": "6726eea4664514a36fda7936adbfef7ac5081603f37695cb860b25a97c194bc3"
+    },
+    {
+      "candidate": "C11",
+      "upstream": "deeptutor/visualizers/protocol.py",
+      "target": "src/deeptutor_reuse/visualization_protocol.py",
+      "mode": "R",
+      "symbols": [
+        "RendererRef",
+        "VisualizationEnvelope",
+        "VisualizerManifest",
+        "VisualizerPlugin"
+      ],
+      "changes": [
+        "Package and module path changed; file bytes unchanged."
+      ],
+      "target_sha256": "3992d7d372577c778c0d7880e26a7cda6e64db3cb5f94d57d1a4194d1b3b9621"
+    },
+    {
+      "candidate": "C14",
+      "upstream": "deeptutor/services/file_io.py",
+      "target": "src/deeptutor_reuse/file_io.py",
+      "mode": "R",
+      "symbols": [
+        "atomic_write_json",
+        "atomic_write_text",
+        "read_text"
+      ],
+      "changes": [
+        "Package and module path changed; file bytes unchanged."
+      ],
+      "target_sha256": "942e4ed3197ccc1e3417f72befcc6236a15eb049304f44b17a9fa4a59adad21f"
+    },
+    {
+      "candidate": "C07",
+      "upstream": "deeptutor/services/rag/source_pages.py",
+      "target": "src/deeptutor_reuse/source_digest.py",
+      "mode": "R-excerpt",
+      "symbols": [
+        "source_digest"
+      ],
+      "changes": [
+        "Unmodified function and its two standard-library imports extracted; source resolution and rendering omitted."
+      ],
+      "target_sha256": "2b37b793c25a7ebf0174cac2a21048aafb29e2fbc2c789463112fe78876c8d95"
+    },
+    {
+      "candidate": "C07",
+      "upstream": "deeptutor/services/rag/source_pages.py",
+      "target": "src/deeptutor_reuse/source_ref.py",
+      "mode": "R-excerpt",
+      "symbols": [
+        "SourceRef",
+        "SourcePageError"
+      ],
+      "changes": [
+        "Only DTO/error classes extracted; project identity, crop validation, and authority are external."
+      ],
+      "target_sha256": "41aca1f6cbae7fcace624f7110ff97239edea5f7cc0142345efb51aec3881398"
+    },
+    {
+      "candidate": "C09",
+      "upstream": "deeptutor/learning/models.py",
+      "target": "src/deeptutor_reuse/learning_transactions.py",
+      "mode": "A",
+      "symbols": [
+        "PendingOption",
+        "PendingQuestion",
+        "InteractionStatus",
+        "MasteryInteraction",
+        "MasteryEvent",
+        "MasteryPathLease"
+      ],
+      "changes": [
+        "Selected typed class closure; removed _read_legacy_option_strings and its DT pending/text-display import. New typed options only.",
+        "No persistence, scoring, schedule, revision, or project identity behavior added."
+      ],
+      "target_sha256": "cfe7c498fafd989c2b8c9e3241bcd1853c8f0fe93d464970fb61a8f87199aa9e"
+    },
+    {
+      "candidate": "C10",
+      "upstream": "deeptutor/book/compiler.py",
+      "target": "src/deeptutor_reuse/book_compiler_state.py",
+      "mode": "A",
+      "symbols": [
+        "BookCompiler._finalize_page_status",
+        "finalize_terminal_page"
+      ],
+      "changes": [
+        "Original static method body retained in a minimal owner class.",
+        "Wrapper rejects pending/generating/hidden blocks; original method otherwise unchanged.",
+        "Compiler model factory, storage, stream, concurrency, and retry pipeline excluded."
+      ],
+      "target_sha256": "bfebab5c1c39e27a8764b6649831a46246d8638f246546f9261bd5f4fe35c458"
+    },
+    {
+      "candidate": "C11",
+      "upstream": "deeptutor/visualizers/protocol.py",
+      "target": "src/deeptutor_reuse/visualization_models.py",
+      "mode": "R-excerpt",
+      "symbols": [
+        "RendererRef",
+        "VisualizationPayload",
+        "VisualizationPresentation",
+        "VisualizationInteraction",
+        "VisualizationEnvelope"
+      ],
+      "changes": [
+        "Unmodified data classes extracted with Pydantic-only imports; no safety or schema validation claim."
+      ],
+      "target_sha256": "a51c2f45ccc64db9f2d0ef7508115d0e01dec109c5bb1415fcce838d749b148d"
+    },
+    {
+      "candidate": "C11",
+      "upstream": "deeptutor/visualizers/protocol.py",
+      "target": "src/deeptutor_reuse/visualization_refs.py",
+      "mode": "R-excerpt",
+      "symbols": [
+        "_find_remote_schema_ref"
+      ],
+      "changes": [
+        "Function body unchanged; added public alias find_remote_schema_ref."
+      ],
+      "target_sha256": "e107bdcb920b5efe83ad2dec6e48627ad9dddee06527549eb7a29082951755be"
+    },
+    {
+      "candidate": "C13",
+      "upstream": "deeptutor/agents/research/data_structures.py",
+      "target": "src/deeptutor_reuse/research_similarity.py",
+      "mode": "R-excerpt",
+      "symbols": [
+        "DynamicTopicQueue._normalize_topic",
+        "DynamicTopicQueue._topic_tokens",
+        "DynamicTopicQueue._topic_similarity"
+      ],
+      "changes": [
+        "Original constant values and method bodies retained in a stateless owner class with public aliases.",
+        "Queue, naive datetime, trace truncation, auto-save, and model JSON repair excluded."
+      ],
+      "target_sha256": "327dc16c8beed3cb1483f017d863a05e32e04882ec438e751688d0a7b87547cf"
+    },
+    {
+      "candidate": "C14",
+      "upstream": "deeptutor/services/parsing/cache.py",
+      "target": "src/deeptutor_reuse/parser_cache.py",
+      "mode": "A",
+      "symbols": [
+        "lookup",
+        "reserve",
+        "write_manifest",
+        "load_ir"
+      ],
+      "changes": [
+        "One import rewritten to isolated file_io; all cache/IR logic unchanged.",
+        "Use only behind project-authorized roots and validated hex keys. Readiness alone does not validate cache content or source identity."
+      ],
+      "target_sha256": "cab5efaceb50d66f65ffbf6bf8c98c7557354b5f7aec5ab9a38445c623fa2b5d"
+    },
+    {
+      "candidate": "C12",
+      "upstream": "web/components/visualize/VisualizationViewer.tsx",
+      "target": "web/visualizationParsers.ts",
+      "mode": "A",
+      "symbols": [
+        "stripCodeFence",
+        "splitSvgBlocks",
+        "parseChartConfig"
+      ],
+      "changes": [
+        "stripCodeFence and splitSvgBlocks bodies unchanged; exports added.",
+        "Chart parser removes jsonish repair fallback; calls strict JSON.parse.",
+        "No Next/React/i18n/viewer, SVG sanitizer, iframe, or remote renderer copied."
+      ],
+      "target_sha256": "3db9c86def0b7819bc2e9215232bc019bbf07f2649dbd644d58c475888309126"
+    },
+    {
+      "candidate": "C10",
+      "upstream": "deeptutor/book/blocks/base.py",
+      "target": "src/deeptutor_reuse/book_block_compiler.py",
+      "mode": "A",
+      "symbols": [
+        "BlockContext",
+        "BlockGenerator",
+        "GenerationFailure",
+        "_classify_failure",
+        "_failure_metadata"
+      ],
+      "changes": [
+        "Retained pure candidate promoted to importable package; only model import path changed.",
+        "Excluded default generator registry and its application/provider imports."
+      ],
+      "target_sha256": "5eb6fd2998876ad77949ca153cbc21b30cbfd492e66ce1c19b7816b7563b6a4b",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C09",
+      "upstream": "deeptutor/book/progress.py",
+      "target": "src/deeptutor_reuse/book_progress.py",
+      "mode": "A",
+      "symbols": [
+        "latest_attempts",
+        "recompute_score",
+        "recompute_weak_chapters",
+        "record_attempt",
+        "mark_visited",
+        "toggle_bookmark",
+        "completion_ratio"
+      ],
+      "changes": [
+        "Retained pure candidate promoted to importable package; only model import path changed."
+      ],
+      "target_sha256": "252f7118644bae55697cecf6c1c4964b7c34ff5ba7a7586d89e6ecf3197678f6",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C10",
+      "upstream": "deeptutor/book/export.py",
+      "target": "src/deeptutor_reuse/book_export.py",
+      "mode": "A",
+      "symbols": [
+        "render_block",
+        "render_book_markdown",
+        "export_filename"
+      ],
+      "changes": [
+        "Retained pure candidate promoted to importable package; only model import path changed."
+      ],
+      "target_sha256": "3d2e98fa4e383d929b7869de96a0978c69b84352971b0056dfd2440fe62cc443",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C10",
+      "upstream": "deeptutor/book/compiler.py",
+      "target": "src/deeptutor_reuse/book_resume.py",
+      "mode": "project-adapter",
+      "source_body_reused": false,
+      "symbols": [
+        "BookCompileSnapshot",
+        "outline_digest",
+        "confirm_outline",
+        "begin_block",
+        "make_block_context",
+        "complete_block",
+        "interrupt_block",
+        "resume_book",
+        "readable_chapters"
+      ],
+      "changes": [
+        "New project DTO/transitions calling retained original models/terminal aggregation; not an upstream scheduler.",
+        "No storage, provider, implicit retry or authoritative queue; unknown attempts require application reconciliation."
+      ],
+      "target_sha256": "ab131cffacf009becac08503122d5ad7cdd37e78ae7d3aab7bc8917a411a367f",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C09",
+      "upstream": "deeptutor/learning/models.py",
+      "target": "src/deeptutor_reuse/learning_actions.py",
+      "mode": "project-adapter",
+      "source_body_reused": false,
+      "symbols": [
+        "LearningActionResult",
+        "apply_learning_action",
+        "independent_grade_eligible"
+      ],
+      "changes": [
+        "New project adapter over original Progress/MasteryInteraction/MasteryEvent.",
+        "Skip/reveal only emit events and do not append QuizAttempt or grant mastery."
+      ],
+      "target_sha256": "c14608083f64a3fcd57bd031bf498ddc2026342495ae6044297a9630c356a728",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C11/C12",
+      "upstream": "deeptutor/visualizers/protocol.py",
+      "target": "src/deeptutor_reuse/offline_data.py",
+      "mode": "project-adapter",
+      "source_body_reused": false,
+      "symbols": [
+        "Inline",
+        "TextPayload",
+        "FigurePayload",
+        "RangeParameter",
+        "PlotData",
+        "validate_offline_visualization"
+      ],
+      "changes": [
+        "New project closed-data policy based on existing offline-candidate fixture validators, using original VisualizationEnvelope.",
+        "No arbitrary HTML/JS/iframe, entry URL, business capability or automatic model events; requires host CSP/asset manifest too."
+      ],
+      "target_sha256": "d5dfe6c7245bade6312bfb2deee2f8e361db41b23f2febeeed7b079d2a3d7200",
+      "validation": "checks/integration-candidate/verify_integration.py (source and installed-wheel runs)"
+    },
+    {
+      "candidate": "C08",
+      "upstream": "deeptutor/services/rag/eval/matching.py",
+      "target": "src/deeptutor_reuse/eval_matching.py",
+      "mode": "R",
+      "source_body_reused": true,
+      "symbols": [
+        "MatchPolicy",
+        "MatchResult",
+        "GoldPassage",
+        "RelevanceMatcher",
+        "normalize_text",
+        "tokenize",
+        "source_text"
+      ],
+      "changes": [
+        "Original complete standard-library-only file, unchanged bytes."
+      ],
+      "target_sha256": "19ae5bde484b6b76f594aa0cac1c6574f82b00d8374c013da94159637bf28c76",
+      "validation": "checks/content-candidate/verify_content.py; installed-wheel run separate"
+    },
+    {
+      "candidate": "C06-project-adapter",
+      "upstream": "project_lossless_unit_contract",
+      "target": "src/deeptutor_reuse/source_windows.py",
+      "mode": "project-adapter",
+      "source_body_reused": false,
+      "symbols": [
+        "TextUnit",
+        "TextWindow",
+        "split_text_unit",
+        "reassemble_text_unit",
+        "text_digest"
+      ],
+      "changes": [
+        "New project codepoint-window implementation; not a DS function translation.",
+        "Preserves exact text/whitespace/newline hashes and segment/version/time identity; no source reads or dispatch."
+      ],
+      "target_sha256": "7852a251caba361d4d7f6ff6d4a17b6e7416594faeebf3fa8dff8f70af592509",
+      "validation": "checks/content-candidate/verify_content.py; installed-wheel run separate"
+    },
+    {
+      "candidate": "C13",
+      "upstream": "deeptutor/agents/research/data_structures.py",
+      "target": "src/deeptutor_reuse/research_records.py",
+      "mode": "A",
+      "source_body_reused": true,
+      "symbols": [
+        "TopicStatus",
+        "TopicBlock",
+        "ResearchTopicView",
+        "TraceReference"
+      ],
+      "changes": [
+        "Preserve 9 original read-only query/statistics methods and original topic DTO methods.",
+        "UTC clocks, evidence asset/version/hash refs replace silently truncated raw_answer.",
+        "No DynamicTopicQueue constructor, append/mark, auto-save or file IO enters runtime package."
+      ],
+      "target_sha256": "8f24a83bc24b647ac4ba9513267101a6735b28d58f16dbab2a5a80dafae9fe1a",
+      "validation": "checks/content-candidate/verify_content.py; installed-wheel run separate"
+    },
+    {
+      "candidate": "C13",
+      "upstream": "deeptutor/agents/research/data_structures.py",
+      "target": "src/deeptutor_reuse/research_recovery.py",
+      "mode": "project-adapter",
+      "source_body_reused": false,
+      "symbols": [
+        "RecoveryReview",
+        "review_research_recovery"
+      ],
+      "changes": [
+        "New pure decision review; never changes states or dispatches.",
+        "Researching requires actual attempt reconciliation; missing sources/evidence and naive timestamps are explicit blockers."
+      ],
+      "target_sha256": "c5391477c3b363e1819e70ffd5e699d5c8d210ac81f842541b6e1ad962896811",
+      "validation": "checks/content-candidate/verify_content.py; installed-wheel run separate"
+    }
+  ],
+  "verification": "See research/reports/workbench/deeptutor-reuse-audit.md and adjacent evidence JSON; hashes are identity evidence, not behavior acceptance."
+}

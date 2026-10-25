@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "reference_source": {
+    "repository": "https://github.com/deepseek-ai/deepseek-harness",
+    "commit": "687f282e8625c6b8d11ff58211a90524be2e4317",
+    "archive_url": "https://codeload.github.com/deepseek-ai/deepseek-harness/zip/687f282e8625c6b8d11ff58211a90524be2e4317",
+    "sha256": "828bbbebaf507d2b1fc335a608e1c8174e2dd5c5c80ebb64d5146ddc5ecb511f"
+  },
+  "client_artifact": {
+    "runtime_lock": "harness/runtime.lock.json",
+    "reported_version": "0.2.1-rc.2",
+    "reported_build_commit": "332895e",
+    "note": "The original Web UI is served from the hash-locked SEA runtime. The reference source is for reviewed integration seams; its commit is not the runtime build commit."
+  },
+  "electron": {
+    "version": "44.7.0",
+    "platform": "win32-x64",
+    "url": "https://github.com/electron/electron/releases/download/v44.7.0/electron-v44.7.0-win32-x64.zip",
+    "sha256": "eee30dc8fa1f5ea95490e59f44e46ea68dd24c6e93d22facf70fe5c2d4c2665c",
+    "checksum_url": "https://github.com/electron/electron/releases/download/v44.7.0/SHASUMS256.txt"
+  }
+}

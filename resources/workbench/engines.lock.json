@@ -1,0 +1,20 @@
+{
+  "manifest_version": 1,
+  "pdfjs": {
+    "version": "5.4.624",
+    "archive_url": "https://github.com/mozilla/pdf.js/releases/download/v5.4.624/pdfjs-5.4.624-dist.zip",
+    "archive_sha256": "1f900c34bb66551989fab363271bd9edf13b12e13dec19a663c93f1dcc2499fd",
+    "archive_bytes": 6546203,
+    "files_manifest": "pdfjs-5.4.624.files.json",
+    "files_manifest_sha256": "ccbac7fde975c0f21061571306ddff940f4adf1217869f27d0351c2bc0574d6c",
+    "file_count": 397
+  },
+  "asr": {
+    "manifest": "asr-runtime.lock.json",
+    "sha256": "9f929ca0e0077dec86799841beffdb3a0f1b4797529ea2099d050194a8fffb92"
+  },
+  "ocr": {
+    "manifest": "ocr-runtime.lock.json",
+    "sha256": "791d2c84c38bb1d932f57b48510fee53b445b155952ef08f34f8b2a581cb3cb2"
+  }
+}
