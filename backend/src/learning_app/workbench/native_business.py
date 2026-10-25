@@ -248,6 +248,10 @@ class NativeBusiness:
             previous = conn.execute(
                 select(s.native_scopes.c.grants).where(s.native_scopes.c.run_id == run_id)
             ).scalar_one_or_none()
+            integrations = getattr(self.repository, "integrations", None)
+            platform_scope = (previous or {}).get("bilibili") if previous is not None else (
+                integrations.native.freeze(chat["course_id"], run_id, current["text"], connection=conn)
+                if integrations is not None else None)
             requested = (
                 previous.get("learning_request")
                 if previous is not None
@@ -287,6 +291,7 @@ class NativeBusiness:
                     *(["search_course_concept"] if query_courses else []),
                     *([DOCUMENT_IMAGE_TOOL] if image_enabled else []),
                     *([ADMISSION_TOOL] if requested else []),
+                    *(["query_bilibili"] if platform_scope else []),
                     *(
                         ["read_nearby_subtitles"]
                         if explicit_subtitles(current["text"]) and freeze_subtitle_anchors(conn, chat["course_id"], context, current)
@@ -304,6 +309,7 @@ class NativeBusiness:
                     "subtitle_anchors": freeze_subtitle_anchors(
                         conn, chat["course_id"], context, current
                     ),
+                    **({"bilibili": platform_scope} if platform_scope else {}),
                 },
                 current["text"],
             )
@@ -687,6 +693,14 @@ class NativeBusiness:
             if scope["owner_kind"] != "chat" or scope["purpose"] != "qa":
                 raise AppError("NEARBY_SUBTITLE_SCOPE_DENIED", "仅允许本次问题附近字幕", 403)
             select_anchor(scope, arguments)
+        elif call.tool_name == "query_bilibili":
+            frozen = scope["grants"].get("bilibili")
+            integrations = getattr(self.repository, "integrations", None)
+            if (scope["owner_kind"] != "chat" or scope["purpose"] != "qa" or not frozen
+                or frozen["course_id"] != scope["course_id"] or frozen["run_id"] != scope["run_id"]
+                or integrations is None):
+                raise AppError("BILI_NATIVE_QUERY_DENIED", "仅允许本次课程输入的B站查询", 403)
+            integrations.native.validate(frozen, arguments, connection=conn)
         elif call.tool_name in EXTERNAL_TOOLS:
             if scope["owner_kind"] != "task":
                 raise AppError(
@@ -855,6 +869,12 @@ class NativeBusiness:
                 return self._invoke_query(call, arguments)
             if call.tool_name == "read_nearby_subtitles":
                 return self._invoke_nearby(call, arguments)
+            if call.tool_name == "query_bilibili":
+                with self.repository.engine.connect() as conn:
+                    scope = self._authorize(conn, call, arguments)
+                return self.repository.integrations.native.query(
+                    scope["grants"]["bilibili"], arguments, asdict(call),
+                    lambda: self.authorize(call, arguments))
             with self.repository._lock, self.repository.engine.begin() as conn:
                 scope = self._authorize(conn, call, arguments)
                 body = self._stage_value(conn, scope, arguments)
@@ -1157,7 +1177,18 @@ class NativeBusiness:
                 "snapshots": [],
             }
         else:
-            if re.search(r"生成|转写|制作|转录", scope["raw_user_text"]) and not re.search(r"附近|这一段|这段|片段", scope["raw_user_text"]):
+            origin = anchor.get("source_course_id") or scope["course_id"]
+            integrations = getattr(self.repository, "integrations", None)
+            remote = integrations and integrations.source(anchor["asset_id"], anchor["source_version"], origin)
+            from .transcripts import TranscriptStore
+
+            cached = TranscriptStore(self.repository).list(origin, anchor["asset_id"], anchor["source_version"]) if remote else []
+            if remote and not cached:
+                self.authorize(call, arguments)
+                job = integrations.queue(origin, anchor["asset_id"], anchor["source_version"], "platform_subtitles")
+                value = {"status": job.state, "preparation_id": job.job_id, "course_id": origin,
+                         "scope": "explicit_current_video", "snapshots": []}
+            elif re.search(r"生成|转写|制作|转录", scope["raw_user_text"]) and not re.search(r"附近|这一段|这段|片段", scope["raw_user_text"]) and not (remote and cached):
                 from learning_app.config import PROJECT_ROOT
 
                 from .preparations import PreparationStore
@@ -1300,6 +1331,9 @@ class NativeBusiness:
                 known = rejected(conn, call)
                 if known:
                     raise KnownToolFailure(known["code"], known["status"], details=known["details"])
+            if call.tool_name == "query_bilibili":
+                integrations = getattr(self.repository, "integrations", None)
+                return integrations.native.receipt(scope["grants"].get("bilibili"), call.args_sha256, connection=conn) if integrations else None
             if call.tool_name == ADMISSION_TOOL:
                 receipt = RequestedLearning.receipt(conn, call, scope)
                 if receipt is not None and self.task_admitted:

@@ -217,6 +217,11 @@ class PreparationService:
                     resource_policy=lease.get("_resource_policy"),
                 ).run
             )
+            if lease["kind"].startswith("platform_"):
+                def handler(remote_lease, cancelled):
+                    return self.repository.integrations.prepare(remote_lease, cancelled,
+                        lambda received, total: self.store.progress(remote_lease,
+                            {"received_bytes": received, "total_bytes": total}))
             work = asyncio.create_task(asyncio.to_thread(handler, lease, self._cancelled))
             try:
                 while not work.done():

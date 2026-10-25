@@ -22,12 +22,14 @@ export class SubtitleSession {
   private polling = false;
   private endpoint: string;
   private prefix: string;
+  private platform = false;
   constructor(
     courseId: string,
     asset: Schema<"MediaAssetResponse">,
     private changed: (state: SubtitleState) => void,
     private failed: (error: unknown) => void,
   ) {
+    this.platform = asset.platform === "bilibili";
     this.prefix = `/courses/${courseId}/learning`;
     this.endpoint = `${this.prefix}/audio/${asset.asset_id}/${asset.source_version}`;
     this.position = asset.position_ms;
@@ -46,6 +48,10 @@ export class SubtitleSession {
     const initialFocus = this.intent;
     this.acquisition = open.sequence;
     this.epoch = null;
+    if (this.platform) {
+      void this.poll();
+      return;
+    }
     void api
       .write<Schema<"AudioFocusState">>(this.endpoint + "/focus", {
         reader_client_id: open.client,

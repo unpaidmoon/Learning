@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from typing import Literal
 
 from sqlalchemy import func, insert, select, update
@@ -62,8 +63,8 @@ class PreparationStore:
         with self.repository.engine.connect() as conn:
             return self._view(conn, course_id, job_id)
 
-    def list(self, course_id: str) -> list[PreparationView]:
-        with self.repository.engine.connect() as conn:
+    def list(self, course_id: str, *, connection=None) -> list[PreparationView]:
+        with (self.repository.engine.connect() if connection is None else nullcontext(connection)) as conn:
             ids = (
                 conn.execute(
                     select(s.preparations.c.job_id)
@@ -197,6 +198,8 @@ class PreparationStore:
             "language": value.language,
             "track_ordinal": 0,
         }
+        if source.get('audio_content_hash'):
+            engine['audio_source_sha256'] = source['audio_content_hash']
         if value.language is None:
             # Background preparation follows the latest compatible explicit
             # track instead of making a fresh default track hide user edits.
@@ -534,7 +537,7 @@ class PreparationStore:
                     .join(s.preparation_units)
                     .where(
                         s.preparations.c.state.in_(["queued", "running"]),
-                        s.preparations.c.kind == "asr",
+                        s.preparations.c.kind.in_(["asr", "platform_download", "platform_subtitles"]),
                         s.preparations.c.parameters["user_requested"].as_boolean().is_(True),
                         s.preparation_units.c.state == "pending",
                         SubtitleWaits.schedulable(),
@@ -653,6 +656,8 @@ class PreparationStore:
                 )
             )
             digest = _hash(result) if result is not None else None
+            if result is not None and lease['kind'].startswith('platform_'):
+                self.repository.integrations.publish_result(conn, lease, result)
             if result is not None and lease["kind"] == "asr":
                 from .transcripts import TranscriptStore
 

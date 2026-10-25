@@ -55,15 +55,19 @@ class MediaRegisterInput(MediaInput):
     path: str = Field(min_length=1, max_length=32760)
 
 
-class MediaOpenInput(MediaInput):
+class MediaVersionInput(MediaInput):
     source_version: str = Field(min_length=1, max_length=160)
 
 
-class MediaRelocateInput(MediaOpenInput):
+class MediaOpenInput(MediaVersionInput):
+    refresh: bool | None = None
+
+
+class MediaRelocateInput(MediaVersionInput):
     path: str | None = Field(default=None, max_length=32760)
 
 
-class MediaPositionInput(MediaOpenInput):
+class MediaPositionInput(MediaVersionInput):
     position_ms: int = Field(ge=0, le=315_360_000_000)
     expected_revision: int = Field(ge=0)
 
@@ -80,7 +84,10 @@ class MediaAssetResponse(MediaPositionResponse):
     display_name: str
     availability: Literal["available", "missing", "version_mismatch"]
     media_type: str
-    size_bytes: int
+    size_bytes: int | None
+    platform: str | None = None
+    audio_content_url: str | None = None
+    playback_session_id: str | None = None
 
 
 def _now() -> str:
@@ -292,6 +299,21 @@ class MediaStore:
         self._lock = threading.RLock()
         self._verified: dict[tuple[str, str], list[int]] = {}
 
+    def attach_remote_source(self, source: dict) -> dict:
+        """Register platform metadata as media identity without treating it as video bytes."""
+        host = getattr(self.repository, "integrations", None)
+        if host is None or not host.source(source["asset_id"], source["source_version"]):
+            raise AppError("PLATFORM_SOURCE_NOT_FOUND", "平台媒体未登记", 404)
+        with self.engine.begin() as conn:
+            if not conn.execute(select(media_assets).where(media_assets.c.asset_id == source["asset_id"])).first():
+                conn.execute(insert(media_assets).values(asset_id=source["asset_id"],
+                    source_version=source["source_version"], media_type="video/mp4", file_signature=[]))
+            if not conn.execute(select(media_positions).where(media_positions.c.asset_id == source["asset_id"],
+                    media_positions.c.source_version == source["source_version"])).first():
+                conn.execute(insert(media_positions).values(asset_id=source["asset_id"],
+                    source_version=source["source_version"], position_ms=0, revision=0))
+        return self._view(self._row(source["asset_id"], source["source_version"]))
+
     def _row(self, asset_id: str, source_version: str | None = None) -> dict:
         query = (
             select(
@@ -326,6 +348,9 @@ class MediaStore:
         return result
 
     def _availability(self, row: dict, *, force: bool = False, catalog: bool = False) -> str:
+        host = getattr(self.repository, "integrations", None)
+        if host is not None and host.source(row["asset_id"], row["source_version"]):
+            return host.media.availability(row["asset_id"], row["source_version"])
         path = Path(row["local_path"])
         key = (row["asset_id"], row["source_version"])
         try:
@@ -348,7 +373,7 @@ class MediaStore:
             return "missing"
 
     def _view(self, row: dict, *, availability: str | None = None) -> dict:
-        return {
+        result = {
             "asset_id": row["asset_id"],
             "source_version": row["source_version"],
             "display_name": row["display_name"],
@@ -359,6 +384,10 @@ class MediaStore:
             "position_revision": row["revision"],
             "last_opened_at": row["last_opened_at"],
         }
+        host = getattr(self.repository, "integrations", None)
+        if host is not None and host.source(row["asset_id"], row["source_version"]):
+            result.update(host.media.view(row["asset_id"], row["source_version"]))
+        return result
 
     def register(self, course_id: str, value: str) -> dict:
         path, media_type = _video_path(value)
@@ -490,7 +519,10 @@ class MediaStore:
         )
         return used + unused
 
-    def open(self, asset_id: str, version: str) -> dict:
+    def open(self, asset_id: str, version: str, *, refresh: bool = False) -> dict:
+        host = getattr(self.repository, "integrations", None)
+        if host is not None and host.source(asset_id, version):
+            host.media.open(asset_id, version, refresh=refresh)
         row = self._row(asset_id, version)
         availability = self._availability(row, force=True)
         self._require_available(availability)
@@ -518,7 +550,8 @@ class MediaStore:
             )
         row["last_opened_at"] = now
         previews = getattr(self.repository, "video_previews", None)
-        if previews is not None:
+        if previews is not None and not (getattr(self.repository, "integrations", None)
+                and self.repository.integrations.source(asset_id, version)):
             previews.enqueue_asset(asset_id, version)
         return self._view(row, availability="available")
 
@@ -559,6 +592,9 @@ class MediaStore:
         return self._view(self._row(asset_id, value.source_version))
 
     def content(self, asset_id: str, version: str, request: Request) -> Response:
+        host = getattr(self.repository, "integrations", None)
+        if host is not None and host.source(asset_id, version):
+            return host.media.content(asset_id, version, request)
         row = self._row(asset_id, version)
         self._require_available(self._availability(row))
         size = row["byte_length"]
@@ -650,7 +686,7 @@ def install_media_routes(app: FastAPI) -> None:
 
     @app.post("/api/v1/videos/{asset_id}/open", response_model=MediaAssetResponse)
     def open_video(asset_id: str, value: MediaOpenInput):
-        return store().open(asset_id, value.source_version)
+        return store().open(asset_id, value.source_version, refresh=bool(value.refresh))
 
     @app.post("/api/v1/videos/{asset_id}/relocate", response_model=MediaAssetResponse | None)
     def relocate(asset_id: str, value: MediaRelocateInput):

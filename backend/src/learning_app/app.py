@@ -48,7 +48,8 @@ from learning_app.workbench.routes import install_workbench_routes
 
 
 def create_app(
-    config: AppConfig | None = None, *, repository=None, execution=None, execution_factory=None
+    config: AppConfig | None = None, *, repository=None, execution=None, execution_factory=None,
+    integrations_provider_factory=None
 ) -> FastAPI:
     config = config or load_config()
     profile = ProfileLocation(config.data_dir)
@@ -64,6 +65,11 @@ def create_app(
 
         require_active_data(repository.root if repository is not None else config.data_dir)
         app.state.repository = repository or Repository(config.data_dir)
+        from learning_app.integrations.host import IntegrationHost
+
+        app.state.integrations = IntegrationHost(app.state.repository, config.project_root,
+            provider_factory=integrations_provider_factory)
+        app.state.repository.integrations = app.state.integrations
         from learning_app.data_maintenance import DataMaintenance
 
         DataMaintenance(app.state.repository).restore_local_jobs()
@@ -161,6 +167,9 @@ def create_app(
         responses={403: {"model": ErrorResponse}, 409: {"model": ErrorResponse}},
     )
     app.state.config = config
+    from learning_app.integrations.routes import install_integration_routes
+
+    install_integration_routes(app)
     app.state.profile_location = profile
     app.state.ready = False
     app.add_middleware(LocalBoundaryMiddleware, config=config, sessions=sessions)

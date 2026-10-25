@@ -1,0 +1,10 @@
+{
+  "engine": "yt-dlp",
+  "version": "2026.10.21",
+  "filename": "yt_dlp-2026.10.21-py3-none-any.whl",
+  "sha256": "94a3a3e2c423129d0bbd2f1be000c4171fa1226c29e251c84aff868f2851c247",
+  "source": "https://pypi.org/pypi/yt-dlp/2026.10.21/json",
+  "source_commit": "6ccd977303412151ee23352c6257dd658ffc1987",
+  "license": "Unlicense (wheel core; optional dependencies not installed)",
+  "path": ".local/platform-engine/yt_dlp-2026.10.21-py3-none-any.whl"
+}

@@ -1,0 +1,19 @@
+{
+  "source_snapshot": "f4b77644983f6a1412cc418483fdfbda54d8315f",
+  "integration_commit": "e9c3766",
+  "notice_preservation_commit": "5786357",
+  "native_verifier_commit": "42f707b",
+  "source_capture": {"formal_files": 949, "changed_from_initial": 125, "platform_overlap": 12, "text_conflicts": 7, "original_index_matches": true, "original_worktree_written": false},
+  "migration": {"tests_passed": 6, "old_migrations_unchanged": true, "single_head": "platform_mainline_20261024", "existing_database_rows_preserved": true, "manual_backup_verified": true, "recovery_backup_verified": true},
+  "backend": {"related_batch_passed": 190, "host_batch_passed": 99, "host_batch_skipped": 4, "offline_supplement_passed": 9},
+  "frontend": {"files": 35, "passed": 216, "static_check": true, "build": true},
+  "node_guards": {"passed": 25},
+  "synthetic_native_browser": {"media_run": "7f9384d0d6494920ac4f6665bb295b27", "favorite_run": "0ddc26f51226409694d4410593ecaedd", "decoded_frames": 20, "expired_http_attempts": 1, "draft_and_attachment_preserved": true, "manual_p2_only": true, "ports_closed": [8918, 8916], "remaining_owned_pids": [], "real_platform": false, "model_called": false, "screenshot_taken": false},
+  "real_local_copies": {"samples": 2, "same_asset_version": true, "position_preserved": true, "local_range_206": true, "platform_requests": 0, "browser_decoding_tested": false},
+  "real_model": {"first_check_passed": false, "first_check_actual_attempts": 1, "fresh_check_passed": true, "fresh_check_actual_attempts": 3, "fresh_directory_receipts": 1, "platform_requests": 1, "directory_parts": 3, "image_blocks": 0, "raw_usage_saved": true, "missing_fields_unknown": true, "native_scopes_released": true, "same_existing_chat": true, "new_assets_or_preparations": false},
+  "isolated_database_actual_model_attempts": 13,
+  "review_patch_files": {"platform": 70, "host": 36, "documentation_at_code_commit": 25},
+  "documentation_inherited_link_errors": 78,
+  "original_mainline_integration_complete": false,
+  "full_bilibili_acceptance": false
+}

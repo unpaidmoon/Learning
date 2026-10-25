@@ -1,0 +1,24 @@
+{
+  "implementation_commit": "d3914d7",
+  "backend": {"fault_tests": 12, "related_passed": 86},
+  "frontend": {"files": 28, "passed": 188},
+  "synthetic_native_browser": {
+    "run": "2efe76ddee4c4e1aa203c8e9950c955b",
+    "passed": true,
+    "expired_http_attempts": 1,
+    "session_changed": true,
+    "position_restored": true,
+    "decoded_frames": 20,
+    "screenshot_taken": false,
+    "real_platform": false,
+    "model_called": false,
+    "remaining_owned_pids": [],
+    "port_closed": true
+  },
+  "real_local_copy": {"same_asset": true, "same_source_version": true, "position_restored": true, "continued_playback": true, "screenshot_taken": false},
+  "source_tree_audit": {"manifest_files": 873, "index_matches_capture": true, "files_changed_since_capture": 45},
+  "isolated_database_actual_model_attempts": 9,
+  "real_cdn_expiry_verified": false,
+  "remote_entity_change_resume_verified": false,
+  "full_bilibili_acceptance": false
+}

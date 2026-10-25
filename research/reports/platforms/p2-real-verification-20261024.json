@@ -1,0 +1,13 @@
+{
+  "media_redirect_commit": "8ca3071",
+  "observed_cdn_commit": "58a1caa",
+  "authorized_scope": {"video": "BV1YPak6pEct", "newly_imported_page": 2, "p1_version_unchanged": true, "p3_imported": false},
+  "real_online_playback": {"passed": true, "duration_seconds": 4647.933438, "advance_seconds": 3.023032, "ready_state": 4, "total_decoded_frames_observed": 304, "separate_audio": true, "av_clock_difference_seconds": 0.040817, "same_origin_only": true, "screenshot_taken": false, "pixels_read": false},
+  "real_subtitle": {"state": "completed", "tracks": 1, "origin": "platform_ai", "language": "ai-zh"},
+  "real_local_copy": {"video_track_bytes": 377573934, "audio_track_bytes": 56855413, "complete_bytes": 437513845, "sha256": "06e534ba706e071444c417b6b0ebc085dce71296788b4d36c8b815530f52e89e", "same_asset_version": true, "same_original_account": true, "position_restored": true, "local_badge": true, "online_nonce_absent": true, "continued_seconds": 2.047248, "new_decoded_frames": 170, "paused_after": true},
+  "media_redirects": {"bounded_requests": 4, "grant_per_hop": true, "frozen_cid_per_hop": true, "range_and_if_range_preserved": true, "account_cookie_not_forwarded_to_cdn": true, "extra_cdn_media_redirect_only": true, "observed_final_status_counts": {"200": 1, "206": 3}},
+  "backend": {"redirect_tests": 17, "related_batch_passed": 82, "domain_related_batch_passed": 92},
+  "source_tree_audit": {"manifest_files": 873, "index_matches_capture": true, "files_changed_since_initial": 63},
+  "isolated_database_actual_model_attempts": 13,
+  "full_bilibili_acceptance": false
+}

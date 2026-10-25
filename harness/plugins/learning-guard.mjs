@@ -11,6 +11,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { prepareDocumentImages } from './native-images.mjs';
 import { workspaceRelocator } from './workspace-relocation.mjs';
 import { installDesktopSettings } from './desktop-settings.mjs';
+import { BILIBILI_QUERY, bilibiliSkill, bilibiliTool, validBilibiliQuery } from './bilibili-query.mjs';
 
 function required(name) {
   const value = process.env[`LEARNING_HARNESS_${name}`];
@@ -65,11 +66,11 @@ function acceptExecutionPolicy(policy) {
       || !['qa', 'task', 'translation'].includes(policy.purpose)
       || (policy.purpose === 'task' ? typeof policy.task_id !== 'string' || !/^[A-Za-z0-9_-]{1,160}$/.test(policy.task_id) : policy.task_id !== null)
       || !Array.isArray(policy.allowed_tools) || new Set(policy.allowed_tools).size !== policy.allowed_tools.length
-      || policy.allowed_tools.some(name => !['skill', 'read_source_handle', 'stage_result', 'admit_requested_artifact', 'search_course_concept', 'read_nearby_subtitles', 'search_research_web', 'read_research_page', 'read_document_region'].includes(name))
+      || policy.allowed_tools.some(name => !['skill', 'read_source_handle', 'stage_result', 'admit_requested_artifact', 'search_course_concept', 'read_nearby_subtitles', 'search_research_web', 'read_research_page', 'read_document_region', BILIBILI_QUERY].includes(name))
       || (policy.purpose === 'translation' && policy.allowed_tools.length !== 0)
       || (policy.purpose !== 'task' && policy.allowed_tools.includes('stage_result'))
       || (policy.purpose !== 'task' && policy.allowed_tools.some(name => ['search_research_web', 'read_research_page'].includes(name)))
-      || (policy.purpose !== 'qa' && policy.allowed_tools.some(name => ['admit_requested_artifact', 'search_course_concept', 'read_nearby_subtitles'].includes(name)))))) {
+      || (policy.purpose !== 'qa' && policy.allowed_tools.some(name => ['admit_requested_artifact', 'search_course_concept', 'read_nearby_subtitles', BILIBILI_QUERY].includes(name)))))) {
     throw Error('LEARNING_EXECUTION_POLICY_FORMAT');
   }
   const normalized = business ? { ...policy, allowed_tools: Object.freeze([...policy.allowed_tools].sort()) } : policy;
@@ -204,6 +205,7 @@ export function apply(ctx) {
     parameters: schema.parameters, ...(schema.deferLoading === true ? { deferLoading: true } : {}) })));
   const text = value => typeof value === 'string' && value.length > 0 && value.length <= 160 && /^[A-Za-z0-9_-]+$/.test(value);
   function validArgs(name, args) {
+    if (name === BILIBILI_QUERY) return !!args && typeof args === 'object' && !Array.isArray(args) && validBilibiliQuery(args, text);
     if (!args || typeof args !== 'object' || Array.isArray(args)) return false;
     if (name === 'admit_requested_artifact') return Object.keys(args).length === 0;
     if (name === 'read_nearby_subtitles') return Object.keys(args).join() === 'anchor_id' && (args.anchor_id === null || text(args.anchor_id));
@@ -297,6 +299,11 @@ export function apply(ctx) {
         stage: { type: 'string' }, body: { type: 'string', description: 'One JSON-encoded ArtifactBody with blocks. Use kind=markdown for prose. Escape JSON backslashes, or use literal Unicode math. Omit duration_seconds for a static visualization.', maxLength: 20 * 1024 * 1024 } }, required: ['task_id', 'object_id', 'expected_version', 'stage', 'body'], additionalProperties: false }, output,
       execute(args, exec) { return invoke('stage_result', args, exec); } },
   ] : [])) { definitions.set(definition.name, definition); ctx.tools.register(definition); }
+  if (businessEndpoint) {
+    const definition = bilibiliTool(invoke, output);
+    definitions.set(BILIBILI_QUERY, definition);
+    schemaPins.set(BILIBILI_QUERY, schemaDigest(definition));
+  }
   function pinSchemas() {
     if (!businessEndpoint) return;
     const native = ctx.tools.get('skill');
@@ -310,13 +317,17 @@ export function apply(ctx) {
       schemaPins.set(schema.name, digest);
     }
   }
+  function visibleTools(agent) {
+    const policy = executionPolicies.get(agent.id);
+    return (policy?.allowed_tools || []).filter(name => name !== BILIBILI_QUERY || leases.history.get(policy.run_id)?.state === 'active');
+  }
   function assertSurface(schemas, agent) {
     if (!businessEndpoint) {
       if (schemas.length) throw Error('LEARNING_HARNESS_UNEXPECTED_TOOLS');
       return;
     }
     pinSchemas();
-    const expected = agent ? executionPolicies.get(agent.id)?.allowed_tools || [] : [...definitions.keys()].sort();
+    const expected = agent ? visibleTools(agent) : [...definitions.keys()].filter(name => name !== BILIBILI_QUERY).sort();
     if (schemas.map(s => s.name).sort().join() !== [...expected].sort().join()) throw Error('LEARNING_BUSINESS_SCHEMA_SCOPE');
     for (const schema of schemas) if (schemaDigest(schema) !== schemaPins.get(schema.name)
       || (agent && ctx.tools.get(schema.name, agent) !== definitions.get(schema.name))) throw Error('LEARNING_BUSINESS_SCHEMA_IDENTITY');
@@ -332,24 +343,25 @@ export function apply(ctx) {
     if (policy && reconcileOnlyRuns.has(policy.run_id)) code = 'LEARNING_RECONCILE_ONLY';
     else if (!policy || owners.get(exec.agent?.id) !== exec.agent || !policy.allowed_tools?.includes(exec.name)) code = 'LEARNING_BUSINESS_TOOL_NOT_ALLOWED';
     else if (ctx.tools.get(exec.name, exec.agent) !== definitions.get(exec.name)) code = 'LEARNING_BUSINESS_TOOL_IDENTITY';
-    else if (exec.name === 'skill' ? ![projectSkill.name, ...artifactSkills.map(skill => skill.name), ...(policy.allowed_tools.includes('read_nearby_subtitles') ? ['subtitles'] : [])].includes(exec.arguments?.name) || Object.keys(exec.arguments).length !== 1 : !validArgs(exec.name, exec.arguments)) code = 'LEARNING_BUSINESS_TOOL_ARGUMENTS';
+    else if (exec.name === 'skill' ? ![projectSkill.name, ...artifactSkills.map(skill => skill.name), ...(policy.allowed_tools.includes('read_nearby_subtitles') ? ['subtitles'] : []), ...(policy.allowed_tools.includes(BILIBILI_QUERY) ? [bilibiliSkill.name] : [])].includes(exec.arguments?.name) || Object.keys(exec.arguments).length !== 1 : !validArgs(exec.name, exec.arguments)) code = 'LEARNING_BUSINESS_TOOL_ARGUMENTS';
     if (!code) { try { const owner = leases.claim(exec); audit('call-owner-frozen', leases.publicOwner(owner)); } catch (error) { code = error.message; } }
     if (code) { state.toolDenials += 1; audit('tool-denied', { sessionId: exec.agent?.id || null, name: exec.name, code }); return code; }
   });
   async function configureAgentSurface(agent) {
     if (!businessEndpoint) return;
-    const policy = executionPolicies.get(agent.id), allow = policy?.allowed_tools || [];
+    const policy = executionPolicies.get(agent.id), allow = visibleTools(agent);
     const signature = JSON.stringify([policy?.purpose || 'unbound', [...allow].sort()]);
     const prior = scopeHandles.get(agent.id);
     if (prior?.agent === agent && prior.signature === signature) { await prior.ready; return; }
     const barrier = agent.ctx.tools.restrict({ allow: [] });
-    const holder = { agent, signature, offTools: barrier, skillFiber: null, ready: null };
+    const holder = { agent, signature, offTools: barrier, skillFiber: null, platformFiber: null, ready: null };
     scopeHandles.set(agent.id, holder);
     holder.ready = (async () => {
       if (prior) {
         await prior.ready;
         if (prior.agent !== agent) throw Error('LEARNING_BUSINESS_AGENT_REPLACED');
         if (prior.skillFiber) await prior.skillFiber.dispose();
+        if (prior.platformFiber) await prior.platformFiber.dispose();
         prior.offTools();
       }
       if (!allow.includes('skill')) {
@@ -357,7 +369,14 @@ export function apply(ctx) {
           invocation: { modelInvocable: false, userInvocable: false }, content: '' }); });
         await holder.skillFiber;
       }
-      const offTools = agent.ctx.tools.restrict({ allow });
+      if (allow.includes(BILIBILI_QUERY)) {
+        holder.platformFiber = agent.ctx.inject(['tools', 'skills'], scope => {
+          scope.tools.register(definitions.get(BILIBILI_QUERY));
+          scope.skills.register(bilibiliSkill);
+        });
+        await holder.platformFiber;
+      }
+      const offTools = agent.ctx.tools.restrict({ allow: allow.filter(name => name !== BILIBILI_QUERY) });
       holder.offTools = offTools;
       barrier();
       assertSurface(ctx.tools.schemas(agent), agent);
@@ -502,7 +521,10 @@ export function apply(ctx) {
       try {
         let body = ''; for await (const chunk of req) { body += chunk; if (Buffer.byteLength(body) > 4096) throw Error('LEASE_BODY_SIZE'); }
         const value = JSON.parse(body);
-        res.end(JSON.stringify(await leases.release(value, ctx)));
+        const receipt = await leases.release(value, ctx);
+        const agent = owners.get(value.session_id);
+        if (agent) await configureAgentSurface(agent);
+        res.end(JSON.stringify(receipt));
       } catch (error) { audit('lease-control-denied', { code: error.message }); res.writeHead(409).end(JSON.stringify({ error: error.message })); }
       return;
     }

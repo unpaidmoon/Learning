@@ -1,0 +1,23 @@
+{
+  "implementation_commit": "0fd8429",
+  "backend": {"source_recovery_tests": 10, "related_passed": 181},
+  "frontend": {"files": 36, "passed": 222, "static_check": true},
+  "source_scope": {"course_and_version_checked": true, "exact_legacy_identity_restored": true, "wrong_account_rejected": true, "anonymous_original_identity_restored": true, "operation_receipt_bound_to_source": true, "old_receipt_cannot_reauthorize": true, "local_unknown_effect_reconciled": true},
+  "synthetic_native_browser": {
+    "account_run": "e5621d334f324bb6a74a4889eaa50530",
+    "anonymous_run": "b1b1b398888b44ab986dc3062f447f55",
+    "same_original_connection": true,
+    "same_original_asset": true,
+    "draft_and_attachment_preserved": true,
+    "only_p2_imported": true,
+    "models_called": false,
+    "media_and_subtitle_requests": 0,
+    "remaining_owned_pids": [],
+    "port_closed": 8916,
+    "real_materials": false
+  },
+  "isolated_instance": {"backend_port": 8876, "debug_port": 9346, "files_tab_visible": true, "existing_login_valid": true, "real_recovery_tested": false},
+  "source_tree_audit": {"manifest_files": 873, "index_matches_capture": true, "files_changed_since_initial": 61},
+  "isolated_database_actual_model_attempts": 13,
+  "full_bilibili_acceptance": false
+}

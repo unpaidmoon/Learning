@@ -146,6 +146,7 @@ class CourseFileEntry(BaseModel):
     source_version: str | None = None
     modified_at: str | None = None
     created_at: str | None = None
+    platform: str | None = None
 
 
 class CourseFilePropertiesResponse(CourseFileEntry):
@@ -248,6 +249,8 @@ def _name(value: str) -> str:
 
 
 def _viewer(path: Path) -> Viewer:
+    if path.suffix.lower() == ".bili":
+        return "video"
     if path.is_dir():
         return "directory"
     suffix = path.suffix.lower()
@@ -386,12 +389,15 @@ class CourseFileStore:
                 .first()
             )
         stat = None if blocked else path.stat()
+        host = getattr(self.repository, "integrations", None)
+        remote = row and host and host.source(row["asset_id"], row["source_version"], course_id)
         return {
             "name": path.name,
             "path": relative,
             "kind": "blocked" if blocked else "directory" if path.is_dir() else "file",
             "size_bytes": None if blocked or path.is_dir() else path.stat().st_size,
-            "viewer": "external" if blocked else _viewer(path),
+            "viewer": "external" if blocked else "video" if remote else _viewer(path),
+            "platform": "bilibili" if remote else None,
             "asset_id": row["asset_id"] if row else None,
             "source_version": row["source_version"] if row else None,
             "modified_at": datetime.fromtimestamp(stat.st_mtime, UTC).isoformat() if stat else None,
@@ -919,8 +925,11 @@ class CourseFileStore:
             raise AppError("FILE_REQUIRED", "请选择文件", 422)
         with self._lock:
             source = self._register(course_id, root, path)
-            viewer = _viewer(path)
-            video = self.media.attach_source(source, path) if viewer == "video" else None
+            host = getattr(self.repository, "integrations", None)
+            remote = host and host.source(source["asset_id"], source["source_version"], course_id)
+            viewer = "video" if remote else _viewer(path)
+            video = (self.media.attach_remote_source(source) if remote else
+                     self.media.attach_source(source, path)) if viewer == "video" else None
             if video:
                 video = self.media.open(source["asset_id"], source["source_version"])
             from learning_app.workbench import schema as workbench_schema

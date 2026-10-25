@@ -24,6 +24,7 @@ class TranscriptView(Contract):
     asset_id: Identity
     source_version: Identity
     source_digest: Digest
+    source_type: Literal["local_asr", "platform_cc", "platform_ai"] = "local_asr"
     edit_head_id: Identity | None
     audio_start_ms: int | None
     audio_end_ms: int | None

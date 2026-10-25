@@ -4,6 +4,295 @@
  */
 
 export interface paths {
+    "/api/v1/integrations/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Modules */
+        get: operations["modules_api_v1_integrations_modules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/modules/{platform}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Module Change */
+        post: operations["module_change_api_v1_integrations_modules__platform__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect */
+        post: operations["connect_api_v1_integrations_bilibili_connect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/connections/{connection_id}/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disconnect */
+        post: operations["disconnect_api_v1_integrations_connections__connection_id__disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login Start */
+        post: operations["login_start_api_v1_integrations_bilibili_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/login/{login_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login Poll */
+        post: operations["login_poll_api_v1_integrations_bilibili_login__login_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/login/{login_id}/qr.svg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Login Qr */
+        get: operations["login_qr_api_v1_integrations_bilibili_login__login_id__qr_svg_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/favorites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Favorites */
+        get: operations["favorites_api_v1_integrations_bilibili_favorites_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/favorites/browse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Favorite Browse */
+        post: operations["favorite_browse_api_v1_integrations_bilibili_favorites_browse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/bilibili/favorites/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Favorite Folders */
+        post: operations["favorite_folders_api_v1_integrations_bilibili_favorites_folders_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/bilibili/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve */
+        post: operations["resolve_api_v1_courses__course_id__integrations_bilibili_resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/bilibili/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inspect Link */
+        post: operations["inspect_link_api_v1_courses__course_id__integrations_bilibili_inspect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Selected */
+        post: operations["import_selected_api_v1_courses__course_id__integrations_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/reconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reconnect Source */
+        post: operations["reconnect_source_api_v1_courses__course_id__integrations__asset_id__reconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/subtitles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Subtitles */
+        post: operations["subtitles_api_v1_courses__course_id__integrations__asset_id__subtitles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Download */
+        post: operations["download_api_v1_courses__course_id__integrations__asset_id__download_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/prepare-subtitles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare Subtitles */
+        post: operations["prepare_subtitles_api_v1_courses__course_id__integrations__asset_id__prepare_subtitles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -3189,6 +3478,18 @@ export interface components {
              */
             timezone_offset_seconds: number;
         };
+        /** AccountSourceRecovery */
+        AccountSourceRecovery: {
+            /**
+             * Kind
+             * @default login
+             * @constant
+             */
+            kind: "login";
+            login: components["schemas"]["LoginView"];
+            /** Account Label */
+            account_label: string;
+        };
         /** AccountWallet */
         AccountWallet: {
             /**
@@ -3210,6 +3511,16 @@ export interface components {
             source_text: string;
             /** Source Parts */
             source_parts: components["schemas"]["TranslationSourcePart"][];
+        };
+        /** AnonymousSourceRecovery */
+        AnonymousSourceRecovery: {
+            /**
+             * Kind
+             * @default anonymous
+             * @constant
+             */
+            kind: "anonymous";
+            connection: components["schemas"]["ConnectionView"];
         };
         /** AnswerHistory */
         AnswerHistory: {
@@ -3950,6 +4261,64 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** CatalogueBrowse */
+        CatalogueBrowse: {
+            /** Connection Id */
+            connection_id: string;
+            /** Url */
+            url: string;
+            /** Catalogue Id */
+            catalogue_id?: string | null;
+            favorite_origin?: components["schemas"]["FavoriteOrigin"] | null;
+            /**
+             * Page
+             * @default 1
+             */
+            page: number;
+        };
+        /** CataloguePage */
+        CataloguePage: {
+            /**
+             * Kind
+             * @default catalogue
+             * @constant
+             */
+            kind: "catalogue";
+            /** Catalogue Id */
+            catalogue_id: string;
+            /** Course Id */
+            course_id: string;
+            /** Connection Id */
+            connection_id: string;
+            /**
+             * Catalogue Kind
+             * @enum {string}
+             */
+            catalogue_kind: "collection" | "series";
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
+            /** Page */
+            page: number;
+            /** Total */
+            total: number;
+            /** Has More */
+            has_more: boolean;
+            /** Provider Revision */
+            provider_revision: string | null;
+            /** Videos */
+            videos: components["schemas"]["CatalogueVideo"][];
+        };
+        /** CatalogueVideo */
+        CatalogueVideo: {
+            /** Bvid */
+            bvid: string;
+            /** Title */
+            title: string;
+            /** Ordinal */
+            ordinal: number;
+        };
         /** ChatEvidence */
         ChatEvidence: {
             /** Course Id */
@@ -3976,6 +4345,26 @@ export interface components {
             messages?: components["schemas"]["MessageResponse"][];
             /** Generations */
             generations?: components["schemas"]["GenerationResponse"][];
+        };
+        /** ConnectionInput */
+        ConnectionInput: {
+            /**
+             * Guest
+             * @default true
+             */
+            guest: boolean;
+        };
+        /** ConnectionView */
+        ConnectionView: {
+            /** Connection Id */
+            connection_id: string;
+            /** Account Label */
+            account_label: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "guest" | "connected" | "expired" | "disconnected";
         };
         /** CorpusDocument */
         CorpusDocument: {
@@ -4119,6 +4508,8 @@ export interface components {
             modified_at?: string | null;
             /** Created At */
             created_at?: string | null;
+            /** Platform */
+            platform?: string | null;
         };
         /** CourseFileListResponse */
         CourseFileListResponse: {
@@ -4199,6 +4590,8 @@ export interface components {
             modified_at?: string | null;
             /** Created At */
             created_at?: string | null;
+            /** Platform */
+            platform?: string | null;
             /** Root Path */
             root_path: string;
         };
@@ -5236,6 +5629,134 @@ export interface components {
             label: string;
             source: components["schemas"]["SourceSnapshot"];
         };
+        /** Favorite */
+        Favorite: {
+            /** Folder Id */
+            folder_id: string;
+            /** Title */
+            title: string;
+            /** Count */
+            count: number;
+            /**
+             * Resource Type
+             * @default folder
+             * @enum {string}
+             */
+            resource_type: "folder" | "collection";
+        };
+        /** FavoriteBrowse */
+        FavoriteBrowse: {
+            /** Connection Id */
+            connection_id: string;
+            /** Folder Id */
+            folder_id: string;
+            /**
+             * Page
+             * @default 1
+             */
+            page: number;
+            /**
+             * Kind
+             * @default created
+             * @enum {string}
+             */
+            kind: "created" | "collected";
+            /**
+             * Folder Page
+             * @default 1
+             */
+            folder_page: number;
+            /**
+             * Resource Type
+             * @default folder
+             * @enum {string}
+             */
+            resource_type: "folder" | "collection";
+        };
+        /** FavoriteFolderBrowse */
+        FavoriteFolderBrowse: {
+            /** Connection Id */
+            connection_id: string;
+            /**
+             * Kind
+             * @default created
+             * @enum {string}
+             */
+            kind: "created" | "collected";
+            /**
+             * Page
+             * @default 1
+             */
+            page: number;
+        };
+        /** FavoriteFolderPage */
+        FavoriteFolderPage: {
+            /** Items */
+            items: components["schemas"]["Favorite"][];
+            /** Page */
+            page: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "created" | "collected";
+            /** Total */
+            total: number;
+            /** Has More */
+            has_more: boolean;
+        };
+        /** FavoriteOrigin */
+        FavoriteOrigin: {
+            /** Folder Id */
+            folder_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "created" | "collected";
+            /**
+             * Resource Type
+             * @enum {string}
+             */
+            resource_type: "folder" | "collection";
+            /** Folder Page */
+            folder_page: number;
+            /** Video Page */
+            video_page: number;
+        };
+        /** FavoritePage */
+        FavoritePage: {
+            /** Items */
+            items: components["schemas"]["FavoriteVideo"][];
+            /** Has More */
+            has_more: boolean;
+            /** Page */
+            page: number;
+            /** Total */
+            total: number;
+            /** Title */
+            title: string;
+            /** Folder Id */
+            folder_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "created" | "collected";
+        };
+        /** FavoriteVideo */
+        FavoriteVideo: {
+            /** Resource Id */
+            resource_id: string;
+            /** Bvid */
+            bvid: string | null;
+            /** Title */
+            title: string;
+            /** Available */
+            available: boolean;
+            /** Unavailable Reason */
+            unavailable_reason?: ("removed" | "unsupported" | "identity_missing") | null;
+        };
         /** GeneratedArtifactReference */
         GeneratedArtifactReference: {
             /** Artifact Id */
@@ -5314,6 +5835,71 @@ export interface components {
              */
             configured_thinking: string;
             capabilities: components["schemas"]["Capabilities"];
+        };
+        /** ImportPlan */
+        ImportPlan: {
+            /**
+             * Kind
+             * @default video
+             * @constant
+             */
+            kind: "video";
+            /** Plan Id */
+            plan_id: string;
+            /** Course Id */
+            course_id: string;
+            /** Connection Id */
+            connection_id: string;
+            /** Title */
+            title: string;
+            /** Parts */
+            parts: components["schemas"]["VideoPart"][];
+            /** Complete */
+            complete: boolean;
+        };
+        /** ImportReceipt */
+        ImportReceipt: {
+            /** Operation Id */
+            operation_id: string;
+            /** Course Id */
+            course_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "completed" | "unknown";
+            /** Items */
+            items: components["schemas"]["ImportedItem"][];
+        };
+        /** ImportSelection */
+        ImportSelection: {
+            /**
+             * Destination Path
+             * @default
+             */
+            destination_path: string;
+            /** Operation Id */
+            operation_id: string;
+            /** Plan Id */
+            plan_id: string;
+            /** Object Ids */
+            object_ids: string[];
+        };
+        /** ImportedItem */
+        ImportedItem: {
+            /** Asset Id */
+            asset_id: string;
+            /** Source Version */
+            source_version: string;
+            /** Path */
+            path: string;
+            /** Object Id */
+            object_id: string;
+            /**
+             * Reused
+             * @default false
+             */
+            reused: boolean;
         };
         JsonValue: unknown;
         /** LearningOperationView */
@@ -5465,6 +6051,19 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** LoginView */
+        LoginView: {
+            /** Login Id */
+            login_id: string;
+            /** Url */
+            url?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "waiting" | "scanned" | "expired" | "connected";
+            connection?: components["schemas"]["ConnectionView"] | null;
+        };
         /** ManifestCreate */
         ManifestCreate: {
             /** Documents */
@@ -5513,12 +6112,20 @@ export interface components {
             /** Media Type */
             media_type: string;
             /** Size Bytes */
-            size_bytes: number;
+            size_bytes: number | null;
+            /** Platform */
+            platform?: string | null;
+            /** Audio Content Url */
+            audio_content_url?: string | null;
+            /** Playback Session Id */
+            playback_session_id?: string | null;
         };
         /** MediaOpenInput */
         MediaOpenInput: {
             /** Source Version */
             source_version: string;
+            /** Refresh */
+            refresh?: boolean | null;
         };
         /** MediaPositionInput */
         MediaPositionInput: {
@@ -5633,6 +6240,32 @@ export interface components {
             max_output_tokens: number;
             /** Timeout Seconds */
             timeout_seconds: number;
+        };
+        /** ModuleChange */
+        ModuleChange: {
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** ModuleView */
+        ModuleView: {
+            /**
+             * Platform
+             * @enum {string}
+             */
+            platform: "bilibili" | "chaoxing" | "maimemo" | "zotero" | "icourse" | "rainclassroom" | "xuetang" | "zhihuishu";
+            /** Enabled */
+            enabled: boolean;
+            /** Implemented */
+            implemented: boolean;
+            /** Connection Id */
+            connection_id?: string | null;
+            /** Account Label */
+            account_label?: string | null;
+            /**
+             * Connection State
+             * @enum {string}
+             */
+            connection_state: "disconnected" | "guest" | "connected" | "expired";
         };
         /** NativeLearningTaskLink */
         NativeLearningTaskLink: {
@@ -6093,7 +6726,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "pdf_ocr" | "asr";
+            kind: "pdf_ocr" | "asr" | "platform_download" | "platform_subtitles";
             /**
              * Scope
              * @enum {string}
@@ -6151,7 +6784,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "pdf_ocr" | "asr";
+            kind: "pdf_ocr" | "asr" | "platform_download" | "platform_subtitles";
             /** Asset Id */
             asset_id: string;
             /** Source Version */
@@ -6442,6 +7075,13 @@ export interface components {
             /** Bytes */
             bytes: number;
         };
+        /** RemoteAction */
+        RemoteAction: {
+            /** Operation Id */
+            operation_id: string;
+            /** Source Version */
+            source_version: string;
+        };
         /** ResearchCheckpoint */
         ResearchCheckpoint: {
             /** Unit Id */
@@ -6542,6 +7182,16 @@ export interface components {
             source_decision_required: string[];
             /** External Reads */
             external_reads?: components["schemas"]["ResearchExternalReadView"][];
+        };
+        /** ResolveInput */
+        ResolveInput: {
+            /** Connection Id */
+            connection_id: string;
+            /** Url */
+            url: string;
+            /** Catalogue Id */
+            catalogue_id?: string | null;
+            favorite_origin?: components["schemas"]["FavoriteOrigin"] | null;
         };
         /** ReviewControl */
         ReviewControl: {
@@ -7123,6 +7773,21 @@ export interface components {
             /** End Ms */
             end_ms: number;
         };
+        /** SubtitleResult */
+        SubtitleResult: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "available" | "absent" | "login_required" | "failed" | "unknown";
+            /**
+             * Track Ids
+             * @default []
+             */
+            track_ids: string[];
+            /** Error Code */
+            error_code?: string | null;
+        };
         /** SubtitleSegment */
         SubtitleSegment: {
             /** Segment Id */
@@ -7700,6 +8365,12 @@ export interface components {
             source_version: string;
             /** Source Digest */
             source_digest: string;
+            /**
+             * Source Type
+             * @default local_asr
+             * @enum {string}
+             */
+            source_type: "local_asr" | "platform_cc" | "platform_ai";
             /** Edit Head Id */
             edit_head_id: string | null;
             /** Audio Start Ms */
@@ -7934,6 +8605,23 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** VideoPart */
+        VideoPart: {
+            /** Object Id */
+            object_id: string;
+            /** Title */
+            title: string;
+            /** Page */
+            page: number;
+            /** Duration Ms */
+            duration_ms: number;
+            /**
+             * Availability
+             * @default unknown
+             * @enum {string}
+             */
+            availability: "full" | "restricted" | "preview" | "unknown";
+        };
         /** VisualizationBlock */
         "VisualizationBlock-Input": {
             /** Block Id */
@@ -8015,6 +8703,859 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    modules_api_v1_integrations_modules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleView"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    module_change_api_v1_integrations_modules__platform__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                platform: "bilibili" | "chaoxing" | "maimemo" | "zotero" | "icourse" | "rainclassroom" | "xuetang" | "zhihuishu";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModuleChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_api_v1_integrations_bilibili_connect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectionInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect_api_v1_integrations_connections__connection_id__disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_start_api_v1_integrations_bilibili_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    login_poll_api_v1_integrations_bilibili_login__login_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                login_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_qr_api_v1_integrations_bilibili_login__login_id__qr_svg_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                login_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    favorites_api_v1_integrations_bilibili_favorites_get: {
+        parameters: {
+            query: {
+                connection_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Favorite"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    favorite_browse_api_v1_integrations_bilibili_favorites_browse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FavoriteBrowse"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoritePage"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    favorite_folders_api_v1_integrations_bilibili_favorites_folders_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FavoriteFolderBrowse"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteFolderPage"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_api_v1_courses__course_id__integrations_bilibili_resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportPlan"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inspect_link_api_v1_courses__course_id__integrations_bilibili_inspect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogueBrowse"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportPlan"] | components["schemas"]["CataloguePage"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_selected_api_v1_courses__course_id__integrations_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportSelection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportReceipt"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reconnect_source_api_v1_courses__course_id__integrations__asset_id__reconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteAction"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnonymousSourceRecovery"] | components["schemas"]["AccountSourceRecovery"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subtitles_api_v1_courses__course_id__integrations__asset_id__subtitles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteAction"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubtitleResult"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_api_v1_courses__course_id__integrations__asset_id__download_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteAction"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreparationView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    prepare_subtitles_api_v1_courses__course_id__integrations__asset_id__prepare_subtitles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteAction"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreparationView"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     health_api_v1_health_get: {
         parameters: {
             query?: never;

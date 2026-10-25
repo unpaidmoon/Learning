@@ -347,6 +347,7 @@
       state.contextMedia = asset; state.contextFile = null;
       const key = materialKey(asset);
       if (!state.tabs.some(value => value.id === key)) state.tabs.push({ id: key, kind: 'video', video: asset, title: asset.display_name });
+      else Object.assign(state.tabs.find(value => value.id === key), { video: asset, title: asset.display_name });
       if (seekRequest) state.tabs.find(value => value.id === key).seekRequest = seekRequest;
       state.active = key;
       notify();
@@ -815,6 +816,10 @@
       }, [sessionId]);
       useEffect(() => { videoHandles.set(tabId, handle); return () => videoHandles.delete(tabId); }, [tabId]);
       useEffect(() => {
+        if (selectedAsset.platform === 'bilibili' && selectedAsset.playback_session_id !== asset?.playback_session_id && handle.current)
+          void handle.current.openAsset(selectedAsset).catch(reportError);
+      }, [selectedAsset]);
+      useEffect(() => {
         if (!seekRequest || appliedSeek.current === seekRequest || !handle.current?.getElement()
           || asset?.asset_id !== selectedAsset.asset_id || asset?.source_version !== selectedAsset.source_version) return;
         appliedSeek.current = seekRequest;
@@ -914,6 +919,17 @@
           submissionUnknown: (...args) => drafts.submissionUnknown(...args),
           uploadHeaders: drafts.uploadHeaders, error: reportError });
         disposers.push(() => drafts.dispose());
+        disposers.push(ctx.inject(['commandUi'], scope => scope.effect(() => {
+          const commands = library.components.installBilibiliCommand({
+            commandUi: scope.get('commandUi'),
+            getScope: () => ({ sessionId: activeSessionId, courseId: selectedCourse || 'course_unclassified', navigating: navigationPending }),
+            openImport: courseId => {
+              ++sourceJumpRevision; immersive = false; materialState().active = 'files'; notify();
+              library.components.requestBilibiliImport(courseId);
+            }, onError: reportError,
+          });
+          return () => commands.dispose();
+        }, 'learning: Bilibili import entry')));
         const quotes = window.LearningAnswerQuotes.create({ React, ReactDOMClient, flushSync: ReactDOM.flushSync, Button,
           ctx, api, components: library.components, getActiveSession: () => activeSessionId, bindingFor, onError: reportError,
           onQuote: async reference => {
@@ -955,6 +971,7 @@
         register('conversation.header', { priority: -100 }, AiHeader);
         register('shell.overlay', { id: 'learning-app-overlays', order: 0 }, AppOverlays);
         register('settings.section', { id: 'learning-data', order: 70, label: '数据与存储' }, DataSettings);
+        register('settings.section', { id: 'platform-connections', order: 65, label: '平台连接' }, () => h('div', { className: 'learning-legacy-module' }, h(library.components.PlatformSettings)));
         register('settings.general.item', { id: 'learning-startup', order: 60 }, library.components.StartupSettingsControl);
         register('conversation.input.dock', { id: 'learning-references', order: 0 }, ReferenceDock);
         register('conversation.chat.turnTail', { id: 'learning-results', order: 50 }, RequestedTaskActions);

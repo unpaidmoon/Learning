@@ -37,7 +37,7 @@ from . import schema as s
 FaultHook = Callable[[str, dict[str, Any]], None]
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled", "truncated"})
 ACTIVE_STATES = frozenset({"dispatching", "accepted", "running", "unknown"})
-SCHEMA_REVISION = "0035_chat_workspaces"
+SCHEMA_REVISION = "0036_platform_sources"
 _SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,160}$")
 
 
@@ -99,6 +99,7 @@ def _atomic_publish(source: Path, target: Path) -> None:
 
 class Repository:
     def __init__(self, root: Path, *, fault_hook: FaultHook | None = None):
+        self.integrations = None
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
         self.db_path = self.root / "business.sqlite3"

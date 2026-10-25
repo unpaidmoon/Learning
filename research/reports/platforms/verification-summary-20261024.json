@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Shanghai",
+  "baseline": "68c9cbcf7e96ef390ba51bd9e143ae75113f46dd",
+  "feature_commit": "87dbb4f",
+  "cancellation_commit": "7b8cd720d22c5f8d1c4bef187ec52308698612ea",
+  "tests": {
+    "frontend": {
+      "passed": 173,
+      "failed": 0
+    },
+    "related_backend": {
+      "passed": 123,
+      "skipped": 5
+    },
+    "platform_specific": {
+      "passed": 26
+    }
+  },
+  "checks": {
+    "typescript": true,
+    "eslint": true,
+    "prettier": true,
+    "ruff": true,
+    "generated_contracts": true,
+    "frontend_build": true,
+    "desktop_build": true,
+    "root_docs": {
+      "passed": false,
+      "inherited_missing_links": 69
+    }
+  },
+  "offline_media": {
+    "platform_requests_before": 91,
+    "platform_requests_after": 91,
+    "zero_remote_requests_while_disabled": true,
+    "restored_enabled": true,
+    "connection_survived": true
+  },
+  "automatic_browser_input": {
+    "force": true,
+    "frame_pixels_submitted_to_model": false
+  },
+  "actual_model_attempts": 3,
+  "completed_questions": 2,
+  "usage": [
+    {
+      "normalized": {
+        "input_tokens": 517,
+        "output_tokens": 315,
+        "cached_input_tokens": 512,
+        "reasoning_tokens": null
+      },
+      "field_presence": {
+        "input_tokens": true,
+        "output_tokens": true,
+        "cache_read_input_tokens": true,
+        "cache_creation_input_tokens": true,
+        "reasoning_tokens": false
+      },
+      "raw_provider_usage": [
+        {
+          "input_tokens": 517,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 512,
+          "output_tokens": 0,
+          "service_tier": "standard"
+        },
+        {
+          "input_tokens": 517,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 512,
+          "output_tokens": 315,
+          "service_tier": "standard"
+        }
+      ]
+    },
+    {
+      "normalized": {
+        "input_tokens": 261,
+        "output_tokens": 174,
+        "cached_input_tokens": 1280,
+        "reasoning_tokens": null
+      },
+      "field_presence": {
+        "input_tokens": true,
+        "output_tokens": true,
+        "cache_read_input_tokens": true,
+        "cache_creation_input_tokens": true,
+        "reasoning_tokens": false
+      },
+      "raw_provider_usage": [
+        {
+          "input_tokens": 389,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 1152,
+          "output_tokens": 0,
+          "service_tier": "standard"
+        },
+        {
+          "input_tokens": 261,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 1280,
+          "output_tokens": 174,
+          "service_tier": "standard"
+        }
+      ]
+    },
+    {
+      "normalized": {
+        "input_tokens": 21721,
+        "output_tokens": 334,
+        "cached_input_tokens": 1664,
+        "reasoning_tokens": null
+      },
+      "field_presence": {
+        "input_tokens": true,
+        "output_tokens": true,
+        "cache_read_input_tokens": true,
+        "cache_creation_input_tokens": true,
+        "reasoning_tokens": false
+      },
+      "raw_provider_usage": [
+        {
+          "input_tokens": 21721,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 1664,
+          "output_tokens": 0,
+          "service_tier": "standard"
+        },
+        {
+          "input_tokens": 21721,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 1664,
+          "output_tokens": 334,
+          "service_tier": "standard"
+        }
+      ]
+    }
+  ],
+  "native_subtitle_read": {
+    "status": "matched",
+    "start_ms": 1320000,
+    "end_ms": 1410000,
+    "image_frames_requested": 0,
+    "external_fallback": false,
+    "results": 50
+  },
+  "all_observed_request_images_empty": true
+}

@@ -70,7 +70,7 @@ class PreparationUnit(Contract):
 class PreparationView(Contract):
     job_id: Identity
     course_id: Identity
-    kind: Literal["pdf_ocr", "asr"]
+    kind: Literal["pdf_ocr", "asr", "platform_download", "platform_subtitles"]
     asset_id: Identity
     source_version: Identity
     source_digest: Digest
@@ -89,7 +89,7 @@ class PreparationProgress(Contract):
     course_id: Identity
     asset_id: Identity
     source_version: Identity
-    kind: Literal["pdf_ocr", "asr"]
+    kind: Literal["pdf_ocr", "asr", "platform_download", "platform_subtitles"]
     scope: Literal["full", "unit", "range"]
     state: PreparationState
     revision: int

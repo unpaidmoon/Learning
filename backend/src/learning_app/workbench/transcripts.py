@@ -27,6 +27,46 @@ class TranscriptStore:
     def __init__(self, repository):
         self.repository = repository
 
+    def publish_platform(self, course_id, asset_id, version, language, origin, segments, duration_ms):
+        """Publish immutable provider text; edits are never overwritten by a refreshed track."""
+        from learning_app.workbench.audio_sources import AudioSources
+        source = AudioSources(self.repository).associated(course_id, asset_id, version)
+        if origin not in {"platform_cc", "platform_ai"} or not 0 < duration_ms <= 600_000_000:
+            raise AppError("PLATFORM_SUBTITLE_INVALID", "平台字幕类型或范围无效", 422)
+        for segment in segments:
+            if (type(segment.get("start_ms")) is not int or type(segment.get("end_ms")) is not int
+                    or not 0 <= segment["start_ms"] < segment["end_ms"] <= duration_ms
+                    or not isinstance(segment.get("text"), str)):
+                raise AppError("PLATFORM_SUBTITLE_INVALID", "平台字幕不在原分P范围内", 422)
+        parameters = {"origin": origin, "language": language, "subtitle_digest": _hash(segments)}
+        identity = "transcript_" + _hash({"course": course_id, "asset": asset_id,
+                                         "version": version, "parameters": parameters})
+        indexes = list(range((duration_ms + WINDOW_MS - 1) // WINDOW_MS))
+        with self.repository.engine.begin() as conn:
+            if conn.execute(select(s.transcript_tracks).where(s.transcript_tracks.c.track_id == identity)).first():
+                return identity
+            # A new provider revision must not displace a user's current edited track.
+            edited = conn.execute(select(s.transcript_tracks.c.track_id).where(
+                s.transcript_tracks.c.course_id == course_id, s.transcript_tracks.c.asset_id == asset_id,
+                s.transcript_tracks.c.source_version == version,
+                s.transcript_tracks.c.edit_head_id.is_not(None))).first()
+            if edited:
+                return edited[0]
+            conn.execute(insert(s.transcript_tracks).values(track_id=identity, course_id=course_id,
+                asset_id=asset_id, source_version=version, source_digest=source["content_hash"],
+                parameters=parameters, probe={"audio_start_ms": 0, "audio_end_ms": duration_ms,
+                    "unit_indexes": indexes}, created_at=now()))
+            for index in indexes:
+                start, end = index * WINDOW_MS, min(duration_ms, (index + 1) * WINDOW_MS)
+                payload = {"kind": origin, "raw": {"segments": [
+                    {**part, "start_ms": max(start, part["start_ms"]), "end_ms": min(end, part["end_ms"])}
+                    for part in segments if part["start_ms"] < end and part["end_ms"] > start]}}
+                digest = _hash(payload)
+                conn.execute(insert(s.transcript_units).values(track_id=identity, unit_index=index,
+                    revision_id="trraw_" + _hash({"track": identity, "index": index, "payload": digest}),
+                    payload=payload, payload_hash=digest, created_at=now()))
+        return identity
+
     @classmethod
     def publish_local(cls, conn, lease, result):
         """Runs in the preparation checkpoint transaction, never from a model."""
@@ -40,7 +80,7 @@ class TranscriptStore:
             if (
                 identity["asset_id"] != lease["asset_id"]
                 or identity["source_version"] != lease["source_version"]
-                or identity["sha256"] != lease["source_digest"]
+                or identity["sha256"] != track['parameters'].get('audio_source_sha256', lease["source_digest"])
             ):
                 raise AppError("ASR_RESULT_SCOPE_CONFLICT", "音轨探测来源与冻结任务不符")
             begin, end = probe["audio_start_ms"], probe["audio_end_ms"]
@@ -135,7 +175,7 @@ class TranscriptStore:
             or audio["requested_end_ms"] != expected_end
             or audio["source"]["asset_id"] != lease["asset_id"]
             or audio["source"]["source_version"] != lease["source_version"]
-            or audio["source"]["sha256"] != lease["source_digest"]
+            or audio["source"]["sha256"] != track['parameters'].get('audio_source_sha256', lease["source_digest"])
             or audio["image_frames_requested"] != 0
             or audio["selected_stream_type"] != "audio"
             or raw["audio_sha256"] != audio["wav_sha256"]
@@ -240,9 +280,9 @@ class TranscriptStore:
     def list(self, course_id, asset_id, version) -> list[str]:
         AudioSources(self.repository).associated(course_id, asset_id, version)
         with self.repository.engine.connect() as conn:
-            return list(
+            rows = list(
                 conn.execute(
-                    select(s.transcript_tracks.c.track_id)
+                    select(s.transcript_tracks)
                     .where(
                         s.transcript_tracks.c.course_id == course_id,
                         s.transcript_tracks.c.asset_id == asset_id,
@@ -251,8 +291,18 @@ class TranscriptStore:
                     .order_by(
                         s.transcript_tracks.c.created_at.desc(), s.transcript_tracks.c.track_id
                     )
-                ).scalars()
+                ).mappings()
             )
+        def preference(row):
+            if row['edit_head_id']:
+                return 0
+            parameters = row['parameters']
+            origin = parameters.get('origin', 'local_asr')
+            chinese = parameters.get('language') in {'zh', 'zh-CN', 'zh-Hans', 'ai-zh'}
+            return (1 if origin == 'platform_cc' and chinese else
+                    2 if origin == 'platform_ai' and chinese else
+                    3 if origin == 'local_asr' else 4 if origin == 'platform_cc' else 5)
+        return [row['track_id'] for row in sorted(rows, key=preference)]
 
     def view(self, course_id, track_id, *, first_unit=0, limit=8) -> TranscriptView:
         if first_unit < 0 or not 1 <= limit <= 16:
@@ -309,6 +359,7 @@ class TranscriptStore:
                     )
                 },
                 audio_start_ms=probe["audio_start_ms"] if probe else None,
+                source_type=track["parameters"].get("origin", "local_asr"),
                 audio_end_ms=probe["audio_end_ms"] if probe else None,
                 units_total=total,
                 units_ready=ready,
@@ -475,9 +526,15 @@ class TranscriptStore:
         reference = snapshot.reference
         if not isinstance(reference, SubtitleRef):
             raise AppError("SUBTITLE_SOURCE_DENIED", "该快照不是字幕来源", 403)
-        source = AudioSources(self.repository).current(
-            snapshot.course_id, reference.asset_id, reference.source_version
-        )
+        host = getattr(self.repository, "integrations", None)
+        if host and host.source(reference.asset_id, reference.source_version, snapshot.course_id):
+            source = self.repository.resolve_source(reference.asset_id, reference.source_version)
+            if source["status"] != "available":
+                raise AppError("SOURCE_VERSION_UNAVAILABLE", "原平台来源版本不可用")
+        else:
+            source = AudioSources(self.repository).current(
+                snapshot.course_id, reference.asset_id, reference.source_version
+            )
         if source["content_hash"] != reference.source_digest:
             raise AppError("SOURCE_VERSION_UNAVAILABLE", "音轨摘要与字幕来源不同")
         with self.repository.engine.connect() as conn:

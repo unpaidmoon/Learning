@@ -31,6 +31,7 @@ const segment: Schema<"SubtitleSegment"> = {
   origin: "original",
 };
 const track: Schema<"TranscriptView"> = {
+  source_type: "local_asr",
   track_id: "track_a",
   course_id: "course_a",
   asset_id: "asset_a",
