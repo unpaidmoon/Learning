@@ -156,9 +156,6 @@
     let navigationRevision = 0;
     let sourceJumpRevision = 0;
     let navigationPending = false;
-    let settingsOpen = false;
-    let dataSettingsOpen = false;
-    let runtimeSettingsOpen = false;
     let attachmentsSessionId;
     let captureRequest;
     let reeditRequest;
@@ -208,8 +205,10 @@
     async function chooseCourse(course, chatId, action = 'open') {
       if (captureRequest) throw new Error('请先完成或取消截图（CAPTURE_CONTEXT_LOCKED）');
       if (!chatId) {
+        const changed = selectedCourse !== course.course_id;
         selectedCourse = course.course_id;
-        await library?.setCourse(selectedCourse);
+        if (changed) await library?.setCourse(selectedCourse);
+        materialState().active = 'files';
         notify(); return;
       }
       if (activeSessionId && !readOnlyHistory()) await drafts?.beforeNavigate(activeSessionId);
@@ -312,17 +311,13 @@
         icon: h(library.components.Icon, { name: 'file', size: 17 }), disabled: !activeSessionId || navigationPending,
         onClick: () => { ++sourceJumpRevision; attachmentsSessionId = activeSessionId; notify(); } });
     }
-    function SettingsButton({ wide = true } = {}) {
-      const [open, setOpen] = useState(false);
-      const [theme, setTheme] = useState(() => ctx.theme.getTheme().preference);
-      useEffect(() => ctx.on('theme/change', value => setTheme(value.preference)), []);
-      const names = { light: '浅色', dark: '深色', system: '跟随系统' };
-      return h(Menu, { open, portal: true, listClassName: 'learning-menu-surface', selectedId: theme, onClose: () => setOpen(false),
-        anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-settings-button', 'data-compact': String(!wide), 'aria-label': '设置', title: '设置',
-          icon: h(library.components.Icon, { name: 'settings', size: 17 }), onClick: () => setOpen(value => !value) }, wide ? '设置' : null),
-        items: [{ id: 'account', label: '账号与模型' }, { id: 'data', label: '数据管理' }, { id: 'runtime', label: '运行设置' }, { type: 'separator', id: 'appearance' },
-          ...Object.entries(names).map(([id, label]) => ({ id, label }))],
-        onSelect: value => { setOpen(false); if (value === 'account') { settingsOpen = true; notify(); } else if (value === 'data') { dataSettingsOpen = true; notify(); } else if (value === 'runtime') { runtimeSettingsOpen = true; notify(); } else ctx.theme.setTheme(value); } });
+    function DataSettings() {
+      return h('div', { className: 'learning-data-settings learning-legacy-module' },
+        h('h2', null, '数据与存储'),
+        h(library.components.DataPanel, { beforeSave: async () => {
+          if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
+          for (const handle of videoHandles.values()) await handle.current?.savePosition?.();
+        } }));
     }
     function ProjectWelcomeStep({ complete }) {
       const finished = useRef(false);
@@ -462,16 +457,6 @@
           !unknownSubmissionSid && !draftConflict && ['DRAFT_NOT_READY', 'DRAFT_SESSION_NOT_READY', 'DRAFT_SAVE_FAILED'].includes(globalErrorCode)
             && h(Button, { size: 'sm', onClick: () => { void drafts.recover().catch(reportError); } }, '接回草稿'),
           h(Button, { size: 'sm', onClick: () => { globalError = ''; notify(); } }, '关闭')),
-        h(Modal, { open: settingsOpen, title: '账号与模型', closeLabel: '关闭设置', onClose: () => { settingsOpen = false; notify(); } },
-          h('div', { className: 'learning-legacy-module' }, h(library.components.AccountPanel, { connected: true,
-            onClose: () => { settingsOpen = false; notify(); }, onChanged: () => { void ctx.sessions.refresh(); } }))),
-        h(Modal, { open: dataSettingsOpen, title: '数据管理', closeLabel: '关闭数据管理', onClose: () => { dataSettingsOpen = false; notify(); } },
-          dataSettingsOpen && h('div', { className: 'learning-legacy-module' }, h(library.components.DataPanel, { beforeSave: async () => {
-            if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
-            for (const handle of videoHandles.values()) await handle.current?.savePosition?.();
-          } }))),
-        h(Modal, { open: runtimeSettingsOpen, title: '运行设置', closeLabel: '关闭运行设置', onClose: () => { runtimeSettingsOpen = false; notify(); } },
-          runtimeSettingsOpen && h('div', { className: 'learning-legacy-module' }, h(library.components.RuntimeSettingsPanel))),
         h(Modal, { open: !!attachmentsSessionId, title: '本对话附件', closeLabel: '关闭附件', onClose: () => { ++sourceJumpRevision; attachmentsSessionId = null; notify(); } },
           attachmentsSessionId && h(ChatAttachments, { key: attachmentsSessionId, sessionId: attachmentsSessionId })),
         h(Modal, { open: !!draftConflict, title: '选择要继续的草稿', closeLabel: '暂不切换',
@@ -582,7 +567,7 @@
       if (identities.length >= 100 && !identities.includes(source.snapshot_id)) throw new Error('当前引用已达上限（SOURCE_SELECTION_LIMIT）');
       controller.update({ source_snapshot_ids: [...new Set([...identities, source.snapshot_id])] });
       await controller.flush();
-      if (activeSessionId === sessionId) { aiCollapsed = false; notify(); inputFor(sessionId).focus(); }
+      if (activeSessionId === sessionId) { aiCollapsed = false; notify(); }
       return source;
     }
     async function subtitleAction(action) {
@@ -605,14 +590,18 @@
       useEffect(() => { let live = true; bindingFor(sessionId).then(value => { if (live) setController(library.components.getDraftController(value.chat_id)); }).catch(reportError); return () => { live = false; }; }, [sessionId]);
       return controller ? h(ReferenceCards, { controller, sessionId }) : null;
     }
-    function addMaterialQuote(quote) {
+    async function addMaterialQuote(quote) {
       try {
         if (navigationPending) throw new Error('请等待课程切换完成（NAVIGATION_PENDING）');
-        const input = inputFor(activeSessionId);
+        const sid = activeSessionId;
+        const input = inputFor(sid);
         const before = input.state.getSnapshot().draft || '';
+        const binding = await bindingFor(sid);
+        if (!library.components.getDraftController(binding.chat_id).snapshot().ready) throw new Error('原对话草稿尚未就绪，请保留选区（DRAFT_NOT_READY）');
         input.setDraft([before, `引用《${quote.title}》：\n${quote.markdown || quote.text}`].filter(Boolean).join('\n\n'));
-        aiCollapsed = false; notify(); input.focus();
-      } catch (error) { reportError(error); }
+        await library.components.getDraftController(binding.chat_id).flush();
+        aiCollapsed = false; notify();
+      } catch (error) { reportError(error); throw error; }
     }
     async function publishCapture(result, binding, sessionId, replaces) {
       const input = inputFor(sessionId);
@@ -727,7 +716,7 @@
         '字幕 · ' + ({ queued: '等待处理', running: '正在转写', completed: '已完成', failed: '未完成', paused: '已暂停' }[job.state] || job.state),
         h(Button, { size: 'sm', variant: 'ghost', onClick: () => { materialState().subtitleAsset = video.asset_id; openMaterial({ ...video, source_course_id: job.course_id }); } }, '查看字幕')));
     }
-    function RequestedTaskActions({ messageId }) {
+    function RequestedTaskActions({ turn: location }) {
       useRevision();
       const sid = activeSessionId;
       const [links, setLinks] = useState([]), [sources, setSources] = useState([]), [turn, setTurn] = useState(null);
@@ -737,7 +726,7 @@
         if (!sid) return;
         const snapshot = ctx.uiConversation.binding(sid).target('chat').getSnapshot();
         const tail = [...(snapshot?.nodes?.values() || [])].find(node => node.kind === 'turn-tail'
-          && node.data?.closing?.finalNode?.messageId === messageId);
+          && node.data?.turn === location.turn);
         if (!tail || !Number.isSafeInteger(tail.data.turn) || tail.data.turn < 1) return;
         setTurn(tail.data.turn);
         void Promise.all([
@@ -745,8 +734,8 @@
           api('/desktop/sessions/' + sid + '/answer-sources?native_turn=' + tail.data.turn),
         ]).then(([tasks, evidence]) => { if (live) { setLinks(tasks); setSources(evidence); } }).catch(reportError);
         return () => { live = false; };
-      }, [sid, messageId]);
-      return h(React.Fragment, null,
+      }, [sid, location.turn]);
+      return h('div', { className: 'learning-message-results' },
         turn && h(SubtitleProgress, { sid, turn }),
         ...links.map(task => h(GeneratedDocument, { key: task.task_id, taskId: task.task_id, sid, title: task.title })),
         ...sources.map((item, index) => h(Button, { key: item.source.snapshot_id, size: 'sm', variant: 'ghost',
@@ -965,9 +954,10 @@
         register('rightbar', { priority: -100 }, MaterialsRoot);
         register('conversation.header', { priority: -100 }, AiHeader);
         register('shell.overlay', { id: 'learning-app-overlays', order: 0 }, AppOverlays);
-        register('sidebar.settings', { priority: -100 }, SettingsButton);
+        register('settings.section', { id: 'learning-data', order: 70, label: '数据与存储' }, DataSettings);
+        register('settings.general.item', { id: 'learning-startup', order: 60 }, library.components.StartupSettingsControl);
         register('conversation.input.dock', { id: 'learning-references', order: 0 }, ReferenceDock);
-        register('conversation.chat.assistant-actions', { id: 'learning-task', order: 50, label: '文档与引用' }, RequestedTaskActions);
+        register('conversation.chat.turnTail', { id: 'learning-results', order: 50 }, RequestedTaskActions);
         const revealTask = event => {
           const detail = event.detail;
           if (!detail || detail.courseId !== selectedCourse || !activeSessionId || navigationPending

@@ -13,9 +13,11 @@ export function MarkdownAnswer({
   onQuote,
 }: {
   text: string;
-  onQuote?: (selection: QuoteSelection) => void;
+  onQuote?: (selection: QuoteSelection) => void | Promise<void>;
 }) {
   const root = useRef<HTMLDivElement>(null);
+  const [adding, setAdding] = useState(false);
+  const [quoteError, setQuoteError] = useState("");
   const rendering = useMemo(() => createSelectionRendering(text), [text]);
   const [selected, setSelected] = useState<{
     quote?: QuoteSelection;
@@ -110,18 +112,26 @@ export function MarkdownAnswer({
           type="button"
           className="selection-quote-button"
           aria-label="添加到对话"
+          disabled={adding}
           style={{ position: "fixed", left: selected.left, top: selected.top, zIndex: 80 }}
           onPointerDown={(event) => event.preventDefault()}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => {
-            onQuote(selected.quote!);
-            window.getSelection()?.removeAllRanges();
-            setSelected(null);
+            if (adding) return;
+            setAdding(true);
+            setQuoteError("");
+            void Promise.resolve().then(() => onQuote(selected.quote!)).then(() => {
+              window.getSelection()?.removeAllRanges();
+              setSelected(null);
+            }).catch((reason: unknown) => {
+              setQuoteError(reason instanceof Error ? reason.message : "添加未完成，请重试。");
+            }).finally(() => setAdding(false));
           }}
         >
           添加到对话
         </button>
       )}
+      {quoteError && <p role="alert">{quoteError}</p>}
       {onQuote && selected?.sourceText === text && selected.error && (
         <span
           className="selection-quote-error"

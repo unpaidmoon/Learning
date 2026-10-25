@@ -3,6 +3,21 @@
 .learning-library-course-heading { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .learning-library-course-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .learning-library-directory-scroll { flex: 1; min-height: 0; overflow: auto; }
+.learning-library-course-heading > span { flex: 1; padding-left: 10px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.learning-course-folder-row { display: flex; align-items: center; min-width: 0; height: 36px; border-radius: var(--dsw-radius-sm); }
+.learning-course-folder-row:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.learning-course-folder-row[data-selected='true'] { background: var(--dsw-alias-interactive-bg-active, var(--dsw-alias-interactive-bg-hover)); }
+.learning-folder-toggle { flex: none; width: 24px; padding: 0; }
+.learning-course-folder-row .learning-course-folder-name { flex: 1; min-width: 0; justify-content: flex-start; padding-inline: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.learning-course-folder-children .file-tree-open { justify-content: flex-start; }
+.learning-course-folder-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.learning-course-folder-row .learning-course-actions { flex: none; position: relative; }
+.learning-course-folder-row .explorer-heading { position: static; }
+.learning-course-folder-row .explorer-heading > div { display: flex; }
+.learning-course-folder-row .explorer-heading > div > button { display: none; }
+.learning-course-folder-row .learning-course-actions { opacity: 0; }
+.learning-course-folder-row:is(:hover, :focus-within) .learning-course-actions { opacity: 1; }
+.learning-course-folder-children { margin-left: 22px; }
 .learning-library-tree { padding: 0; margin: 0; list-style: none; }
 .learning-library-tree li { padding: 0; margin: 0; }
 .learning-library-entry { display: flex; align-items: center; gap: 7px; width: 100%; min-width: 0; justify-content: flex-start; text-align: start; }

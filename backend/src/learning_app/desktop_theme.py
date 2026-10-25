@@ -1,4 +1,4 @@
-"""One durable native Appearance preference, without Host configuration authority."""
+"""Durable native appearance fields, without Host configuration authority."""
 
 from __future__ import annotations
 
@@ -23,8 +23,7 @@ _LOCKS_LOCK = threading.Lock()
 def _schema() -> dict:
     """Pinned Schemastery toJSON reference envelope used by ConfigForms.
 
-    The full section supplies the unchanged native typography defaults, but
-    only preference is writable through this application adapter.
+    The full section retains native typography defaults and validates writes.
     """
     refs = {
         "0": {"type": "object", "dict": {
@@ -60,16 +59,27 @@ class DesktopThemePreferences:
                     or value.get("preference") not in _PREFERENCES
                     or type(value.get("revision")) is not int or value["revision"] < 0):
                 raise ValueError("invalid theme document")
-            return {key: value[key] for key in ("version", "preference", "revision")}
+            return {"version": 1, "revision": value["revision"], **self._values(value)}
         except (OSError, UnicodeError, ValueError, TypeError) as exc:
             raise AppError("DESKTOP_THEME_STORAGE_INVALID", "外观设置记录无效，请检查本地数据", 503) from exc
 
+    @staticmethod
+    def _values(record: dict) -> dict:
+        values = {key: record.get(key, default) for key, default in _BASE.items()}
+        valid = isinstance(values["preference"], str) and values["preference"] in _PREFERENCES
+        for key, upper in (("fontSize", 22), ("codeFontSize", 16), ("terminalFontSize", 20)):
+            valid = valid and type(values[key]) in (int, float) and 10 <= values[key] <= upper
+        for key in ("textFontFamily", "codeFontFamily", "terminalFontFamily"):
+            valid = valid and isinstance(values[key], str) and len(values[key]) <= 256
+        if not valid:
+            raise AppError("DESKTOP_THEME_INVALID", "外观设置值无效", 422)
+        return values
+
     def _view(self, record: dict) -> dict:
-        preference = record["preference"]
         return {
             "ns": "ui-theme", "autoGenerate": False, "schema": _schema(),
-            "value": {**_BASE, "preference": preference}, "base": dict(_BASE),
-            "user": {"preference": preference} if record["revision"] else {},
+            "value": self._values(record), "base": dict(_BASE),
+            "user": self._values(record) if record["revision"] else {},
             "applies": "live", "secrets": [], "revision": record["revision"],
         }
 
@@ -94,21 +104,26 @@ class DesktopThemePreferences:
             if method == "settings/query":
                 return self._view(record)
             ops = request.get("ops")
-            if (not isinstance(ops, list) or len(ops) != 1 or not isinstance(ops[0], dict)
-                    or set(ops[0]) != {"op", "path", "value"}
-                    or ops[0].get("op") != "set" or ops[0].get("path") != ["preference"]):
-                raise AppError("DESKTOP_METHOD_DENIED", "只允许选择浅色、深色或跟随系统", 403)
-            preference = ops[0].get("value")
-            if not isinstance(preference, str) or preference not in _PREFERENCES:
-                raise AppError("DESKTOP_THEME_INVALID", "请选择浅色、深色或跟随系统", 422)
+            if not isinstance(ops, list) or not 1 <= len(ops) <= len(_BASE):
+                raise AppError("DESKTOP_THEME_INVALID", "外观设置请求无效", 422)
+            values = self._values(record)
+            for op in ops:
+                if (not isinstance(op, dict) or set(op) - {"op", "path", "value"}
+                        or op.get("op") not in {"set", "unset"}
+                        or not isinstance(op.get("path"), list) or len(op["path"]) != 1
+                        or not isinstance(op["path"][0], str) or op["path"][0] not in _BASE):
+                    raise AppError("DESKTOP_METHOD_DENIED", "只允许修改原生外观选项", 403)
+                key = op["path"][0]
+                values[key] = op.get("value") if op["op"] == "set" else _BASE[key]
+            values = self._values(values)
             if "expectedRevision" in request:
                 expected = request["expectedRevision"]
                 if type(expected) is not int or expected < 0:
                     raise AppError("DESKTOP_THEME_INVALID", "外观设置版本无效", 422)
                 if expected != record["revision"]:
                     raise AppError("settings/conflict", "外观设置已有较新版本，请刷新后再试", 409)
-            if record["preference"] != preference:
-                record = {"version": 1, "preference": preference, "revision": record["revision"] + 1}
+            if values != self._values(record):
+                record = {"version": 1, **values, "revision": record["revision"] + 1}
                 self._write(record)
             return self._view(record)
 

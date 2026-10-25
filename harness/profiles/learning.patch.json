@@ -257,7 +257,7 @@
   },
   {
     "id": "config-editor",
-    "disabled": true
+    "disabled": false
   },
   {
     "id": "preset-standard",
