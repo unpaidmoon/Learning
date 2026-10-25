@@ -18,7 +18,6 @@ export class ReaderSession {
   private openPromise: Promise<void> | null = null;
   private visible = false;
   private disposed = false;
-  private ready = false;
   private saving = false;
   private conflicted = false;
   private timer = 0;
@@ -63,7 +62,6 @@ export class ReaderSession {
   setVisible(value: boolean) {
     if (this.disposed || this.visible === value) return;
     this.visible = value;
-    this.preparation.setVisible(value);
     if (!value) {
       this.releaseIntent = this.pendingFocus;
       if (this.state && this.releaseIntent) void this.release(this.state, this.releaseIntent);
@@ -75,13 +73,12 @@ export class ReaderSession {
     // delayed open must not mint a newer sequence after a different tab opens.
     const open = readerIntent(),
       focus = readerIntent();
-    this.ready = false;
     this.pendingFocus = focus;
     this.acquisition = open.sequence;
-    void this.acquire(open, focus);
+    void this.acquire(open);
   }
 
-  private async acquire(open: Intent, focus: Intent) {
+  private async acquire(open: Intent) {
     try {
       const [resources, state] = await Promise.all([
         api.read<Schema<"ReadingResourcesView">>("/reading/resources"),
@@ -103,32 +100,10 @@ export class ReaderSession {
       this.openPromise ??= this.adapter.open(resources.pdfjs_version, this.abort.signal, state);
       await this.openPromise;
       if (this.disposed || !this.visible || this.acquisition !== open.sequence) return;
-      this.ready = true;
-      this.prepare(this.pendingFocus || focus);
     } catch (error) {
       if (!this.disposed && this.visible && this.acquisition === open.sequence)
         this.callbacks.error(error);
     }
-  }
-
-  private prepare(intent: Intent) {
-    if (!this.state || !this.visible || this.disposed) return;
-    void this.preparation
-      .focus({
-        reader_client_id: intent.client,
-        reader_epoch: this.state.reader_epoch,
-        focus_sequence: intent.sequence,
-        request_id: intent.requestId,
-        page_index: this.position?.page_index ?? this.state.page_index,
-      })
-      .catch((error) => {
-        if (
-          !this.disposed &&
-          this.visible &&
-          (error as { code?: string })?.code !== "READING_VIEW_STALE"
-        )
-          this.callbacks.notice(error);
-      });
   }
 
   private async release(state: Schema<"ReadingState">, intent: Intent) {
@@ -157,7 +132,6 @@ export class ReaderSession {
     this.pending = value;
     if (changedPage) {
       this.pendingFocus = readerIntent();
-      if (this.ready) this.prepare(this.pendingFocus);
     }
     window.clearTimeout(this.timer);
     this.timer = window.setTimeout(() => void this.save(), 700);

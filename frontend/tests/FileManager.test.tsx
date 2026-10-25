@@ -123,14 +123,41 @@ describe("中间文件资源管理器", () => {
     vi.stubGlobal("fetch", request);
     render(<FileManager courseId={course} connected onOpen={vi.fn()} />);
     await screen.findByText("此文件夹为空");
-    fireEvent.drop(screen.getByRole("region", { name: "文件资源管理器" }), {
-      dataTransfer: { getData: () => "", types: ["Files"], items: [], files: [dropped] },
-    });
+    const manager = screen.getByRole("region", { name: "文件资源管理器" });
+    // The host's chat composer listens on document. A consumed library drop
+    // must not activate its overlay or attach the same file to the chat.
+    const hostDrag = vi.fn();
+    const hostDrop = vi.fn();
+    const dragEnd = vi.fn();
+    document.addEventListener("dragenter", hostDrag);
+    document.addEventListener("dragover", hostDrag);
+    document.addEventListener("dragleave", hostDrag);
+    document.addEventListener("drop", hostDrop);
+    window.addEventListener("dragend", dragEnd);
+    const dataTransfer = { getData: () => "", types: ["Files"], items: [], files: [dropped] };
+    try {
+      fireEvent.dragEnter(manager, { dataTransfer });
+      fireEvent.dragOver(manager, { dataTransfer });
+      fireEvent.dragLeave(manager, { dataTransfer });
+      fireEvent.dragEnter(manager, { dataTransfer });
+      fireEvent.drop(manager, { dataTransfer });
+      expect(hostDrag).not.toHaveBeenCalled();
+      expect(hostDrop).not.toHaveBeenCalled();
+      // Clear an already visible host overlay if the drag entered elsewhere.
+      expect(dragEnd).toHaveBeenCalledTimes(1);
+    } finally {
+      document.removeEventListener("dragenter", hostDrag);
+      document.removeEventListener("dragover", hostDrag);
+      document.removeEventListener("dragleave", hostDrag);
+      document.removeEventListener("drop", hostDrop);
+      window.removeEventListener("dragend", dragEnd);
+    }
     await waitFor(() =>
       expect(request.mock.calls.some(([url]) => url.includes("/upload?"))).toBe(true),
     );
     const [url, options] = request.mock.calls.find(([url]) => url.includes("/upload?"))!;
     expect(options?.body).toBe(dropped);
+    expect(request.mock.calls.filter(([url]) => url.includes("/upload?"))).toHaveLength(1);
     expect(new URL(url, "http://localhost").searchParams.get("path")).toBe("新增.txt");
     expect(new URL(url, "http://localhost").searchParams.has("mode")).toBe(false);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

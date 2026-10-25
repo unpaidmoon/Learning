@@ -23,6 +23,7 @@ export { Icon } from "../../frontend/src/components/ui/Icon";
 export { WorkspaceCapture } from "../../frontend/src/media/WorkspaceCapture";
 export { CaptureEditor } from "../../frontend/src/media/CaptureEditor";
 export { WorkbenchPanel } from "../../frontend/src/workbench/WorkbenchPanel";
+export { BookReader } from "../../frontend/src/workbench/BookReader";
 export { translatePdfSelection } from "../../frontend/src/reading/translationMemo";
 export { captureWorkspace } from "../../frontend/src/media/workspaceSnapshot";
 export * from "../../frontend/src/media/capture";

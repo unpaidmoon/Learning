@@ -458,8 +458,8 @@
     "node_modules/.pnpm/web-namespaces@2.0.1/node_modules/web-namespaces/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
     "node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/index.js": "81f592d700aff8042238e7cab8e03c002e689117ecf15844ed753e08825a2873",
     "node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/license": "ca4662cb5d1b738fbe5350c0d5485ba11773b4b7208974082ae6e129a52d631d",
-    "resources/workbench/notices/offline/rehype-katex@7.0.1.LICENSE": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983",
-    "resources/workbench/notices/offline/remark-math@6.0.0.LICENSE": "d80192568efa757ab40ae81c330ac032c289885de187f0273e7f719fd14bb983",
+    "resources/workbench/notices/offline/rehype-katex@7.0.1.LICENSE": "cb992262f361a5359e6771c28740d33c7041e15332ae8537fae40538992591a9",
+    "resources/workbench/notices/offline/remark-math@6.0.0.LICENSE": "cb992262f361a5359e6771c28740d33c7041e15332ae8537fae40538992591a9",
     "scripts/workbench/build-offline.mjs": "e58588e204381e65343c9584d55dd784ab1470b1d7579b302f00c4227dbd279e"
   },
   "dependencies": [
@@ -927,8 +927,8 @@
     },
     {
       "path": "notices.txt",
-      "bytes": 102670,
-      "sha256": "fd8775af48b5357c17c7e68473d322f846ae39a61da5d7352be175b48d9f5431"
+      "bytes": 102628,
+      "sha256": "84768d31e82ce210fc5974d92da6ca635527189a0fcce891db6c39e77a0288f6"
     }
   ]
 }

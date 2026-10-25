@@ -84,7 +84,7 @@ class DraftContent(BaseModel):
     corrections: list[str] = Field(default_factory=list, max_length=100)
     references: list[DraftReference] = Field(default_factory=list, max_length=100)
     source_snapshot_ids: list[str] = Field(default_factory=list, max_length=100)
-    read_course_ids: list[str] = Field(default_factory=list, max_length=4)
+    read_course_ids: list[str] = Field(default_factory=list, max_length=32)
     model: str | None = Field(default=None, min_length=1, max_length=200)
     thinking: Thinking | None = None
 
@@ -147,6 +147,7 @@ class AttachmentSourceInput(BaseModel):
     origin: Literal["video", "image", "workspace"] = "video"
     asset_id: str | None = Field(default=None, min_length=1, max_length=160)
     source_version: str | None = Field(default=None, min_length=1, max_length=160)
+    source_course_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,160}$")
     time_ms: int | None = Field(default=None, ge=0)
     source_width: int = Field(gt=0, le=16_384)
     source_height: int = Field(gt=0, le=16_384)
@@ -171,7 +172,7 @@ class AttachmentSourceInput(BaseModel):
                 value is not None for value in locator
             ):
                 raise ValueError("Workspace video locator requires all source fields")
-        elif any(value is not None for value in (self.asset_id, self.source_version, self.time_ms)):
+        elif any(value is not None for value in (self.asset_id, self.source_version, self.time_ms, self.source_course_id)):
             raise ValueError("External images cannot claim a video source")
         return self
 
@@ -369,6 +370,14 @@ def message_references(conditions: Iterable[str]) -> list[dict]:
     return result
 
 
+def draft_content_hash(value: dict) -> str:
+    """Hash user-owned input, excluding program-derived sources and settings."""
+    from learning_app.storage.repository import _hash
+
+    content = DraftContent.model_validate({key: item for key, item in value.items() if key in DraftContent.model_fields})
+    return _hash(content.model_dump(exclude={"model", "thinking"}))
+
+
 def read_draft(repository: Repository, chat_id: str) -> dict:
     with repository.engine.connect() as conn:
         _chat(conn, chat_id)
@@ -453,11 +462,14 @@ def clear_draft(repository: Repository, chat_id: str, value: DraftClearInput) ->
         expected_conditions += source_selection_conditions(
             conn, chat["course_id"], payload["source_snapshot_ids"]
         )
-        if (
+        mismatch = (
             any(payload[key] != submitted[key] for key in ("text", "attachment_ids", "corrections"))
             or expected_conditions != submitted["conditions"]
             or payload.get("read_course_ids", []) != submitted.get("read_course_ids", [])
-        ):
+        )
+        if submitted.get("draft_content_hash"):
+            mismatch = draft_content_hash(payload) != submitted["draft_content_hash"]
+        if mismatch:
             raise AppError("DRAFT_SUBMISSION_MISMATCH", "草稿与已提交内容不同，保留草稿以便核对")
         cleared = {
             **DraftContent().model_dump(),
@@ -501,7 +513,7 @@ def read_attachment_source(repository: Repository, attachment_id: str) -> dict:
 def _validate_video_locator(conn, course_id: str, payload: dict) -> None:
     association = conn.execute(
         select(business.course_assets.c.asset_id).where(
-            business.course_assets.c.course_id == course_id,
+            business.course_assets.c.course_id == (payload.get("source_course_id") or course_id),
             business.course_assets.c.asset_id == payload["asset_id"],
         )
     ).first()
@@ -558,10 +570,11 @@ def submission_source_locators(
                     "attachment_id": attachment_id,
                     **({"origin": "workspace"} if payload["origin"] == "workspace" else {}),
                     **{
-                        key: payload[key]
+                        key: payload.get(key)
                         for key in (
                             "asset_id",
                             "source_version",
+                            "source_course_id",
                             "time_ms",
                             "source_width",
                             "source_height",
@@ -609,11 +622,16 @@ def save_attachment_source(
                 "origin",
                 "asset_id",
                 "source_version",
+                "source_course_id",
                 "time_ms",
                 "source_width",
                 "source_height",
             )
-            if any(parent["payload"][key] != payload[key] for key in protected):
+            if any(
+                ((parent["payload"].get(key) or chat["course_id"]) != (payload.get(key) or chat["course_id"]))
+                if key == "source_course_id" else parent["payload"].get(key) != payload.get(key)
+                for key in protected
+            ):
                 raise AppError("EDIT_SOURCE_MISMATCH", "重新编辑必须沿用同一原截图")
             if value.parent_attachment_id == attachment_id:
                 raise AppError("EDIT_SOURCE_MISMATCH", "编辑附件不能引用自身")
@@ -627,7 +645,9 @@ def save_attachment_source(
             .first()
         )
         if previous:
-            if previous["payload"] != payload:
+            prior_payload = {**previous["payload"], "source_course_id": previous["payload"].get("source_course_id") or (chat["course_id"] if previous["payload"].get("asset_id") else None)}
+            comparable = {**payload, "source_course_id": payload.get("source_course_id") or (chat["course_id"] if payload.get("asset_id") else None)}
+            if prior_payload != comparable:
                 raise AppError("ATTACHMENT_SOURCE_CONFLICT", "已保存图片的来源不可覆盖")
         else:
             conn.execute(

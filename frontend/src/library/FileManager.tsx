@@ -729,6 +729,9 @@ export function FileManager({
     event.stopPropagation();
     dragDepth.current = 0;
     setDragOver(false);
+    // This drop is consumed here. Notify document-level drag UI that the
+    // gesture ended without bubbling the files into the host chat composer.
+    window.dispatchEvent(new Event("dragend"));
     if (disabled) return;
     const data = event.dataTransfer;
     const internal = data.getData(CLIPBOARD_FORMAT);
@@ -855,6 +858,7 @@ export function FileManager({
       onPaste={paste}
       onDragEnter={(event) => {
         event.preventDefault();
+        event.stopPropagation();
         dragDepth.current += 1;
         if (
           Array.from(event.dataTransfer.types).some(
@@ -865,11 +869,13 @@ export function FileManager({
       }}
       onDragOver={(event) => {
         event.preventDefault();
+        event.stopPropagation();
         event.dataTransfer.dropEffect = event.dataTransfer.types.includes(CLIPBOARD_FORMAT)
           ? "move"
           : "copy";
       }}
-      onDragLeave={() => {
+      onDragLeave={(event) => {
+        event.stopPropagation();
         dragDepth.current = Math.max(0, dragDepth.current - 1);
         if (!dragDepth.current) setDragOver(false);
       }}

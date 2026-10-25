@@ -202,6 +202,10 @@ class SourceStore:
     @staticmethod
     def save_in_transaction(conn, course_id, reference, text, content_role) -> SourceSnapshot:
         """Internal verified capture; the caller owns its authority and transaction."""
+        if reference.kind in {"document", "document_selection"} and content_role == "original":
+            from .artifact_files import source_role
+
+            content_role = source_role(conn, reference.asset_id, reference.source_version)
         payload = {
             "course_id": course_id,
             "reference": reference.model_dump(mode="json"),

@@ -58,7 +58,6 @@ export class SubtitleSession {
           return;
         }
         this.epoch = state.reader_epoch;
-        await this.prepare(this.intent || initialFocus);
         void this.poll();
       })
       .catch((error) => {
@@ -74,7 +73,6 @@ export class SubtitleSession {
     this.position = position;
     if (changed) {
       this.intent = readerIntent();
-      if (this.epoch) void this.prepare(this.intent).catch((error) => this.error(error));
     }
   }
 
@@ -86,25 +84,6 @@ export class SubtitleSession {
       focus_sequence: intent.sequence,
       position_ms: this.position,
     };
-  }
-
-  private async prepare(intent: Intent) {
-    if (!this.epoch || this.disposed || !this.visible) return;
-    const epoch = this.epoch;
-    const preparation = await api.write<Preparation>(
-      this.endpoint + "/prepare-current",
-      this.input(epoch, intent),
-    );
-    if (
-      this.disposed ||
-      !this.visible ||
-      this.epoch !== epoch ||
-      this.intent?.sequence !== intent.sequence
-    )
-      return;
-    this.state = { ...this.state, preparation };
-    this.changed(this.state);
-    void this.poll();
   }
 
   private async release(epoch: string, intent: Intent) {

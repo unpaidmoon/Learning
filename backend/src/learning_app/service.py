@@ -277,7 +277,7 @@ class GenerationService:
             self.cleanup = await self.execution.close()
         self.execution_ready = False
 
-    async def submit(self, value: dict) -> dict:
+    async def submit(self, value: dict, *, submitted_draft: dict | None = None) -> dict:
         if not self.execution_ready:
             raise AppError("EXECUTION_UNAVAILABLE", "Harness尚未连接，未提交问题", 503)
         process = getattr(getattr(self.execution, "host", None), "process", None)
@@ -362,6 +362,8 @@ class GenerationService:
                         self.repository, value["chat_id"], value["question_video"]
                     )
                 )
+            from learning_app.drafts import draft_content_hash
+
             result = self.repository.publish_submission(
                 value["chat_id"],
                 value["text"],
@@ -371,6 +373,7 @@ class GenerationService:
                 corrections=value.get("corrections", ()) if existing_submission else (),
                 source_locators=source_locators,
                 read_course_ids=value.get("read_course_ids", ()),
+                draft_content_hash=draft_content_hash(submitted_draft) if submitted_draft is not None else None,
                 model=value["model"],
                 thinking=value["thinking"],
                 max_output_tokens=self.config.max_output_tokens,

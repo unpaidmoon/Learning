@@ -14,7 +14,6 @@ from pathlib import Path
 from learning_app.errors import AppError
 from learning_app.storage.repository import _hash
 
-from .corpus_indexer import CorpusIndexer
 from .local_workers import run_json_worker
 from .ocr_resources import OcrResources
 from .preparations import PreparationStore
@@ -52,7 +51,6 @@ class PreparationService:
         self._closing = False
         self._active: dict | None = None
         self._cancelled: threading.Event | None = None
-        self.corpus = CorpusIndexer(repository, project_root)
         self.get_resource_policy = get_resource_policy or (lambda: None)
 
     async def open(self):
@@ -200,26 +198,7 @@ class PreparationService:
                     continue
                 lease = self.store.claim(native_wait_only=self.is_busy())
             if lease is None:
-                self._cancelled = threading.Event()
-                background = asyncio.create_task(
-                    asyncio.to_thread(self.corpus.step, self._cancelled)
-                )
-                try:
-                    while not background.done():
-                        await asyncio.wait([background], timeout=0.1)
-                        if (
-                            self._closing
-                            or self.is_stopping()
-                            or self.is_busy()
-                            or self.store.has_urgent()
-                        ):
-                            self._cancelled.set()
-                    background.result()
-                except AppError as error:
-                    if error.code != "PREPARATION_INTERRUPTED":
-                        logger.error("Course corpus failed: %s", error.code)
-                finally:
-                    self._cancelled = None
+                # Idle means idle: no course discovery, indexing or OCR.
                 self._wake.clear()
                 try:
                     await asyncio.wait_for(self._wake.wait(), timeout=1)

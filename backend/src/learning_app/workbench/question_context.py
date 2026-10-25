@@ -26,7 +26,7 @@ def question_video_locator(repository, chat_id, value):
         raise AppError("QUESTION_VIDEO_CONTEXT_DENIED", "问题时间没有对应课程对话", 403)
     # This verifies recorded association/version only. Deleted originals cannot
     # prevent a question about an intact confirmed crop or saved transcript.
-    AudioSources(repository).associated(course, frozen.asset_id, frozen.source_version)
+    AudioSources(repository).associated(frozen.source_course_id or course, frozen.asset_id, frozen.source_version)
     return {"origin": "video_question", **frozen.model_dump(mode="json")}
 
 
@@ -63,7 +63,7 @@ def freeze_subtitle_anchors(conn, course, context, current):
                         business.course_assets.c.asset_id == business.source_versions.c.asset_id,
                     )
                     .where(
-                        business.course_assets.c.course_id == course,
+                        business.course_assets.c.course_id == (value.source_course_id or course),
                         business.source_versions.c.asset_id == value.asset_id,
                         business.source_versions.c.source_version == value.source_version,
                     )

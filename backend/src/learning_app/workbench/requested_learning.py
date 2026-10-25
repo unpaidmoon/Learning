@@ -28,15 +28,10 @@ PARSER_VERSION = "literal-learning-request-v1"
 KINDS = {
     "note": ("学习笔记", r"笔记|notes?"),
     "handout": ("学习讲义", r"讲义|handout"),
-    "card_set": ("复习卡片", r"卡片|flashcards?"),
-    "question_set": ("练习题集", r"练习题|题集|试卷|习题|quiz|practice questions?"),
-    "deep_solution": ("深入解答", r"深入解答|完整解答|深入求解|详细解答|solution"),
-    "visualization": ("概念互动图", r"可视化|互动图|交互图|动画|visualization"),
-    "learning_path": ("目标学习路线", r"学习路线|learning path"),
     "book": ("交互学习书", r"交互书|学习书|interactive book"),
     "research": ("资料对照报告", r"调研报告|研究报告|对照报告|比较报告|research report"),
 }
-EDIT_KIND = {"solution": "deep_solution", "report": "research", **{kind: kind for kind in KINDS}}
+EDIT_KIND = {"report": "research", **{kind: kind for kind in KINDS}}
 
 
 class NativeLearningTaskLink(Contract):
@@ -83,6 +78,9 @@ def admitted_task_links(repository, course_id, chat_id, session_id, native_turn)
 
 def literal_request(text):
     """Only direct imperatives in current user text, never quoted instructions."""
+    command = re.match(r"^[/\$](notes|research|interactive-book)\b", text.strip())
+    if command:
+        return {"mode": "create", "kind": {"notes": "note", "research": "research", "interactive-book": "book"}[command[1]]}
     value = text.strip()
     value = re.sub(r"^(?:请你帮我|请帮我|请你|帮我|麻烦你|请|现在)\s*", "", value, count=1)
     if re.search(
@@ -206,8 +204,19 @@ class RequestedLearning:
         identities = list(dict.fromkeys(identities))
         if len(identities) > 512:
             return None
+        save_course_id = course_id
+        match = re.search(r"(?:保存到|存到|放到)[“\"「]?([^，。；\n”\"」]+)", current["text"])
+        if match:
+            title = match[1].strip().removesuffix("课程").strip()
+            destinations = [item for item in conn.execute(select(business.courses)).mappings()
+                            if item["title"] == title or item["course_id"] == title]
+            if len(destinations) != 1:
+                raise AppError("SAVE_TARGET_UNRESOLVED", "请明确指定一个可用的保存课程", 422)
+            save_course_id = destinations[0]["course_id"]
         return {
             "version": PARSER_VERSION,
+            "save_course_id": save_course_id,
+            "open_result": bool(re.search(r"(?:生成|保存|完成)(?:后|并)(?:立即)?打开", current["text"])),
             "kind": kind,
             "target": target,
             "source_snapshot_ids": identities,
@@ -330,7 +339,7 @@ class RequestedLearning:
             "mode": value.target.mode,
             "state_at_admission": task.state,
             "disposition": "admitted",
-            "message": "已保存为本课程独立任务，可在学习成果的任务页查看与停止。",
+            "message": "已开始处理，进度和完成文件将显示在本对话中。",
         }
         conn.execute(
             insert(s.operations).values(
