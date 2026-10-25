@@ -25,6 +25,7 @@ coverage/
 htmlcov/
 playwright-report/
 .playwright-cli/
+**/browser-profile/
 test-results/
 output/playwright/
 
