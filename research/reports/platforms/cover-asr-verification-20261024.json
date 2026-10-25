@@ -1,0 +1,46 @@
+{
+  "implementation_commit": "5b9146d",
+  "verification_scope_commit": "9ac0915",
+  "deterministic_backend": {"passed": 63, "cover_tests": 13, "failed": 0},
+  "frontend": {"files": 25, "passed": 177, "failed": 0},
+  "synthetic_browser": {
+    "run": "35a079eeaa424ff8b5c8d17207836ac3",
+    "passed": true,
+    "cover_loaded": true,
+    "calls": {"catalogue": 2, "resolve": 1, "cover": 1, "media": 0, "subtitle": 0},
+    "actual_model_attempts": 0,
+    "remaining_owned_pids": [],
+    "port_closed": true
+  },
+  "local_asr": {
+    "test_run": "platform-asr-real-r3",
+    "passed": 1,
+    "synthetic_platform_and_http_audio": true,
+    "actual_pinned_local_gpu_engine": true,
+    "input_duration_ms": 18035,
+    "audio_bytes": 144549,
+    "segments": 5,
+    "confirmed_absent_calls": 1,
+    "audio_http_calls": 1,
+    "video_downloads": 0,
+    "image_frames_requested": 0,
+    "selected_stream_type": "audio",
+    "raw_segment_and_word_seconds_present": true,
+    "manual_edit_preserved_after_reopen": true,
+    "completed_task_reused": true,
+    "actual_model_attempts": 0,
+    "remaining_owned_asr_audio_workers": 0,
+    "real_bilibili_absence_verified": false
+  },
+  "real_covers": {
+    "ordinary": {"bytes": 137348, "type": "image/jpeg", "initial_platform_requests": 2},
+    "paid_episode": {"bytes": 66626, "type": "image/jpeg", "initial_platform_requests": 2},
+    "host_reopen_reuses_cache": true,
+    "source_records_unchanged": true,
+    "pixels_exposed_to_model": false
+  },
+  "real_desktop": {"cover_natural_width": 1103, "cover_natural_height": 689, "display_width": 132, "same_origin": true, "connected_after_restart": true, "screenshot_taken": false},
+  "real_file_operations": {"passed": true, "original_path_restored": true, "position_ms": 1453989, "existing_question_unchanged": true, "same_asset_version_local_copy": true},
+  "original_tree_audit": {"source_manifest_files": 873, "source_index_matches": true, "source_files_changed_since_capture": 38},
+  "full_bilibili_acceptance": false
+}

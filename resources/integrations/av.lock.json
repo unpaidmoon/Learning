@@ -1,0 +1,23 @@
+{
+  "id": "python:av",
+  "name": "av",
+  "version": "17.1.0",
+  "filename": "av-17.1.0-cp311-abi3-win_amd64.whl",
+  "url": "https://files.pythonhosted.org/packages/6b/f2/53a7cd34adb6a971d7e6d99663e74db286966c9db8afdca17472fdf0f98e/av-17.1.0-cp311-abi3-win_amd64.whl",
+  "sha256": "5df5c1172ef1cf65a1529d612f7da7798ce2cf82c1ff7212466b538a6cc7214c",
+  "bytes": 28036393,
+  "wheel_tags": [
+    "cp311-abi3-win_amd64"
+  ],
+  "requires_dist": [],
+  "license": {
+    "expression": "BSD-3-Clause",
+    "metadata_text": null,
+    "metadata_classifiers": [],
+    "notices": [
+      "notices/asr/python/av-17.1.0/wheel/av-17.1.0.dist-info/licenses/LICENSE.txt"
+    ],
+    "basis": "upstream metadata and archived original notices; bundled native vendor terms tracked separately"
+  },
+  "archive_verification": "sha256_recomputed_on_complete_archive"
+}

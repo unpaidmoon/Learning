@@ -7,6 +7,9 @@ import type { CaptureSource } from "./capture";
 import { usePlaybackControls } from "./usePlaybackControls";
 import { VideoControls } from "./VideoControls";
 import { SubtitlePanel } from "./SubtitlePanel";
+import { SplitAudio } from "../integrations/SplitAudio";
+import { PlatformMediaActions } from "../integrations/PlatformMediaActions";
+import { videoContentUrl } from "../integrations/playbackUrl";
 import type { SubtitleActionHandler } from "../reading/actions";
 import "./VideoWorkspace.css";
 
@@ -69,6 +72,7 @@ export function VideoWorkspace({
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
   const initialPosition = useRef(0);
   const lastSaved = useRef(-1);
+  const lastKnownPosition = useRef(0);
   const saveFailure = useRef<string | null>(null);
   const mounted = useRef(true);
   const fullscreenExitPending = useRef(false);
@@ -99,6 +103,7 @@ export function VideoWorkspace({
     };
     if (!selected || !player || player.readyState === 0) return completed();
     const position = Math.max(0, Math.round(player.currentTime * 1_000));
+    lastKnownPosition.current = position;
     if (position === lastSaved.current) return completed();
     lastSaved.current = position;
     saveQueue.current = saveQueue.current.then(async () => {
@@ -136,11 +141,13 @@ export function VideoWorkspace({
     }
   };
 
-  const openAsset = async (selected: VideoAsset, timeMs?: number) => {
+  const openAsset = async (selected: VideoAsset, timeMs?: number, force = false) => {
     if (
       current.current?.asset_id === selected.asset_id &&
       current.current.source_version === selected.source_version &&
-      timeMs === undefined
+      current.current.playback_session_id === selected.playback_session_id &&
+      timeMs === undefined &&
+      !force
     )
       return;
     const epoch = ++openEpoch.current;
@@ -149,7 +156,8 @@ export function VideoWorkspace({
     if (previous && player) {
       sessions.current.set(`${previous.asset_id}:${previous.source_version}`, {
         playing: resumeOnActive.current || !player.paused,
-        position: Math.round(player.currentTime * 1000),
+        position:
+          player.readyState > 0 ? Math.round(player.currentTime * 1000) : lastKnownPosition.current,
       });
       player.pause();
     }
@@ -158,6 +166,7 @@ export function VideoWorkspace({
       if (!mounted.current || epoch !== openEpoch.current) return;
       const opened = await api.write<VideoAsset>(`/videos/${selected.asset_id}/open`, {
         source_version: selected.source_version,
+        ...(force ? { refresh: true } : {}),
       } satisfies Schema<"MediaOpenInput">);
       if (!mounted.current || epoch !== openEpoch.current) return;
       setError("");
@@ -166,14 +175,22 @@ export function VideoWorkspace({
       const session = sessions.current.get(`${opened.asset_id}:${opened.source_version}`);
       resumeOnActive.current = false;
       initialPosition.current = timeMs ?? session?.position ?? opened.position_ms;
+      lastKnownPosition.current = initialPosition.current;
       pendingPlay.current = timeMs !== undefined || (session?.playing ?? true);
       positionRevision.current = opened.position_revision;
       lastSaved.current = -1;
       current.current = opened;
       callbacks.current.onAssetChange?.(opened);
-      if (asset?.asset_id === opened.asset_id && asset.source_version === opened.source_version) {
-        if (video.current) video.current.currentTime = initialPosition.current / 1_000;
-        if (pendingPlay.current) await play();
+      if (
+        asset?.asset_id === opened.asset_id &&
+        asset.source_version === opened.source_version &&
+        asset.playback_session_id === opened.playback_session_id
+      ) {
+        if (force) video.current?.load();
+        else if (video.current && video.current.readyState > 0) {
+          video.current.currentTime = initialPosition.current / 1_000;
+          if (pendingPlay.current) await play();
+        }
       }
       setAsset(opened);
     } catch (reason) {
@@ -494,7 +511,7 @@ export function VideoWorkspace({
             data-primary-video="true"
             preload="metadata"
             playsInline
-            src={`/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`}
+            src={videoContentUrl(asset)}
             onLoadedMetadata={() => {
               if (!video.current) return;
               const target = initialPosition.current / 1_000;
@@ -509,6 +526,10 @@ export function VideoWorkspace({
             }}
             onPlay={() => setPlaying(true)}
             onSeeked={saveQuietly}
+            onTimeUpdate={() => {
+              if (video.current && video.current.readyState > 0)
+                lastKnownPosition.current = Math.round(video.current.currentTime * 1000);
+            }}
             onEnded={saveQuietly}
             onError={() =>
               setError("视频无法播放，请刷新目录检查原件或浏览器格式支持（MEDIA_PLAYBACK_FAILED）")
@@ -534,11 +555,7 @@ export function VideoWorkspace({
             key={`${asset.asset_id}:${asset.source_version}`}
             playing={playing}
             {...playback}
-            previewSrc={
-              asset.media_type.startsWith("audio/")
-                ? undefined
-                : `/api/v1/videos/${asset.asset_id}/content?source_version=${encodeURIComponent(asset.source_version)}`
-            }
+            previewSrc={asset.media_type.startsWith("audio/") ? undefined : videoContentUrl(asset)}
             sourceKey={`${asset.asset_id}:${asset.source_version}`}
             onFullscreen={toggleFullscreen}
             onSeek={seekBound}
@@ -560,6 +577,23 @@ export function VideoWorkspace({
           />
         )}
       </div>
+      {asset?.audio_content_url && (
+        <SplitAudio
+          key={`${asset.asset_id}:${asset.source_version}:audio`}
+          video={video}
+          src={asset.audio_content_url}
+          onError={() => setError("平台音轨无法播放，请重新打开核对（MEDIA_AUDIO_FAILED）")}
+        />
+      )}
+      {asset?.platform === "bilibili" && connected && (
+        <PlatformMediaActions
+          courseId={courseId}
+          asset={asset}
+          onReload={() => {
+            void openAsset(asset, undefined, true);
+          }}
+        />
+      )}
       {asset && connected && showSubtitles && (
         <SubtitlePanel
           key={`${asset.asset_id}:${asset.source_version}`}

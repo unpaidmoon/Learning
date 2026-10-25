@@ -1,0 +1,25 @@
+{
+  "implementation_commit": "2ef8c85",
+  "backend": {"integrity_tests": 22, "related_passed": 108},
+  "frontend": {"files": 28, "passed": 188, "static_check": true},
+  "synthetic_container": {
+    "codecs": ["h264", "aac"],
+    "first_attempt_interrupted": true,
+    "implicit_retry": false,
+    "explicit_retry_completed": true,
+    "http_attempts": 3,
+    "real_mux": true,
+    "published_only_by_live_lease": true,
+    "same_asset_version_local_open_after_disable": true,
+    "browser_decoding_tested": false,
+    "screenshot_taken": false,
+    "real_platform": false,
+    "model_called": false
+  },
+  "changed_representation": {"old_checkpoint_retained": true, "explicit_restart_only": true, "business_source_revalidated": true},
+  "source_tree_audit": {"manifest_files": 873, "index_matches_capture": true, "files_changed_since_capture": 46, "earlier_snapshot_changed_files": 45},
+  "isolated_database_actual_model_attempts": 9,
+  "isolated_desktop_restart": {"backend_port": 8876, "debug_port": 9346, "ready": true, "files_tab_visible": true, "screenshot_taken": false},
+  "real_cdn_entity_change_verified": false,
+  "full_bilibili_acceptance": false
+}

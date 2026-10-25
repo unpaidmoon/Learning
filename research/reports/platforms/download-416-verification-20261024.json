@@ -1,0 +1,12 @@
+{
+  "implementation_commit": "b9f2e11",
+  "backend": {"related_batch_passed": 64, "download_integrity_tests": 26, "later_browser_supplement_passed": 1},
+  "synthetic_download": {"416_with_or_without_range_header": true, "implicit_retry": false, "checkpoint_retained": true, "explicit_restart_only": true, "business_source_rechecked": true, "changed_source_rejected_before_network": true, "real_fixed_mux": true, "normal_resume_http_attempts": 3, "416_recovery_http_attempts": 4, "same_asset_version_local_open": true},
+  "browser_range_regression": {"range_416_code_unchanged": true, "healthy_session_preserved": true, "next_valid_range_bytes_verified": true, "media_resolution_count": 1},
+  "static_check": true,
+  "isolated_desktop": {"backend_port": 8876, "debug_port": 9346, "files_tab_visible": true, "screenshot_taken": false},
+  "source_tree_audit": {"manifest_files": 873, "index_matches_capture": true, "files_changed_since_initial": 61},
+  "isolated_database_actual_model_attempts": 13,
+  "real_cdn_416_verified": false,
+  "full_bilibili_acceptance": false
+}

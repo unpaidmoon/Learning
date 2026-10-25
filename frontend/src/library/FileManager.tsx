@@ -11,6 +11,9 @@ import { api, ApiError, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
 import { Icon } from "../components/ui/Icon";
+import { BilibiliImport } from "../integrations/BilibiliImport";
+import { BilibiliFileIcon } from "../integrations/BilibiliFileIcon";
+import { BilibiliSourceRecovery } from "../integrations/BilibiliSourceRecovery";
 import { droppedItems, MAX_UPLOAD_BYTES, type IncomingFile } from "./dropFiles";
 import { useFileOperation } from "./fileOperations";
 import "./library.css";
@@ -940,6 +943,20 @@ export function FileManager({
           onChange={(event) => setQuery(event.target.value)}
         />
       </div>
+      <BilibiliImport
+        courseId={courseId}
+        destinationPath={path}
+        connected={connected}
+        onImported={() => {
+          onChanged?.();
+          refresh();
+        }}
+      />
+      <BilibiliSourceRecovery
+        courseId={courseId}
+        entry={selectedEntries.length === 1 ? selectedEntries[0] : null}
+        disabled={disabled}
+      />
       <div className="file-manager-toolbar" role="toolbar" aria-label="文件操作">
         <div className="file-manager-actions">
           {actionButtons()}
@@ -1143,7 +1160,16 @@ export function FileManager({
               }}
             >
               <span className="file-manager-file-icon">
-                {renderFileIcon ? (
+                {entry.platform === "bilibili" && entry.asset_id && entry.source_version ? (
+                  <BilibiliFileIcon
+                    key={entry.asset_id + entry.source_version}
+                    courseId={courseId}
+                    assetId={entry.asset_id}
+                    sourceVersion={entry.source_version}
+                    size={view === "icons" ? 42 : 19}
+                    preview={view === "icons"}
+                  />
+                ) : renderFileIcon ? (
                   renderFileIcon(entry)
                 ) : (
                   <Icon

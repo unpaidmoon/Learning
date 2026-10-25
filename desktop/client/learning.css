@@ -36,6 +36,7 @@ html[data-windows-titlebar] [data-learning-region='courses'] [data-slot='sidebar
 [data-learning-region='courses'] nav[aria-label='全局面板'],
 [data-learning-region='courses'] button[aria-label='新建会话'] { display: none; }
 [data-learning-frame] > [data-side='rightbar'] { display: none; }
+[data-learning-frame][data-learning-immersive='true'] > [data-side='sidebar'] { display: none; }
 [data-learning-frame] > [data-side='sidebar'] { left: var(--learning-course-width, 240px) !important; }
 [data-learning-frame][data-learning-ai-collapsed='true'] { grid-template-columns: var(--learning-course-width, 240px) minmax(0, 1fr) 0 !important; }
 [data-learning-ai-collapsed='true'] [data-learning-region='ai'] { display: none; }
@@ -93,7 +94,7 @@ html[data-windows-titlebar] [data-learning-region='courses'] [data-slot='sidebar
   .learning-new-chat { padding-inline: 6px; }
 }
 @media (max-width: 850px) {
-  [data-learning-frame] { grid-template-columns: minmax(0, min(var(--learning-course-width, 180px), 180px)) minmax(160px, 1fr) clamp(280px, var(--learning-ai-width, 300px), calc(100% - min(var(--learning-course-width, 180px), 180px) - 180px)) !important; }
+  [data-learning-frame] { grid-template-columns: minmax(0, var(--learning-course-width, 180px)) minmax(160px, 1fr) clamp(280px, var(--learning-ai-width, 300px), calc(100% - var(--learning-course-width, 180px) - 180px)) !important; }
 }
 
 /* One Harness text family across native controls and migrated HTML controls.

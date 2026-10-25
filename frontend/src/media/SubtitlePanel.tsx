@@ -254,6 +254,15 @@ export function SubtitlePanel({
     <section className="subtitle-panel" aria-label="课程字幕">
       <div className="subtitle-heading">
         <strong>字幕</strong>
+        {transcript && (
+          <span>
+            {
+              { platform_cc: "平台CC", platform_ai: "平台AI", local_asr: "本地转写" }[
+                transcript.source_type
+              ]
+            }
+          </span>
+        )}
         {transcript?.units_total != null && (
           <span>
             {transcript.units_ready.length}/{transcript.units_total} 段已保存
@@ -261,12 +270,12 @@ export function SubtitlePanel({
         )}
         {batch && ["queued", "running"].includes(batch.state) && (
           <Button variant="outline" disabled={busy} onClick={() => void control("pause")}>
-            暂停转写
+            {asset.platform === "bilibili" ? "暂停准备" : "暂停转写"}
           </Button>
         )}
         {batch && ["paused", "cancelled"].includes(batch.state) && (
           <Button variant="outline" disabled={busy} onClick={() => void control("resume")}>
-            恢复转写
+            {asset.platform === "bilibili" ? "恢复准备" : "恢复转写"}
           </Button>
         )}
         {batch && ["failed", "needs_source"].includes(batch.state) && (

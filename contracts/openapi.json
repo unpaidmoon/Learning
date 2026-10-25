@@ -5,6 +5,1110 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v1/integrations/modules": {
+      "get": {
+        "summary": "Modules",
+        "operationId": "modules_api_v1_integrations_modules_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleView"
+                  },
+                  "type": "array",
+                  "title": "Response Modules Api V1 Integrations Modules Get"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/modules/{platform}": {
+      "post": {
+        "summary": "Module Change",
+        "operationId": "module_change_api_v1_integrations_modules__platform__post",
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "bilibili",
+                "chaoxing",
+                "maimemo",
+                "zotero",
+                "icourse",
+                "rainclassroom",
+                "xuetang",
+                "zhihuishu"
+              ],
+              "type": "string",
+              "title": "Platform"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleView"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/connect": {
+      "post": {
+        "summary": "Connect",
+        "operationId": "connect_api_v1_integrations_bilibili_connect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/connections/{connection_id}/disconnect": {
+      "post": {
+        "summary": "Disconnect",
+        "operationId": "disconnect_api_v1_integrations_connections__connection_id__disconnect_post",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/login": {
+      "post": {
+        "summary": "Login Start",
+        "operationId": "login_start_api_v1_integrations_bilibili_login_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginView"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/login/{login_id}": {
+      "post": {
+        "summary": "Login Poll",
+        "operationId": "login_poll_api_v1_integrations_bilibili_login__login_id__post",
+        "parameters": [
+          {
+            "name": "login_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Login Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginView"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/login/{login_id}/qr.svg": {
+      "get": {
+        "summary": "Login Qr",
+        "operationId": "login_qr_api_v1_integrations_bilibili_login__login_id__qr_svg_get",
+        "parameters": [
+          {
+            "name": "login_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Login Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/favorites": {
+      "get": {
+        "summary": "Favorites",
+        "operationId": "favorites_api_v1_integrations_bilibili_favorites_get",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Favorite"
+                  },
+                  "title": "Response Favorites Api V1 Integrations Bilibili Favorites Get"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/favorites/browse": {
+      "post": {
+        "summary": "Favorite Browse",
+        "operationId": "favorite_browse_api_v1_integrations_bilibili_favorites_browse_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteBrowse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoritePage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/bilibili/favorites/folders": {
+      "post": {
+        "summary": "Favorite Folders",
+        "operationId": "favorite_folders_api_v1_integrations_bilibili_favorites_folders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteFolderBrowse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoriteFolderPage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/bilibili/resolve": {
+      "post": {
+        "summary": "Resolve",
+        "operationId": "resolve_api_v1_courses__course_id__integrations_bilibili_resolve_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportPlan"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/bilibili/inspect": {
+      "post": {
+        "summary": "Inspect Link",
+        "operationId": "inspect_link_api_v1_courses__course_id__integrations_bilibili_inspect_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogueBrowse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ImportPlan"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CataloguePage"
+                    }
+                  ],
+                  "title": "Response Inspect Link Api V1 Courses  Course Id  Integrations Bilibili Inspect Post"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/import": {
+      "post": {
+        "summary": "Import Selected",
+        "operationId": "import_selected_api_v1_courses__course_id__integrations_import_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportSelection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportReceipt"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/reconnect": {
+      "post": {
+        "summary": "Reconnect Source",
+        "operationId": "reconnect_source_api_v1_courses__course_id__integrations__asset_id__reconnect_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          },
+          {
+            "name": "asset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Asset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AnonymousSourceRecovery"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AccountSourceRecovery"
+                    }
+                  ],
+                  "title": "Response Reconnect Source Api V1 Courses  Course Id  Integrations  Asset Id  Reconnect Post"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/subtitles": {
+      "post": {
+        "summary": "Subtitles",
+        "operationId": "subtitles_api_v1_courses__course_id__integrations__asset_id__subtitles_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          },
+          {
+            "name": "asset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Asset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/download": {
+      "post": {
+        "summary": "Download",
+        "operationId": "download_api_v1_courses__course_id__integrations__asset_id__download_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          },
+          {
+            "name": "asset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Asset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreparationView"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/courses/{course_id}/integrations/{asset_id}/prepare-subtitles": {
+      "post": {
+        "summary": "Prepare Subtitles",
+        "operationId": "prepare_subtitles_api_v1_courses__course_id__integrations__asset_id__prepare_subtitles_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          },
+          {
+            "name": "asset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Asset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreparationView"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/health": {
       "get": {
         "summary": "Health",
@@ -13312,6 +14416,30 @@
         "type": "object",
         "title": "AccountSignInInput"
       },
+      "AccountSourceRecovery": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "login",
+            "title": "Kind",
+            "default": "login"
+          },
+          "login": {
+            "$ref": "#/components/schemas/LoginView"
+          },
+          "account_label": {
+            "type": "string",
+            "title": "Account Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login",
+          "account_label"
+        ],
+        "title": "AccountSourceRecovery"
+      },
       "AccountWallet": {
         "properties": {
           "currency": {
@@ -13368,6 +14496,25 @@
           "source_parts"
         ],
         "title": "AlignedTranslation"
+      },
+      "AnonymousSourceRecovery": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "anonymous",
+            "title": "Kind",
+            "default": "anonymous"
+          },
+          "connection": {
+            "$ref": "#/components/schemas/ConnectionView"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection"
+        ],
+        "title": "AnonymousSourceRecovery"
       },
       "AnswerHistory": {
         "properties": {
@@ -15678,6 +16825,169 @@
         ],
         "title": "CartesianData"
       },
+      "CatalogueBrowse": {
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Connection Id"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Url"
+          },
+          "catalogue_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalogue Id"
+          },
+          "favorite_origin": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FavoriteOrigin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Page",
+            "default": 1
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection_id",
+          "url"
+        ],
+        "title": "CatalogueBrowse"
+      },
+      "CataloguePage": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "catalogue",
+            "title": "Kind",
+            "default": "catalogue"
+          },
+          "catalogue_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Catalogue Id"
+          },
+          "course_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Course Id"
+          },
+          "connection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Connection Id"
+          },
+          "catalogue_kind": {
+            "type": "string",
+            "enum": [
+              "collection",
+              "series"
+            ],
+            "title": "Catalogue Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "provider_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Revision"
+          },
+          "videos": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueVideo"
+            },
+            "type": "array",
+            "title": "Videos"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "catalogue_id",
+          "course_id",
+          "connection_id",
+          "catalogue_kind",
+          "title",
+          "url",
+          "page",
+          "total",
+          "has_more",
+          "provider_revision",
+          "videos"
+        ],
+        "title": "CataloguePage"
+      },
+      "CatalogueVideo": {
+        "properties": {
+          "bvid": {
+            "type": "string",
+            "title": "Bvid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Ordinal"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bvid",
+          "title",
+          "ordinal"
+        ],
+        "title": "CatalogueVideo"
+      },
       "ChatEvidence": {
         "properties": {
           "course_id": {
@@ -15756,6 +17066,49 @@
           "course_id"
         ],
         "title": "ChatResponse"
+      },
+      "ConnectionInput": {
+        "properties": {
+          "guest": {
+            "type": "boolean",
+            "title": "Guest",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ConnectionInput"
+      },
+      "ConnectionView": {
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Connection Id"
+          },
+          "account_label": {
+            "type": "string",
+            "title": "Account Label"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "guest",
+              "connected",
+              "expired",
+              "disconnected"
+            ],
+            "title": "State"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection_id",
+          "account_label",
+          "state"
+        ],
+        "title": "ConnectionView"
       },
       "CorpusDocument": {
         "properties": {
@@ -16176,6 +17529,17 @@
               }
             ],
             "title": "Created At"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
           }
         },
         "type": "object",
@@ -16456,6 +17820,17 @@
               }
             ],
             "title": "Created At"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
           },
           "root_path": {
             "type": "string",
@@ -19373,6 +20748,312 @@
         ],
         "title": "EvidenceCard"
       },
+      "Favorite": {
+        "properties": {
+          "folder_id": {
+            "type": "string",
+            "title": "Folder Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "folder",
+              "collection"
+            ],
+            "title": "Resource Type",
+            "default": "folder"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "folder_id",
+          "title",
+          "count"
+        ],
+        "title": "Favorite"
+      },
+      "FavoriteBrowse": {
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "title": "Connection Id"
+          },
+          "folder_id": {
+            "type": "string",
+            "pattern": "^\\d+$",
+            "title": "Folder Id"
+          },
+          "page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Page",
+            "default": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "created",
+              "collected"
+            ],
+            "title": "Kind",
+            "default": "created"
+          },
+          "folder_page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Folder Page",
+            "default": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "folder",
+              "collection"
+            ],
+            "title": "Resource Type",
+            "default": "folder"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection_id",
+          "folder_id"
+        ],
+        "title": "FavoriteBrowse"
+      },
+      "FavoriteFolderBrowse": {
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "title": "Connection Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "created",
+              "collected"
+            ],
+            "title": "Kind",
+            "default": "created"
+          },
+          "page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Page",
+            "default": 1
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection_id"
+        ],
+        "title": "FavoriteFolderBrowse"
+      },
+      "FavoriteFolderPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Favorite"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "created",
+              "collected"
+            ],
+            "title": "Kind"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "kind",
+          "total",
+          "has_more"
+        ],
+        "title": "FavoriteFolderPage"
+      },
+      "FavoriteOrigin": {
+        "properties": {
+          "folder_id": {
+            "type": "string",
+            "pattern": "^[1-9]\\d*$",
+            "title": "Folder Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "created",
+              "collected"
+            ],
+            "title": "Kind"
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "folder",
+              "collection"
+            ],
+            "title": "Resource Type"
+          },
+          "folder_page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Folder Page"
+          },
+          "video_page": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Video Page"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "folder_id",
+          "kind",
+          "resource_type",
+          "folder_page",
+          "video_page"
+        ],
+        "title": "FavoriteOrigin"
+      },
+      "FavoritePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FavoriteVideo"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "folder_id": {
+            "type": "string",
+            "title": "Folder Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "created",
+              "collected"
+            ],
+            "title": "Kind"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "has_more",
+          "page",
+          "total",
+          "title",
+          "folder_id",
+          "kind"
+        ],
+        "title": "FavoritePage"
+      },
+      "FavoriteVideo": {
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "title": "Resource Id"
+          },
+          "bvid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bvid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "removed",
+                  "unsupported",
+                  "identity_missing"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "resource_id",
+          "bvid",
+          "title",
+          "available"
+        ],
+        "title": "FavoriteVideo"
+      },
       "GeneratedArtifactReference": {
         "properties": {
           "artifact_id": {
@@ -19518,6 +21199,168 @@
           "capabilities"
         ],
         "title": "HealthResponse"
+      },
+      "ImportPlan": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "video",
+            "title": "Kind",
+            "default": "video"
+          },
+          "plan_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Plan Id"
+          },
+          "course_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Course Id"
+          },
+          "connection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Connection Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/VideoPart"
+            },
+            "type": "array",
+            "title": "Parts"
+          },
+          "complete": {
+            "type": "boolean",
+            "title": "Complete"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "plan_id",
+          "course_id",
+          "connection_id",
+          "title",
+          "parts",
+          "complete"
+        ],
+        "title": "ImportPlan"
+      },
+      "ImportReceipt": {
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Operation Id"
+          },
+          "course_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Course Id"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "unknown"
+            ],
+            "title": "State"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportedItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation_id",
+          "course_id",
+          "state",
+          "items"
+        ],
+        "title": "ImportReceipt"
+      },
+      "ImportSelection": {
+        "properties": {
+          "destination_path": {
+            "type": "string",
+            "maxLength": 32760,
+            "title": "Destination Path",
+            "default": ""
+          },
+          "operation_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Operation Id"
+          },
+          "plan_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Plan Id"
+          },
+          "object_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Object Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation_id",
+          "plan_id",
+          "object_ids"
+        ],
+        "title": "ImportSelection"
+      },
+      "ImportedItem": {
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Asset Id"
+          },
+          "source_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Source Version"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "object_id": {
+            "type": "string",
+            "title": "Object Id"
+          },
+          "reused": {
+            "type": "boolean",
+            "title": "Reused",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "asset_id",
+          "source_version",
+          "path",
+          "object_id"
+        ],
+        "title": "ImportedItem"
       },
       "JsonValue": {},
       "LearningOperationView": {
@@ -19818,6 +21661,53 @@
         "title": "LocalVisualizationEnvelope",
         "description": "Strict adaptation of the actual upstream DTO, not its unsafe fallback renderer."
       },
+      "LoginView": {
+        "properties": {
+          "login_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Login Id"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "scanned",
+              "expired",
+              "connected"
+            ],
+            "title": "State"
+          },
+          "connection": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConnectionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login_id",
+          "state"
+        ],
+        "title": "LoginView"
+      },
       "ManifestCreate": {
         "properties": {
           "documents": {
@@ -19936,8 +21826,48 @@
             "title": "Media Type"
           },
           "size_bytes": {
-            "type": "integer",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Size Bytes"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
+          },
+          "audio_content_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio Content Url"
+          },
+          "playback_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Playback Session Id"
           }
         },
         "type": "object",
@@ -19960,6 +21890,17 @@
             "maxLength": 160,
             "minLength": 1,
             "title": "Source Version"
+          },
+          "refresh": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh"
           }
         },
         "additionalProperties": false,
@@ -20270,6 +22211,87 @@
           "timeout_seconds"
         ],
         "title": "ModelSettings"
+      },
+      "ModuleChange": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "ModuleChange"
+      },
+      "ModuleView": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "bilibili",
+              "chaoxing",
+              "maimemo",
+              "zotero",
+              "icourse",
+              "rainclassroom",
+              "xuetang",
+              "zhihuishu"
+            ],
+            "title": "Platform"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "implemented": {
+            "type": "boolean",
+            "title": "Implemented"
+          },
+          "connection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connection Id"
+          },
+          "account_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Label"
+          },
+          "connection_state": {
+            "type": "string",
+            "enum": [
+              "disconnected",
+              "guest",
+              "connected",
+              "expired"
+            ],
+            "title": "Connection State"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "platform",
+          "enabled",
+          "implemented",
+          "connection_state"
+        ],
+        "title": "ModuleView"
       },
       "NativeLearningTaskLink": {
         "properties": {
@@ -21708,7 +23730,9 @@
             "type": "string",
             "enum": [
               "pdf_ocr",
-              "asr"
+              "asr",
+              "platform_download",
+              "platform_subtitles"
             ],
             "title": "Kind"
           },
@@ -21888,7 +23912,9 @@
             "type": "string",
             "enum": [
               "pdf_ocr",
-              "asr"
+              "asr",
+              "platform_download",
+              "platform_subtitles"
             ],
             "title": "Kind"
           },
@@ -22593,6 +24619,27 @@
         ],
         "title": "ReleaseOffer"
       },
+      "RemoteAction": {
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Operation Id"
+          },
+          "source_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Source Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation_id",
+          "source_version"
+        ],
+        "title": "RemoteAction"
+      },
       "ResearchCheckpoint": {
         "properties": {
           "unit_id": {
@@ -22917,6 +24964,50 @@
           "source_decision_required"
         ],
         "title": "ResearchView"
+      },
+      "ResolveInput": {
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$",
+            "title": "Connection Id"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Url"
+          },
+          "catalogue_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalogue Id"
+          },
+          "favorite_origin": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FavoriteOrigin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connection_id",
+          "url"
+        ],
+        "title": "ResolveInput"
       },
       "ReviewControl": {
         "properties": {
@@ -24590,6 +26681,46 @@
           "end_ms"
         ],
         "title": "SubtitleRef"
+      },
+      "SubtitleResult": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "available",
+              "absent",
+              "login_required",
+              "failed",
+              "unknown"
+            ],
+            "title": "State"
+          },
+          "track_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Track Ids",
+            "default": []
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "title": "SubtitleResult"
       },
       "SubtitleSegment": {
         "properties": {
@@ -26447,6 +28578,16 @@
             "pattern": "^[a-f0-9]{64}$",
             "title": "Source Digest"
           },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "local_asr",
+              "platform_cc",
+              "platform_ai"
+            ],
+            "title": "Source Type",
+            "default": "local_asr"
+          },
           "edit_head_id": {
             "anyOf": [
               {
@@ -27241,6 +29382,48 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VideoPart": {
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "title": "Object Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "full",
+              "restricted",
+              "preview",
+              "unknown"
+            ],
+            "title": "Availability",
+            "default": "unknown"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "object_id",
+          "title",
+          "page",
+          "duration_ms"
+        ],
+        "title": "VideoPart"
       },
       "VisualizationBlock-Input": {
         "properties": {

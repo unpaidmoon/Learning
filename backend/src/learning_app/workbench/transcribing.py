@@ -105,7 +105,7 @@ class LocalTranscriber:
                     "asset_id": lease["asset_id"],
                     "source_version": lease["source_version"],
                     "bytes": source["byte_length"],
-                    "sha256": source["content_hash"],
+                    "sha256": source.get('audio_content_hash', source["content_hash"]),
                 },
             )
             if lease["unit_index"] == 0:
@@ -144,7 +144,7 @@ class LocalTranscriber:
                 )
                 metadata = decoded["audio"]
                 if (
-                    metadata["source"]["sha256"] != lease["source_digest"]
+                    metadata["source"]["sha256"] != engine.get('audio_source_sha256', lease["source_digest"])
                     or metadata["requested_start_ms"] != start
                     or metadata["requested_end_ms"] != end
                 ):

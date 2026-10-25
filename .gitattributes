@@ -16,3 +16,6 @@
 *.bin binary
 *.onnx binary
 *.safetensors binary
+
+# Keep the reviewed optional platform license notices byte-for-byte.
+resources/integrations/notices/** -text

@@ -1,0 +1,14 @@
+{
+  "review_code_head": "39a7df6",
+  "source_snapshot": "f4b77644983f6a1412cc418483fdfbda54d8315f",
+  "scope_preserved": {"common_requirements_checked": 12, "bilibili_categories_checked": 8, "execution_steps_checked": 5, "other_seven_platforms_started": false},
+  "authorized_course_subtitle_status": {"season": "739409695", "checked": 29, "available": 29, "absent": 0, "unknown": 0, "login_required": 0, "failed": 0, "subtitle_bodies_read": false, "media_read": false, "imported": false},
+  "authorized_p3_subtitle_status": {"video": "BV1YPak6pEct", "page": 3, "state": "available", "track_count": 1, "subtitle_bodies_read": false, "media_read": false, "imported": false},
+  "review_groups": {"platform_files": 79, "host_files": 37, "documentation_files": 37},
+  "original_apply_check": {"check_only": true, "applies_cleanly": false, "conflicting_files": ["backend/src/learning_app/workbench/native_business.py", "backend/src/learning_app/workbench/routes.py", "contracts/generated/api.ts", "contracts/openapi.json", "harness/plugins/learning-guard.mjs"], "original_index_unchanged": true, "patch_applied": false},
+  "source_tree_audit": {"initial_manifest_files": 873, "files_changed_since_capture": 63, "index_matches_capture": true},
+  "isolated_database_actual_model_attempts": 13,
+  "missing_external_evidence": ["authorized_membership_sample", "authorized_charging_sample", "authorized_truly_absent_subtitle_sample", "user_scanned_reconnect"],
+  "original_mainline_integration_complete": false,
+  "full_goal_complete": false
+}

@@ -71,7 +71,11 @@ def freeze_subtitle_anchors(conn, course, context, current):
                 .mappings()
                 .first()
             )
-            if source is None or Path(source["local_path"]).suffix.lower() not in AUDIO_CONTAINERS:
+            from learning_app.integrations.schema import sources as remote_sources
+            remote = source is not None and conn.execute(select(remote_sources.c.asset_id).where(
+                remote_sources.c.course_id == (value.source_course_id or course), remote_sources.c.asset_id == value.asset_id,
+                remote_sources.c.source_version == value.source_version)).first()
+            if source is None or (not remote and Path(source["local_path"]).suffix.lower() not in AUDIO_CONTAINERS):
                 continue
             payload = {
                 "message_id": message["message_id"],

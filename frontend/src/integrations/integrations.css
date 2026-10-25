@@ -1,0 +1,119 @@
+.integration-settings,
+.integration-import-body {
+  display: grid;
+  gap: 0.75rem;
+}
+.integration-module {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.integration-module label,
+.integration-part {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.integration-module label {
+  min-width: 9rem;
+}
+.integration-import-body {
+  padding: 0.75rem;
+  max-height: min(36rem, 65dvh);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+.integration-import-body input:not([type="checkbox"]) {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  color: inherit;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+}
+.integration-import-body fieldset {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 20rem;
+  overflow: auto;
+}
+.integration-platform-badge {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.integration-media-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block: 6px;
+}
+.integration-file-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--primary);
+}
+.integration-file-icon img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.35rem;
+}
+.integration-file-preview {
+  width: 132px;
+  height: 74px;
+}
+.integration-file-source {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 0 0.15rem;
+  background: var(--background);
+  font-size: 0.65rem;
+}
+.integration-catalogue {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 24rem;
+  overflow: auto;
+}
+.integration-catalogue > button {
+  justify-content: flex-start;
+  white-space: normal;
+  text-align: left;
+}
+.integration-favorites,
+.integration-favorites section {
+  display: grid;
+  gap: 0.5rem;
+}
+.integration-favorite-items {
+  display: grid;
+  max-height: 16rem;
+  overflow: auto;
+}
+.integration-favorite-items > button {
+  justify-content: flex-start;
+  white-space: normal;
+  text-align: left;
+}
+.integration-favorite-pages {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.integration-source-recovery {
+  max-height: min(32rem, 60dvh);
+  overflow: auto;
+  flex: 0 0 auto;
+}
