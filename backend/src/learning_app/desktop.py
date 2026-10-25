@@ -71,6 +71,14 @@ _READ_METHODS = frozenset(
         "account/hasRunningAccountTasks",
         "account/getUnnotifiedBonuses",
         "remoteAccess/explain",
+        "commands/list",
+        "agentPresets/list",
+        "agentPresets/read",
+        "llm/listProviders",
+        "llm/listConfigurableProviders",
+        "credentials/describe",
+        "permissionPresets/catalog",
+        "pluginInventory/list",
     }
 )
 _STREAM_METHODS = frozenset(
@@ -236,6 +244,13 @@ def _arguments(envelope: dict) -> dict:
     if not isinstance(request, dict):
         raise AppError("DESKTOP_RPC_INVALID", "原生界面请求参数无效", 422)
     return request
+
+
+def _scoped_session(envelope: dict, request: dict):
+    scope = envelope.get("payload", {}).get("scope", {})
+    if not isinstance(scope, dict):
+        raise AppError("DESKTOP_RPC_INVALID", "原生对话范围无效", 422)
+    return request.get("sessionId") or request.get("agentId") or scope.get("agentId") or scope.get("sessionId")
 
 
 class DesktopGateway:
@@ -781,8 +796,45 @@ class DesktopGateway:
                     additions.append({"sessionId": identity, "snippet": found[:240]})
             items = [*original, *additions]
             return {"items": items[:20], "hasMore": value.get("hasMore", False) or len(items) > 20}
+        if method == "settings/describe":
+            native = await self.native_read(method, envelope)
+            local = self.theme.handle(method, request)
+            return {**native, "hasDocument": False, "namespaces": [
+                *[row for row in native["namespaces"] if row["ns"] != "ui-theme"],
+                *local["namespaces"],
+            ]}
+        if method in {"settings/query", "settings/mutate", "settings/update", "settings/replace"}:
+            namespace = request.get("ns", request.get("namespace", ""))
+            if namespace == "ui-theme":
+                return self.theme.handle(method, request)
+            if method != "settings/query" and not (
+                isinstance(namespace, str)
+                and (namespace.startswith("ui-") or namespace in {
+                    "locale", "agent-preset-registry", "agent-default-model",
+                })
+            ):
+                raise AppError("DESKTOP_SETTINGS_MANAGED", "此执行设置由学习应用管理，不能绕过资料与模型权限边界", 403)
+            return None
         if method.startswith("settings/"):
-            return self.theme.handle(method, request)
+            raise AppError("DESKTOP_METHOD_DENIED", "此设置操作未开放", 403)
+        if method == "permissionPresets/catalog":
+            # This app's tool guard owns authority; no shell permission preset
+            # is installed. Keep the native row unavailable without a failed
+            # request or advertising a permission the app cannot grant.
+            return {"options": [], "defaultOptions": [], "defaultPreset": "custom"}
+        if method == "agentPresets/select":
+            sid = _scoped_session(envelope, request)
+            self.mapping(sid or "")
+            return None
+        if method == "commands/execute":
+            sid = _scoped_session(envelope, request)
+            self.mapping(sid or "")
+            # The native export command only admits a log download. Other
+            # human commands cannot bypass the business submission path.
+            line = request.get("line")
+            if not isinstance(line, str) or line.strip() != "/export":
+                raise AppError("DESKTOP_METHOD_DENIED", "此指令请通过学习对话提交", 403)
+            return None
         if method == "session/prompt":
             return await self.prompt(request)
         if method == "session/cancel":
@@ -915,7 +967,9 @@ class DesktopGateway:
                 return value
         if method not in _READ_METHODS:
             raise AppError("DESKTOP_METHOD_DENIED", "此操作不在学习试用范围内", 403)
-        sid = request.get("sessionId")
+        sid = _scoped_session(envelope, request)
+        if method == "commands/list" and not sid:
+            raise AppError("DESKTOP_SESSION_INVALID", "请选择当前对话", 422)
         address = request.get("address")
         if isinstance(address, dict):
             if address.get("kind") != "session":
@@ -1374,6 +1428,19 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
                         },
                     }
                 )
+        if path == "api/session.export":
+            if request.method not in {"GET", "HEAD"}:
+                raise AppError("DESKTOP_METHOD_DENIED", "导出请求方式无效", 403)
+            sid = request.query_params.get("sessionId", "")
+            gateway.mapping(sid)
+            if request.query_params.get("includeDescendants", "false") not in {"true", "false"}:
+                raise AppError("DESKTOP_RPC_INVALID", "导出范围无效", 422)
+            client = await gateway.browser()
+            response = await client.get("/api/session.export", params={"sessionId": sid, "includeDescendants": "false"})
+            return Response(response.content, status_code=response.status_code, headers={
+                key: value for key, value in response.headers.items()
+                if key.lower() in {"content-type", "content-disposition"}
+            })
         if path.startswith("api/"):
             if request.method != "POST":
                 raise AppError("DESKTOP_METHOD_DENIED", "原生接口请求方式无效", 403)

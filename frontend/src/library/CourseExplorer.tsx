@@ -58,6 +58,7 @@ export function CourseExplorer({
   rootLabel,
   headerContainer,
   compact = false,
+  foldersOnly = false,
 }: {
   courseId: string;
   connected: boolean;
@@ -70,6 +71,7 @@ export function CourseExplorer({
   rootLabel?: string;
   headerContainer?: HTMLElement | null;
   compact?: boolean;
+  foldersOnly?: boolean;
 }) {
   const [root, setRoot] = useState<Listing | null>(null);
   const [children, setChildren] = useState<Record<string, Entry[]>>({});
@@ -344,7 +346,7 @@ export function CourseExplorer({
     }
   };
   const tree = (path: string, depth = 0) =>
-    (children[path] || []).map((entry) => (
+    (children[path] || []).filter((entry) => !foldersOnly || entry.kind === "directory").map((entry) => (
       <li
         key={entry.path}
         role="treeitem"
@@ -354,7 +356,9 @@ export function CourseExplorer({
           className={`file-tree-row ${selectedPath === entry.path ? "selected" : ""}`}
           style={{ paddingLeft: 10 + depth * 14 }}
         >
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             className="file-tree-open"
             data-file-path={entry.path}
             disabled={!connected || entry.kind === "blocked"}
@@ -366,7 +370,7 @@ export function CourseExplorer({
             </span>
             <FileMark kind={entry.kind} viewer={entry.viewer} />
             <span>{entry.name}</span>
-          </button>
+          </Button>
         </div>
         {entry.kind === "directory" && expanded.has(entry.path) && (
           <ul role="group">{tree(entry.path, depth + 1)}</ul>
@@ -499,10 +503,10 @@ export function CourseExplorer({
       )}
       {ready ? (
         <>
-          <ul role="tree" aria-label="当前课程文件树" className="file-tree">
+          <ul role={foldersOnly ? "group" : "tree"} aria-label="当前课程文件树" className="file-tree">
             {tree("")}
           </ul>
-          {children[""]?.length === 0 && <p className="explorer-empty">文件夹为空。</p>}
+          {!foldersOnly && children[""]?.length === 0 && <p className="explorer-empty">文件夹为空。</p>}
         </>
       ) : root?.course_id === courseId ? (
         <div className="explorer-empty">

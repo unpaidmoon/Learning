@@ -16,6 +16,7 @@ export { CourseExplorer } from "../../frontend/src/library/CourseExplorer";
 export { AccountPanel } from "../../frontend/src/account/AccountPanel";
 export { DataPanel } from "../../frontend/src/data/DataPanel";
 export { RuntimeSettingsPanel } from "../../frontend/src/data/RuntimeSettingsPanel";
+export { StartupSettingsControl } from "../../frontend/src/data/StartupSettingsControl";
 export { useDraft, saveAllDrafts, getDraftController } from "../../frontend/src/chat/draft";
 export { saveCapture, loadCapture } from "../../frontend/src/chat/captureCache";
 export { MarkdownAnswer };
@@ -90,19 +91,22 @@ export type MaterialQuote = QuoteSelection & {
 /** A visible, version-bound text read; no model request or surrounding source. */
 export function MaterialViewer({ file, onQuote, onSourceAction, sourceJump, visible = true }: {
   file: File;
-  onQuote?: (quote: MaterialQuote) => void;
+  onQuote?: (quote: MaterialQuote) => void | Promise<void>;
   onSourceAction?: ReadingActionHandler;
   sourceJump?: SourceJump;
   visible?: boolean;
 }) {
   const [read, setRead] = useState({ file, text: "", loading: true, error: "" });
   const [selection, setSelection] = useState<QuoteSelection | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [quoteError, setQuoteError] = useState("");
   const root = useRef<HTMLDivElement>(null);
   const markdown = /\.(?:md|markdown)$/i.test(file.entry.name);
   useEffect(() => {
     const controller = new AbortController();
     setRead({ file, text: "", loading: true, error: "" });
     setSelection(null);
+    setQuoteError("");
     if (file.viewer !== "text" || !file.content_url) {
       setRead({ file, text: "", loading: false, error: "" });
       return () => controller.abort();
@@ -149,9 +153,14 @@ export function MaterialViewer({ file, onQuote, onSourceAction, sourceJump, visi
     data-testid="learning-resource-viewer" data-asset-id={file.asset_id} data-source-version={file.source_version}>
     {content}
     {onQuote && selection && read.file === file && !read.loading && <div className="learning-material-selection">
-      <Button variant="outline" onMouseDown={event => event.preventDefault()} onClick={() => {
-        quote(selection); setSelection(null); window.getSelection()?.removeAllRanges();
+      <Button variant="outline" disabled={adding} onMouseDown={event => event.preventDefault()} onClick={() => {
+        if (adding) return;
+        setAdding(true); setQuoteError("");
+        void Promise.resolve().then(() => quote(selection)).then(() => {
+          setSelection(null); window.getSelection()?.removeAllRanges();
+        }).catch((reason: unknown) => setQuoteError(errorMessage(reason))).finally(() => setAdding(false));
       }}>添加到对话</Button>
     </div>}
+    {quoteError && <p role="alert">{quoteError}</p>}
   </div>;
 }
