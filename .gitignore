@@ -125,6 +125,7 @@ research/probes/v1-harness/scripts/*
 *.markdown
 *.mdx
 *.rst
+!/README.md
 
 # 保留运行所需 Skill、第三方许可与来源声明，以及实际测试素材。
 !**/SKILL.md

@@ -1077,7 +1077,7 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
     async def account_avatar(version: str):
         from learning_app.accounts import _client
 
-        profile = await gateway.service.execution.peer.rpc_args("account/getProfile", _client())
+        profile = await gateway.service.execution.peer.rpc_args("account/getProfile", {"client": _client()})
         reference = picture_reference(profile)
         if reference is None or reference[1] != version:
             raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像已改变，请刷新账号", 404)

@@ -435,11 +435,14 @@ class MediaStore:
                 source = self.repository.register_source(course_id, path)
             return self.attach_source(source, path)
 
-    def attach_source(self, source: dict, path: Path) -> dict:
+    def attach_source(self, source: dict, path: Path, *, open_for_playback: bool = False) -> dict:
         """Use a course file's exact version without changing historical sources."""
         path, media_type = _video_path(str(path))
+        signature = _signature(path)
         if _hash_file(path) != source["content_hash"]:
             raise AppError("SOURCE_VERSION_MISMATCH", "视频内容在打开时改变，请重新主动打开")
+        if _signature(path) != signature:
+            raise AppError("SOURCE_CHANGED_DURING_READ", "原件正在改变，请稍后主动重新打开")
         with self._lock:
             with self.engine.begin() as conn:
                 registered = conn.execute(
@@ -481,7 +484,11 @@ class MediaStore:
                             revision=0,
                         )
                     )
-            result = self._view(self._row(source["asset_id"]))
+            self._verified[(source["asset_id"], source["source_version"])] = signature
+            row = self._row(source["asset_id"])
+            if open_for_playback:
+                return self._finish_open(row)
+            result = self._view(row)
             previews = getattr(self.repository, "video_previews", None)
             if previews is not None:
                 previews.enqueue_asset(result["asset_id"], result["source_version"])
@@ -526,6 +533,11 @@ class MediaStore:
         row = self._row(asset_id, version)
         availability = self._availability(row, force=True)
         self._require_available(availability)
+        return self._finish_open(row)
+
+    def _finish_open(self, row: dict) -> dict:
+        """Record the open after the caller has verified this exact source."""
+        asset_id, version = row["asset_id"], row["source_version"]
         with self.engine.begin() as conn:
             # Some Windows clocks return the same instant for consecutive UI
             # operations. Preserve their transaction order without sleeping.

@@ -933,8 +933,8 @@ class CourseFileStore:
             remote = host and host.source(source["asset_id"], source["source_version"], course_id)
             viewer = "video" if remote else _viewer(path)
             video = (self.media.attach_remote_source(source) if remote else
-                     self.media.attach_source(source, path)) if viewer == "video" else None
-            if video:
+                     self.media.attach_source(source, path, open_for_playback=True)) if viewer == "video" else None
+            if video and remote:
                 video = self.media.open(source["asset_id"], source["source_version"])
             from learning_app.workbench import schema as workbench_schema
             from learning_app.workbench.artifact_files import generated_files

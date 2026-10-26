@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">DSH Study</title>
+  <desc id="description">Indigo open pages with an S-shaped channel. Editable application icon master.</desc>
+  <rect width="1024" height="1024" rx="160" fill="#4F46E5"/>
+  <g id="pages" fill="#FFFFFF">
+    <path d="M148 198 C258 198 374 244 466 320 C422 389 430 453 472 520 C509 579 563 627 557 692 C551 759 497 810 451 850 C370 772 249 746 148 727 Q126 722 126 700 V222 Q126 198 148 198 Z"/>
+    <path d="M876 198 Q898 198 898 220 V704 Q898 724 876 729 C757 751 650 792 557 850 C644 732 649 666 610 604 C582 558 536 508 506 454 C479 403 484 367 512 327 C593 247 725 210 876 198 Z"/>
+  </g>
+</svg>

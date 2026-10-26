@@ -33,6 +33,7 @@ def test_native_profile_picture_uses_authenticated_same_origin_route(tmp_path, m
 
         async def rpc_args(method, arguments):
             assert method == "account/getProfile"
+            assert set(arguments) == {"client"}
             return profile
 
         monkeypatch.setattr(gateway.service.execution, "rpc_args", rpc_args, raising=False)
@@ -57,10 +58,14 @@ def test_native_profile_picture_uses_authenticated_same_origin_route(tmp_path, m
 
 @pytest.mark.parametrize("status,media,content", [
     (200, "image/png", png()),
+    (200, "binary/octet-stream", png()),
+    (200, "application/octet-stream", png()),
+    (200, "binary/octet-stream", b"<svg/>"),
+    (200, "image/jpeg", png()),
     (302, "image/png", b""),
     (200, "image/svg+xml", b"<svg/>"),
     (200, "image/png", b"x" * (2 * 1024 * 1024 + 1)),
-], ids=["raster", "redirect", "svg", "oversize"])
+], ids=["raster", "binary-raster", "generic-raster", "binary-svg", "mismatched-type", "redirect", "svg", "oversize"])
 def test_picture_fetch_is_bounded_anonymous_and_pins_public_address(
     monkeypatch, status, media, content,
 ):
@@ -80,10 +85,10 @@ def test_picture_fetch_is_bounded_anonymous_and_pins_public_address(
     monkeypatch.setattr("learning_app.desktop_avatar.resolve_public", lambda *_: ["1.1.1.1"])
     monkeypatch.setattr("learning_app.desktop_avatar.httpx.Client", lambda **kwargs:
                         original(**kwargs, transport=httpx.MockTransport(upstream)))
-    if status == 200 and media == "image/png" and len(content) < 2 * 1024 * 1024:
-        assert read_account_picture("https://pictures.example/avatar.png") == (content, media)
+    if status == 200 and media in {"image/png", "binary/octet-stream", "application/octet-stream"} and content == png():
+        assert read_account_picture("https://pictures.example/avatar.png") == (content, "image/png")
     else:
-        with pytest.raises(AppError):
+        with pytest.raises((AppError, OSError)):
             read_account_picture("https://pictures.example/avatar.png")
     assert len(requests) == 1
 

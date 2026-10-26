@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">DSH Study — dark tray mark</title>
+  <desc id="description">Optically enlarged open pages with a wider S-shaped channel for small sizes on light backgrounds.</desc>
+  <g id="tray-pages" fill="#202124" transform="translate(-76 -118) scale(1.15)">
+    <path d="M148 198 C258 198 360 240 440 312 C400 396 415 470 465 540 C508 600 548 648 540 700 C530 760 488 800 451 836 C370 772 249 746 148 727 Q126 722 126 700 V222 Q126 198 148 198 Z"/>
+    <path d="M876 198 Q898 198 898 220 V704 Q898 724 876 729 C757 751 650 792 580 836 C662 724 662 652 622 590 C586 536 548 480 534 430 C505 380 510 350 548 312 C630 240 741 210 876 198 Z"/>
+  </g>
+</svg>

@@ -48,6 +48,27 @@ def content_url(asset):
     return f"/api/v1/videos/{asset['asset_id']}/content?source_version={asset['source_version']}"
 
 
+def test_attach_and_open_share_validation_but_later_explicit_open_rechecks(media, monkeypatch):
+    import learning_app.media as module
+
+    repo, store, path = media
+    source = repo.register_source("course_a", path)
+    original = module._hash_file
+    calls = []
+
+    def counted(value):
+        calls.append(value)
+        return original(value)
+
+    monkeypatch.setattr(module, "_hash_file", counted)
+    opened = store.attach_source(source, path, open_for_playback=True)
+    assert opened["last_opened_at"] is not None
+    assert opened["availability"] == "available"
+    assert calls == [path]
+    store.open(source["asset_id"], source["source_version"])
+    assert calls == [path, path]
+
+
 def test_registration_reuses_business_identity_without_copying_and_associates_courses(media):
     repo, store, video = media
     first = store.register("course_a", str(video))

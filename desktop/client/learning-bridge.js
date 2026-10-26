@@ -270,10 +270,11 @@
         || chat.displayTitle.startsWith('[[learning-generation:') || chat.displayTitle.startsWith('learning-')
         ? (chat.blank ? '新对话' : '当前对话') : chat.displayTitle;
       const show = async () => {
+        setOpen(!open);
+        if (open) return;
+        setArchived(false); setError('');
         try {
           await ctx.sessions.refresh();
-          setArchived(false); setError('');
-          setOpen(true);
         } catch (reason) { if (activeSessionId) inputFor(activeSessionId).notify('error', reason.message); }
       };
       const act = async action => {
@@ -309,7 +310,7 @@
       }); };
       return h(React.Fragment, null, h(Menu, { open, portal: true, align: 'start', listClassName: 'learning-history-menu', onClose: () => setOpen(false),
         anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-conversation-title', title: displayTitle || '新对话',
-          'aria-label': '选择历史对话', onClick: show }, h('span', null, displayTitle || '新对话'), h(library.components.Icon, { name: 'chevron-down', size: 14 })),
+          'aria-label': '选择历史对话', 'aria-expanded': open, onClick: show }, h('span', null, displayTitle || '新对话'), h(library.components.Icon, { name: 'chevron-down', size: 14 })),
       },
         h('div', { className: 'learning-history-heading' }, archived ? '已归档对话' : '历史对话'),
         chats.map(chat => h('div', { key: chat.id, className: 'learning-history-row', 'data-current': chat.id === activeSessionId },
@@ -365,13 +366,13 @@
       const title = ids.map(id => courses.find(item => item.course_id === id)?.title || '课程').join('、') || '工作区';
       useEffect(() => { void api('/courses').then(setCourses).catch(reportError); }, [open]);
       return h(Menu, { open, portal: true, align: 'end', items, selectedIds: adding ? [] : ids, onClose: () => { setOpen(false); setAdding(false); },
-        anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-icon-action', title, 'aria-label': '对话工作区', disabled: !activeSessionId || readOnlyHistory(), onClick: () => setOpen(true) }, h(library.components.Icon, { name: 'folder', size: 17 })),
+        anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-icon-action', title, 'aria-label': '对话工作区', disabled: !activeSessionId || readOnlyHistory(), onClick: () => setOpen(true), icon: h(primitives.IconFolderCloseRegular, { size: 16 }) }),
         onSelect: identity => { void choose(identity).catch(reportError); } });
     }
     function VideoButton() {
       useRevision();
       return h(Button, { variant: 'ghost', size: 'sm', className: 'learning-new-chat learning-icon-action', title: '新对话', 'aria-label': '新对话',
-        icon: h(library.components.Icon, { name: 'rename', size: 17 }), disabled: !selectedCourse || !!newChatPending || navigationPending, onClick: () => {
+        icon: h(library.components.Icon, { name: 'rename', size: 16 }), disabled: !selectedCourse || !!newChatPending || navigationPending, onClick: () => {
         if (newChatPending || !selectedCourse) return;
         newChatPending = (async () => {
           if (captureRequest) throw new Error('请完成或取消当前截图（CAPTURE_CONTEXT_LOCKED）');
@@ -430,7 +431,7 @@
     }
     function CollapseAiButton() {
       return h(Button, { variant: 'ghost', size: 'sm', className: 'learning-icon-action', 'aria-label': '收起 AI', title: '收起 AI · Ctrl+Shift+A',
-        icon: h(library.components.Icon, { name: 'panel', size: 17 }), onClick: toggleAi });
+        icon: h(library.components.Icon, { name: 'panel', size: 16 }), onClick: toggleAi });
     }
     function toggleAi() {
       aiCollapsed = !aiCollapsed; notify();
@@ -879,8 +880,10 @@
               if (state.active === item.id) state.active = 'files';
               notify();
             } }, '×'))),
-          aiCollapsed && h(Button, { size: 'sm', onClick: () => { aiCollapsed = false; notify(); } }, '展开 AI'),
         ),
+        aiCollapsed && !immersive && h('aside', { className: 'learning-ai-rail', 'aria-label': 'AI 侧栏' },
+          h(Button, { size: 'sm', variant: 'ghost', className: 'learning-icon-action', 'aria-label': '展开 AI', title: '展开 AI · Ctrl+Shift+A',
+            icon: h(library.components.Icon, { name: 'panel', size: 16 }), onClick: toggleAi })),
         immersive && aiCollapsed && h(Button, { className: 'learning-immersive-ai-edge', 'aria-label': '展开 AI 问答', title: 'Ctrl+Shift+A',
           onMouseEnter: toggleAi, onFocus: toggleAi, onClick: () => { if (aiCollapsed) toggleAi(); } }, '问答'),
         h('div', { className: 'learning-material-body', role: 'tabpanel' },
@@ -889,7 +892,7 @@
             item.kind === 'video' ? h(VideoPanel, { sessionId: activeSessionId, selectedAsset: item.video, active: state.active === item.id, tabId: item.id, seekRequest: item.seekRequest })
               : item.kind === 'book' ? h(library.components.BookReader, { courseId: item.file.generated_artifact.course_id, artifactId: item.file.generated_artifact.artifact_id, fixedRevision: item.file.generated_artifact.revision_id, onOpenSource: source => { void openWorkbenchSource(source).catch(reportError); } })
               : h(library.ResourceViewer, { file: item.file, onQuote: addMaterialQuote, onSourceAction: sourceAction, sourceJump: item.sourceJump, visible: state.active === item.id })))),
-        h('div', { className: 'learning-ai-resizer', role: 'separator', tabIndex: 0, 'aria-label': '调整 AI 宽度', 'aria-orientation': 'vertical',
+        !aiCollapsed && h('div', { className: 'learning-ai-resizer', role: 'separator', tabIndex: 0, 'aria-label': '调整 AI 宽度', 'aria-orientation': 'vertical',
           onPointerDown: event => {
             resize.current = event.pointerId;
             const frame = document.querySelector('[data-learning-frame]');
@@ -907,16 +910,8 @@
     }
     function VideoPanel({ sessionId, selectedAsset, active, tabId, seekRequest }) {
       const [asset, setAsset] = useState(selectedAsset);
-      const [binding, setBinding] = useState(null);
-      const [candidate, setCandidate] = useState(null);
-      const [error, setError] = useState('');
       const handle = useRef(null);
       const appliedSeek = useRef(null);
-      useEffect(() => {
-        let live = true;
-        bindingFor(sessionId).then(value => { if (live) setBinding(value); }).catch(reportError);
-        return () => { live = false; };
-      }, [sessionId]);
       useEffect(() => { videoHandles.set(tabId, handle); return () => videoHandles.delete(tabId); }, [tabId]);
       useEffect(() => {
         if (selectedAsset.platform === 'bilibili' && selectedAsset.playback_session_id !== asset?.playback_session_id && handle.current)
@@ -928,32 +923,10 @@
         appliedSeek.current = seekRequest;
         void handle.current.openAsset(selectedAsset, seekRequest.time_ms).catch(reportError);
       }, [asset, seekRequest, selectedAsset]);
-      const screenshot = () => {
-        try {
-          const source = handle.current?.pauseForCapture();
-          const video = handle.current?.getElement();
-          if (!video || !asset || !binding) throw new Error('视频尚未就绪（VIDEO_FRAME_UNAVAILABLE）');
-          const captured = library.components.captureVideoFrame(video, source);
-          void videoComponents.interactionPriority(true).catch(() => {});
-          captureRequest = { sessionId, binding, source: captured, sourceCourseId: selectedAsset.source_course_id || selectedCourse };
-          setCandidate(captured);
-          notify();
-        } catch (reason) { setError(reason.message); }
-      };
-      const finish = async result => {
-        try {
-          await publishCapture(result, captureRequest.binding, captureRequest.sessionId);
-          setCandidate(null); captureRequest = null; notify();
-          void videoComponents.interactionPriority(false).catch(() => {});
-        } catch (reason) { setError(reason.message); throw reason; }
-      };
       return h('section', { className: 'learning-video-panel learning-video-components learning-legacy-module',
         'data-testid': 'learning-video', 'data-session-id': sessionId },
-        h('div', { className: 'learning-video-toolbar' },
-          h(Button, { variant: 'toolbar', size: 'sm', disabled: !asset || !binding || asset.media_type?.startsWith('audio/'),
-            'data-testid': 'learning-capture', onClick: screenshot }, '截图提问')),
         h(videoComponents.VideoWorkspace, {
-          courseId: selectedAsset.source_course_id || selectedCourse, assetId: selectedAsset.asset_id,
+          courseId: selectedAsset.source_course_id || selectedCourse, assetId: selectedAsset.asset_id, openedAsset: selectedAsset,
           showSubtitles: materialState().subtitleAsset === selectedAsset.asset_id,
           onSubtitleAction: subtitleAction,
           active, connected: true, minimal: true, workspaceHandleRef: handle, workspaceRef,
@@ -961,9 +934,6 @@
           onOpenChat: () => { aiCollapsed = false; notify(); inputFor(sessionId).focus(); },
           onImmersiveChange: setImmersive,
         }),
-        error && h('p', { role: 'alert', className: 'learning-error' }, error),
-        candidate && h(library.components.CaptureEditor, { source: candidate, onConfirm: finish,
-          onCancel: () => { setCandidate(null); captureRequest = null; notify(); void videoComponents.interactionPriority(false).catch(() => {}); } }),
       );
     }
     return {

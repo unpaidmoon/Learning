@@ -39,6 +39,7 @@ export function VideoWorkspace({
   minimal = false,
   showSubtitles = false,
   assetId,
+  openedAsset,
   RateControl,
   ref,
 }: {
@@ -55,6 +56,7 @@ export function VideoWorkspace({
   minimal?: boolean;
   showSubtitles?: boolean;
   assetId?: string;
+  openedAsset?: VideoAsset;
   RateControl?: ComponentType<{ rate: number; onRate: (rate: number) => void }>;
   ref?: Ref<VideoWorkspaceHandle>;
 }) {
@@ -144,7 +146,12 @@ export function VideoWorkspace({
     }
   };
 
-  const openAsset = async (selected: VideoAsset, timeMs?: number, force = false) => {
+  const openAsset = async (
+    selected: VideoAsset,
+    timeMs?: number,
+    force = false,
+    alreadyOpened = false,
+  ) => {
     if (
       current.current?.asset_id === selected.asset_id &&
       current.current.source_version === selected.source_version &&
@@ -167,10 +174,14 @@ export function VideoWorkspace({
     try {
       await savePosition();
       if (!mounted.current || epoch !== openEpoch.current) return;
-      const opened = await api.write<VideoAsset>(`/videos/${selected.asset_id}/open`, {
-        source_version: selected.source_version,
-        ...(force ? { refresh: true } : {}),
-      } satisfies Schema<"MediaOpenInput">);
+      // files/open already validates and opens this exact source. Adopt its
+      // response for the first render instead of repeating the same disk scan.
+      const opened = alreadyOpened
+        ? selected
+        : await api.write<VideoAsset>(`/videos/${selected.asset_id}/open`, {
+            source_version: selected.source_version,
+            ...(force ? { refresh: true } : {}),
+          } satisfies Schema<"MediaOpenInput">);
       if (!mounted.current || epoch !== openEpoch.current) return;
       setError("");
       setPlayBlocked(false);
@@ -291,8 +302,11 @@ export function VideoWorkspace({
   useEffect(() => {
     mounted.current = true;
     let disposed = false;
-    void api
-      .read<VideoAsset[]>(`/courses/${courseId}/videos`)
+    void (
+      minimal && openedAsset
+        ? Promise.resolve([openedAsset])
+        : api.read<VideoAsset[]>(`/courses/${courseId}/videos`)
+    )
       .then((values) => {
         if (!disposed) {
           setAssets(values);
@@ -330,7 +344,8 @@ export function VideoWorkspace({
     void Promise.resolve().then(async () => {
       if (disposed) return;
       try {
-        let selected = assets.find((item) => item.asset_id === assetId);
+        const adopted = openedAsset?.asset_id === assetId ? openedAsset : undefined;
+        let selected = adopted ?? assets.find((item) => item.asset_id === assetId);
         if (!selected) {
           // Opening a newly imported file may create its media identity after the first listing.
           const values = await api.read<VideoAsset[]>(`/courses/${courseId}/videos`);
@@ -339,7 +354,7 @@ export function VideoWorkspace({
           callbacks.current.onLibraryChange(values);
           selected = values.find((item) => item.asset_id === assetId);
         }
-        if (!disposed && selected) await openAsset(selected);
+        if (!disposed && selected) await openAsset(selected, undefined, false, !!adopted);
         else if (!disposed) setError("该视频不在当前课程目录中（SOURCE_UNAVAILABLE）");
       } catch (reason) {
         if (!disposed) setError(errorMessage(reason));

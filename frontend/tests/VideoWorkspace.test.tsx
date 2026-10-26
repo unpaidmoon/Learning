@@ -46,6 +46,31 @@ function renderPlayer() {
 }
 
 describe("原地视频播放器", () => {
+  it("采用文件入口已打开的精确版本，不重复读取列表或再次打开原件", async () => {
+    const fetcher = vi.fn((url: string) => {
+      if (url.includes("/video-previews/")) return answer({ frames: [], status: "pending" });
+      return answer({});
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(
+      <VideoWorkspace
+        courseId="course-A"
+        assetId={asset.asset_id}
+        openedAsset={asset}
+        connected
+        minimal
+        onLibraryChange={noop}
+        onOpenChat={noop}
+        onImmersiveChange={noop}
+      />,
+    );
+    await waitFor(() => expect(document.querySelector("video")).not.toBeNull());
+    expect(document.querySelector("video")?.getAttribute("src")).toContain(asset.asset_id);
+    expect(
+      fetcher.mock.calls.filter(([url]) => /\/open$|\/courses\/[^/]+\/videos$/.test(url)),
+    ).toHaveLength(0);
+  });
+
   it("关闭当前视频会使仍在途的打开回调失效，不反弹已经关闭的标签", async () => {
     let release: (() => void) | undefined;
     vi.stubGlobal(

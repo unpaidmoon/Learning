@@ -51,7 +51,9 @@ def read_account_picture(url):
                                     "Accept-Encoding": "identity"},
                            extensions={"sni_hostname": parts.hostname}) as response:
             media = response.headers.get("content-type", "").split(";", 1)[0].strip().lower()
-            if response.status_code != 200 or media not in {"image/png", "image/jpeg", "image/webp"}:
+            if response.status_code != 200 or media not in {
+                "image/png", "image/jpeg", "image/webp", "application/octet-stream", "binary/octet-stream",
+            }:
                 raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像暂时无法加载", 502)
             raw = bytearray()
             for chunk in response.iter_bytes(chunk_size=65536):
@@ -61,5 +63,8 @@ def read_account_picture(url):
     with Image.open(io.BytesIO(raw)) as image:
         if image.format not in {"PNG", "JPEG", "WEBP"} or image.width * image.height > 4_000_000:
             raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像格式不受支持", 502)
+        actual_media = Image.MIME[image.format]
+        if media.startswith("image/") and media != actual_media:
+            raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像格式与内容不一致", 502)
         image.verify()
-    return bytes(raw), media
+    return bytes(raw), actual_media

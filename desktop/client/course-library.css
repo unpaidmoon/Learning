@@ -8,7 +8,7 @@
 .learning-workspace-row .learning-workspace-name { flex: 1; min-width: 0; height: 32px; padding-inline: 0; justify-content: flex-start; text-align: start; background: transparent; font-size: 14px; font-weight: 400; }
 .learning-workspace-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .learning-workspace-pin { display: inline-flex; align-items: center; color: var(--dsw-alias-label-tertiary); flex: none; }
-.learning-workspace-row .learning-workspace-actions { flex: none; width: 20px; height: 24px; padding: 0; opacity: 0; pointer-events: none; }
+.learning-course-directory .learning-workspace-row .learning-workspace-actions { flex: none; width: 20px; height: 24px; padding: 0; opacity: 0; pointer-events: none; }
 .learning-course-directory[data-pointer-inside='true'] .learning-workspace-row:is(:hover, :has(:focus-visible), [data-menu-open='true']) .learning-workspace-actions { opacity: 1; pointer-events: auto; }
 .learning-workspace-row .learning-workspace-toggle { flex: none; width: 20px; height: 28px; padding: 0; background: transparent; color: var(--dsw-alias-label-tertiary); }
 .learning-workspace-folder, .learning-workspace-chevron { align-items: center; justify-content: center; }

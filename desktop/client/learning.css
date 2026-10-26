@@ -50,6 +50,8 @@ html[data-windows-titlebar] [data-learning-region='courses'] [data-slot='sidebar
 [data-learning-frame][data-learning-ai-collapsed='true'] { grid-template-columns: var(--learning-course-width, 240px) minmax(0, 1fr) 0 !important; }
 [data-learning-ai-collapsed='true'] [data-learning-region='ai'] { display: none; }
 .learning-materials { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; background: var(--dsw-alias-bg-base); }
+.learning-materials:has(> .learning-ai-rail) { padding-right: 36px; box-sizing: border-box; }
+.learning-ai-rail { position: absolute; inset: 0 0 0 auto; width: 36px; box-sizing: border-box; display: flex; justify-content: center; padding-top: 8px; border-left: 1px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base); }
 .learning-material-tabs { flex: none; min-height: 43px; display: flex; align-items: center; gap: 4px; overflow-x: auto; padding: 4px 8px; border-bottom: 1px solid var(--dsw-alias-border-l3, #ddd); }
 .learning-material-tab { display: inline-flex; align-items: center; flex: none; }
 .learning-material-tab > :first-child { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
