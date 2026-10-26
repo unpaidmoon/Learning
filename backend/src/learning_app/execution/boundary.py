@@ -31,6 +31,7 @@ from urllib.parse import urlsplit
 from .continuation_routing import resolve_tool_result_continuation
 from .native_tools import NativeCallRegistry, ToolRejected
 from .provider_tool_calls import ProviderToolCalls
+from .selection import native_thinking
 from .types import ExecutionPolicy
 
 OFFICIAL_HOST = "api.deepseek.com"
@@ -306,6 +307,7 @@ class MessagesBoundary:
         self.ledger = OutboundLedger(self.run_dir / "boundary-ledger.jsonl")
         self._lock = threading.RLock()
         self._condition = threading.Condition(self._lock)
+        self._title_requests = {}
         previous: dict[str, dict[str, Any]] = {}
         for entry in self.ledger.entries:
             if entry.get("event") in {"request_received", "request_finished", "request_reconciled"}:
@@ -419,7 +421,7 @@ class MessagesBoundary:
                             owner._requests.discard(threading.current_thread())
                             owner._sockets.discard(request)
                             row = owner._native_connections.pop(request, None)
-                            if row is not None and owner.native_registry is not None:
+                            if row is not None and owner.native_registry is not None and row.get("purpose") != "session-title":
                                 owner.native_registry.network_closed(
                                     row, downstream_closed=request.fileno() == -1
                                 )
@@ -482,6 +484,25 @@ class MessagesBoundary:
             )
             self._server_thread.start()
         return self
+
+    def register_title(self, identity, session_id, text, model, thinking):
+        """One private native title request; never acquires learning tools or image scope."""
+        if not isinstance(text, str) or len(text.encode("utf-8")) > 64 * 1024:
+            raise ValueError("TITLE_INPUT_TOO_LARGE")
+        title_input = "Generate a concise session title for this human message:\n" + json.dumps(text, ensure_ascii=False)
+        policy = ExecutionPolicy(model=model, thinking=thinking, max_output_tokens=4096,
+                                 timeout_seconds=60, allowed_image_sha256=(), exact_image_sequence=True)
+        self.bind(identity, model=model, thinking=thinking, policy=policy)
+        with self._lock:
+            if identity in self._title_requests:
+                raise ValueError("TITLE_ALREADY_REGISTERED")
+            scope = {"request_id": identity, "session_id": session_id, "input": title_input,
+                     "model": model, "thinking": native_thinking(thinking), "max_tokens": 4096,
+                     "token": secrets.token_urlsafe(32), "consumed": False}
+            self._title_requests[identity] = scope
+        self.ledger.append({"event": "session_title_registered", "request_id": identity,
+                            "session_id": session_id, "input_sha256": _sha256(title_input.encode())})
+        return {key: value for key, value in scope.items() if key != "consumed"}
 
     def bind(
         self,
@@ -968,19 +989,34 @@ class MessagesBoundary:
                 if len(session_headers) > 1:
                     raise ValueError("CONTINUATION_SESSION_HEADER_AMBIGUOUS")
                 native_session_id = session_headers[0] if session_headers else None
-                generation_id = self._resolve_generation(request, session_id=native_session_id)
+                title_ids = handler.headers.get_all("x-learning-title-id", [])
+                title_request = None
+                if title_ids:
+                    title_request = self._title_requests.get(title_ids[0]) if len(title_ids) == 1 else None
+                    supplied = handler.headers.get_all("x-learning-title-token", [])
+                    if (title_request is None or title_request["consumed"] or len(supplied) != 1
+                        or not secrets.compare_digest(supplied[0], title_request["token"])
+                        or native_session_id != title_request["session_id"]
+                        or images or request.get("tools")
+                        or request.get("messages") != [{"role": "user", "content": [{"type": "text", "text": title_request["input"]}]}]):
+                        raise ValueError("TITLE_REQUEST_DENIED")
+                    title_request["consumed"] = True
+                    generation_id = title_request["request_id"]
+                else:
+                    generation_id = self._resolve_generation(request, session_id=native_session_id)
             except ValueError:
                 self.ledger.append({"event": "generation_binding_rejected"})
                 return self._reject(handler, 403, "GENERATION_BINDING_REJECTED")
-            scenario = copy.deepcopy(self._scenario)
-            if self._scenario.get("fault_once"):
+            scenario = ({"text_chunks": ["条件独立的理解"]} if title_request else copy.deepcopy(self._scenario))
+            if not title_request and self._scenario.get("fault_once"):
                 self._scenario.pop("fault", None)
                 self._scenario.pop("fault_once", None)
-            if self._scenario.get("tool_calls") and not self._scenario.get("repeat_tools", False):
+            if not title_request and self._scenario.get("tool_calls") and not self._scenario.get("repeat_tools", False):
                 self._scenario.pop("tool_calls", None)
             row: dict[str, Any] = {
                 "request_id": f"boundary-{uuid.uuid4().hex}",
                 "generation_id": generation_id,
+                "purpose": "session-title" if title_request else "agent-loop",
                 "native_session_id": native_session_id
                 if native_session_id in self._continuation_sessions
                 else None,
@@ -1005,7 +1041,7 @@ class MessagesBoundary:
             handler.native_row = row
         observer = UsageObserver(row["request_id"])
         try:
-            if self.native_registry is not None:
+            if self.native_registry is not None and not title_request:
                 supplied = handler.headers.get_all("x-learning-dispatch-id", [])
                 if len(supplied) != 1:
                     self._update(row, status="native_attribution_denied")
@@ -1018,7 +1054,7 @@ class MessagesBoundary:
                 os.fsync(raw.fileno())
             self.ledger.append({"event": "request_received", **row})
             self._event("request_received", row)
-            if self.native_registry is not None:
+            if self.native_registry is not None and not title_request:
                 validator = getattr(self.native_registry.business_port, "validate_model_images", None)
                 if validator is not None:
                     validator(generation_id, request, _image_summary)
@@ -1056,7 +1092,7 @@ class MessagesBoundary:
                 cancel_observed=not controlled and not self._stop.is_set(),
             )
         finally:
-            if self.native_registry is not None:
+            if self.native_registry is not None and not title_request:
                 self.native_registry.finish_attempt(
                     row,
                     "completed"
@@ -1088,7 +1124,7 @@ class MessagesBoundary:
 
     def _observe(self, observer: UsageObserver, chunk: bytes, row: dict[str, Any]) -> list[str]:
         names: list[str] = []
-        if self.native_registry is not None:
+        if self.native_registry is not None and row.get("purpose") != "session-title":
             self.native_registry.feed(row, chunk)
         for event in observer.feed(chunk):
             name = event.get("type", "unknown_provider_event")

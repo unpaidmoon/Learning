@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 
 type IconName =
   | "folder"
+  | "search"
+  | "archive"
   | "file"
   | "chat"
   | "plus"
@@ -30,6 +32,8 @@ type IconName =
   | "file-text"
   | "file-pdf";
 const paths: Record<IconName, string> = {
+  search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
+  archive: "M4 8h16v13H4V8ZM3 3h18v5H3V3ZM9 12h6",
   folder: "M3 7V5a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z",
   file: "M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5Zm0 0v5h5M8 12h8M8 16h6",
   chat: "M21 11a8 8 0 0 1-8 8H8l-5 3V11a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8ZM8 9h8M8 13h5",

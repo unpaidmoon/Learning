@@ -81,6 +81,8 @@ def create_app(
         app.state.service = GenerationService(
             app.state.repository, config, execution=execution, execution_factory=execution_factory
         )
+        if config.desktop_enabled:
+            app.state.service.prepare_native_title = app.state.desktop_gateway.prepare_title
         await app.state.service.open()
         from learning_app.workbench.executor import TaskExecutor
 

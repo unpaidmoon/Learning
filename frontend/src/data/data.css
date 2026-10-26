@@ -41,3 +41,91 @@
 .data-confirm button {
   margin-right: 8px;
 }
+
+.learning-settings-heading {
+  margin: 0 0 20px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.learning-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.learning-setting-copy {
+  min-width: 0;
+  flex: 1;
+}
+.learning-setting-title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.data-settings .learning-setting-description,
+.runtime-startup-setting .learning-setting-description {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 18px;
+}
+.learning-setting-row > button {
+  flex-shrink: 0;
+}
+.data-location {
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+.data-location .data-path {
+  margin: 8px 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+.data-storage-usage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 12px;
+}
+.data-storage-usage dt {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 18px;
+}
+.data-storage-usage dd {
+  margin: 4px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.data-export-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.data-history-heading {
+  margin: 24px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.data-operations:empty {
+  display: none;
+}
+@media (max-width: 600px) {
+  .data-settings .learning-setting-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .data-settings .learning-setting-copy {
+    flex-basis: 100%;
+  }
+}

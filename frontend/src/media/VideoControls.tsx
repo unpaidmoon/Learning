@@ -36,6 +36,7 @@ function PlayerIcon({ kind }: { kind: "play" | "pause" | "volume" | "muted" | "f
 }
 
 export function VideoControls({
+  RateControl,
   playing,
   elapsed,
   duration,
@@ -51,6 +52,7 @@ export function VideoControls({
   onVolume,
   onRate,
 }: {
+  RateControl?: ComponentType<{ rate: number; onRate: (rate: number) => void }>;
   playing: boolean;
   elapsed: number;
   duration: number;
@@ -210,17 +212,21 @@ export function VideoControls({
             onChange={(event) => onVolume(Number(event.target.value))}
           />
         </div>
-        <select
-          aria-label="播放倍速"
-          value={rate}
-          onChange={(event) => onRate(Number(event.target.value))}
-        >
-          {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((value) => (
-            <option key={value} value={value}>
-              {value}×
-            </option>
-          ))}
-        </select>
+        {RateControl ? (
+          <RateControl rate={rate} onRate={onRate} />
+        ) : (
+          <select
+            aria-label="播放倍速"
+            value={rate}
+            onChange={(event) => onRate(Number(event.target.value))}
+          >
+            {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((value) => (
+              <option key={value} value={value}>
+                {value}×
+              </option>
+            ))}
+          </select>
+        )}
         <button
           type="button"
           aria-label="视频全屏"
@@ -234,5 +240,5 @@ export function VideoControls({
   );
 }
 import { useEffect, useRef, useState } from "react";
-import type { PointerEvent } from "react";
+import type { PointerEvent, ComponentType } from "react";
 import { SeekPreview } from "./SeekPreview";

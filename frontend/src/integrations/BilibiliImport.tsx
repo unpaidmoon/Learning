@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
+import { Icon } from "../components/ui/Icon";
 import "./integrations.css";
 import { FavoriteBrowser } from "./FavoriteBrowser";
 import { CataloguePage } from "./CataloguePage";
@@ -12,13 +13,20 @@ type Props = {
   destinationPath?: string;
   connected: boolean;
   onImported: () => void;
+  hideTrigger?: boolean;
 };
 
 export function BilibiliImport(props: Props) {
   return <CourseBilibiliImport key={props.courseId} {...props} />;
 }
 
-function CourseBilibiliImport({ courseId, destinationPath = "", connected, onImported }: Props) {
+function CourseBilibiliImport({
+  courseId,
+  destinationPath = "",
+  connected,
+  onImported,
+  hideTrigger,
+}: Props) {
   const [importPath, setImportPath] = useState(destinationPath);
   const [manualOpen, setOpen] = useState(false);
   const requested = useSyncExternalStore(subscribeBilibiliUi, () => bilibiliOpenRequest(courseId));
@@ -35,8 +43,11 @@ function CourseBilibiliImport({ courseId, destinationPath = "", connected, onImp
   const [catalogueId, setCatalogueId] = useState<string | null>(null);
   const alive = useRef(true);
   useEffect(() => {
-    if (requested > 0) setImportPath(destinationPath);
-  }, [requested]);
+    // Capture the folder at the explicit open gesture, not subsequent browsing.
+    return subscribeBilibiliUi(() => {
+      if (bilibiliOpenRequest(courseId) > 0) setImportPath(destinationPath);
+    });
+  }, [courseId, destinationPath]);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -151,21 +162,41 @@ function CourseBilibiliImport({ courseId, destinationPath = "", connected, onImp
     });
   return (
     <div className="integration-import">
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={!connected || busy}
-        onClick={() => {
-          closeBilibiliImport(courseId);
-          if (!open) setImportPath(destinationPath);
-          setOpen(!open);
-        }}
-        aria-expanded={open}
-      >
-        导入B站链接
-      </Button>
+      {!hideTrigger && (
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!connected || busy}
+          onClick={() => {
+            closeBilibiliImport(courseId);
+            if (!open) setImportPath(destinationPath);
+            setOpen(!open);
+          }}
+          aria-expanded={open}
+        >
+          导入B站链接
+        </Button>
+      )}
       {open && (
         <section className="integration-import-body" aria-label="导入B站资料">
+          {hideTrigger && (
+            <div className="integration-import-heading">
+              <span>导入B站资料</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="关闭B站导入"
+                title="关闭"
+                disabled={busy}
+                onClick={() => {
+                  setOpen(false);
+                  closeBilibiliImport(courseId);
+                }}
+              >
+                <Icon name="close" size={16} />
+              </Button>
+            </div>
+          )}
           <p className="muted">保存到：{importPath || "当前课程根目录"}</p>
           <FavoriteBrowser disabled={busy || !!pending} onSelect={changeLink} />
           <label>

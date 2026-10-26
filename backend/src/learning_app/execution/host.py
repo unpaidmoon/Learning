@@ -162,6 +162,10 @@ class HarnessHost:
         profile = profile.replace('"__MAX_TOKENS__"', str(self.max_tokens))
         profile = profile.replace('"__TIMEOUT_MS__"', str(int(self.timeout * 1000)))
         effective_profile = json.loads(profile)
+        if not self.desktop_enabled:
+            for item in effective_profile:
+                if item.get("id") == "session-title-llm":
+                    item["disabled"] = True
         preferences = self.home / "learning-desktop-settings.json"
         if self.desktop_enabled and preferences.is_file():
             try:
@@ -322,6 +326,14 @@ class HarnessHost:
             )
             if response.status_code != 200:
                 raise ExecutionError("HARNESS_EXECUTION_POLICY_REJECTED")
+
+    async def configure_title(self, scope: dict) -> None:
+        async with httpx.AsyncClient(trust_env=False, timeout=8) as client:
+            response = await client.post(
+                f"http://127.0.0.1:{self.control_port}/session-titles",
+                headers={"X-Learning-Harness-Control": self._control_token}, json=scope)
+            if response.status_code != 200:
+                raise ExecutionError("HARNESS_TITLE_SCOPE_REJECTED")
 
     async def prepare_document_images(self, value: dict) -> list[dict]:
         async with httpx.AsyncClient(trust_env=False, timeout=35) as client:

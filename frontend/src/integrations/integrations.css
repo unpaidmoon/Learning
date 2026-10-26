@@ -3,6 +3,12 @@
   display: grid;
   gap: 0.75rem;
 }
+.integration-import-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
 .integration-module {
   display: flex;
   align-items: center;

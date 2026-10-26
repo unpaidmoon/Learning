@@ -6,6 +6,7 @@ import type {
   KeyboardEvent,
   MouseEvent,
   ReactNode,
+  ComponentType,
 } from "react";
 import { api, ApiError, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
@@ -17,6 +18,9 @@ import { BilibiliSourceRecovery } from "../integrations/BilibiliSourceRecovery";
 import { droppedItems, MAX_UPLOAD_BYTES, type IncomingFile } from "./dropFiles";
 import { useFileOperation } from "./fileOperations";
 import "./library.css";
+import { FileToolbar } from "./FileToolbar";
+import type { FileMenuProps } from "./FileToolbar";
+import { requestBilibiliImport } from "../integrations/bilibiliUi";
 
 type Entry = Schema<"CourseFileEntry">;
 type Listing = Schema<"CourseFileListResponse">;
@@ -99,6 +103,7 @@ export function FileManager({
   onChanged,
   compact = false,
   renderFileIcon,
+  MenuComponent,
 }: {
   courseId: string;
   connected: boolean;
@@ -109,6 +114,7 @@ export function FileManager({
   onChanged?: () => void;
   compact?: boolean;
   renderFileIcon?: (entry: Entry) => ReactNode;
+  MenuComponent?: ComponentType<FileMenuProps>;
 }) {
   const [navigation, setNavigation] = useState({ paths: [path || ""], at: 0 });
   const currentPath = path ?? navigation.paths[navigation.at];
@@ -884,68 +890,156 @@ export function FileManager({
       }}
       onDrop={(event) => drop(event)}
     >
-      <div className="file-manager-navigation">
-        <button
-          className="icon-button"
-          aria-label="后退"
-          title="后退"
-          disabled={navigation.at === 0}
-          onClick={() => navigate(navigation.paths[navigation.at - 1], navigation.at - 1)}
-        >
-          <Icon name="back" />
-        </button>
-        <button
-          className="icon-button"
-          aria-label="前进"
-          title="前进"
-          disabled={navigation.at === navigation.paths.length - 1}
-          onClick={() => navigate(navigation.paths[navigation.at + 1], navigation.at + 1)}
-        >
-          <Icon name="forward" />
-        </button>
-        <button
-          className="icon-button"
-          aria-label="上一级"
-          title="上一级"
-          disabled={!currentPath}
-          onClick={() => navigate(parentPath(currentPath))}
-        >
-          <Icon name="up" />
-        </button>
-        <nav className="file-manager-breadcrumbs" aria-label="文件夹位置">
-          <button onClick={() => navigate("")} title={listing?.root_path || ""}>
-            <Icon name="folder" size={15} />
-            {listing?.title || "课程文件"}
-          </button>
-          {breadcrumbs.map((part, index) => (
-            <span key={breadcrumbs.slice(0, index + 1).join("/")}>
-              <span aria-hidden="true">›</span>
-              <button onClick={() => navigate(breadcrumbs.slice(0, index + 1).join("/"))}>
-                {part}
-              </button>
-            </span>
-          ))}
-        </nav>
-        <button
-          className="icon-button"
-          aria-label="刷新文件"
-          title="刷新文件"
-          disabled={loading}
-          onClick={refresh}
-        >
-          <Icon name="refresh" />
-        </button>
-        <input
-          className="file-manager-search"
-          aria-label="搜索当前文件夹"
-          placeholder="搜索当前文件夹"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
+      {MenuComponent ? (
+        <FileToolbar
+          Menu={MenuComponent}
+          query={query}
+          onQuery={setQuery}
+          sort={sort}
+          view={view}
+          onSort={setSort}
+          onView={setView}
+          disabled={disabled}
+          loading={loading}
+          onFiles={(files) =>
+            void run(() => upload(files.map((file) => ({ file, path: file.name }))))
+          }
+          onAction={(id) => {
+            if (id === "directory" || id === "rename" || id === "move" || id === "properties")
+              show(id);
+            else if (id === "paste") paste();
+            else if (id === "refresh") refresh();
+            else if (id === "bilibili") requestBilibiliImport(courseId);
+            else if (id === "copy" || id === "cut") copySelection(id === "cut" ? "move" : "copy");
+            else if (id === "recycle") recycle();
+          }}
+          selectionActions={
+            selection.length
+              ? [
+                  { id: "copy", label: "复制", disabled },
+                  { id: "cut", label: "剪切", disabled },
+                  { id: "rename", label: "重命名", disabled: disabled || selection.length !== 1 },
+                  { id: "move", label: "移动到…", disabled },
+                  { id: "recycle", label: "移入回收站", disabled },
+                  { id: "properties", label: "属性", disabled: !ready || selection.length !== 1 },
+                ]
+              : []
+          }
+          navigation={
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="后退"
+                title="后退"
+                disabled={navigation.at === 0}
+                onClick={() => navigate(navigation.paths[navigation.at - 1], navigation.at - 1)}
+              >
+                <Icon name="back" size={17} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="前进"
+                title="前进"
+                disabled={navigation.at === navigation.paths.length - 1}
+                onClick={() => navigate(navigation.paths[navigation.at + 1], navigation.at + 1)}
+              >
+                <Icon name="forward" size={17} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="上一级"
+                title="上一级"
+                disabled={!currentPath}
+                onClick={() => navigate(parentPath(currentPath))}
+              >
+                <Icon name="up" size={17} />
+              </Button>
+              <nav
+                className="file-manager-breadcrumbs"
+                aria-label="文件夹位置"
+                title={[listing?.title, ...breadcrumbs].join(" / ")}
+              >
+                <button onClick={() => navigate("")}>{listing?.title || "当前工作区"}</button>
+                {breadcrumbs.map((part, index) => (
+                  <span key={index}>
+                    <span aria-hidden="true">›</span>
+                    <button onClick={() => navigate(breadcrumbs.slice(0, index + 1).join("/"))}>
+                      {part}
+                    </button>
+                  </span>
+                ))}
+              </nav>
+            </>
+          }
         />
-      </div>
+      ) : (
+        <div className="file-manager-navigation">
+          <button
+            className="icon-button"
+            aria-label="后退"
+            title="后退"
+            disabled={navigation.at === 0}
+            onClick={() => navigate(navigation.paths[navigation.at - 1], navigation.at - 1)}
+          >
+            <Icon name="back" />
+          </button>
+          <button
+            className="icon-button"
+            aria-label="前进"
+            title="前进"
+            disabled={navigation.at === navigation.paths.length - 1}
+            onClick={() => navigate(navigation.paths[navigation.at + 1], navigation.at + 1)}
+          >
+            <Icon name="forward" />
+          </button>
+          <button
+            className="icon-button"
+            aria-label="上一级"
+            title="上一级"
+            disabled={!currentPath}
+            onClick={() => navigate(parentPath(currentPath))}
+          >
+            <Icon name="up" />
+          </button>
+          <nav className="file-manager-breadcrumbs" aria-label="文件夹位置">
+            <button onClick={() => navigate("")} title={listing?.root_path || ""}>
+              <Icon name="folder" size={15} />
+              {listing?.title || "课程文件"}
+            </button>
+            {breadcrumbs.map((part, index) => (
+              <span key={breadcrumbs.slice(0, index + 1).join("/")}>
+                <span aria-hidden="true">›</span>
+                <button onClick={() => navigate(breadcrumbs.slice(0, index + 1).join("/"))}>
+                  {part}
+                </button>
+              </span>
+            ))}
+          </nav>
+          <button
+            className="icon-button"
+            aria-label="刷新文件"
+            title="刷新文件"
+            disabled={loading}
+            onClick={refresh}
+          >
+            <Icon name="refresh" />
+          </button>
+          <input
+            className="file-manager-search"
+            aria-label="搜索当前文件夹"
+            placeholder="搜索当前文件夹"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
+      )}
       <BilibiliImport
+        hideTrigger={!!MenuComponent}
         courseId={courseId}
-        destinationPath={path}
+        destinationPath={currentPath}
         connected={connected}
         onImported={() => {
           onChanged?.();
@@ -957,95 +1051,97 @@ export function FileManager({
         entry={selectedEntries.length === 1 ? selectedEntries[0] : null}
         disabled={disabled}
       />
-      <div className="file-manager-toolbar" role="toolbar" aria-label="文件操作">
-        <div className="file-manager-actions">
-          {actionButtons()}
-          {compact && (
-            <details
-              className="file-manager-more"
-              onKeyDown={(event) => event.stopPropagation()}
-              onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget))
-                  event.currentTarget.removeAttribute("open");
-              }}
-            >
-              <summary aria-label="更多文件操作" title="更多文件操作">
-                <Icon name="more" />
-              </summary>
-              <div
-                className="file-actions-menu"
-                role="menu"
-                aria-label="更多文件操作"
-                onClick={(event) => {
-                  if ((event.target as Element).closest("button"))
-                    event.currentTarget.parentElement?.removeAttribute("open");
-                }}
-                onKeyDown={(event) => {
-                  const buttons = [
-                    ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
-                      "button:not(:disabled)",
-                    ),
-                  ];
-                  const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-                  if (event.key === "Escape") {
-                    event.currentTarget.parentElement?.removeAttribute("open");
-                    event.currentTarget.parentElement
-                      ?.querySelector<HTMLElement>("summary")
-                      ?.focus();
-                  } else if (
-                    ["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) &&
-                    buttons.length
-                  ) {
-                    event.preventDefault();
-                    const next =
-                      event.key === "Home"
-                        ? 0
-                        : event.key === "End"
-                          ? buttons.length - 1
-                          : (index + (event.key === "ArrowUp" ? -1 : 1) + buttons.length) %
-                            buttons.length;
-                    buttons[next]?.focus();
-                  }
+      {!MenuComponent && (
+        <div className="file-manager-toolbar" role="toolbar" aria-label="文件操作">
+          <div className="file-manager-actions">
+            {actionButtons()}
+            {compact && (
+              <details
+                className="file-manager-more"
+                onKeyDown={(event) => event.stopPropagation()}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget))
+                    event.currentTarget.removeAttribute("open");
                 }}
               >
-                {actionButtons(true)}
-              </div>
-            </details>
-          )}
+                <summary aria-label="更多文件操作" title="更多文件操作">
+                  <Icon name="more" />
+                </summary>
+                <div
+                  className="file-actions-menu"
+                  role="menu"
+                  aria-label="更多文件操作"
+                  onClick={(event) => {
+                    if ((event.target as Element).closest("button"))
+                      event.currentTarget.parentElement?.removeAttribute("open");
+                  }}
+                  onKeyDown={(event) => {
+                    const buttons = [
+                      ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                        "button:not(:disabled)",
+                      ),
+                    ];
+                    const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+                    if (event.key === "Escape") {
+                      event.currentTarget.parentElement?.removeAttribute("open");
+                      event.currentTarget.parentElement
+                        ?.querySelector<HTMLElement>("summary")
+                        ?.focus();
+                    } else if (
+                      ["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) &&
+                      buttons.length
+                    ) {
+                      event.preventDefault();
+                      const next =
+                        event.key === "Home"
+                          ? 0
+                          : event.key === "End"
+                            ? buttons.length - 1
+                            : (index + (event.key === "ArrowUp" ? -1 : 1) + buttons.length) %
+                              buttons.length;
+                      buttons[next]?.focus();
+                    }
+                  }}
+                >
+                  {actionButtons(true)}
+                </div>
+              </details>
+            )}
+          </div>
+          <div className="file-manager-view">
+            <label className="sr-only" htmlFor={`file-sort-${courseId}`}>
+              排序方式
+            </label>
+            <select
+              id={`file-sort-${courseId}`}
+              aria-label="排序方式"
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+            >
+              <option value="name">名称</option>
+              <option value="type">类型</option>
+              <option value="size">大小</option>
+              <option value="modified">修改时间</option>
+            </select>
+            <button
+              aria-label="图标视图"
+              title="图标视图"
+              aria-pressed={view === "icons"}
+              onClick={() => setView("icons")}
+            >
+              <Icon name="grid" />
+            </button>
+            <button
+              aria-label="列表视图"
+              title="列表视图"
+              aria-pressed={view === "list"}
+              onClick={() => setView("list")}
+            >
+              <Icon name="list" />
+            </button>
+          </div>
         </div>
-        <div className="file-manager-view">
-          <label className="sr-only" htmlFor={`file-sort-${courseId}`}>
-            排序方式
-          </label>
-          <select
-            id={`file-sort-${courseId}`}
-            aria-label="排序方式"
-            value={sort}
-            onChange={(event) => setSort(event.target.value)}
-          >
-            <option value="name">名称</option>
-            <option value="type">类型</option>
-            <option value="size">大小</option>
-            <option value="modified">修改时间</option>
-          </select>
-          <button
-            aria-label="图标视图"
-            title="图标视图"
-            aria-pressed={view === "icons"}
-            onClick={() => setView("icons")}
-          >
-            <Icon name="grid" />
-          </button>
-          <button
-            aria-label="列表视图"
-            title="列表视图"
-            aria-pressed={view === "list"}
-            onClick={() => setView("list")}
-          >
-            <Icon name="list" />
-          </button>
-        </div>
-      </div>
+      )}
       {error && (
         <p role="alert" className="file-manager-error">
           {error}

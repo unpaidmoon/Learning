@@ -9,7 +9,7 @@
   },
   {
     "id": "session-title-llm",
-    "disabled": true
+    "disabled": false
   },
   {
     "id": "session-log-deepseek",

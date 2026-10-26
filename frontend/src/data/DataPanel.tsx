@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ComponentType } from "react";
 import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
@@ -21,7 +22,33 @@ const names: Record<string, string> = {
 };
 const bytes = (value: number) => `${(value / 1024 / 1024).toFixed(1)} MB`;
 
-export function DataPanel({ beforeSave }: { beforeSave?: () => Promise<void> }) {
+type CheckboxProps = {
+  checked: boolean;
+  disabled: boolean;
+  label: string;
+  onChange: (value: boolean) => void;
+};
+function ExportCheckbox({ checked, disabled, label, onChange }: CheckboxProps) {
+  return (
+    <label>
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      {label}
+    </label>
+  );
+}
+
+export function DataPanel({
+  beforeSave,
+  CheckboxControl = ExportCheckbox,
+}: {
+  beforeSave?: () => Promise<void>;
+  CheckboxControl?: ComponentType<CheckboxProps>;
+}) {
   const [info, setInfo] = useState<Schema<"DataLocationResponse"> | null>(null);
   const [originals, setOriginals] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -114,17 +141,32 @@ export function DataPanel({ beforeSave }: { beforeSave?: () => Promise<void> }) 
   };
   return (
     <section className="data-settings" aria-label="数据管理">
+      <h2 className="learning-settings-heading">数据与存储</h2>
       {error && <p role="alert">{error}</p>}
       {status && <p role="status">{status}</p>}
       {info ? (
         <>
-          <p>软件数据位置</p>
-          <p className="data-path">{info.data_directory}</p>
-          <p>
-            学习数据 {bytes(info.business_bytes)} · 执行记录 {bytes(info.execution_bytes)} ·
-            预览缓存 {bytes(info.cache_bytes)}
-          </p>
-          <p>课程原视频和课件在各自课程目录，不计入上述占用。</p>
+          <div className="data-location">
+            <div className="learning-setting-title">软件数据位置</div>
+            <p className="data-path">{info.data_directory}</p>
+            <dl className="data-storage-usage">
+              <div>
+                <dt>学习数据</dt>
+                <dd>{bytes(info.business_bytes)}</dd>
+              </div>
+              <div>
+                <dt>执行记录</dt>
+                <dd>{bytes(info.execution_bytes)}</dd>
+              </div>
+              <div>
+                <dt>预览缓存</dt>
+                <dd>{bytes(info.cache_bytes)}</dd>
+              </div>
+            </dl>
+            <p className="learning-setting-description">
+              课程原视频和课件保留在各自课程目录，不计入上述占用。
+            </p>
+          </div>
           {info.pending_operation_id && (
             <p role="status">
               有数据切换等待安全退出。{" "}
@@ -141,44 +183,61 @@ export function DataPanel({ beforeSave }: { beforeSave?: () => Promise<void> }) 
               </Button>
             </p>
           )}
-          <div className="data-actions">
-            <label>
-              <input
-                type="checkbox"
+          <div className="learning-setting-row data-export-row">
+            <div className="learning-setting-copy">
+              <div className="learning-setting-title">导出软件数据</div>
+              <p className="learning-setting-description">
+                保存学习记录、聊天、已提交图片、字幕及成果。解压后打开
+                offline/index.html，可断网查看聊天；不包含登录凭据和模型运行环境。
+              </p>
+              <CheckboxControl
+                label="包含全部课程原件"
                 checked={originals}
                 disabled={busy || exiting}
-                onChange={(event) => setOriginals(event.target.checked)}
+                onChange={setOriginals}
               />
-              包含全部课程原件
-            </label>
+            </div>
             <Button
+              variant="outline"
+              size="sm"
               disabled={busy || exiting || pending.length > 0}
               onClick={() => void perform(() => start("export"))}
             >
               导出全部软件数据
             </Button>
           </div>
-          <p>
-            默认包含学习记录、聊天、已提交图片、字幕及成果。解压后打开
-            offline/index.html，可断网查看聊天。登录凭据和模型运行环境不进入导出包。
-          </p>
-          <div className="data-actions">
+          <div className="learning-setting-row">
+            <div className="learning-setting-copy">
+              <div className="learning-setting-title">导入软件数据</div>
+              <p className="learning-setting-description">
+                从数据包恢复到独立新目录。旧回答和任务保留为历史，不会自动重新生成。
+              </p>
+            </div>
             <Button
+              variant="outline"
+              size="sm"
               disabled={busy || exiting || pending.length > 0}
               onClick={() => void perform(() => start("import"))}
             >
               选择数据包导入
             </Button>
+          </div>
+          <div className="learning-setting-row">
+            <div className="learning-setting-copy">
+              <div className="learning-setting-title">迁移数据目录</div>
+              <p className="learning-setting-description">
+                选择目标文件夹后创建独立新目录，校验完成后确认退出并切换，原数据目录保留。
+              </p>
+            </div>
             <Button
+              variant="outline"
+              size="sm"
               disabled={busy || exiting || pending.length > 0}
               onClick={() => void perform(() => start("move"))}
             >
               迁移软件数据目录
             </Button>
           </div>
-          <p>
-            选择目标文件夹后会创建独立新目录，校验完成后再确认退出切换。导入的旧回答和任务保留为历史，不会自动重新生成。
-          </p>
           {switching && (
             <div role="alertdialog" aria-label="确认数据切换" className="data-confirm">
               <p>退出并切换至 {String(switching.result?.target || "新数据目录")}？</p>
@@ -191,6 +250,7 @@ export function DataPanel({ beforeSave }: { beforeSave?: () => Promise<void> }) 
               </Button>
             </div>
           )}
+          {info.operations.length > 0 && <h3 className="data-history-heading">最近操作</h3>}
           <ol className="data-operations">
             {info.operations.map((row) => (
               <li key={row.operation_id}>

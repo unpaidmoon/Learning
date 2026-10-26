@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import { NativeLease } from './native-lease.mjs';
 import { NativeAttempts } from './native-attempt.mjs';
+import { NativeTitles } from './native-titles.mjs';
 import { recoverReadonlyLease, proveToolStop } from './native-recovery.mjs';
 import http from 'node:http';
 import https from 'node:https';
@@ -45,6 +46,7 @@ const reconcileRunsPath = process.env.LEARNING_HARNESS_RECONCILE_RUNS_PATH;
 const reconcileOnlyRuns = new Set(reconcileRunsPath ? JSON.parse(fs.readFileSync(reconcileRunsPath, 'utf8')) : []);
 const leases = new NativeLease(executionPolicies);
 const attempts = new NativeAttempts(endpoint, leases);
+const titles = new NativeTitles(endpoint, audit);
 leases.attempts = attempts;
 function acceptExecutionPolicy(policy) {
   const routed = policy && (Object.hasOwn(policy, 'request_id') || Object.hasOwn(policy, 'epoch'));
@@ -115,6 +117,8 @@ globalThis.fetch = async function(input, init) {
   } catch (error) {
     return Promise.reject(error);
   }
+  const title = titles.decorate(input, init);
+  if (title) return originalFetch.call(this, title.input, title.init);
   if (!businessEndpoint) return originalFetch.call(this, input, init);
   const decorated = attempts.decorate(input, init);
   const response = await originalFetch.call(this, decorated.input, decorated.init);
@@ -426,6 +430,7 @@ export function apply(ctx) {
     required: true, interpolate: false, text: ({ agent }) => agent && revisions.get(agent.id)
       ? `BUSINESS_CONTEXT_REVISION_${revisions.get(agent.id)}` : '' });
   ctx.on('llm/stream', function(options, next) {
+    if (options.purpose === 'session-title') return titles.stream(ctx, options, next);
     const policy = executionPolicies.get(String(options.sessionId || ''));
     if (policy && reconcileOnlyRuns.has(policy.run_id)) {
       audit('reconcile-dispatch-denied', { runId: policy.run_id });
@@ -526,6 +531,17 @@ export function apply(ctx) {
         if (agent) await configureAgentSurface(agent);
         res.end(JSON.stringify(receipt));
       } catch (error) { audit('lease-control-denied', { code: error.message }); res.writeHead(409).end(JSON.stringify({ error: error.message })); }
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/session-titles') {
+      try {
+        let body = '';
+        for await (const chunk of req) { body += chunk; if(Buffer.byteLength(body) > 80000) throw Error('TITLE_SCOPE_SIZE'); }
+        const scope = JSON.parse(body);
+        titles.register(scope);
+        audit('session-title-authorized', { requestId: scope.request_id, sessionId: scope.session_id });
+        res.end('{"accepted":true}');
+      } catch { res.writeHead(409).end('{"error":"TITLE_SCOPE_INVALID"}'); }
       return;
     }
     if (req.method === 'POST' && req.url === '/executions') {

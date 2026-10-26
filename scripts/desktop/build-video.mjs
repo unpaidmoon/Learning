@@ -69,7 +69,7 @@ try {
   const code = ['/* Shared existing project video behavior; Harness owns React and native controls. */',
     'window.LearningVideoComponents={create(nativeControls){',
     'const jsxRuntime={Fragment:nativeControls.React.Fragment,jsx:(type,props,key)=>nativeControls.React.createElement(type,key===undefined?props:{...props,key}),jsxs:(type,props,key)=>nativeControls.React.createElement(type,key===undefined?props:{...props,key})};',
-    'const shared={react:nativeControls.React,"react/jsx-runtime":jsxRuntime,"@deepseek-ai/dsh-client-ui-primitives":{Button:nativeControls.Button}};',
+    'const shared={react:nativeControls.React,"react/jsx-runtime":jsxRuntime,"@deepseek-ai/dsh-client-ui-primitives":{Button:nativeControls.Button,Menu:nativeControls.Menu}};',
     'const require=id=>{if(!shared[id])throw new Error("DESKTOP_VIDEO_EXTERNAL_UNAVAILABLE: "+id);return shared[id]};',
     'const module={exports:{}};const exports=module.exports;', chunks[0].code.trimEnd(), 'return module.exports;}};', ''].join('\n');
   const styles = [...css].sort(([a], [b]) => a.localeCompare(b)).map(([name, value]) => `/* ${path.basename(name)} */\n` + scopeStyles(value)).join('\n')

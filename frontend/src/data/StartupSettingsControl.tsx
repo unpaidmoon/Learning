@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import type { ComponentType } from "react";
 import { Button } from "../components/ui/button";
+import "./data.css";
 
 type StartupStatus = {
   available: boolean;
@@ -23,7 +25,29 @@ declare global {
   }
 }
 
-export function StartupSettingsControl() {
+type ToggleProps = {
+  checked: boolean;
+  disabled: boolean;
+  label: string;
+  onChange: (value: boolean) => void;
+};
+function StartupToggle({ checked, disabled, label, onChange }: ToggleProps) {
+  return (
+    <input
+      type="checkbox"
+      aria-label={label}
+      checked={checked}
+      disabled={disabled}
+      onChange={(event) => onChange(event.target.checked)}
+    />
+  );
+}
+
+export function StartupSettingsControl({
+  Toggle = StartupToggle,
+}: {
+  Toggle?: ComponentType<ToggleProps>;
+}) {
   const bridge = window.learningDesktopRuntime;
   const [view, setView] = useState<StartupStatus | null>(null);
   const [busy, setBusy] = useState(false);
@@ -86,20 +110,22 @@ export function StartupSettingsControl() {
   };
   return (
     <div className="runtime-startup-setting">
-      <label>
-        <input
-          type="checkbox"
+      <div className="learning-setting-row">
+        <div className="learning-setting-copy">
+          <div className="learning-setting-title">登录 Windows 后启动学习软件</div>
+          <p className="learning-setting-description">
+            {!bridge || (view && !view.available)
+              ? "在 Windows 独立运行包中可用，默认关闭。"
+              : "登录 Windows 后自动打开当前学习工作区。"}
+          </p>
+        </div>
+        <Toggle
+          label="登录 Windows 后启动学习软件"
           checked={view?.enabled === true}
           disabled={!view?.available || !view.revision || busy || !!pending}
-          onChange={(event) => void setEnabled(event.target.checked)}
+          onChange={(enabled) => void setEnabled(enabled)}
         />
-        登录 Windows 后启动学习软件
-      </label>
-      {!bridge || (view && !view.available) ? (
-        <p>此选项在 Windows 独立运行包中可用，默认关闭。</p>
-      ) : (
-        <p>按系统中当前运行包的实际启动状态显示；选择后仅修改本软件当前资料位置的用户启动项。</p>
-      )}
+      </div>
       {view?.registered && !view.enabled && <p>系统当前禁用了此启动项。</p>}
       {error && <p role="alert">{error}</p>}
       {pending && (

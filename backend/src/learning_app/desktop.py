@@ -22,6 +22,12 @@ from fastapi import FastAPI, Query, Request, WebSocket
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
+from learning_app.chat_presentation import ChatPresentation
+from learning_app.desktop_avatar import (
+    picture_reference,
+    project_account_picture,
+    read_account_picture,
+)
 from learning_app.desktop_theme import DesktopThemePreferences
 from learning_app.document_processing import MAX_PDF_BYTES
 from learning_app.documents import (
@@ -262,6 +268,7 @@ class DesktopGateway:
         self.course_locks = defaultdict(asyncio.Lock)
         self._history = None
         self.theme = DesktopThemePreferences(app.state.config.data_dir)
+        self._pending_renames = set()
 
     @property
     def service(self):
@@ -301,6 +308,30 @@ class DesktopGateway:
         if response.status_code != 200 or not value.get("ok"):
             raise AppError("DESKTOP_NATIVE_READ_UNAVAILABLE", "原生对话列表暂不可读，请重新连接", 503)
         return value.get("value", _NO_VALUE)
+
+    @property
+    def presentation(self):
+        return ChatPresentation(self.service.repository)
+
+    async def prepare_title(self, generation, binding):
+        boundary = getattr(self.service.execution, "boundary", None)
+        configure = getattr(self.service.execution.host, "configure_title", None)
+        if boundary is None or configure is None:
+            return
+        chat = self.service.repository.get_chat(binding.conversation_id)
+        if len([m for m in chat["messages"] if m["role"] == "user"]) != 1:
+            return
+        identity = self.presentation.reserve_title(binding.conversation_id)
+        if not identity:
+            return
+        try:
+            scope = boundary.register_title(identity, binding.session_id,
+                generation.get("text") or "图片提问", generation["model"], generation["thinking"])
+            await configure(scope)
+            self.presentation.set(binding.conversation_id, title_receipt={"state": "authorized", "request_id": identity})
+        except (ValueError, ExecutionError, httpx.HTTPError):
+            self.presentation.set(binding.conversation_id, title_receipt={"state": "unavailable", "request_id": identity})
+            logger.warning("Native title preparation unavailable; the main submission continues")
 
     @property
     def history(self):
@@ -389,6 +420,8 @@ class DesktopGateway:
         async with self.course_locks[course_id]:
             repository = self.service.repository
             chats = repository.list_chats(course_id)
+            preferences = self.presentation.all()
+            chats = [chat for chat in chats if not preferences.get(chat["chat_id"], {}).get("archived")]
             chat = repository.get_chat(chats[-1]["chat_id"]) if chats else None
             if chat is None:
                 chat = repository.create_chat(course_id)
@@ -403,15 +436,17 @@ class DesktopGateway:
         course_id = course_id or ensure_unclassified(self.service.repository)
         async with self.course_locks[course_id]:
             repository = self.service.repository
+            preferences = self.presentation.all()
             if not current_session:
                 existing = repository.list_chats(course_id)
+                existing = [chat for chat in existing if not preferences.get(chat["chat_id"], {}).get("archived")]
                 if existing and existing[-1]["chat_id"] in self.history.chats:
                     # Native first-use/blank initialization must not silently
                     # replace a restored history with a new business chat.
                     return await self.open_chat(existing[-1]["chat_id"])
             if current_session:
                 mapped = self.read_mapping(current_session)
-                if mapped["course_id"] != course_id:
+                if mapped["course_id"] != course_id or preferences.get(mapped["chat_id"], {}).get("archived"):
                     current_session = None
             if current_session:
                 mapped = self.read_mapping(current_session)
@@ -421,6 +456,8 @@ class DesktopGateway:
                     # A repeated click neither clears it nor switches the input.
                     return mapped
                 for candidate in reversed(repository.list_chats(course_id)):
+                    if preferences.get(candidate["chat_id"], {}).get("archived"):
+                        continue
                     candidate = repository.get_chat(candidate["chat_id"])
                     binding = repository.current_binding(candidate["chat_id"])
                     if (
@@ -454,6 +491,7 @@ class DesktopGateway:
             # retains the current Session as the source of the new blank.
             if not current_session and not requested_session:
                 chats = repository.list_chats(course_id)
+                chats = [chat for chat in chats if not preferences.get(chat["chat_id"], {}).get("archived")]
                 if chats:
                     latest = repository.get_chat(chats[-1]["chat_id"])
                     if not latest["messages"] and not latest["generations"]:
@@ -476,6 +514,8 @@ class DesktopGateway:
         """Project a native Workspace feed from business records, without another store."""
         repository = self.service.repository
         items = []
+        preferences = self.presentation.all()
+        archived = []
         for course in repository.list_courses():
             session_ids = []
             for sid, view in self.history.views.items():
@@ -485,6 +525,12 @@ class DesktopGateway:
                 binding = repository.current_binding(chat["chat_id"])
                 if binding and binding["state"] not in {"stale", "retired"}:
                     session_ids.append(binding["session_id"])
+                    if preferences.get(chat["chat_id"], {}).get("archived"):
+                        archived.append(binding["session_id"])
+            for sid in session_ids:
+                mapped = self.history.views.get(sid, {}).get("mapping")
+                if mapped and preferences.get(mapped["chat_id"], {}).get("archived"):
+                    archived.append(sid)
             items.append(
                 {
                     "workspaceId": course["course_id"],
@@ -495,7 +541,7 @@ class DesktopGateway:
                     "updatedAt": course["created_at"],
                 }
             )
-        return {"items": items, "archivedSessionIds": [], "pinnedSessionIds": []}
+        return {"items": items, "archivedSessionIds": list(dict.fromkeys(archived)), "pinnedSessionIds": []}
 
     def selected(self, session_id: str) -> tuple[str, str]:
         chat = self.service.repository.get_chat(self.mapping(session_id)["chat_id"])
@@ -544,18 +590,21 @@ class DesktopGateway:
                 else "title"
             )
             title = result.get(title_field)
-            if isinstance(title, str) and title.startswith("[[learning-generation:") and sid:
+            if isinstance(sid, str) and sid.startswith("learning-") and (title is not None or "sessionId" in result):
                 try:
-                    mapped = self.mapping(sid)
+                    mapped = self.read_mapping(sid)
                     chat = self.service.repository.get_chat(mapped["chat_id"])
-                    binding = self.service.repository.current_binding(mapped["chat_id"])
-                    manual = binding.get("adapter_metadata", {}).get("desktop_title_override")
                     source = result.get("source", {})
-                    if manual != title and source.get("kind") != "user":
-                        prompt = next(
-                            (m["text"] for m in chat["messages"] if m["role"] == "user"), ""
-                        )
-                        result[title_field] = " ".join(prompt.split())[:80] or "图片提问"
+                    if source.get("kind") == "user" and isinstance(title, str):
+                        self.presentation.set(mapped["chat_id"], title=title, manual=True)
+                    saved = self.presentation.all().get(mapped["chat_id"], {})
+                    if (saved.get("title_request_id") and not saved.get("manual")
+                        and sid not in self._pending_renames and isinstance(title, str)
+                        and title.strip() and title not in {"workspace", mapped["course_id"]}
+                        and not title.startswith(("[[learning-generation:", "learning-"))):
+                        if saved.get("title") != title:
+                            self.presentation.set(mapped["chat_id"], title=title, title_receipt={"state": "completed"})
+                    result[title_field] = title if sid in self._pending_renames and isinstance(title, str) else self.presentation.title(chat, title)
                 except (AppError, StorageError):
                     pass
             return result
@@ -760,9 +809,32 @@ class DesktopGateway:
     async def rpc(self, method: str, envelope: dict) -> dict | None:
         request = _arguments(envelope)
         sid = request.get("sessionId") or request.get("address", {}).get("sessionId")
+        if method in {"workspace/archiveSession", "workspace/unarchiveSession"}:
+            mapped = self.read_mapping(sid or "")
+            chat = self.service.repository.get_chat(mapped["chat_id"])
+            active = [g for g in chat["generations"] if g["state"] not in TERMINAL]
+            if method == "workspace/archiveSession":
+                if active and request.get("stopActivity") is not True:
+                    raise AppError("workspace/session-active", "此对话仍有回答运行或待核对，请确认停止后归档", 409)
+                if active:
+                    for generation in active:
+                        await self.service.cancel(generation["generation_id"])
+                    chat = self.service.repository.get_chat(mapped["chat_id"])
+                    if any(g["state"] not in TERMINAL for g in chat["generations"]):
+                        raise AppError("workspace/session-active", "停止结果仍待核对，暂未归档", 409)
+            # This pinned SEA has no Workspace server controller. Its original
+            # client contract is backed by the same business projection as follow.
+            self.presentation.set(mapped["chat_id"], archived=method == "workspace/archiveSession")
+            return {"archivedSessionIds": self.workspaces()["archivedSessionIds"]}
         if isinstance(sid, str) and sid.startswith("learning-history-"):
             if not self.history.mapping(sid):
                 raise AppError("DESKTOP_SESSION_UNMAPPED", "历史视图身份无效", 404)
+            if method == "session/rename":
+                title = request.get("title")
+                if not isinstance(title, str) or not title.strip() or len(title.encode()) > 512:
+                    raise AppError("title-invalid", "请输入有效的对话名称", 422)
+                self.presentation.set(self.history.mapping(sid)["chat_id"], title=title.strip(), manual=True)
+                return {"title": title.strip(), "seq": 0}
             if method == "session/create":
                 if request.get("workspaceId", self.history.mapping(sid)["course_id"]) != self.history.mapping(sid)["course_id"]:
                     raise AppError("DESKTOP_CREATE_CONFLICT", "历史不属于此课程")
@@ -782,12 +854,13 @@ class DesktopGateway:
         if method in {"session/list", "session/search"}:
             value = await self.native_read(method, envelope)
             aliases = self.history.views
-            original = [item for item in value["items"] if item["sessionId"] not in aliases]
+            allowed = {sid for workspace in self.workspaces()["items"] for sid in workspace["sessionIds"]}
+            original = [item for item in value["items"] if item["sessionId"] in allowed and item["sessionId"] not in aliases]
             if method == "session/list":
-                return {**value, "items": [*original, *self.history.summaries()]}
+                return self.project_view({**value, "items": [*original, *self.history.summaries()]})
             query = request.get("query", "").casefold().strip()
             if not query or len(query) > 500:
-                return value
+                return self.project_view({**value, "items": original})
             additions = []
             for identity, view in aliases.items():
                 texts = [part.get("text", "") for row in view["records"] for part in (row["event"]["data"].get("content") or row["event"]["data"].get("message", {}).get("content", []))]
@@ -795,7 +868,7 @@ class DesktopGateway:
                 if found is not None:
                     additions.append({"sessionId": identity, "snippet": found[:240]})
             items = [*original, *additions]
-            return {"items": items[:20], "hasMore": value.get("hasMore", False) or len(items) > 20}
+            return self.project_view({"items": items[:20], "hasMore": value.get("hasMore", False) or len(items) > 20})
         if method == "settings/describe":
             native = await self.native_read(method, envelope)
             local = self.theme.handle(method, request)
@@ -894,7 +967,12 @@ class DesktopGateway:
         if method == "session/rename":
             sid = request.get("sessionId", "")
             mapped = self.mapping(sid)
-            selected = await self.service.execution.peer.rpc(method, request)
+            self._pending_renames.add(sid)
+            try:
+                selected = await self.service.execution.peer.rpc(method, request)
+                self.presentation.set(mapped["chat_id"], title=selected["title"], manual=True)
+            finally:
+                self._pending_renames.discard(sid)
             binding = self.service.repository.current_binding(mapped["chat_id"])
             self.service.repository.update_binding_metadata(
                 binding["binding_id"],
@@ -983,6 +1061,20 @@ class DesktopGateway:
 def install_desktop_routes(app: FastAPI, sessions) -> None:
     gateway = DesktopGateway(app)
     app.state.desktop_gateway = gateway
+
+    @app.get("/api/v1/desktop/account-avatar/{version}", include_in_schema=False)
+    async def account_avatar(version: str):
+        from learning_app.accounts import _client
+
+        profile = await gateway.service.execution.peer.rpc_args("account/getProfile", _client())
+        reference = picture_reference(profile)
+        if reference is None or reference[1] != version:
+            raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像已改变，请刷新账号", 404)
+        try:
+            content, media = await asyncio.to_thread(read_account_picture, reference[0])
+        except (OSError, ValueError, httpx.HTTPError) as error:
+            raise AppError("ACCOUNT_AVATAR_UNAVAILABLE", "账号头像暂时无法加载", 502) from error
+        return Response(content, media_type=media)
 
     @app.post("/api/v1/desktop/chats/{chat_id}/open", response_model=DesktopSessionResponse)
     async def open_chat(chat_id: str):
@@ -1490,6 +1582,8 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
             response = await client.post(
                 "/" + path, content=body, headers={"Content-Type": "application/json"}
             )
+            if method == "account/getProfile" and response.status_code == 200:
+                return JSONResponse(project_account_picture(response.json()))
             if (
                 method in {"session/page", "session/list", "session/search", "session/projections"}
                 and response.status_code == 200

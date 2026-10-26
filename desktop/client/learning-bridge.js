@@ -142,7 +142,7 @@
     const React = require('react');
     const ReactDOM = require('react-dom');
     const ReactDOMClient = require('react-dom/client');
-    const { Button, Input, Modal, Menu } = require('@deepseek-ai/dsh-client-ui-primitives');
+    const { Button, Input, Modal, Menu, Switch, Checkbox } = require('@deepseek-ai/dsh-client-ui-primitives');
     const h = React.createElement;
     const { useState, useEffect, useRef } = React;
     let ctx;
@@ -221,24 +221,100 @@
     }
     function HistoryTitle({ displayTitle }) {
       const [open, setOpen] = useState(false);
-      const [items, setItems] = useState([]);
+      const [archived, setArchived] = useState(false);
+      const [rename, setRename] = useState(null);
+      const [name, setName] = useState('');
+      const [confirmArchive, setConfirmArchive] = useState(null);
+      const [busy, setBusy] = useState(false);
+      const [error, setError] = useState('');
+      const composing = useRef(false);
+      const sessions = React.useSyncExternalStore(ctx.sessions.list.subscribe, ctx.sessions.list.getSnapshot);
+      const workspaceStore = React.useMemo(() => ({
+        subscribe: listener => ctx.workspaces.list.subscribe(listener),
+        getSnapshot: () => ctx.workspaces.list.getSnapshot(),
+      }), []);
+      const workspaces = React.useSyncExternalStore(workspaceStore.subscribe, workspaceStore.getSnapshot);
+      const archivedIds = new Set(workspaces.archivedSessionIds || []);
+      const chats = Object.values(sessions.byId).filter(chat => archivedIds.has(chat.id) === archived).reverse();
+      const safeTitle = chat => !chat.displayTitle || chat.displayTitle === 'workspace'
+        || chat.displayTitle.startsWith('[[learning-generation:') || chat.displayTitle.startsWith('learning-')
+        ? (chat.blank ? '新对话' : '当前对话') : chat.displayTitle;
       const show = async () => {
         try {
           await ctx.sessions.refresh();
-          const chats = Object.values(ctx.sessions.list.getSnapshot().byId);
-          setItems(chats.map(chat => ({ id: chat.id, label: chat.displayTitle || '新对话' })).reverse());
+          setArchived(false); setError('');
           setOpen(true);
         } catch (reason) { if (activeSessionId) inputFor(activeSessionId).notify('error', reason.message); }
       };
-      return h(Menu, { open, portal: true, listClassName: 'learning-menu-surface', items, onClose: () => setOpen(false),
+      const act = async action => {
+        if (busy) return;
+        setBusy(true); setError('');
+        try { await action(); await ctx.sessions.refresh(); }
+        catch (reason) { setError(reason.message || '操作未完成，请核对当前对话'); }
+        finally { setBusy(false); }
+      };
+      const archive = async (chat, stopActivity = false) => {
+        try {
+          const wasActive = chat.id === activeSessionId;
+          if (chat.id === activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(chat.id);
+          await ctx.uiWorkspace.archiveSession(chat.id, { stopActivity });
+          setConfirmArchive(null);
+          if (wasActive) {
+            setOpen(false);
+            const sid = await createLearningChat();
+            ctx.uiWorkspace.openSession(sid);
+          }
+        } catch (reason) {
+          if (reason.code === 'workspace/session-active' || reason.rpcError?.code === 'workspace/session-active') {
+            setConfirmArchive(chat); setOpen(false); return;
+          }
+          throw reason;
+        }
+      };
+      const saveRename = () => { if (!name.trim() || composing.current) return; void act(async () => {
+        const result = await ctx.sessions.using(rename.id, { source: 'workspaceOperation' },
+          reference => reference.binding.session.rename(name.trim()));
+        if (!result.ok) throw new Error(result.error.message);
+        setRename(null);
+      }); };
+      return h(React.Fragment, null, h(Menu, { open, portal: true, align: 'start', listClassName: 'learning-history-menu', onClose: () => setOpen(false),
         anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-conversation-title', title: displayTitle || '新对话',
           'aria-label': '选择历史对话', onClick: show }, h('span', null, displayTitle || '新对话'), h(library.components.Icon, { name: 'chevron-down', size: 14 })),
-        onSelect: sid => { setOpen(false); void (async () => {
+      },
+        h('div', { className: 'learning-history-heading' }, archived ? '已归档对话' : '历史对话'),
+        chats.map(chat => h('div', { key: chat.id, className: 'learning-history-row', 'data-current': chat.id === activeSessionId },
+          h(Button, { role: 'menuitem', variant: 'ghost', size: 'sm', className: 'learning-history-open', title: safeTitle(chat), disabled: busy,
+            'aria-current': chat.id === activeSessionId ? 'true' : undefined,
+            onClick: () => { if (archived) return; setOpen(false); void (async () => {
           if (captureRequest) throw new Error('请先完成或取消截图（CAPTURE_CONTEXT_LOCKED）');
           if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
-          ctx.uiWorkspace.openSession(sid);
-        })().catch(reportError); },
-      });
+          ctx.uiWorkspace.openSession(chat.id);
+        })().catch(reportError); } }, safeTitle(chat)),
+          h('div', { className: 'learning-history-actions' },
+            h(Button, { role: 'menuitem', variant: 'ghost', size: 'sm', title: '重命名', 'aria-label': '重命名 ' + safeTitle(chat), disabled: busy,
+              onClick: () => { setRename(chat); setName(safeTitle(chat)); setError(''); setOpen(false); } }, h(library.components.Icon, { name: 'rename', size: 15 })),
+            h(Button, { role: 'menuitem', variant: 'ghost', size: 'sm', title: archived ? '取消归档' : '归档',
+              'aria-label': (archived ? '取消归档 ' : '归档 ') + safeTitle(chat), disabled: busy,
+              onClick: () => { void act(() => archived ? ctx.uiWorkspace.unarchiveSession(chat.id) : archive(chat)); } },
+              h(library.components.Icon, { name: 'archive', size: 15 }))))),
+        !chats.length && h('div', { className: 'learning-history-empty' }, archived ? '没有已归档对话' : '暂无历史对话'),
+        error && h('div', { role: 'alert', className: 'learning-history-error' }, error),
+        h(Button, { role: 'menuitem', variant: 'ghost', size: 'sm', className: 'learning-history-archive-toggle',
+          onClick: () => { setArchived(!archived); setError(''); } }, archived ? '返回历史对话' : '已归档对话')),
+        h(Modal, { open: !!rename, title: '重命名对话', closeLabel: '取消', onClose: () => { if(!busy)setRename(null); },
+          footer: h(React.Fragment, null,
+            h(Button, { variant: 'outline', disabled: busy, onClick: () => setRename(null) }, '取消'),
+            h(Button, { disabled: busy || !name.trim(), onClick: saveRename }, '重命名')) },
+          h(Input, { value: name, 'aria-label': '对话名称', 'data-modal-autofocus': true, disabled: busy,
+            onChange: event => setName(event.target.value), onCompositionStart: () => { composing.current = true; },
+            onCompositionEnd: () => { composing.current = false; }, onKeyDown: event => {
+              if(event.key === 'Enter' && !event.nativeEvent.isComposing && !composing.current){event.preventDefault();saveRename();}
+            } }), error && h('p', { role: 'alert' }, error)),
+        h(Modal, { open: !!confirmArchive, title: '停止回答并归档？', closeLabel: '取消', onClose: () => { if(!busy)setConfirmArchive(null); },
+          footer: h(React.Fragment, null,
+            h(Button, { variant: 'outline', disabled: busy, onClick: () => setConfirmArchive(null) }, '取消'),
+            h(Button, { disabled: busy, onClick: () => { void act(() => archive(confirmArchive, true)); } }, '停止并归档')) },
+          h('p', null, '此对话仍有运行中的回答。停止并归档后，对话和附件继续保留。'), error && h('p', { role: 'alert' }, error)));
     }
     function WorkspaceMenu() {
       useRevision();
@@ -254,18 +330,18 @@
         bindings.set(sid, result); setOpen(false); setAdding(false); notify();
       };
       const items = courses.filter(course => adding ? !ids.includes(course.course_id) : ids.includes(course.course_id))
-        .map(course => ({ id: course.course_id, label: (adding ? '' : '✓ ') + course.title }));
+        .map(course => ({ id: course.course_id, label: course.title }));
       if (!adding) items.push({ id: '__add', label: '＋ 添加工作区…' });
       const title = ids.map(id => courses.find(item => item.course_id === id)?.title || '课程').join('、') || '工作区';
       useEffect(() => { void api('/courses').then(setCourses).catch(reportError); }, [open]);
-      return h(Menu, { open, portal: true, items, onClose: () => { setOpen(false); setAdding(false); },
-        anchor: h(Button, { size: 'sm', variant: 'ghost', title, 'aria-label': '对话工作区', disabled: !activeSessionId || readOnlyHistory(), onClick: () => setOpen(true) }, title),
+      return h(Menu, { open, portal: true, align: 'end', items, selectedIds: adding ? [] : ids, onClose: () => { setOpen(false); setAdding(false); },
+        anchor: h(Button, { size: 'sm', variant: 'ghost', className: 'learning-icon-action', title, 'aria-label': '对话工作区', disabled: !activeSessionId || readOnlyHistory(), onClick: () => setOpen(true) }, h(library.components.Icon, { name: 'folder', size: 17 })),
         onSelect: identity => { void choose(identity).catch(reportError); } });
     }
     function VideoButton() {
       useRevision();
       return h(Button, { variant: 'ghost', size: 'sm', className: 'learning-new-chat learning-icon-action', title: '新对话', 'aria-label': '新对话',
-        icon: h(library.components.Icon, { name: 'plus', size: 16 }), disabled: !selectedCourse || !!newChatPending || navigationPending, onClick: () => {
+        icon: h(library.components.Icon, { name: 'rename', size: 17 }), disabled: !selectedCourse || !!newChatPending || navigationPending, onClick: () => {
         if (newChatPending || !selectedCourse) return;
         newChatPending = (async () => {
           if (captureRequest) throw new Error('请完成或取消当前截图（CAPTURE_CONTEXT_LOCKED）');
@@ -291,10 +367,7 @@
       return h(React.Fragment, null,
         h('header', { className: 'learning-ai-header', 'data-testid': 'learning-ai-header' },
           h('div', { className: 'learning-ai-title' }, h(HistoryTitle, { displayTitle: title })), h('div', { className: 'learning-ai-actions', role: 'toolbar', 'aria-label': '对话操作' },
-            h(WorkspaceMenu), h(VideoButton), h(AttachmentsButton),
-            h(Button, { variant: 'ghost', size: 'sm', className: 'learning-icon-action', 'aria-label': '截图', title: '截图 · Ctrl+Shift+S',
-              icon: h(library.components.Icon, { name: 'capture', size: 17 }),
-            onClick: beginWorkspaceCapture, disabled: !activeSessionId || navigationPending || readOnlyHistory() }), h(CollapseAiButton))),
+            h(WorkspaceMenu), h(VideoButton), h(CollapseAiButton))),
         readOnlyHistory() && h('div', { className: 'learning-import-history-notice', role: 'status' },
           bindings.get(activeSessionId)?.has_unresolved_history ? '导入历史只读；旧请求结果仍待核对，不会重新发送。' : '导入历史只读；继续提问将使用新的执行身份。',
           h(Button, { size: 'sm', onClick: () => { const mapped = bindings.get(activeSessionId);
@@ -313,8 +386,7 @@
     }
     function DataSettings() {
       return h('div', { className: 'learning-data-settings learning-legacy-module' },
-        h('h2', null, '数据与存储'),
-        h(library.components.DataPanel, { beforeSave: async () => {
+        h(library.components.DataPanel, { CheckboxControl: Checkbox, beforeSave: async () => {
           if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
           for (const handle of videoHandles.values()) await handle.current?.savePosition?.();
         } }));
@@ -743,6 +815,7 @@
           onClick: () => { void openWorkbenchSource(item.source).catch(reportError); } }, '[' + (index + 1) + '] ' + item.label)));
     }
     function MaterialsRoot() {
+      const courseTitle = library.useCourseTitle();
       useRevision();
       const state = materialState();
       const resize = useRef(null);
@@ -762,7 +835,7 @@
       return h('section', { className: 'learning-materials', 'data-testid': 'learning-materials', 'data-session-id': activeSessionId },
         h('div', { className: 'learning-material-tabs', role: 'tablist', 'aria-label': '资料标签' },
           h(Button, { role: 'tab', 'aria-selected': state.active === 'files', size: 'sm', variant: state.active === 'files' ? 'outline' : 'ghost',
-            onClick: () => { ++sourceJumpRevision; state.active = 'files'; notify(); } }, '文件'),
+            title: courseTitle, onClick: () => { ++sourceJumpRevision; state.active = 'files'; notify(); } }, courseTitle),
           state.tabs.map(item => h('span', { key: item.id, className: 'learning-material-tab' },
             h(Button, { role: 'tab', 'aria-selected': state.active === item.id, size: 'sm', variant: state.active === item.id ? 'outline' : 'ghost',
               onClick: () => { ++sourceJumpRevision; state.active = item.id;
@@ -864,13 +937,13 @@
       );
     }
     return {
-      inject: ['slots', 'sessions', 'uiWorkspace', 'uiConversation', 'conversation', 'sidebarRight', 'sidebarRightTabs', 'theme'],
+      inject: ['slots', 'sessions', 'workspaces', 'uiWorkspace', 'uiConversation', 'conversation', 'sidebarRight', 'sidebarRightTabs', 'theme'],
       async apply(context) {
         try {
         ctx = context;
         const disposers = [];
-        library = window.LearningCourseLibrary.create({ React, ReactDOM, Button, Input, Modal, api, chooseCourse });
-        videoComponents = window.LearningVideoComponents.create({ React, Button });
+        library = window.LearningCourseLibrary.create({ React, ReactDOM, Button, Input, Modal, Menu, api, chooseCourse });
+        videoComponents = window.LearningVideoComponents.create({ React, Button, Menu });
         await Promise.all([library.components.initialize(), videoComponents.initialize()]);
         drafts = window.NativeDraftBridge.create({ ctx, api, getDraftController: library.components.getDraftController,
           onError: (error, info) => reportError(Object.assign(error, { sessionId: info?.sessionId || activeSessionId, savedDraft: info?.savedDraft })),
@@ -972,7 +1045,9 @@
         register('shell.overlay', { id: 'learning-app-overlays', order: 0 }, AppOverlays);
         register('settings.section', { id: 'learning-data', order: 70, label: '数据与存储' }, DataSettings);
         register('settings.section', { id: 'platform-connections', order: 65, label: '平台连接' }, () => h('div', { className: 'learning-legacy-module' }, h(library.components.PlatformSettings)));
-        register('settings.general.item', { id: 'learning-startup', order: 60 }, library.components.StartupSettingsControl);
+        register('settings.general.item', { id: 'learning-startup', order: 60 }, () =>
+          h('div', { className: 'learning-legacy-module learning-startup-settings' },
+            h(library.components.StartupSettingsControl, { Toggle: Switch })));
         register('conversation.input.dock', { id: 'learning-references', order: 0 }, ReferenceDock);
         register('conversation.chat.turnTail', { id: 'learning-results', order: 50 }, RequestedTaskActions);
         const revealTask = event => {

@@ -282,6 +282,50 @@
   position: relative;
   outline: none;
 }
+.file-toolbar-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 10px;
+  flex: none;
+  border-bottom: 1px solid var(--border);
+}
+.file-toolbar-navigation,
+.file-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.file-toolbar-navigation {
+  flex: 1;
+}
+.file-toolbar-navigation > button,
+.file-toolbar-controls > button {
+  flex: none;
+  padding: 0 6px;
+  width: 30px;
+}
+.file-toolbar-compact .file-manager-breadcrumbs {
+  border: 0;
+  margin-left: 6px;
+  min-width: 0;
+  padding: 0;
+  scrollbar-width: none;
+}
+.file-toolbar-compact .file-manager-breadcrumbs > button,
+.file-toolbar-compact .file-manager-breadcrumbs > span {
+  flex: none;
+}
+.file-toolbar-compact .file-manager-search {
+  width: clamp(80px, 16vw, 180px);
+  min-width: 0;
+  height: 30px;
+}
+.integration-import:empty {
+  display: none;
+}
 .file-manager-navigation {
   display: flex;
   gap: 3px;

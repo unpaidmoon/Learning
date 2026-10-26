@@ -503,6 +503,9 @@ class GenerationService:
                 history = context.get("history_context") if needs_history else None
                 if isinstance(history, (list, dict)):
                     history = json.dumps(history, ensure_ascii=False)
+                prepare_native_title = getattr(self, "prepare_native_title", None)
+                if prepare_native_title is not None:
+                    await prepare_native_title(generation, binding)
                 binding = await self.execution.start(
                     binding,
                     prompt,

@@ -3,7 +3,7 @@
 (() => {
   'use strict';
   window.LearningCourseLibrary = {
-    create({ React, Button, Input, Modal, ReactDOM, api, chooseCourse }) {
+    create({ React, Button, Input, Modal, Menu, ReactDOM, api, chooseCourse }) {
       const h = React.createElement;
       const { useEffect, useState, useSyncExternalStore } = React;
       const components = window.LearningLibraryComponents.create({ React, Button, Input, Modal, ReactDOM });
@@ -156,6 +156,7 @@
         return h('section', { className: 'learning-library-files learning-legacy-module', 'data-testid': 'learning-library-files', 'aria-label': '课程文件' },
           data.courseId && data.componentsReady ? h(components.FileManager, {
             key: data.courseId, courseId: data.courseId, connected: true, path: data.folder,
+            MenuComponent: Menu,
             revision: data.componentRevision, onPathChange: folder => publish({ folder }),
             onOpen: file => {
               if (file.viewer === 'video' && file.video) { for (const listener of videoListeners) listener(file.video); }
@@ -170,6 +171,8 @@
         CourseDirectory, LibraryFiles, ResourceViewer: components.MaterialViewer, components, setCourse, refresh,
         openCourseDialog() { publish({ dialog: true }); },
         getCourseId() { return state.courseId; },
+        getCourseTitle() { return state.courses.find(course => course.course_id === state.courseId)?.title || '未分类'; },
+        useCourseTitle() { const current = useLibrary(); return current.courses.find(course => course.course_id === current.courseId)?.title || '未分类'; },
         subscribeOpenVideo(listener) { videoListeners.add(listener); return () => videoListeners.delete(listener); },
         subscribeOpenFile(listener) { fileListeners.add(listener); return () => fileListeners.delete(listener); },
       };

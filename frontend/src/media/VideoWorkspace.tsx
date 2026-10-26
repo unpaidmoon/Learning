@@ -1,5 +1,5 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import type { FormEvent, Ref, RefObject } from "react";
+import type { FormEvent, Ref, RefObject, CSSProperties, ComponentType } from "react";
 import { api, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
@@ -39,6 +39,7 @@ export function VideoWorkspace({
   minimal = false,
   showSubtitles = false,
   assetId,
+  RateControl,
   ref,
 }: {
   courseId: string;
@@ -54,6 +55,7 @@ export function VideoWorkspace({
   minimal?: boolean;
   showSubtitles?: boolean;
   assetId?: string;
+  RateControl?: ComponentType<{ rate: number; onRate: (rate: number) => void }>;
   ref?: Ref<VideoWorkspaceHandle>;
 }) {
   const [assets, setAssets] = useState<VideoAsset[]>([]);
@@ -62,6 +64,7 @@ export function VideoWorkspace({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [pictureRatio, setPictureRatio] = useState(16 / 9);
   const [playBlocked, setPlayBlocked] = useState(false);
   const [positionStatus, setPositionStatus] = useState("");
   const video = useRef<HTMLVideoElement>(null);
@@ -503,79 +506,91 @@ export function VideoWorkspace({
         aria-label="视频画面"
         tabIndex={0}
       >
-        {asset ? (
-          <video
-            ref={video}
-            key={`${asset.asset_id}:${asset.source_version}`}
-            aria-label={asset.media_type.startsWith("audio/") ? "课程录音" : "课程视频"}
-            data-primary-video="true"
-            preload="metadata"
-            playsInline
-            src={videoContentUrl(asset)}
-            onLoadedMetadata={() => {
-              if (!video.current) return;
-              const target = initialPosition.current / 1_000;
-              video.current.currentTime = Number.isFinite(video.current.duration)
-                ? Math.min(target, Math.max(0, video.current.duration - 0.05))
-                : target;
-              if (pendingPlay.current) void play();
-            }}
-            onPause={() => {
-              setPlaying(false);
-              saveQuietly();
-            }}
-            onPlay={() => setPlaying(true)}
-            onSeeked={saveQuietly}
-            onTimeUpdate={() => {
-              if (video.current && video.current.readyState > 0)
-                lastKnownPosition.current = Math.round(video.current.currentTime * 1000);
-            }}
-            onEnded={saveQuietly}
-            onError={() =>
-              setError("视频无法播放，请刷新目录检查原件或浏览器格式支持（MEDIA_PLAYBACK_FAILED）")
-            }
-          />
-        ) : (
-          <div className="video-empty">
-            <span className="video-empty-symbol" aria-hidden="true">
-              ▷
-            </span>
-            <h3>选择视频，接着看</h3>
-            <p>从当前课程目录选择视频。打开后恢复播放进度；截图快捷键可框选软件内可见内容。</p>
-          </div>
-        )}
-        {asset?.media_type.startsWith("audio/") && (
-          <div className="audio-recording-title">
-            <span aria-hidden="true">♫</span>
-            <p>{asset.display_name}</p>
-          </div>
-        )}
-        {asset && (
-          <VideoControls
-            key={`${asset.asset_id}:${asset.source_version}`}
-            playing={playing}
-            {...playback}
-            previewSrc={asset.media_type.startsWith("audio/") ? undefined : videoContentUrl(asset)}
-            sourceKey={`${asset.asset_id}:${asset.source_version}`}
-            onFullscreen={toggleFullscreen}
-            onSeek={seekBound}
-            onTogglePlay={() => {
-              if (video.current?.paused) void play();
-              else video.current?.pause();
-            }}
-            onMute={() => {
-              if (video.current) video.current.muted = !video.current.muted;
-            }}
-            onVolume={(value) => {
-              if (!video.current) return;
-              video.current.volume = value;
-              video.current.muted = false;
-            }}
-            onRate={(value) => {
-              if (video.current) video.current.playbackRate = value;
-            }}
-          />
-        )}
+        <div
+          className="video-picture-frame"
+          style={{ "--video-ratio": pictureRatio } as CSSProperties}
+        >
+          {asset ? (
+            <video
+              ref={video}
+              key={`${asset.asset_id}:${asset.source_version}`}
+              aria-label={asset.media_type.startsWith("audio/") ? "课程录音" : "课程视频"}
+              data-primary-video="true"
+              preload="metadata"
+              playsInline
+              src={videoContentUrl(asset)}
+              onLoadedMetadata={() => {
+                if (!video.current) return;
+                if (video.current.videoWidth && video.current.videoHeight)
+                  setPictureRatio(video.current.videoWidth / video.current.videoHeight);
+                const target = initialPosition.current / 1_000;
+                video.current.currentTime = Number.isFinite(video.current.duration)
+                  ? Math.min(target, Math.max(0, video.current.duration - 0.05))
+                  : target;
+                if (pendingPlay.current) void play();
+              }}
+              onPause={() => {
+                setPlaying(false);
+                saveQuietly();
+              }}
+              onPlay={() => setPlaying(true)}
+              onSeeked={saveQuietly}
+              onTimeUpdate={() => {
+                if (video.current && video.current.readyState > 0)
+                  lastKnownPosition.current = Math.round(video.current.currentTime * 1000);
+              }}
+              onEnded={saveQuietly}
+              onError={() =>
+                setError(
+                  "视频无法播放，请刷新目录检查原件或浏览器格式支持（MEDIA_PLAYBACK_FAILED）",
+                )
+              }
+            />
+          ) : (
+            <div className="video-empty">
+              <span className="video-empty-symbol" aria-hidden="true">
+                ▷
+              </span>
+              <h3>选择视频，接着看</h3>
+              <p>从当前课程目录选择视频。打开后恢复播放进度；截图快捷键可框选软件内可见内容。</p>
+            </div>
+          )}
+          {asset?.media_type.startsWith("audio/") && (
+            <div className="audio-recording-title">
+              <span aria-hidden="true">♫</span>
+              <p>{asset.display_name}</p>
+            </div>
+          )}
+          {asset && (
+            <VideoControls
+              RateControl={RateControl}
+              key={`${asset.asset_id}:${asset.source_version}`}
+              playing={playing}
+              {...playback}
+              previewSrc={
+                asset.media_type.startsWith("audio/") ? undefined : videoContentUrl(asset)
+              }
+              sourceKey={`${asset.asset_id}:${asset.source_version}`}
+              onFullscreen={toggleFullscreen}
+              onSeek={seekBound}
+              onTogglePlay={() => {
+                if (video.current?.paused) void play();
+                else video.current?.pause();
+              }}
+              onMute={() => {
+                if (video.current) video.current.muted = !video.current.muted;
+              }}
+              onVolume={(value) => {
+                if (!video.current) return;
+                video.current.volume = value;
+                video.current.muted = false;
+              }}
+              onRate={(value) => {
+                if (video.current) video.current.playbackRate = value;
+              }}
+            />
+          )}
+        </div>
       </div>
       {asset?.audio_content_url && (
         <SplitAudio
