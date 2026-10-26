@@ -254,7 +254,11 @@ export function SeekPreview({ src, time, visible, left, sourceKey }: PreviewProp
     }, 80);
     return () => window.clearTimeout(timer);
   }, [time, visible, sourceHref, cache, cache.strategy, leaseId]);
-  const frame = nearest(cache.loaded.values(), Number.isFinite(time) ? time : 0);
+  const candidate = nearest(cache.loaded.values(), Number.isFinite(time) ? time : 0);
+  const frame =
+    cache.strategy === "media" && candidate && Math.abs(candidate.time_ms - time * 1000) >= 2000
+      ? undefined
+      : candidate;
   // Never present a time-only/loading box as a frame. Keep a real decoded
   // neighbor visible while a closer cached thumbnail is being loaded.
   if (!visible || !source || !sourceKey || !frame) return null;

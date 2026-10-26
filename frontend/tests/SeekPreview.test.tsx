@@ -281,6 +281,7 @@ describe("本地缓存进度预览", () => {
     expect(video.currentTime).toBe(12);
     view.rerender(<SeekPreview {...props} time={30} />);
     await act(async () => vi.advanceTimersByTime(90));
+    expect(screen.queryByLabelText("视频进度预览")).not.toBeInTheDocument();
     fireEvent.seeked(video);
     expect(video.currentTime).toBe(30);
     fireEvent.seeked(video);
@@ -291,5 +292,21 @@ describe("本地缓存进度预览", () => {
     await act(async () => vi.advanceTimersByTime(90));
     expect(decoders).toHaveLength(1); // A cached time does not reopen a decoder.
     expect(fetchMock.mock.calls.every(([, init]) => init?.method !== "POST")).toBe(true);
+  });
+
+  it("在线视频解码失败后释放资源，指针移动不隐式重发媒体请求", async () => {
+    vi.useFakeTimers();
+    manifest = { status: "ready", strategy: "media", frames: [] };
+    const props = properties();
+    const view = render(<SeekPreview {...props} />);
+    await settle();
+    await act(async () => vi.advanceTimersByTime(90));
+    expect(decoders).toHaveLength(1);
+    fireEvent.error(decoders[0]);
+    expect(decoders[0]).not.toHaveAttribute("src");
+    view.rerender(<SeekPreview {...props} time={40} />);
+    await act(async () => vi.advanceTimersByTime(200));
+    expect(decoders).toHaveLength(1);
+    expect(screen.queryByLabelText("视频进度预览")).not.toBeInTheDocument();
   });
 });

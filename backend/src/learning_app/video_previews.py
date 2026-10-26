@@ -1,4 +1,4 @@
-"""Local-only, resumable video thumbnails; never an attachment or model tool.
+"""UI-only local thumbnail cache and remote preview strategy; never a model tool.
 
 Course enrollment authorizes this worker to decode nearby frames for the UI.
 The sole worker yields between file chunks and frames. Foreground interaction
