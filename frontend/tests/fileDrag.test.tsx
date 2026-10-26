@@ -134,18 +134,18 @@ it("忙碌时拒绝重复落放；清理后释放事件和高亮", async () => {
   expect(screen.getByTestId("input")).not.toHaveClass("learning-file-drop-target");
 });
 
-it("整批预检拒绝文件夹、视频和路径越界，不登记或下载原件", async () => {
+it("整批预检拒绝文件夹、未下载平台源和路径越界，不登记或下载原件", async () => {
   const request = vi.fn<(url: string) => Promise<Response>>(() =>
     response({
       entries: [
         entry("原文.txt"),
         entry("文件夹", "directory", "directory"),
-        entry("视频.mp4", "file", "video"),
+        { ...entry("平台.mp4", "file", "video"), platform: "bilibili" },
       ],
     }),
   );
   vi.stubGlobal("fetch", request);
-  for (const path of ["文件夹", "视频.mp4", "../原文.txt"]) {
+  for (const path of ["文件夹", "平台.mp4", "../原文.txt"]) {
     await expect(
       readCourseDragFiles({ courseId: "drag", paths: ["原文.txt", path] }),
     ).rejects.toThrow(/FILE_ATTACHMENT_UNSUPPORTED|FILE_DROP_SOURCE_INVALID/);
@@ -157,14 +157,14 @@ it("只读取显式来源的精确版本字节，重复路径只读一次", asyn
   const item = entry("原文.txt");
   const request = vi.fn((url: string) => {
     if (url.includes("/files?")) return response({ entries: [item] });
-    if (url.endsWith("/open"))
+    if (url.endsWith("/attachment-source"))
       return response({
         course_id: "other",
         entry: item,
         viewer: "text",
         asset_id: "asset_1",
         source_version: "v1",
-        content_url: "/api/v1/course-files/asset_1/content?source_version=v1",
+        content_url: "/api/v1/course-files/asset_1/content?source_version=v1&download=1",
       });
     return Promise.resolve(new Response("text"));
   });

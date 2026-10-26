@@ -7,17 +7,20 @@ export type CourseFileDrag = { courseId: string; paths: string[] };
 const attachmentType = (name: string) => {
   const extension = name.split(".").at(-1)?.toLowerCase() || "";
   return (
-    {
-      png: "image/png",
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      webp: "image/webp",
-      pdf: "application/pdf",
-      txt: "text/plain",
-      md: "text/markdown",
-      markdown: "text/markdown",
-    } as Record<string, string>
-  )[extension];
+    (
+      {
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        webp: "image/webp",
+        gif: "image/gif",
+        pdf: "application/pdf",
+        txt: "text/plain",
+        md: "text/markdown",
+        markdown: "text/markdown",
+      } as Record<string, string>
+    )[extension] || "application/octet-stream"
+  );
 };
 
 /** Read only the explicitly dropped files through existing version-bound routes. */
@@ -28,7 +31,6 @@ export async function readCourseDragFiles(value: CourseFileDrag): Promise<File[]
     !value.courseId ||
     !Array.isArray(value.paths) ||
     !value.paths.length ||
-    value.paths.length > 8 ||
     value.paths.some(
       (path) =>
         typeof path !== "string" ||
@@ -46,31 +48,26 @@ export async function readCourseDragFiles(value: CourseFileDrag): Promise<File[]
     if (!listings.has(parent))
       listings.set(parent, await api.read(`${prefix}?path=${encodeURIComponent(parent)}`));
     const entry = listings.get(parent)!.entries.find((entry) => entry.path === path);
-    if (
-      !entry ||
-      entry.kind !== "file" ||
-      !attachmentType(entry.name) ||
-      !["text", "pdf", "image"].includes(entry.viewer)
-    )
+    if (!entry || entry.kind !== "file" || entry.platform)
       throw new Error(
-        "请添加图片、PDF、TXT 或 Markdown 文件；文件夹和视频不能作为附件（FILE_ATTACHMENT_UNSUPPORTED）",
+        "请选择本地文件；文件夹或未下载的平台资源不能作为附件（FILE_ATTACHMENT_UNSUPPORTED）",
       );
-    const maximum =
-      entry.viewer === "pdf"
-        ? 20 * 1024 * 1024
-        : entry.viewer === "image"
-          ? 10_000_000
-          : 1024 * 1024;
-    if (!entry.size_bytes || entry.size_bytes > maximum)
+    const maximum = attachmentType(entry.name).startsWith("image/")
+      ? 20 * 1024 * 1024
+      : Number.POSITIVE_INFINITY;
+    if (entry.size_bytes === null || entry.size_bytes > maximum)
       throw new Error("文件为空或超过附件大小上限（FILE_ATTACHMENT_SIZE_LIMIT）");
     entries.push(entry);
   }
   const files: File[] = [];
   for (const entry of entries) {
-    const opened = await api.write<Schema<"CourseFileOpenResponse">>(`${prefix}/open`, {
-      path: entry.path,
-    });
-    const expected = `/api/v1/course-files/${encodeURIComponent(opened.asset_id)}/content?source_version=${encodeURIComponent(opened.source_version)}`;
+    const opened = await api.write<Schema<"CourseFileOpenResponse">>(
+      `${prefix}/attachment-source`,
+      {
+        path: entry.path,
+      },
+    );
+    const expected = `/api/v1/course-files/${encodeURIComponent(opened.asset_id)}/content?source_version=${encodeURIComponent(opened.source_version)}&download=1`;
     if (
       opened.course_id !== value.courseId ||
       opened.entry.path !== entry.path ||

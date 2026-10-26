@@ -7,7 +7,7 @@
   const id = '@learning/desktop-video';
   const rawFetch = window.fetch.bind(window);
   const nativeHooks = {};
-  const uploadIds = new Map();
+  const uploadIds = new WeakMap();
   let csrf;
   let applicationInstance;
   let reconnecting;
@@ -83,11 +83,13 @@
         }
         init = { ...init, body: JSON.stringify(envelope) };
       } else if (target.pathname.endsWith('/session/uploadFileBinary') && init.body instanceof Blob) {
-        const bytes = await init.body.arrayBuffer();
-        const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(value => value.toString(16).padStart(2, '0')).join('');
-        const key = target.searchParams.get('sessionId') + ':' + target.searchParams.get('name') + ':' + hash;
-        if (!uploadIds.has(key)) uploadIds.set(key, crypto.randomUUID());
-        headers.set('X-Learning-Upload-Id', uploadIds.get(key));
+        // Native retries retain the same File/Blob. Do not aggregate arbitrary
+        // uploads in renderer memory merely to mint their stable identity.
+        const key = target.searchParams.get('sessionId') + ':' + target.searchParams.get('name');
+        let identities = uploadIds.get(init.body);
+        if (!identities) { identities = new Map(); uploadIds.set(init.body, identities); }
+        if (!identities.has(key)) identities.set(key, crypto.randomUUID());
+        headers.set('X-Learning-Upload-Id', identities.get(key));
         for (const [name, value] of Object.entries(nativeHooks.uploadHeaders?.(init.body) || {})) headers.set(name, value);
       }
       const reconciledResponse = result => result?.state === 'accepted' ? new Response(JSON.stringify({
@@ -1056,8 +1058,6 @@
               const files = await library.components.readCourseDragFiles(value);
               if (submitted || activeSessionId !== sid || navigationRevision !== navigation || navigationPending || readOnlyHistory())
                 throw new Error('对话已切换或问题已发送，请重新添加附件（FILE_ATTACHMENT_CONTEXT_CHANGED）');
-              if (input.state.getSnapshot().attachmentIds.length + files.length > 8)
-                throw new Error('每次最多添加 8 个附件，请先移除部分附件（FILE_ATTACHMENT_LIMIT）');
               if (!library.components.getDraftController(binding.chat_id).snapshot().ready)
                 throw new Error('原对话草稿尚未就绪，请稍后重试（DRAFT_NOT_READY）');
               const prepared = ctx.conversation.createDrafts(sid, files);

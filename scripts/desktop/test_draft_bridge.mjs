@@ -298,6 +298,18 @@ test('late saved draft restoration never overwrites text entered while attachmen
   f.bridge.dispose();
 });
 
+test('a verbatim file with an image MIME stays a file after restoring its draft', async () => {
+  const f = fixture({ ...initial(), attachment_ids: ['document_raw_image'] });
+  await savedFile(f, 'document_raw_image', 'unparsed original bytes', 'picked.png', 'image/png', 'file');
+  await f.bridge.attach('s1', 'chat1');
+  assert.equal(f.uploadsHeaders.length, 1);
+  assert.equal(f.uploadsHeaders[0].file.type, 'application/octet-stream');
+  assert.equal(f.uploadsHeaders[0].headers['X-Learning-Existing-Document'], 'document_raw_image');
+  await f.bridge.beforeNavigate('s1');
+  assert.deepEqual([...f.controller.snapshot().value.attachment_ids], ['document_raw_image']);
+  f.bridge.dispose();
+});
+
 test('sending persists exact outgoing draft and successful clear preserves newly typed follow-up', async () => {
   const f = fixture();
   await f.bridge.attach('s1', 'chat1');

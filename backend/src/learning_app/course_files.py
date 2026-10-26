@@ -922,6 +922,22 @@ class CourseFileStore:
                 )
         return source
 
+    def attachment_source(self, course_id: str, value: str) -> dict:
+        """Register only explicitly selected local bytes; never open a player."""
+        root = self._root(course_id)
+        path = self._path(root, value)
+        if not path.is_file():
+            raise AppError("FILE_REQUIRED", "请选择本地文件，文件夹不能作为附件", 422)
+        with self._lock:
+            source = self._register(course_id, root, path)
+            integrations = getattr(self.repository, "integrations", None)
+            if integrations and integrations.source(source["asset_id"], source["source_version"], course_id):
+                raise AppError("FILE_ATTACHMENT_REMOTE_SOURCE", "请先明确下载平台资源，再选择本地原件作为附件", 422)
+            return {"course_id": course_id, "entry": self._entry(course_id, root, path),
+                    "asset_id": source["asset_id"], "source_version": source["source_version"],
+                    "viewer": _viewer(path), "video": None, "generated_artifact": None,
+                    "content_url": f"/api/v1/course-files/{source['asset_id']}/content?source_version={source['source_version']}&download=1"}
+
     def open(self, course_id: str, value: str) -> dict:
         root = self._root(course_id)
         path = self._path(root, value)
@@ -1567,7 +1583,8 @@ class CourseFileStore:
         ):
             raise AppError("COURSE_SOURCE_OUTSIDE_ROOT", "资料不在当前已绑定课程根目录内", 403)
         viewer = _viewer(path)
-        if viewer not in {"text", "image", "pdf"}:
+        download = request.query_params.get("download") == "1"
+        if not download and viewer not in {"text", "image", "pdf"}:
             raise AppError("FILE_VIEWER_UNSUPPORTED", "请主动使用系统默认程序打开此文件", 422)
         media_type = (
             "text/plain; charset=utf-8"
@@ -1576,7 +1593,7 @@ class CourseFileStore:
             if viewer == "pdf"
             else mimetypes.guess_type(path.name)[0] or "application/octet-stream"
         )
-        if viewer == "text" and path.stat().st_size > 5_000_000:
+        if viewer == "text" and not download and path.stat().st_size > 5_000_000:
             raise AppError("TEXT_PREVIEW_TOO_LARGE", "文本超过5MB，请主动使用系统程序打开", 422)
         stream = _read_locked(path)
         try:
@@ -1592,6 +1609,9 @@ class CourseFileStore:
                 "Accept-Ranges": "bytes",
                 "ETag": f'"{source["content_hash"]}"',
             }
+            if download:
+                media_type = "application/octet-stream"
+                headers["Content-Disposition"] = "attachment"
             status = 200
             range_header = request.headers.get("range")
             if range_header and request.headers.get("if-range", headers["ETag"]) == headers["ETag"]:
@@ -1747,6 +1767,10 @@ def install_course_file_routes(app: FastAPI) -> None:
     )
     def delete_file(course_id: str, value: CourseDeleteInput):
         return store().delete(course_id, value)
+
+    @app.post("/api/v1/courses/{course_id}/files/attachment-source", response_model=CourseFileOpenResponse)
+    def attachment_source(course_id: str, value: CoursePathInput):
+        return store().attachment_source(course_id, value.path)
 
     @app.post("/api/v1/courses/{course_id}/files/open", response_model=CourseFileOpenResponse)
     def open_file(course_id: str, value: CoursePathInput):

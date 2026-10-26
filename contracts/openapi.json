@@ -3230,6 +3230,75 @@
         }
       }
     },
+    "/api/v1/courses/{course_id}/files/attachment-source": {
+      "post": {
+        "summary": "Attachment Source",
+        "operationId": "attachment_source_api_v1_courses__course_id__files_attachment_source_post",
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Course Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoursePathInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseFileOpenResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/courses/{course_id}/files/open": {
       "post": {
         "summary": "Open File",
@@ -15730,7 +15799,7 @@
         "properties": {
           "data_base64": {
             "type": "string",
-            "maxLength": 16000000,
+            "maxLength": 27962028,
             "title": "Data Base64"
           },
           "media_type": {
@@ -15738,7 +15807,8 @@
             "enum": [
               "image/png",
               "image/jpeg",
-              "image/webp"
+              "image/webp",
+              "image/gif"
             ],
             "title": "Media Type"
           },
@@ -15785,7 +15855,8 @@
               "image",
               "pdf",
               "text",
-              "markdown"
+              "markdown",
+              "file"
             ],
             "title": "Kind"
           },
@@ -19758,7 +19829,6 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 8,
             "title": "Attachment Ids"
           },
           "conditions": {
@@ -19924,7 +19994,6 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 8,
             "title": "Attachment Ids"
           },
           "conditions": {
@@ -26600,7 +26669,6 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 8,
             "title": "Attachment Ids"
           },
           "conditions": {

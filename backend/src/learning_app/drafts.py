@@ -79,7 +79,7 @@ class DraftContent(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     text: str = Field(default="", max_length=100_000)
-    attachment_ids: list[str] = Field(default_factory=list, max_length=8)
+    attachment_ids: list[str] = Field(default_factory=list)
     conditions: list[str] = Field(default_factory=list, max_length=100)
     corrections: list[str] = Field(default_factory=list, max_length=100)
     references: list[DraftReference] = Field(default_factory=list, max_length=100)

@@ -51,8 +51,8 @@ class MessageResponse(BaseModel):
 
 
 class AttachmentInput(InputDTO):
-    data_base64: str = Field(max_length=16_000_000)
-    media_type: Literal["image/png", "image/jpeg", "image/webp"]
+    data_base64: str = Field(max_length=((20 * 1024 * 1024 + 2) // 3) * 4)
+    media_type: Literal["image/png", "image/jpeg", "image/webp", "image/gif"]
     confirmed: Literal[True]
 
 
@@ -68,7 +68,7 @@ class SubmissionInput(InputDTO):
     chat_id: str
     submission_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9_-]+$")
     text: str = Field(max_length=100_000)
-    attachment_ids: list[str] = Field(default_factory=list, max_length=8)
+    attachment_ids: list[str] = Field(default_factory=list)
     conditions: list[str] = Field(
         default_factory=list, max_length=0, json_schema_extra={"deprecated": True}
     )

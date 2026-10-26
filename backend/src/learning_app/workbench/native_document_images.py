@@ -696,7 +696,11 @@ class NativeDocumentImages:
                     snapshot, allowance["proof"], self._owner(scope), scope["settings"]["model"]
                 )
                 grants.append((row, allowance["proof"]))
-        occurrences = 0
+            from learning_app.chat_attachments import wire_grants
+
+            file_grants = wire_grants(conn, scope)
+            grants.extend(file_grants)
+        occurrences, file_occurrences = 0, 0
         for message in request.get("messages", []):
             content = message.get("content", [])
             if not isinstance(content, list):
@@ -728,6 +732,9 @@ class NativeDocumentImages:
                     if row["native_call"]["call_id"] == part.get("tool_use_id")
                     and metadata == rendered_metadata(row["result"])
                 ]
+                if any(row["native_call"].get("tool_name") == "read_chat_attachment"
+                       for row, _ in matches):
+                    file_occurrences += len(pictures)
                 if len(pictures) != 1 or not any(
                     pictures[0]["sha256"] == proof["encoded_sha256"]
                     and pictures[0].get("mime") == proof["encoded_media_type"]
@@ -778,7 +785,7 @@ class NativeDocumentImages:
                             "实际历史图片不属于本次冻结来源和编码",
                             403,
                         )
-        if occurrences > MAX_IMAGES:
+        if occurrences - file_occurrences > MAX_IMAGES:
             raise AppError(
                 "DOCUMENT_IMAGE_INPUT_LIMIT", "工具图片历史超过本次输入预算，未发送", 403
             )

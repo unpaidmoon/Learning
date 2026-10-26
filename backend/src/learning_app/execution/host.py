@@ -280,6 +280,7 @@ class HarnessHost:
                     expected = (
                         [
                             "admit_requested_artifact",
+                            "read_chat_attachment",
                             "read_document_region",
                             "read_nearby_subtitles",
                             "read_research_page",

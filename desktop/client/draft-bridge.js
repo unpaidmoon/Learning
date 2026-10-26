@@ -49,8 +49,8 @@
       }
       async function storeImage(data, mediaType, name) {
         const bytes = typeof data === 'string' ? bytesFromBase64(data) : new Uint8Array(await data.arrayBuffer());
-        if (!['image/png', 'image/jpeg', 'image/webp'].includes(mediaType) || !bytes.length || bytes.length > 10000000) {
-          throw fault('IMAGE_SIZE_INVALID', '请选择不超过 10MB 的 PNG、JPEG 或 WebP 图片');
+        if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(mediaType) || !bytes.length || bytes.length > 20 * 1024 * 1024) {
+          throw fault('IMAGE_SIZE_INVALID', '请选择不超过 20MiB 的 PNG、JPEG、WebP 或 GIF 图片');
         }
         const digest = await hash(bytes);
         const matched = captureName.exec(name || '');
@@ -150,7 +150,7 @@
           }
           const image = metadata.kind === 'image';
           const name = image ? `learning-capture_${id}.png` : metadata.filename;
-          const file = new File([blob], name, { type: metadata.media_type });
+          const file = new File([blob], name, { type: image ? metadata.media_type : "application/octet-stream" });
           files.set(file, id);
           if (!image) restoredDocuments.set(file, id);
           prepared.push(file);
