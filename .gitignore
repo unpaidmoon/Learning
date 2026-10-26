@@ -116,3 +116,22 @@ research/probes/v1-harness/scripts/*
 !research/probes/v1-harness/scripts/Run-V1B.py
 !research/probes/v1-harness/scripts/Run-V1BStop.py
 !research/probes/v1-harness/scripts/Run-V1BContinuation.py
+
+# 项目文档与开发记录仅保留在本机（包括任意层级的 AGENTS.md）。
+/docs/
+/research/reports/
+/research/topics/
+*.md
+*.markdown
+*.mdx
+*.rst
+
+# 保留运行所需 Skill、第三方许可与来源声明，以及实际测试素材。
+!**/SKILL.md
+!**/LICENSE*.md
+!**/NOTICE*.md
+!**/THIRD_PARTY*.md
+!**/SOURCES.md
+!**/UPSTREAM.md
+!/third_party/deeptutor/checks/offline-candidate/package/book.md
+!/third_party/deeptutor/checks/offline-candidate/verification/unpacked-r1/book.md
