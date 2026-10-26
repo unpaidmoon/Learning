@@ -11,5 +11,5 @@
     "types": [],
     "typeRoots": ["../frontend/node_modules/@types"]
   },
-  "include": ["src/library-entry.tsx"]
+  "include": ["src/library-entry.tsx", "src/native-directory-flow.d.ts"]
 }

@@ -27,6 +27,8 @@ class CourseInput(InputDTO):
 class CourseResponse(BaseModel):
     course_id: str
     title: str
+    created_at: str | None = None
+    root_path: str | None = None
 
 
 class ChatResponse(BaseModel):

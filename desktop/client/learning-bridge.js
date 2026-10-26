@@ -75,7 +75,7 @@
         if (operation === 'session/create' && request && nativeHooks.current) {
           const current = nativeHooks.current();
           if (current?.navigating && !request.sessionId) throw new Error('课程或对话正在切换（NAVIGATION_PENDING）');
-          if (current?.sessionId && (!current.readOnly || current.explicitNew) && (!request.workspaceId || request.workspaceId === current.courseId)) request.currentSessionId = current.sessionId;
+          if (current?.sessionId && (!current.freshSeed || request.sessionId !== current.freshSeed) && (!current.readOnly || current.explicitNew) && (!request.workspaceId || request.workspaceId === current.courseId)) request.currentSessionId = current.sessionId;
         }
         if (operation === 'session/prompt' && request) {
           try { await nativeHooks.beforeSubmit?.(request.sessionId, request.requestId, request); }
@@ -142,7 +142,8 @@
     const React = require('react');
     const ReactDOM = require('react-dom');
     const ReactDOMClient = require('react-dom/client');
-    const { Button, Input, Modal, Menu, Switch, Checkbox } = require('@deepseek-ai/dsh-client-ui-primitives');
+    const primitives = require('@deepseek-ai/dsh-client-ui-primitives');
+    const { Button, Input, Modal, Menu, Switch, Checkbox } = primitives;
     const h = React.createElement;
     const { useState, useEffect, useRef } = React;
     let ctx;
@@ -153,6 +154,7 @@
     let drafts;
     let newChatPending;
     let newChatIntent = 0;
+    let freshChatSeed;
     let navigationRevision = 0;
     let sourceJumpRevision = 0;
     let navigationPending = false;
@@ -197,10 +199,27 @@
       return ctx.conversation.input.for(scope);
     }
     const readOnlyHistory = () => !!bindings.get(activeSessionId)?.read_only;
-    async function createLearningChat() {
+    async function createLearningChat(courseId = selectedCourse, fresh = false) {
       newChatIntent++;
-      try { return await ctx.sessions.create({ workspaceId: selectedCourse }); }
-      finally { newChatIntent--; }
+      const seed = fresh ? 'learning-create-' + crypto.randomUUID().replaceAll('-', '') : undefined;
+      if (fresh) freshChatSeed = seed;
+      try { return await ctx.sessions.create({ workspaceId: courseId, ...(seed ? { sessionId: seed } : {}) }); }
+      finally { newChatIntent--; if (freshChatSeed === seed) freshChatSeed = undefined; }
+    }
+    async function newCourseChat(courseId) {
+      if (newChatPending) return newChatPending;
+      newChatPending = (async () => {
+        if (captureRequest) throw new Error('请完成或取消当前截图（CAPTURE_CONTEXT_LOCKED）');
+        if (navigationPending) throw new Error('请等待课程或对话切换完成（NAVIGATION_PENDING）');
+        if (activeSessionId && !readOnlyHistory()) await drafts.beforeNavigate(activeSessionId);
+        // An explicit course-row action owns a stable creation seed. Even an
+        // unsent old draft keeps its own identity and readable workspaces.
+        const sid = await createLearningChat(courseId, true);
+        await bindingFor(sid);
+        ctx.uiWorkspace.openSession(sid);
+      })().finally(() => { newChatPending = null; notify(); });
+      notify();
+      return newChatPending;
     }
     async function chooseCourse(course, chatId, action = 'open') {
       if (captureRequest) throw new Error('请先完成或取消截图（CAPTURE_CONTEXT_LOCKED）');
@@ -218,6 +237,17 @@
       ctx.uiWorkspace.openSession(opened.session_id);
       if (!opened.read_only) await drafts?.attach(opened.session_id, opened.chat_id);
       notify();
+    }
+    async function resolveWorkspaceInfo(course) {
+      // Older running backends expose only id/title in /courses. Their native
+      // workspace feed still contains the registration time; its path is an
+      // execution carrier, so use the existing read-only properties endpoint
+      // for the real course root, without enumerating or preparing materials.
+      const native = ctx.workspaces.list.getSnapshot().items.find(item => item.workspaceId === course.course_id);
+      const createdAt = course.created_at || native?.createdAt;
+      if (!createdAt) throw new Error('工作区信息尚未就绪，请重新悬停（WORKSPACE_INFO_UNAVAILABLE）');
+      const root = Object.hasOwn(course, 'root_path') ? course : await api('/courses/' + course.course_id + '/files/properties', { path: '' });
+      return { root_path: root.root_path, created_at: createdAt };
     }
     function HistoryTitle({ displayTitle }) {
       const [open, setOpen] = useState(false);
@@ -942,7 +972,9 @@
         try {
         ctx = context;
         const disposers = [];
-        library = window.LearningCourseLibrary.create({ React, ReactDOM, Button, Input, Modal, Menu, api, chooseCourse });
+        library = window.LearningCourseLibrary.create({ React, ReactDOM, Button, Input, Modal, Menu,
+          HoverCard: primitives.HoverCard, HoverCardGroup: primitives.HoverCardGroup, Tooltip: primitives.Tooltip,
+          icons: primitives, api, chooseCourse, newCourseChat, resolveWorkspaceInfo });
         videoComponents = window.LearningVideoComponents.create({ React, Button, Menu });
         await Promise.all([library.components.initialize(), videoComponents.initialize()]);
         drafts = window.NativeDraftBridge.create({ ctx, api, getDraftController: library.components.getDraftController,
@@ -954,7 +986,7 @@
             }
           },
           fetchBlob: async url => { const response = await rawFetch(url, { credentials: 'same-origin' }); if (!response.ok) throw new Error('附件无法恢复（ATTACHMENT_MISSING）'); return response.blob(); } });
-        Object.assign(nativeHooks, { current: () => ({ sessionId: activeSessionId, courseId: selectedCourse, navigating: navigationPending, readOnly: readOnlyHistory(), explicitNew: newChatIntent > 0 }),
+        Object.assign(nativeHooks, { current: () => ({ sessionId: activeSessionId, courseId: selectedCourse, navigating: navigationPending, readOnly: readOnlyHistory(), explicitNew: newChatIntent > 0, freshSeed: freshChatSeed }),
           backendRecovered: async () => {
             // Refresh application capabilities and reads only. Draft/message
             // DOM stays mounted; failed submissions are never sent again.
@@ -1159,7 +1191,7 @@
     graph.batches.push({ phase: 'application', url: 'native-workspace.js', rev: 'learning-pinned-workspace-v1', entries: [workspaceId] });
   }
   const entry = { id, url: 'learning-bridge.js', rev: 'learning-desktop-v1',
-    inject: ['@deepseek-ai/dsh-api-session-controller', '@deepseek-ai/dsh-client-ui-conversation',
+    inject: ['@deepseek-ai/dsh-api-session-controller', workspaceId, '@deepseek-ai/dsh-client-ui-conversation',
       '@deepseek-ai/dsh-client-ui-sidebar-right', '@deepseek-ai/dsh-client-ui-workspace'],
   };
   graph.entries.push(entry);

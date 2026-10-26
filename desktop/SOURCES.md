@@ -11,3 +11,7 @@
 `scripts/desktop/bootstrap.py` 校验上游源码及 Electron 归档后，提取上游窗口／托盘图标和原样许可证至忽略的 `.runtime/desktop/resources/`。Electron、Chromium 与 Harness 第三方通知随各自制品保留。应用名称使用“AI 辅助学习”，这是独立学习项目，并非官方桌面发行版。
 
 `src/library-entry.tsx` 与 `src/video-entry.tsx` 是本项目既有学习模块的桌面编译入口，分别由 `scripts/desktop/build-learning.mjs`、`scripts/desktop/build-video.mjs` 构建至忽略的 `.runtime/desktop/client/`。共享原生客户端的 React／ReactDOM 和控件，不把第二套 React 打入 bundle。产物清单记录输入摘要、编译器与锁文件；两条构建命令的 `--check` 均已成功用于核验当前产物，正常启动由 bootstrap 自动准备。第三方依赖许可沿项目锁文件及各制品保留。
+
+工作区导航另通过同一学习组件构建原样复用固定参考提交的 `packages/client/ui-directory-picker-native/src/client/flow.ts`（SHA-256 `d4bb4bf3383fe3240d32ad7e8676151607482327ec2758f411d7c2c505c78d36`）。构建前核对提交与源码摘要，使用项目现有受限Windows文件夹选择接口提供 `pick`；路径接纳由业务目录层完成，不接入原生添加后的新建对话行为。列表按钮、菜单、弹窗及文件夹／置顶等图标直接使用原生客户端primitives，项目适配课程目录导航和业务回执。
+
+2026-10-26工作区根行直接使用实际固定客户端提供的`HoverCard`、`HoverCardGroup`、`Tooltip`及新对话／展开图标；浮窗内容的字体、颜色和间距对照上述固定参考提交`ui-workspace/src/client/rows/Rows.tsx`及`Rows.module.css`适配。目录展开使用本项目受限文件接口，不把上游工作区／对话树冒充磁盘目录树，也不复制另一套浮窗定位或生命周期实现。

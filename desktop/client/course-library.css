@@ -1,4 +1,30 @@
-/* Geometry only; Harness primitives and existing --dsw-* tokens own appearance. */
+/* Course navigation; Harness primitives own menus, dialogs, hover cards and icons. */
+.learning-workspace-list { list-style: none; padding: 0; margin: 0; }
+.learning-workspace-row { display: flex; align-items: center; gap: 6px; min-width: 0; height: 34px; padding-inline: 8px; border-radius: var(--dsw-radius-md); }
+.learning-course-directory[data-pointer-inside='true'] .learning-workspace-row:hover,
+.learning-course-directory[data-pointer-inside='true'] .learning-workspace-row[data-menu-open='true'] { background: var(--dsw-alias-interactive-bg-hover); }
+.learning-course-directory .learning-workspace-row button,
+.learning-course-directory .learning-workspace-row button:is(:hover, :active, :focus):not(:disabled) { background: transparent; }
+.learning-workspace-row .learning-workspace-name { flex: 1; min-width: 0; height: 32px; padding-inline: 0; justify-content: flex-start; text-align: start; background: transparent; font-size: 14px; font-weight: 400; }
+.learning-workspace-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.learning-workspace-pin { display: inline-flex; align-items: center; color: var(--dsw-alias-label-tertiary); flex: none; }
+.learning-workspace-row .learning-workspace-actions { flex: none; width: 20px; height: 24px; padding: 0; opacity: 0; pointer-events: none; }
+.learning-course-directory[data-pointer-inside='true'] .learning-workspace-row:is(:hover, :has(:focus-visible), [data-menu-open='true']) .learning-workspace-actions { opacity: 1; pointer-events: auto; }
+.learning-workspace-row .learning-workspace-toggle { flex: none; width: 20px; height: 28px; padding: 0; background: transparent; color: var(--dsw-alias-label-tertiary); }
+.learning-workspace-folder, .learning-workspace-chevron { align-items: center; justify-content: center; }
+.learning-workspace-folder { display: inline-flex; }
+.learning-workspace-chevron { display: none; transition: transform 150ms var(--ds-ease-in-out); }
+.learning-workspace-chevron[data-expanded='true'] { transform: rotate(90deg); }
+.learning-course-directory[data-pointer-inside='true'] .learning-workspace-row:is(:hover, :has(:focus-visible)) .learning-workspace-folder { display: none; }
+.learning-course-directory[data-pointer-inside='true'] .learning-workspace-row:is(:hover, :has(:focus-visible)) .learning-workspace-chevron { display: inline-flex; }
+.learning-workspace-children { list-style: none; margin: 0 0 0 20px; padding: 0; }
+.learning-workspace-hover { display: flex; flex-direction: column; gap: 8px; }
+.learning-workspace-hover-title { font-size: 14px; line-height: 20px; color: #fff; overflow-wrap: break-word; }
+.learning-workspace-hover-path { font-size: 12px; line-height: 16px; color: #cfd3d6; word-break: break-all; }
+.learning-workspace-hover-time { font-size: 12px; line-height: 16px; color: #cfd3d6; }
+@media (prefers-reduced-motion: reduce) { .learning-workspace-chevron { transition: none; } }
+.learning-workspace-form, .learning-workspace-form label { display: flex; flex-direction: column; gap: 8px; }
+.learning-workspace-form p, .learning-workspace-reconcile { font-size: 12px; color: var(--dsw-alias-label-secondary); }
 .learning-course-directory { display: flex; flex-direction: column; min-height: 0; height: 100%; gap: 10px; }
 .learning-library-course-heading { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .learning-library-course-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }

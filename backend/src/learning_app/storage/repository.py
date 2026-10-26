@@ -212,7 +212,7 @@ class Repository:
             return [
                 dict(row)
                 for row in conn.execute(
-                    select(s.courses)
+                    select(s.courses, course_roots.c.local_path.label("root_path"))
                     .outerjoin(course_roots, course_roots.c.course_id == s.courses.c.course_id)
                     .outerjoin(
                         course_visibility, course_visibility.c.course_id == s.courses.c.course_id
