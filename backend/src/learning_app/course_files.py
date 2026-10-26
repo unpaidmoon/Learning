@@ -425,6 +425,10 @@ class CourseFileStore:
             if existing:
                 if course_id is None or existing["course_id"] == course_id:
                     course_id = existing["course_id"]
+                    from learning_app.workspaces import UNCLASSIFIED
+
+                    if course_id == UNCLASSIFIED and title not in {None, "未分类"}:
+                        raise AppError("WORKSPACE_SYSTEM_PROTECTED", "未分类是默认保存工作区，不能重命名", 403)
                     with self.engine.begin() as conn:
                         conn.execute(
                             update(roots)
@@ -1481,6 +1485,10 @@ class CourseFileStore:
                 ) from exc
 
     def rename_course(self, course_id: str, value: CourseRenameFolderInput) -> dict:
+        from learning_app.workspaces import UNCLASSIFIED
+
+        if course_id == UNCLASSIFIED:
+            raise AppError("WORKSPACE_SYSTEM_PROTECTED", "未分类是默认保存工作区，不能重命名", 403)
         name = value.name.strip()
         if not name or any(ord(character) < 32 for character in name):
             raise AppError("COURSE_NAME_INVALID", "请输入有效的课程显示名称", 422)
@@ -1506,6 +1514,10 @@ class CourseFileStore:
                 raise AppError("COURSE_RENAME_UNKNOWN", "课程显示名保存结果需要核对", 409) from exc
 
     def detach(self, course_id: str, value: CourseDetachInput) -> dict:
+        from learning_app.workspaces import UNCLASSIFIED
+
+        if course_id == UNCLASSIFIED:
+            raise AppError("WORKSPACE_SYSTEM_PROTECTED", "未分类是默认保存工作区，不能移除", 403)
         with self._lock:
             self.folder(course_id)  # Existence check; a missing/unbound root is removable.
             op_id, previous = self._begin(
@@ -1643,6 +1655,10 @@ class CourseFileStore:
 
 
 def install_course_file_routes(app: FastAPI) -> None:
+    from learning_app.workspace_navigation import install_workspace_navigation_routes
+
+    install_workspace_navigation_routes(app)
+
     def store() -> CourseFileStore:
         if not hasattr(app.state, "course_files"):
             app.state.course_files = CourseFileStore(app.state.repository)
