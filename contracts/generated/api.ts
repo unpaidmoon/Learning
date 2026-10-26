@@ -6921,6 +6921,12 @@ export interface components {
             frames?: components["schemas"]["PreviewFrame"][];
             /** Error Code */
             error_code?: string | null;
+            /**
+             * Strategy
+             * @default thumbnails
+             * @enum {string}
+             */
+            strategy: "thumbnails" | "media";
         };
         /** PreviewPriorityInput */
         PreviewPriorityInput: {
@@ -6933,12 +6939,18 @@ export interface components {
              * @default interaction
              * @enum {string}
              */
-            kind: "playback" | "interaction";
+            kind: "playback" | "interaction" | "preview";
             /**
              * Ttl Ms
              * @default 3000
              */
             ttl_ms: number;
+            /** Asset Id */
+            asset_id?: string | null;
+            /** Source Version */
+            source_version?: string | null;
+            /** Time Ms */
+            time_ms?: number | null;
         };
         /** QuestionBlock */
         "QuestionBlock-Input": {

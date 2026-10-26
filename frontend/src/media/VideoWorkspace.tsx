@@ -583,7 +583,9 @@ export function VideoWorkspace({
               playing={playing}
               {...playback}
               previewSrc={
-                asset.media_type.startsWith("audio/") ? undefined : videoContentUrl(asset)
+                !active || asset.media_type.startsWith("audio/")
+                  ? undefined
+                  : videoContentUrl(asset)
               }
               sourceKey={`${asset.asset_id}:${asset.source_version}`}
               onFullscreen={toggleFullscreen}

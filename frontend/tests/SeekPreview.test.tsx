@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SeekPreview } from "../src/media/SeekPreview";
 
 type Frame = { index: number; time_ms: number; url: string };
-type Manifest = { status: string; frames: Frame[] };
+type Manifest = { status: string; frames: Frame[]; strategy?: "thumbnails" | "media" };
 let sequence = 0;
 let identity: string;
 let manifest: Manifest;
@@ -112,12 +112,7 @@ describe("本地缓存进度预览", () => {
     const view = render(<SeekPreview {...props} />);
     await settle();
     loadImage(1);
-    const writes: number[] = [];
-    Object.defineProperty(decoders[0], "currentTime", {
-      configurable: true,
-      get: () => 0,
-      set: (value) => writes.push(value),
-    });
+    expect(decoders).toHaveLength(0);
     view.rerender(<SeekPreview {...props} time={19} left={170} />);
     expect(screen.getByText("0:19")).toBeInTheDocument();
     expect(screen.getByLabelText("视频进度预览")).toHaveStyle({ left: "170px" });
@@ -125,7 +120,7 @@ describe("本地缓存进度预览", () => {
     loadImage(2);
     expect(screen.getByTestId("video-preview-image")).toHaveAttribute("src", frame(2, 20).url);
     expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-frame-time", "20");
-    expect(writes).toEqual([]);
+    expect(decoders).toHaveLength(0);
   });
 
   it("只预载同一业务视频和来源版本的缩略图，拒绝外部、错版本及带凭据地址", async () => {
@@ -193,29 +188,27 @@ describe("本地缓存进度预览", () => {
     );
   });
 
-  it("StrictMode清理重放不会让旧温热解码回调发布已释放的帧", async () => {
+  it("StrictMode清理重放保持图片缓存且不额外解码本地视频", async () => {
     render(
       <StrictMode>
         <SeekPreview {...properties()} />
       </StrictMode>,
     );
     await settle();
-    expect(decoders.length).toBeGreaterThanOrEqual(2);
-    const old = decoders[0];
-    expect(old).not.toHaveAttribute("src");
-    Object.defineProperty(old, "readyState", { configurable: true, get: () => 4 });
-    fireEvent.loadedData(old);
+    expect(decoders).toHaveLength(0);
     expect(screen.queryByLabelText("视频进度预览")).not.toBeInTheDocument();
     loadImage(1);
     expect(screen.getByTestId("video-preview-image")).toHaveAttribute("src", frame(1, 10).url);
   });
 
-  it("隐藏结束交互优先租约而保留已缓存图片，下次悬停无需重取", async () => {
+  it("悬停提交目标时间并在隐藏时释放预览租约，缓存下次仍可使用", async () => {
+    vi.useFakeTimers();
     const props = properties();
     const view = render(<SeekPreview {...props} />);
     await settle();
     loadImage(1);
     const gets = () => fetchMock.mock.calls.filter(([, init]) => init?.method !== "POST").length;
+    await act(async () => vi.advanceTimersByTime(90));
     const before = gets();
     view.rerender(<SeekPreview {...props} visible={false} />);
     await settle();
@@ -226,6 +219,12 @@ describe("本地缓存进度预览", () => {
       true,
       false,
     ]);
+    expect(JSON.parse(priority[0][1]!.body as string)).toMatchObject({
+      kind: "preview",
+      asset_id: identity,
+      source_version: "version-one",
+      time_ms: 10000,
+    });
     expect(screen.queryByLabelText("视频进度预览")).not.toBeInTheDocument();
     view.rerender(<SeekPreview {...props} />);
     expect(screen.getByTestId("video-preview-image")).toBeInTheDocument();
@@ -241,7 +240,7 @@ describe("本地缓存进度预览", () => {
     view.unmount();
     await act(async () => vi.advanceTimersByTime(2000));
     expect(fetchMock.mock.calls).toHaveLength(initial);
-    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
+    expect(decoders).toHaveLength(0);
     expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
   });
 
@@ -250,6 +249,47 @@ describe("本地缓存进度预览", () => {
     render(<SeekPreview {...properties()} visible={false} />);
     await settle();
     expect(images.length).toBeGreaterThan(1);
-    expect(images.length).toBeLessThanOrEqual(40);
+    expect(images.length).toBeLessThanOrEqual(3);
+  });
+
+  it("在线预览只在悬停未命中时解码，追随最新目标并在隐藏时释放", async () => {
+    vi.useFakeTimers();
+    manifest = { status: "ready", strategy: "media", frames: [] };
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      fillRect: vi.fn(),
+      drawImage: vi.fn(),
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+      "data:image/jpeg;base64,c3ludGhldGlj",
+    );
+    const props = { ...properties(), time: 12 };
+    const view = render(<SeekPreview {...props} visible={false} />);
+    await settle();
+    expect(decoders).toHaveLength(0);
+    view.rerender(<SeekPreview {...props} />);
+    await act(async () => vi.advanceTimersByTime(90));
+    expect(decoders).toHaveLength(1);
+    const video = decoders[0];
+    for (const [key, value] of Object.entries({
+      duration: 60,
+      readyState: 2,
+      videoWidth: 160,
+      videoHeight: 90,
+    }))
+      Object.defineProperty(video, key, { configurable: true, value });
+    fireEvent.loadedMetadata(video);
+    expect(video.currentTime).toBe(12);
+    view.rerender(<SeekPreview {...props} time={30} />);
+    await act(async () => vi.advanceTimersByTime(90));
+    fireEvent.seeked(video);
+    expect(video.currentTime).toBe(30);
+    fireEvent.seeked(video);
+    expect(screen.getByLabelText("视频进度预览")).toHaveAttribute("data-preview-frame-time", "30");
+    view.rerender(<SeekPreview {...props} time={30} visible={false} />);
+    expect(video).not.toHaveAttribute("src");
+    view.rerender(<SeekPreview {...props} time={30} />);
+    await act(async () => vi.advanceTimersByTime(90));
+    expect(decoders).toHaveLength(1); // A cached time does not reopen a decoder.
+    expect(fetchMock.mock.calls.every(([, init]) => init?.method !== "POST")).toBe(true);
   });
 });

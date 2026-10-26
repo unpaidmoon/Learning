@@ -24329,6 +24329,15 @@
               }
             ],
             "title": "Error Code"
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "thumbnails",
+              "media"
+            ],
+            "title": "Strategy",
+            "default": "thumbnails"
           }
         },
         "type": "object",
@@ -24356,7 +24365,8 @@
             "type": "string",
             "enum": [
               "playback",
-              "interaction"
+              "interaction",
+              "preview"
             ],
             "title": "Kind",
             "default": "interaction"
@@ -24367,6 +24377,44 @@
             "minimum": 100.0,
             "title": "Ttl Ms",
             "default": 3000
+          },
+          "asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Id"
+          },
+          "source_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Version"
+          },
+          "time_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Ms"
           }
         },
         "additionalProperties": false,

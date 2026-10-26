@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client";
+import { createPreviewDecoder } from "./previewDecoder";
 import "./SeekPreview.css";
 
 type Frame = { index: number; time_ms: number; url: string };
-type Manifest = { status: string; frames: Frame[] };
+type Manifest = { status: string; frames: Frame[]; strategy?: "thumbnails" | "media" };
 type PreviewCache = {
   frames: Frame[];
   loaded: Map<string, Frame>;
   loading: Set<string>;
   listeners: Set<() => void>;
-  fallback?: Frame;
+  strategy?: "thumbnails" | "media";
+  decoderFailed?: boolean;
+  failed: Set<string>;
   timer?: number;
   polling: boolean;
   desiredTime?: number;
@@ -25,6 +28,8 @@ function cacheFor(key: string) {
       loading: new Set(),
       listeners: new Set(),
       polling: false,
+      failed: new Set(),
+      strategy: "thumbnails",
     };
     caches.set(key, value);
     for (const [old, entry] of caches) {
@@ -73,7 +78,8 @@ function nearest(frames: Iterable<Frame>, time: number) {
   return best;
 }
 function preload(cache: PreviewCache, frame: Frame) {
-  if (cache.loaded.has(frame.url) || cache.loading.has(frame.url)) return;
+  if (cache.loaded.has(frame.url) || cache.loading.has(frame.url) || cache.failed.has(frame.url))
+    return;
   cache.loading.add(frame.url);
   const image = new Image();
   image.onload = () => {
@@ -82,7 +88,10 @@ function preload(cache: PreviewCache, frame: Frame) {
     while (cache.loaded.size > 96) cache.loaded.delete(cache.loaded.keys().next().value!);
     publish(cache);
   };
-  image.onerror = () => cache.loading.delete(frame.url);
+  image.onerror = () => {
+    cache.loading.delete(frame.url);
+    cache.failed.add(frame.url);
+  };
   image.src = frame.url;
 }
 function requestFrame(cache: PreviewCache, time: number) {
@@ -98,6 +107,7 @@ function poll(cache: PreviewCache, source: URL) {
     .then(async (response) => {
       if (!response.ok) return false;
       const manifest: Manifest = await response.json();
+      cache.strategy = manifest.strategy || "thumbnails";
       cache.frames = manifest.frames.filter((frame) => {
         try {
           const url = new URL(frame.url, location.href);
@@ -112,14 +122,16 @@ function poll(cache: PreviewCache, source: URL) {
           return false;
         }
       });
-      const stride = Math.max(1, Math.ceil(cache.frames.length / 32));
-      cache.frames.forEach((frame, index) => {
-        if (index % stride === 0 || index === cache.frames.length - 1) preload(cache, frame);
-      });
       if (cache.desiredTime !== undefined) {
         const requested = nearest(cache.frames, cache.desiredTime);
         if (requested) preload(cache, requested);
       }
+      // Three coarse images warm the cache without competing with a hovered
+      // target or the primary video's first Range requests.
+      for (const index of [0, Math.floor(cache.frames.length / 2), cache.frames.length - 1]) {
+        if (cache.frames[index]) preload(cache, cache.frames[index]);
+      }
+      publish(cache);
       return manifest.status === "queued" || manifest.status === "building";
     })
     .catch(() => false)
@@ -138,55 +150,27 @@ type PreviewProps = {
   sourceKey: string;
 };
 
-/** Cached local-only thumbnails; neither this cache nor its decoder submits attachments. */
+/** Versioned UI thumbnails; neither the cache nor the decoder submits attachments. */
 export function SeekPreview({ src, time, visible, left, sourceKey }: PreviewProps) {
   const source = sourceKey ? localSource(src) : undefined;
   const sourceHref = source?.href;
   const cache = cacheFor(`${sourceKey}:${sourceHref || ""}`);
   const [, redraw] = useState(0);
   const [leaseId] = useState(() => `preview-${crypto.randomUUID()}`);
+  const decoder = useRef<ReturnType<typeof createPreviewDecoder> | null>(null);
+  const latestTime = useRef(time);
+  useEffect(() => {
+    latestTime.current = time;
+  }, [time]);
   useEffect(() => {
     if (!sourceHref) return;
     const url = new URL(sourceHref);
     const changed = () => redraw((value) => value + 1);
     cache.listeners.add(changed);
     poll(cache, url);
-    // Warm one low-resolution browser-local image before any pointer movement.
-    // It is never a draft, a server upload or a model input.
-    const decoder = document.createElement("video");
-    decoder.muted = true;
-    decoder.playsInline = true;
-    decoder.preload = "auto";
-    let disposed = false;
-    decoder.onloadeddata = () => {
-      if (disposed || cache.fallback || decoder.readyState < 2) return;
-      const canvas = document.createElement("canvas");
-      canvas.width = 240;
-      canvas.height = 135;
-      const context = canvas.getContext("2d");
-      if (!context) return;
-      context.drawImage(decoder, 0, 0, canvas.width, canvas.height);
-      cache.fallback = {
-        index: -1,
-        time_ms: Math.round(decoder.currentTime * 1000),
-        url: canvas.toDataURL("image/jpeg", 0.65),
-      };
-      publish(cache);
-      decoder.pause();
-      decoder.removeAttribute("src");
-      decoder.load();
-    };
-    if (!cache.fallback && !cache.loaded.size) {
-      decoder.src = sourceHref;
-      decoder.load();
-    }
     return () => {
-      disposed = true;
       cache.listeners.delete(changed);
       if (!cache.listeners.size) window.clearTimeout(cache.timer);
-      decoder.pause();
-      decoder.removeAttribute("src");
-      decoder.load();
     };
   }, [sourceHref, cache]);
   useEffect(() => {
@@ -194,30 +178,83 @@ export function SeekPreview({ src, time, visible, left, sourceKey }: PreviewProp
     requestFrame(cache, time);
   }, [time, visible, cache]);
   useEffect(() => {
-    if (!visible || !sourceHref) return;
+    if (!visible || !sourceHref || cache.strategy === "media") return;
+    const url = new URL(sourceHref);
     const renew = () =>
       void api
         .write("/video-previews/priority", {
           lease_id: leaseId,
           active: true,
-          kind: "interaction",
+          kind: "preview",
+          asset_id: url.pathname.split("/")[4],
+          source_version: url.searchParams.get("source_version"),
+          time_ms: Math.round(Math.max(0, latestTime.current) * 1000),
           ttl_ms: 3000,
         })
         .catch(() => {});
-    renew();
     const timer = window.setInterval(renew, 2000);
     return () => {
       window.clearInterval(timer);
       void api
         .write(
           "/video-previews/priority",
-          { lease_id: leaseId, active: false, kind: "interaction", ttl_ms: 3000 },
+          { lease_id: leaseId, active: false, kind: "preview", ttl_ms: 3000 },
           { keepalive: true },
         )
         .catch(() => {});
     };
-  }, [visible, sourceHref, leaseId]);
-  const frame = nearest(cache.loaded.values(), Number.isFinite(time) ? time : 0) || cache.fallback;
+  }, [visible, sourceHref, leaseId, cache, cache.strategy]);
+  useEffect(() => {
+    if (!visible || !sourceHref || cache.strategy !== "media" || cache.decoderFailed) return;
+    let instance: ReturnType<typeof createPreviewDecoder> | undefined;
+    const publishFrame = (value: { time_ms: number; url: string }) => {
+      const key = `media-${Math.round(value.time_ms / 2000)}`;
+      cache.loaded.delete(key);
+      cache.loaded.set(key, { ...value, index: -1 });
+      while (cache.loaded.size > 48) cache.loaded.delete(cache.loaded.keys().next().value!);
+      publish(cache);
+    };
+    decoder.current = {
+      seek(targetTime) {
+        const target = Math.floor(targetTime / 2) * 2000;
+        const cached = nearest(cache.loaded.values(), target / 1000);
+        if (cache.decoderFailed || (cached && Math.abs(cached.time_ms - target) < 1000)) return;
+        instance ??= createPreviewDecoder(sourceHref, publishFrame, () => {
+          cache.decoderFailed = true;
+        });
+        instance.seek(targetTime);
+      },
+      dispose() {
+        instance?.dispose();
+      },
+    };
+    return () => {
+      instance?.dispose();
+      decoder.current = null;
+    };
+  }, [visible, sourceHref, cache, cache.strategy]);
+  useEffect(() => {
+    if (!visible) return;
+    const timer = window.setTimeout(() => {
+      decoder.current?.seek(time);
+      if (sourceHref && cache.strategy !== "media") {
+        const url = new URL(sourceHref);
+        void api
+          .write("/video-previews/priority", {
+            lease_id: leaseId,
+            active: true,
+            kind: "preview",
+            ttl_ms: 3000,
+            asset_id: url.pathname.split("/")[4],
+            source_version: url.searchParams.get("source_version"),
+            time_ms: Math.round(Math.max(0, time) * 1000),
+          })
+          .catch(() => {});
+      }
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [time, visible, sourceHref, cache, cache.strategy, leaseId]);
+  const frame = nearest(cache.loaded.values(), Number.isFinite(time) ? time : 0);
   // Never present a time-only/loading box as a frame. Keep a real decoded
   // neighbor visible while a closer cached thumbnail is being loaded.
   if (!visible || !source || !sourceKey || !frame) return null;

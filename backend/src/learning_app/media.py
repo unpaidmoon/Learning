@@ -296,8 +296,12 @@ class MediaStore:
     def __init__(self, repository: Repository):
         self.repository = repository
         self.engine = repository.engine
-        self._lock = threading.RLock()
-        self._verified: dict[tuple[str, str], list[int]] = {}
+        # File opening and Range routes use separate stores for one repository.
+        # Share only accepted source-version receipts, never a process-global cache.
+        with repository._lock:
+            if not hasattr(repository, "_media_validation"):
+                repository._media_validation = (threading.RLock(), {})
+            self._lock, self._verified = repository._media_validation
 
     def attach_remote_source(self, source: dict) -> dict:
         """Register platform metadata as media identity without treating it as video bytes."""
@@ -351,6 +355,10 @@ class MediaStore:
         host = getattr(self.repository, "integrations", None)
         if host is not None and host.source(row["asset_id"], row["source_version"]):
             return host.media.availability(row["asset_id"], row["source_version"])
+        with self._lock:
+            return self._local_availability(row, force=force, catalog=catalog)
+
+    def _local_availability(self, row: dict, *, force: bool, catalog: bool) -> str:
         path = Path(row["local_path"])
         key = (row["asset_id"], row["source_version"])
         try:
@@ -435,11 +443,14 @@ class MediaStore:
                 source = self.repository.register_source(course_id, path)
             return self.attach_source(source, path)
 
-    def attach_source(self, source: dict, path: Path, *, open_for_playback: bool = False) -> dict:
+    def attach_source(self, source: dict, path: Path, *, open_for_playback: bool = False,
+                      verified_signature: list[int] | None = None) -> dict:
         """Use a course file's exact version without changing historical sources."""
         path, media_type = _video_path(str(path))
         signature = _signature(path)
-        if _hash_file(path) != source["content_hash"]:
+        # The file route holds a read lock across registration and adoption.
+        # Its freshly computed digest already verified these same file bytes.
+        if verified_signature != signature and _hash_file(path) != source["content_hash"]:
             raise AppError("SOURCE_VERSION_MISMATCH", "视频内容在打开时改变，请重新主动打开")
         if _signature(path) != signature:
             raise AppError("SOURCE_CHANGED_DURING_READ", "原件正在改变，请稍后主动重新打开")

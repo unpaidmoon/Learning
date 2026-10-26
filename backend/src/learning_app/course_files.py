@@ -37,7 +37,13 @@ from learning_app.course_files_schema import (
 )
 from learning_app.course_files_schema import course_visibility as visibility
 from learning_app.errors import AppError
-from learning_app.media import PLAYBACK_TYPES, MediaAssetResponse, MediaStore, _read_locked
+from learning_app.media import (
+    PLAYBACK_TYPES,
+    MediaAssetResponse,
+    MediaStore,
+    _read_locked,
+    _signature,
+)
 from learning_app.native_files import pick_paths, read_clipboard_paths, recycle_path
 from learning_app.storage import Repository
 from learning_app.storage import schema as business
@@ -927,13 +933,17 @@ class CourseFileStore:
         path = self._path(root, value)
         if not path.is_file():
             raise AppError("FILE_REQUIRED", "请选择文件", 422)
-        with self._lock:
+        with self._lock, _read_locked(path):
+            signature = _signature(path)
             source = self._register(course_id, root, path)
+            if signature != _signature(path):
+                raise AppError("SOURCE_CHANGED_DURING_READ", "原件正在改变，请稍后主动重新打开")
             host = getattr(self.repository, "integrations", None)
             remote = host and host.source(source["asset_id"], source["source_version"], course_id)
             viewer = "video" if remote else _viewer(path)
             video = (self.media.attach_remote_source(source) if remote else
-                     self.media.attach_source(source, path, open_for_playback=True)) if viewer == "video" else None
+                     self.media.attach_source(source, path, open_for_playback=True,
+                                              verified_signature=signature)) if viewer == "video" else None
             if video and remote:
                 video = self.media.open(source["asset_id"], source["source_version"])
             from learning_app.workbench import schema as workbench_schema

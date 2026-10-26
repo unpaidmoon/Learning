@@ -148,7 +148,32 @@ export function DataPanel({
         <>
           <div className="data-location">
             <div className="learning-setting-title">软件数据位置</div>
-            <p className="data-path">{info.data_directory}</p>
+            <div className="data-location-path">
+              <p className="data-path">{info.data_directory}</p>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="迁移数据目录"
+                title="迁移数据目录：选择目标文件夹，校验后确认退出并切换，原目录保留。"
+                disabled={busy || exiting || pending.length > 0}
+                onClick={() => void perform(() => start("move"))}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v3" />
+                  <path d="M13 17h8m-3-3 3 3-3 3" />
+                </svg>
+              </Button>
+            </div>
             <dl className="data-storage-usage">
               <div>
                 <dt>学习数据</dt>
@@ -220,22 +245,6 @@ export function DataPanel({
               onClick={() => void perform(() => start("import"))}
             >
               选择数据包导入
-            </Button>
-          </div>
-          <div className="learning-setting-row">
-            <div className="learning-setting-copy">
-              <div className="learning-setting-title">迁移数据目录</div>
-              <p className="learning-setting-description">
-                选择目标文件夹后创建独立新目录，校验完成后确认退出并切换，原数据目录保留。
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={busy || exiting || pending.length > 0}
-              onClick={() => void perform(() => start("move"))}
-            >
-              迁移软件数据目录
             </Button>
           </div>
           {switching && (

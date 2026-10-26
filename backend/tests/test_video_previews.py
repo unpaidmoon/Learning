@@ -181,6 +181,31 @@ def test_mismatched_local_tool_is_rejected_without_spawning(repository, tmp_path
         cache.close()
 
 
+def test_hovered_missing_frame_precedes_coarse_coverage_and_background_batches(
+    repository, synthetic_video, tmp_path,
+):
+    asset = MediaStore(repository).register("course_preview", str(synthetic_video))
+    cache = VideoPreviewCache(repository, tmp_path, ffmpeg_path=FFMPEG)
+    cache._resolve_tool()
+    cache.priority(PreviewPriorityInput(lease_id="hover-target", active=True, kind="preview",
+        asset_id=asset["asset_id"], source_version=asset["source_version"], time_ms=2000))
+    job = next(iter(cache._jobs.values()))
+    assert not cache._step(job)
+    assert cache._load_manifest(asset["source_version"])["frames"] == [1]
+    assert cache._step(job)
+    assert cache._load_manifest(asset["source_version"])["frames"] == [0, 1]
+
+    # A fresh background pass publishes both images in one bounded decode.
+    other = VideoPreviewCache(repository, tmp_path, ffmpeg_path=FFMPEG)
+    for frame in cache._manifest_path(asset["source_version"]).parent.glob("*.jpg"):
+        frame.unlink()
+    cache._manifest_path(asset["source_version"]).unlink()
+    other._resolve_tool()
+    other.enqueue_asset(asset["asset_id"], asset["source_version"])
+    assert other._step(next(iter(other._jobs.values())))
+    assert len(other._load_manifest(asset["source_version"])["frames"]) == 2
+
+
 def test_interaction_cancels_only_the_running_owned_decoder(repository, tmp_path):
     if not FFMPEG.is_file():
         pytest.skip("fixed local FFmpeg 8.1 is not installed")

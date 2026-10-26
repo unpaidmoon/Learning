@@ -14,7 +14,7 @@ import re
 import subprocess
 import threading
 import time
-from collections import deque
+from collections import OrderedDict, deque
 from pathlib import Path
 from typing import Callable, Literal
 from urllib.parse import urlencode
@@ -22,7 +22,7 @@ from urllib.parse import urlencode
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import select
 
 from learning_app.errors import AppError
@@ -55,6 +55,7 @@ class PreviewManifest(BaseModel):
     height: int = HEIGHT
     frames: list[PreviewFrame] = Field(default_factory=list)
     error_code: str | None = None
+    strategy: Literal["thumbnails", "media"] = "thumbnails"
 
 
 class CourseCoverResponse(BaseModel):
@@ -69,8 +70,19 @@ class PreviewPriorityInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     lease_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9_-]+$")
     active: bool
-    kind: Literal["playback", "interaction"] = "interaction"
+    kind: Literal["playback", "interaction", "preview"] = "interaction"
     ttl_ms: int = Field(default=3000, ge=100, le=15000)
+    asset_id: str | None = Field(default=None, min_length=1, max_length=160)
+    source_version: str | None = Field(default=None, min_length=1, max_length=160)
+    time_ms: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def preview_target(self):
+        if self.kind == "preview" and self.active and (
+            not self.asset_id or not self.source_version or self.time_ms is None
+        ):
+            raise ValueError("Active preview needs the exact source and target time")
+        return self
 
 
 def _write(path: Path, value: dict) -> None:
@@ -127,6 +139,8 @@ class VideoPreviewCache:
         self._tool: Path | None = None
         self._tool_error: str | None = None
         self._lock = threading.RLock()
+        self._manifests: OrderedDict[str, tuple[list[int], dict, frozenset[int]]] = OrderedDict()
+        self._targets: dict[str, tuple[int, float]] = {}
         self._wake, self._stop = threading.Event(), threading.Event()
         self._leases: dict[str, tuple[str, float]] = {}
         self._courses: deque[str] = deque()
@@ -170,11 +184,21 @@ class VideoPreviewCache:
             delattr(self.repository, "video_previews")
 
     def priority(self, value: PreviewPriorityInput) -> dict:
+        target = None
+        if value.kind == "preview" and value.active:
+            _, path, _, _ = self._source(value.asset_id, value.source_version)
+            if path is not None:
+                target = _file_key(path, _signature(path))
+                self.enqueue_asset(value.asset_id, value.source_version)
         with self._lock:
             if value.active:
                 self._leases[value.lease_id] = (value.kind, time.monotonic() + value.ttl_ms / 1000)
             else:
                 self._leases.pop(value.lease_id, None)
+            if target is not None:
+                self._targets = {key: saved for key, saved in self._targets.items()
+                                 if saved[1] > time.monotonic()}
+                self._targets[target] = (value.time_ms, time.monotonic() + value.ttl_ms / 1000)
         self._wake.set()
         return {"accepted": True}
 
@@ -214,8 +238,29 @@ class VideoPreviewCache:
         self._wake.set()
 
     def enqueue_asset(self, asset_id: str, source_version: str) -> None:
-        row = self.media._row(asset_id, source_version)
-        self._enqueue(Path(row["local_path"]), content_hash=row["content_hash"], priority=True)
+        _, path, digest, _ = self._source(asset_id, source_version)
+        if path is not None:
+            self._enqueue(path, content_hash=digest, priority=True)
+
+    def _source(self, asset_id, version):
+        """Keep local copy and remote session identity behind the same preview interface."""
+        row = self.media._row(asset_id, version)
+        host = getattr(self.repository, "integrations", None)
+        remote = host and host.source(asset_id, version)
+        if remote:
+            path = host.media.local(remote)
+            if path:
+                return row, path, remote["local_sha256"], remote["payload"]["duration_ms"]
+            grant = host.access.grant(remote["connection_id"])
+            host.access.check(grant)
+            return row, None, None, remote["payload"]["duration_ms"]
+        path = Path(row["local_path"])
+        try:
+            if _signature(path) != row["file_signature"]:
+                raise AppError("SOURCE_VERSION_MISMATCH", "视频内容已变化，请重新打开", 409)
+        except OSError as error:
+            raise AppError("SOURCE_MISSING", "视频原件缺失，请重新定位", 404) from error
+        return row, path, row["content_hash"], None
 
     def _enqueue(self, path: Path, *, content_hash: str | None = None, priority: bool = False) -> None:
         if _linked(path) or path.suffix.lower() not in VIDEO_TYPES:
@@ -371,9 +416,19 @@ class VideoPreviewCache:
         path = self._manifest_path(content_hash)
         if path.is_file():
             try:
+                signature = _signature(path)
+                with self._lock:
+                    saved = self._manifests.get(content_hash)
+                    if saved and saved[0] == signature:
+                        self._manifests.move_to_end(content_hash)
+                        return dict(saved[1])
                 value = json.loads(path.read_text("utf-8"))
                 if value.get("revision") == REVISION and value.get("content_hash") == content_hash:
-                    return value
+                    with self._lock:
+                        self._manifests[content_hash] = (signature, value, frozenset(value["frames"]))
+                        while len(self._manifests) > 64:
+                            self._manifests.popitem(last=False)
+                    return dict(value)
             except (OSError, ValueError, TypeError):
                 pass
         return {"revision": REVISION, "content_hash": content_hash, "status": "queued",
@@ -408,24 +463,51 @@ class VideoPreviewCache:
         existing = {index for index in manifest["frames"] if (cache / f"{index}.jpg").is_file()}
         pending = [index for index in _frame_order(len(manifest["times"])) if index not in existing]
         if pending:
-            index = pending[0]
-            temporary = cache / f"{index}.partial.jpg"
+            with self._lock:
+                wanted = self._targets.get(_file_key(path, job["fingerprint"]))
+            requested = None
+            if wanted and wanted[1] > time.monotonic():
+                requested = min(len(manifest["times"]) - 1,
+                                round(wanted[0] / manifest["interval_ms"]))
+            index = requested if requested is not None and requested not in existing else pending[0]
+            # A hovered missing frame is delivered alone. Background coverage
+            # amortizes process startup over a small contiguous batch.
+            batch = [index]
+            if index != requested:
+                limit = min(4, 1 + int(12_000 / manifest["interval_ms"]))
+                for neighbor in range(index + 1, min(index + limit, len(manifest["times"]))):
+                    if neighbor in existing:
+                        break
+                    batch.append(neighbor)
+            pattern = cache / "batch-%d.partial.jpg"
+            temporary = [cache / f"batch-{number}.partial.jpg" for number in batch]
+            interval = manifest["interval_ms"] / 1000
+            select = f"select=isnan(prev_selected_t)+gte(t-prev_selected_t\\,{interval:.6f}),"
             try:
                 self._command(["-y", "-loglevel", "error", "-protocol_whitelist", "file,pipe",
                                "-ss", f"{manifest['times'][index] / 1000:.3f}", "-i", str(path),
-                               "-frames:v", "1", "-an", "-sn", "-dn", "-vf",
-                               "format=yuv444p,scale=240:135:force_original_aspect_ratio=decrease,pad=240:135:(ow-iw)/2:(oh-ih)/2",
-                               "-q:v", "5", str(temporary)])
-                with Image.open(temporary) as image:
-                    if image.format != "JPEG" or image.size != (WIDTH, HEIGHT):
-                        raise AppError("PREVIEW_IMAGE_INVALID", "缩略图内容无效", 422)
-                    image.verify()
+                               "-frames:v", str(len(batch)), "-an", "-sn", "-dn", "-vf",
+                               select + "format=yuv444p,scale=240:135:force_original_aspect_ratio=decrease,pad=240:135:(ow-iw)/2:(oh-ih)/2",
+                               "-fps_mode", "vfr", "-start_number", str(index),
+                               "-q:v", "5", str(pattern)])
                 if _signature(path) != job["fingerprint"]:
                     raise AppError("SOURCE_VERSION_MISMATCH", "预览来源已经改变", 409)
-                temporary.replace(cache / f"{index}.jpg")
-                existing.add(index)
+                produced = 0
+                for number, image_path in zip(batch, temporary, strict=True):
+                    if not image_path.is_file():
+                        continue
+                    with Image.open(image_path) as image:
+                        if image.format != "JPEG" or image.size != (WIDTH, HEIGHT):
+                            raise AppError("PREVIEW_IMAGE_INVALID", "缩略图内容无效", 422)
+                        image.verify()
+                    image_path.replace(cache / f"{number}.jpg")
+                    existing.add(number)
+                    produced += 1
+                if not produced:
+                    raise AppError("PREVIEW_DECODE_FAILED", "无法生成此视频的缩略图", 422)
             finally:
-                temporary.unlink(missing_ok=True)
+                for image_path in temporary:
+                    image_path.unlink(missing_ok=True)
         complete = len(existing) == len(manifest["times"])
         manifest.update(frames=sorted(existing), status="ready" if complete else "building")
         _write(self._manifest_path(content_hash), manifest)
@@ -449,7 +531,8 @@ class VideoPreviewCache:
             try:
                 self._idle()
                 with self._lock:
-                    course = self._courses.popleft() if self._courses else None
+                    targeting = any(until > time.monotonic() for _, until in self._targets.values())
+                    course = self._courses.popleft() if self._courses and not targeting else None
                 if course:
                     try:
                         self._scan(course)
@@ -530,17 +613,14 @@ class VideoPreviewCache:
         return FileResponse(frame, media_type="image/jpeg", headers={"Cache-Control": "private, no-cache"})
 
     def manifest(self, asset_id: str, version: str) -> PreviewManifest:
-        row = self.media._row(asset_id, version)
-        # A metadata signature check is enough for a completed immutable cache;
-        # no foreground file hashing or decoding occurs on hover.
-        path = Path(row["local_path"])
-        try:
-            if _signature(path) != row["file_signature"]:
-                raise AppError("SOURCE_VERSION_MISMATCH", "视频内容已变化，请重新打开", 409)
-        except OSError as error:
-            raise AppError("SOURCE_MISSING", "视频原件缺失，请重新定位", 404) from error
+        _, path, digest, duration = self._source(asset_id, version)
+        if path is None:
+            # Browser-local target seeking uses the already-opened, guarded
+            # media URL. A descriptor is never mistaken for video bytes.
+            return PreviewManifest(asset_id=asset_id, source_version=version, status="ready",
+                                   strategy="media", duration_ms=duration)
         self.enqueue_asset(asset_id, version)
-        value = self._load_manifest(row["content_hash"])
+        value = self._load_manifest(digest)
         if self._tool_error:
             value.update(status="unavailable", error_code=self._tool_error)
         elif self._thread is None:
@@ -550,14 +630,20 @@ class VideoPreviewCache:
             error_code=value.get("error_code"), frames=[PreviewFrame(index=index,
                 time_ms=value["times"][index], url=f"/api/v1/videos/{asset_id}/previews/{index}.jpg?source_version={version}")
                 for index in value["frames"] if index < len(value["times"])
-                and (self._manifest_path(row["content_hash"]).parent / f"{index}.jpg").is_file()])
+                ])
 
     def frame(self, asset_id: str, version: str, index: int) -> FileResponse:
-        manifest = self.manifest(asset_id, version)
-        if index not in {frame.index for frame in manifest.frames}:
+        _, path, digest, _ = self._source(asset_id, version)
+        if path is None:
             raise AppError("PREVIEW_FRAME_NOT_READY", "此预览图尚未生成", 404)
-        row = self.media._row(asset_id, version)
-        return FileResponse(self._manifest_path(row["content_hash"]).parent / f"{index}.jpg",
+        self._load_manifest(digest)
+        with self._lock:
+            saved = self._manifests.get(digest)
+            known = saved is not None and index in saved[2]
+        target = self._manifest_path(digest).parent / f"{index}.jpg"
+        if not known or not target.is_file():
+            raise AppError("PREVIEW_FRAME_NOT_READY", "此预览图尚未生成", 404)
+        return FileResponse(target,
                             media_type="image/jpeg", headers={"Cache-Control": "private, max-age=31536000, immutable"})
 
 
