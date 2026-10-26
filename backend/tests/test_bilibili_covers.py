@@ -6,11 +6,13 @@ import zlib
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 
 from learning_app.app import create_app
 from learning_app.config import PROJECT_ROOT, AppConfig
 from learning_app.course_files import CourseFileStore, CourseMoveInput, CourseRenameInput
 from learning_app.errors import AppError
+from learning_app.integrations import schema as s
 from learning_app.integrations.bilibili.provider import BilibiliProvider
 from learning_app.integrations.covers import MAX_COVER_BYTES
 from learning_app.integrations.host import IntegrationHost
@@ -227,3 +229,46 @@ def test_old_metadata_image_scheme_is_upgraded_before_dispatch(cover_host):
     with pytest.raises(AppError) as denied:
         host.provider.cover(grant, part)
     assert denied.value.code == "PLATFORM_URL_DENIED"
+
+
+def test_preimport_cover_uses_existing_metadata_and_cached_bytes_remain_revocable(cover_host):
+    repo, host, course, item, calls, _ = cover_host
+    connection = host.source(item.asset_id)["connection_id"]
+    with repo.engine.connect() as db:
+        count = db.scalar(select(func.count()).select_from(s.sources))
+    plan = host.resolve(course, ResolveInput(connection_id=connection, url="BV1234567890"))
+    assert plan.cover_path.startswith("/api/v1/integrations/bilibili/covers/")
+    assert IMAGE_URL not in plan.model_dump_json()
+    # Resolving publishes metadata only; the visible image request fetches the cover.
+    assert IMAGE_URL not in calls
+    token = plan.cover_path.rsplit("/", 1)[1]
+    response = host.covers.preview_response(token)
+    assert response.body == synthetic_cover()
+    assert response.headers["cache-control"] == "private, no-store"
+    assert host.covers.preview_response(token).body == response.body
+    assert calls.count(IMAGE_URL) == 1
+    with repo.engine.connect() as db:
+        assert db.scalar(select(func.count()).select_from(s.sources)) == count
+    host.access.change("bilibili", False)
+    with pytest.raises(AppError) as denied:
+        host.covers.preview_response(token)
+    assert denied.value.code == "PLATFORM_DISABLED"
+
+
+def test_preimport_cover_requires_browser_session_and_revokes_after_read(cover_host, tmp_path):
+    repo, host, _, item, _, state = cover_host
+    grant = host.access.grant(host.source(item.asset_id)["connection_id"])
+    path = host.covers.preview(grant, {"cover_url": IMAGE_URL})
+    app = create_app(
+        AppConfig(mode="test", data_dir=repo.root, runtime_dir=tmp_path / "run"), repository=repo
+    )
+    with TestClient(app, base_url="http://127.0.0.1:8765") as client:
+        app.state.integrations = host
+        assert client.get(path).status_code == 403
+        client.get("/api/v1/session")
+        state["data"] += b"0" * 65536
+        state["during_read"] = lambda: host.access.change("bilibili", False)
+        denied = client.get(path)
+        assert denied.status_code == 409
+        assert denied.json()["code"] == "PLATFORM_DISABLED"
+    assert not host.covers.preview_images

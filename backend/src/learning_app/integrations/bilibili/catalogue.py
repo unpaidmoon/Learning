@@ -150,7 +150,18 @@ def browse_catalogue(provider, grant, locator, page):
                 "BILI_CATALOGUE_PAGE_INCOMPLETE", "目录含缺失或重复的视频身份，未静默过滤", 409
             )
         seen.add(bvid)
-        videos.append({"bvid": bvid, "title": archive["title"], "ordinal": offset + index})
+        duration = archive.get("duration")
+        videos.append(
+            {
+                "bvid": bvid,
+                "title": archive["title"],
+                "ordinal": offset + index,
+                "cover_url": archive.get("pic"),
+                "duration_ms": round(duration * 1000)
+                if type(duration) in {int, float} and duration >= 0
+                else None,
+            }
+        )
     revision = meta.get("mtime", meta.get("ptime"))
     return {
         "kind": "catalogue",

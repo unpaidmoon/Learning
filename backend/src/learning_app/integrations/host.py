@@ -125,7 +125,9 @@ class IntegrationHost:
                 raise AppError("BILI_IMPORT_ORIGIN_AMBIGUOUS", "请只使用一个明确的目录来源", 422)
             from .bilibili.favorites import Favorites
 
-            collection = Favorites(self).selection(value.connection_id, value.favorite_origin, value.url, grant)
+            collection = Favorites(self).selection(
+                value.connection_id, value.favorite_origin, value.url, grant
+            )
         if value.catalogue_id:
             from .bilibili.provider import video_url
 
@@ -160,6 +162,8 @@ class IntegrationHost:
                 for p in payload["parts"]
             ],
             complete=payload["complete"],
+            cover_path=self.covers.preview(grant, payload["parts"][0]),
+            author=payload.get("author"),
         )
 
     def _save_plan(self, course_id, grant, payload):
@@ -217,12 +221,20 @@ class IntegrationHost:
         payload = browse_catalogue(self.provider, grant, locator, value.page)
         self.access.check(grant)
         identity = self._save_plan(course_id, grant, payload)
+        videos = [
+            {
+                **{k: v for k, v in video.items() if k != "cover_url"},
+                "cover_path": self.covers.preview(grant, video),
+            }
+            for video in payload["videos"]
+        ]
         return CataloguePage.model_validate(
             {
                 **{k: v for k, v in payload.items() if k in CataloguePage.model_fields},
                 "catalogue_id": identity,
                 "course_id": course_id,
                 "connection_id": grant.connection_id,
+                "videos": videos,
             }
         )
 
@@ -251,7 +263,9 @@ class IntegrationHost:
             )
 
     def source(self, asset_id, version=None, course_id=None, *, connection=None):
-        with (self.repository.engine.connect() if connection is None else nullcontext(connection)) as conn:
+        with (
+            self.repository.engine.connect() if connection is None else nullcontext(connection)
+        ) as conn:
             row = (
                 conn.execute(select(s.sources).where(s.sources.c.asset_id == asset_id))
                 .mappings()

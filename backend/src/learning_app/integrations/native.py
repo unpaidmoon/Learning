@@ -231,7 +231,11 @@ class NativeBilibili:
                 raw = browse_catalogue(
                     self.host.provider, grant, catalogue_link(link["url"]), value.page
                 )
-                return {k: v for k, v in raw.items() if k != "group_id"} | {
+                return {k: v for k, v in raw.items() if k not in {"group_id", "videos"}} | {
+                    "videos": [
+                        {k: video[k] for k in ("bvid", "title", "ordinal")}
+                        for video in raw["videos"]
+                    ],
                     "status": "ready",
                     "coverage": "directory_only",
                     "media_opened": False,

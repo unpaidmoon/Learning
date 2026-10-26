@@ -61,6 +61,9 @@ class CatalogueVideo(Contract):
     bvid: str
     title: str
     ordinal: int = Field(ge=1)
+    cover_path: str | None = None
+    author: str | None = None
+    duration_ms: int | None = None
 
 
 class CataloguePage(Contract):
@@ -94,6 +97,8 @@ class ImportPlan(Contract):
     title: str
     parts: list[VideoPart]
     complete: bool
+    cover_path: str | None = None
+    author: str | None = None
 
 
 class ImportSelection(Contract):

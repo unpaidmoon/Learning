@@ -43,6 +43,9 @@ class FavoriteVideo(Contract):
     title: str
     available: bool
     unavailable_reason: Literal["removed", "unsupported", "identity_missing"] | None = None
+    cover_path: str | None = None
+    author: str | None = None
+    duration_ms: int | None = None
 
 
 class FavoritePage(Contract):
@@ -141,6 +144,10 @@ def install_integration_routes(app: FastAPI):
         from .bilibili.favorites import Favorites
 
         return Favorites(host()).folder_page(value)
+
+    @app.get("/api/v1/integrations/bilibili/covers/{preview_id}", include_in_schema=False)
+    def preview_cover(preview_id: str):
+        return host().covers.preview_response(preview_id)
 
     @app.post(
         "/api/v1/courses/{course_id}/integrations/bilibili/resolve", response_model=ImportPlan

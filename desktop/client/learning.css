@@ -32,6 +32,9 @@
 /* Product structure stays course directory | material | AI. Only these layout
    seats are adapted; Harness owns the chat/editor/menu/theme implementations. */
 [data-learning-frame] {
+  position: relative;
+  overflow: hidden;
+  transition: none !important;
   grid-template-columns: var(--learning-course-width, 240px) minmax(0, 1fr) clamp(300px, var(--learning-ai-width, 440px), calc(100% - var(--learning-course-width, 240px) - 260px)) !important;
 }
 [data-learning-region='courses'] { grid-column: 1; grid-row: 1; min-height: 0; min-width: 0; overflow: hidden; }
@@ -49,10 +52,13 @@ html[data-windows-titlebar] [data-learning-region='courses'] [data-slot='sidebar
 [data-learning-frame] > [data-side='sidebar'] { left: var(--learning-course-width, 240px) !important; }
 [data-learning-frame][data-learning-ai-collapsed='true'] { grid-template-columns: var(--learning-course-width, 240px) minmax(0, 1fr) 0 !important; }
 [data-learning-ai-collapsed='true'] [data-learning-region='ai'] { display: none; }
+[data-learning-frame][data-learning-ai-motion='closing'] [data-learning-region='ai'] { display: flex; position: absolute; inset: 0 0 0 auto; width: var(--learning-ai-motion-width); z-index: 30; pointer-events: none; background: var(--dsw-alias-bg-base); }
 .learning-materials { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; background: var(--dsw-alias-bg-base); }
-.learning-materials:has(> .learning-ai-rail) { padding-right: 36px; box-sizing: border-box; }
-.learning-ai-rail { position: absolute; inset: 0 0 0 auto; width: 36px; box-sizing: border-box; display: flex; justify-content: center; padding-top: 8px; border-left: 1px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base); }
-.learning-material-tabs { flex: none; min-height: 43px; display: flex; align-items: center; gap: 4px; overflow-x: auto; padding: 4px 8px; border-bottom: 1px solid var(--dsw-alias-border-l3, #ddd); }
+.learning-material-header { flex: none; display: flex; align-items: center; min-width: 0; min-height: 43px; border-bottom: 1px solid var(--dsw-alias-border-l3, #ddd); }
+.learning-material-tabs { flex: 1; min-width: 0; min-height: 43px; display: flex; align-items: center; gap: 4px; overflow-x: auto; padding: 4px 8px; }
+.learning-material-tabs > [role='tab'] { flex: none; }
+.learning-ai-toggle { flex: none; }
+.learning-material-header > .learning-ai-toggle { margin-inline: 4px 8px; }
 .learning-material-tab { display: inline-flex; align-items: center; flex: none; }
 .learning-material-tab > :first-child { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .learning-material-body { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
@@ -69,7 +75,7 @@ html[data-windows-titlebar] [data-learning-region='courses'] [data-slot='sidebar
 .learning-immersive-ai-edge { position: absolute; z-index: 40; right: 0; top: 42%; width: 12px; height: 100px; padding: 0; opacity: 0; }
 .learning-immersive-ai-edge:hover, .learning-immersive-ai-edge:focus-visible { opacity: 1; width: 42px; }
 [data-learning-immersive='true'] [data-learning-region='courses'],
-[data-learning-immersive='true'] .learning-material-tabs,
+[data-learning-immersive='true'] .learning-material-header,
 [data-learning-immersive='true'] .learning-video-toolbar { display: none; }
 .learning-ai-resizer { position: absolute; z-index: 15; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; touch-action: none; }
 .learning-ai-resizer:focus-visible, .learning-ai-resizer:hover { background: var(--dsw-alias-brand-primary, #4d6bfe); opacity: .45; }
@@ -139,10 +145,13 @@ html[data-learning-desktop] :is(button, input, select, textarea) { font-family: 
 .learning-course-actions .file-actions-menu button { font-size: 13px; line-height: 20px; }
 .learning-file-type { font-size: 11px; }
 
+.learning-file-drop-target {
+  outline: 2px dashed var(--dsw-alias-border-focus, currentColor);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
 /* Feedback stays short and local; direct dragging never trails the pointer. */
-[data-learning-frame] { transition: grid-template-columns var(--ds-transition-duration, .2s) var(--ds-ease-in-out); }
-[data-learning-frame][data-learning-resizing] { transition: none; }
-.learning-ai-header button, .learning-material-tabs button, .learning-legacy-module button, .learning-settings-button {
+.learning-ai-header button, .learning-material-header button, .learning-legacy-module button, .learning-settings-button {
   transition: background-color var(--ds-transition-duration-fast, .1s) var(--ds-ease-in-out), color var(--ds-transition-duration-fast, .1s) var(--ds-ease-in-out), border-color var(--ds-transition-duration-fast, .1s) var(--ds-ease-in-out);
 }
 [data-learning-frame][data-learning-history="true"] [data-slot="conversation.composer"] { display: none !important; }
@@ -153,6 +162,6 @@ html[data-learning-desktop] :is(button, input, select, textarea) { font-family: 
 @keyframes learning-menu-enter { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   [data-learning-frame], .learning-course-actions, .learning-ai-actions,
-  .learning-ai-header button, .learning-material-tabs button, .learning-legacy-module button, .learning-settings-button,
+  .learning-ai-header button, .learning-material-header button, .learning-legacy-module button, .learning-settings-button,
   .file-manager-more[open] .file-actions-menu, .learning-course-actions details[open] .file-actions-menu, .learning-menu-surface { transition: none !important; animation: none !important; }
 }

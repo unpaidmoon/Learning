@@ -1495,6 +1495,13 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
             if not app.state.service.execution_ready or (process is not None and process.poll() is not None):
                 return RedirectResponse("/?read_only=1", status_code=307)
         gateway.service
+        if path == "branding/dsh-study/mark.svg":
+            if request.method not in {"GET", "HEAD"}:
+                raise AppError("DESKTOP_METHOD_DENIED", "品牌资源只支持读取", 403)
+            candidate = app.state.config.project_root / "resources/branding/dsh-study/mark-dark.svg"
+            if not candidate.is_file():
+                raise AppError("DESKTOP_BUILD_MISSING", "项目品牌资源尚未准备好", 503)
+            return FileResponse(candidate, media_type="image/svg+xml")
         if path in _CLIENT_NAMES or path in _BUILT_CLIENT_NAMES:
             folder = ".runtime/desktop/client" if path in _BUILT_CLIENT_NAMES else "desktop/client"
             candidate = app.state.config.project_root / folder / path

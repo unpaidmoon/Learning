@@ -101,24 +101,53 @@ function fixture() {
 }
 
 describe("收藏来源分页与手选", () => {
+  it("收藏内连续导入：成功后保留列表位置，不插入完成页挤占下次操作", async () => {
+    const env = fixture(),
+      imported = vi.fn();
+    render(<BilibiliImport courseId="a" destinationPath="网课" connected onImported={imported} />);
+    fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
+    fireEvent.click(screen.getByRole("tab", { name: "我的收藏" }));
+    fireEvent.click(await screen.findByRole("button", { name: "下一页目录" }));
+    fireEvent.click(await screen.findByRole("button", { name: "合成收藏夹21（21）" }));
+    fireEvent.click(await screen.findByRole("button", { name: "下一页视频" }));
+    const listing = await screen.findByRole("region", { name: "收藏目录视频" });
+    const scroll = listing.querySelector(".integration-video-rows")!;
+    scroll.scrollTop = 120;
+    fireEvent.click(screen.getByRole("button", { name: "合成收藏视频21" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: /P1/ }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
+    await waitFor(() => expect(imported).toHaveBeenCalledOnce());
+    expect(screen.queryByText("资料已添加")).toBeNull();
+    expect(screen.getByRole("region", { name: "收藏目录视频" })).toBe(listing);
+    expect(scroll.scrollTop).toBe(120);
+    expect(screen.getByRole("button", { name: "合成收藏视频21" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "合成收藏视频21" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: /P2/ }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
+    await waitFor(() => expect(imported).toHaveBeenCalledTimes(2));
+    const imports = env.calls.filter((call) => call.path.endsWith("/import"));
+    expect(imports.map((call) => call.body.object_ids)).toEqual([["p1"], ["p2"]]);
+    expect(imports[0].body.operation_id).not.toBe(imports[1].body.operation_id);
+    expect(imports.every((call) => call.body.destination_path === "网课")).toBe(true);
+    expect(env.calls.filter((call) => call.path.endsWith("/favorites/browse"))).toHaveLength(2);
+  });
+
   it("先选目录与视频页，失效项不可选；只确认P2才导入", async () => {
     const env = fixture(),
       imported = vi.fn();
     render(<BilibiliImport courseId="a" connected onImported={imported} />);
     fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
-    fireEvent.click(screen.getByRole("button", { name: "浏览账号收藏夹" }));
+    fireEvent.click(screen.getByRole("tab", { name: "我的收藏" }));
     await screen.findByRole("button", { name: "合成收藏夹1（21）" });
     fireEvent.click(screen.getByRole("button", { name: "下一页目录" }));
     fireEvent.click(await screen.findByRole("button", { name: "合成收藏夹21（21）" }));
     expect(await screen.findByRole("button", { name: "失效视频（已失效）" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "下一页视频" }));
     fireEvent.click(await screen.findByRole("button", { name: "合成收藏视频21" }));
-    expect(env.calls.some((c) => c.path.endsWith("/inspect"))).toBe(false);
-    fireEvent.click(screen.getByRole("button", { name: "读取链接" }));
     const second = await screen.findByRole("checkbox", { name: /P2/ });
     expect(second).not.toBeChecked();
     fireEvent.click(second);
-    fireEvent.click(screen.getByRole("button", { name: "导入所选分P" }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
     await waitFor(() => expect(imported).toHaveBeenCalledOnce());
     expect(env.calls.find((c) => c.path.endsWith("/import"))?.body.object_ids).toEqual(["p2"]);
     expect(
@@ -198,12 +227,11 @@ describe("收藏来源分页与手选", () => {
     const env = fixture();
     render(<BilibiliImport courseId="a" connected onImported={vi.fn()} />);
     fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
-    fireEvent.click(screen.getByRole("button", { name: "浏览账号收藏夹" }));
+    fireEvent.click(screen.getByRole("tab", { name: "我的收藏" }));
     fireEvent.click(await screen.findByRole("button", { name: "合成收藏夹1（21）" }));
     const videos = await screen.findByRole("region", { name: "收藏目录视频" });
-    fireEvent.click(within(videos).getByRole("button", { name: "正常视频" }));
     env.changeConnection("account-b");
-    fireEvent.click(screen.getByRole("button", { name: "读取链接" }));
+    fireEvent.click(within(videos).getByRole("button", { name: "正常视频" }));
     await screen.findByText(/BILI_FAVORITE_CONNECTION_CHANGED/);
     expect(env.calls.some((c) => c.path.endsWith("/inspect"))).toBe(false);
   });

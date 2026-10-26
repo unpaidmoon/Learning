@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor, cleanup } from "@testing-libra
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { bindSplitAudio } from "../src/integrations/audioSynchronization";
 import { BilibiliImport } from "../src/integrations/BilibiliImport";
+import { ImportVideoCover } from "../src/integrations/ImportVideoCover";
 
 afterEach(() => {
   cleanup();
@@ -10,6 +11,50 @@ afterEach(() => {
 });
 
 describe("平台媒体与手选导入", () => {
+  it("封面失败保留占位，不允许客户端直接加载任意远程图片", () => {
+    const view = render(<ImportVideoCover title="示例" path="https://invalid.example/cover.png" />);
+    expect(screen.queryByRole("img")).toBeNull();
+    view.rerender(
+      <ImportVideoCover
+        title="示例"
+        path={`/api/v1/integrations/bilibili/covers/${"a".repeat(32)}`}
+      />,
+    );
+    fireEvent.error(screen.getByRole("img", { name: "示例的视频封面" }));
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByLabelText("暂无封面")).toBeVisible();
+  });
+
+  it("关闭读取中的弹窗后，旧结果不能在重开时回填", async () => {
+    let finish!: (value: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (path: string) => {
+        if (path.endsWith("/modules"))
+          return new Response(
+            JSON.stringify([{ platform: "bilibili", enabled: true, connection_id: "a" }]),
+          );
+        return new Promise<Response>((resolve) => {
+          finish = resolve;
+        });
+      }),
+    );
+    render(<BilibiliImport courseId="a" connected onImported={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "B站视频链接" }), {
+      target: { value: "BV1234567890" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "读取链接" }));
+    await waitFor(() => expect(finish).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "关闭B站导入" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
+    await act(async () => {
+      finish(new Response(JSON.stringify({ kind: "video", title: "迟到的结果", parts: [] })));
+    });
+    expect(screen.queryByText("迟到的结果")).toBeNull();
+  });
+
   it("番剧季目录不默认全选，确认后只导入手选分集且不自动保存媒体", async () => {
     const requests: { path: string; body: Record<string, unknown> }[] = [];
     vi.stubGlobal(
@@ -49,7 +94,7 @@ describe("平台媒体与手选导入", () => {
     expect(second).not.toBeChecked();
     expect(screen.getByRole("checkbox", { name: /P1/ })).not.toBeChecked();
     fireEvent.click(second);
-    fireEvent.click(screen.getByRole("button", { name: "导入所选分P" }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
     expect(await screen.findByText(/已导入 1/)).toBeVisible();
     expect(requests.find((r) => r.path.endsWith("/inspect"))?.body.url).toBe(
       "https://www.bilibili.com/bangumi/play/ss100",
@@ -134,7 +179,14 @@ describe("平台媒体与手选导入", () => {
         return new Response(JSON.stringify(value), { status: 200 });
       }),
     );
-    render(<BilibiliImport courseId="course_a" connected onImported={vi.fn()} />);
+    const view = render(
+      <BilibiliImport
+        courseId="course_a"
+        destinationPath="原目录"
+        connected
+        onImported={vi.fn()}
+      />,
+    );
     fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
     fireEvent.change(screen.getByRole("textbox", { name: "B站视频链接" }), {
       target: { value: "BV1234567890" },
@@ -142,10 +194,21 @@ describe("平台媒体与手选导入", () => {
     fireEvent.click(screen.getByRole("button", { name: "读取链接" }));
     const checkbox = await screen.findByRole("checkbox", { name: /P1/ });
     expect(checkbox).not.toBeChecked();
-    expect(screen.getByRole("button", { name: "导入所选分P" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /导入所选/ })).toBeDisabled();
     fireEvent.click(checkbox);
-    fireEvent.click(screen.getByRole("button", { name: "导入所选分P" }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
     await waitFor(() => expect(screen.getByText(/导入结果待核对/)).toBeVisible());
+    view.rerender(
+      <BilibiliImport
+        courseId="course_a"
+        destinationPath="新目录"
+        connected
+        onImported={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "关闭B站导入" }));
+    fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
+    expect(screen.getByText("原目录")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "核对原导入" }));
     await act(async () => {
       await Promise.resolve();
@@ -155,6 +218,7 @@ describe("平台媒体与手选导入", () => {
     expect(imports).toHaveLength(2);
     expect(imports[1].body).toEqual(imports[0].body);
     expect(imports[0].body.object_ids).toEqual(["p1"]);
+    expect(imports[0].body.destination_path).toBe("原目录");
   });
 
   it("合集逐页浏览，手选一个视频才解析分P，确认后只导入所选分P", async () => {
@@ -230,7 +294,7 @@ describe("平台媒体与手选导入", () => {
     );
     expect(videoRequest?.body.catalogue_id).toBe("page_2");
     fireEvent.click(checkbox);
-    fireEvent.click(screen.getByRole("button", { name: "导入所选分P" }));
+    fireEvent.click(screen.getByRole("button", { name: /导入所选/ }));
     await screen.findByText(/已导入 1/);
     expect(requests.filter((value) => value.path.endsWith("/import"))).toHaveLength(1);
     expect(requests.find((value) => value.path.endsWith("/import"))?.body.object_ids).toEqual([

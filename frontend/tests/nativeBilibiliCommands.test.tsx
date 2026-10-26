@@ -164,7 +164,7 @@ describe("Harness原生B站入口", () => {
     await waitFor(() => expect(env.openImport).toHaveBeenCalledWith("a"));
     render(<BilibiliImport courseId="a" connected onImported={vi.fn()} />);
     expect(screen.getByRole("region", { name: "导入B站资料" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "导入B站链接" }));
+    fireEvent.click(screen.getByRole("button", { name: "关闭B站导入" }));
     expect(screen.queryByRole("region", { name: "导入B站资料" })).toBeNull();
     act(() => {
       requestBilibiliImport("b");

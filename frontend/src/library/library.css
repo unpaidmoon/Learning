@@ -412,6 +412,89 @@
   padding: 4px;
   max-width: 90px;
 }
+.file-manager-body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.file-manager-body > .file-manager-content {
+  transition: opacity 140ms ease-out;
+}
+.file-manager-body.is-opening > .file-manager-content {
+  opacity: 0.24;
+  pointer-events: none;
+}
+.file-manager-opening {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: var(--foreground);
+  cursor: progress;
+  animation: file-opening-appear 140ms ease-out both;
+}
+.file-manager-opening-symbol {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  color: var(--muted-foreground);
+}
+.file-manager-opening-symbol::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--border);
+  border-top-color: var(--foreground);
+  border-radius: 50%;
+  corner-shape: round;
+  animation: file-opening-spin 1s linear infinite;
+}
+.file-manager-opening-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.file-manager-opening-name {
+  max-width: min(100%, 360px);
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes file-opening-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes file-opening-appear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .file-manager-body > .file-manager-content {
+    transition: none;
+  }
+  .file-manager-opening,
+  .file-manager-opening-symbol::before {
+    animation: none;
+  }
+}
 .file-manager-content {
   flex: 1;
   min-height: 0;
@@ -565,6 +648,11 @@
   pointer-events: none;
   color: var(--foreground);
   font-size: 14px;
+}
+.file-manager-entry.is-drop-target {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
 .file-manager-context {
   position: fixed;

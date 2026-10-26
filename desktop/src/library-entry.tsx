@@ -18,6 +18,7 @@ export { AccountPanel } from "../../frontend/src/account/AccountPanel";
 export { PlatformSettings } from "../../frontend/src/integrations/PlatformSettings";
 export { installBilibiliCommand } from "../../frontend/src/integrations/nativeCommands";
 export { requestBilibiliImport } from "../../frontend/src/integrations/bilibiliUi";
+export { installCourseFileDrag, readCourseDragFiles } from "../../frontend/src/library/fileDrag";
 export { DataPanel } from "../../frontend/src/data/DataPanel";
 export { RuntimeSettingsPanel } from "../../frontend/src/data/RuntimeSettingsPanel";
 export { StartupSettingsControl } from "../../frontend/src/data/StartupSettingsControl";
@@ -75,7 +76,7 @@ function FileTile({ entry, courseId }: { entry: Entry; courseId: string }) {
     return () => { controller.abort(); clearTimeout(timer); observer.disconnect(); };
   }, [video, courseId, entry.path, entry.size_bytes, entry.modified_at, entry.platform]);
   return <span ref={root} className={`learning-file-tile learning-file-kind-${kind}`} data-file-type={kind}>
-    {image ? <img src={image} alt="" loading="lazy" onError={() => setImage("")} /> : <Icon name={entry.kind === "directory" ? "folder" : video ? "video" : entry.viewer === "pdf" ? "file-pdf" : entry.viewer === "text" ? "file-text" : "file"} size={38} />}
+    {image ? <img src={image} alt="" draggable={false} loading="lazy" onError={() => setImage("")} /> : <Icon name={entry.kind === "directory" ? "folder" : video ? "video" : entry.viewer === "pdf" ? "file-pdf" : entry.viewer === "text" ? "file-text" : "file"} size={38} />}
     {(word || entry.viewer === "pdf") && <span className="learning-file-type" aria-hidden="true">{word ? "Word" : "PDF"}</span>}
     {entry.platform === "bilibili" && <span className="learning-file-type" aria-label="B站来源">B站</span>}
   </span>;

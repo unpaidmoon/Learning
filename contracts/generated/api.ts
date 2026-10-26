@@ -4352,6 +4352,12 @@ export interface components {
             title: string;
             /** Ordinal */
             ordinal: number;
+            /** Cover Path */
+            cover_path?: string | null;
+            /** Author */
+            author?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
         };
         /** ChatEvidence */
         ChatEvidence: {
@@ -5794,6 +5800,12 @@ export interface components {
             available: boolean;
             /** Unavailable Reason */
             unavailable_reason?: ("removed" | "unsupported" | "identity_missing") | null;
+            /** Cover Path */
+            cover_path?: string | null;
+            /** Author */
+            author?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
         };
         /** GeneratedArtifactReference */
         GeneratedArtifactReference: {
@@ -5894,6 +5906,10 @@ export interface components {
             parts: components["schemas"]["VideoPart"][];
             /** Complete */
             complete: boolean;
+            /** Cover Path */
+            cover_path?: string | null;
+            /** Author */
+            author?: string | null;
         };
         /** ImportReceipt */
         ImportReceipt: {

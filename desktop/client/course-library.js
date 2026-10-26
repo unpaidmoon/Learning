@@ -3,7 +3,7 @@
 (() => {
   'use strict';
   window.LearningCourseLibrary = {
-    create({ React, Button, Input, Modal, Menu, HoverCard, HoverCardGroup, Tooltip, icons, ReactDOM, api, chooseCourse, newCourseChat, resolveWorkspaceInfo }) {
+    create({ React, Button, Input, Modal, Menu, HoverCard, HoverCardGroup, Tooltip, icons, ReactDOM, api, chooseCourse, newCourseChat, resolveWorkspaceInfo, WorkspaceHeader }) {
       const h = React.createElement;
       const { useEffect, useState, useSyncExternalStore } = React;
       const components = window.LearningLibraryComponents.create({ React, Button, Input, Modal, ReactDOM });
@@ -265,10 +265,11 @@
         }, []);
         return h(React.Fragment, null,
           wide ? h('section', { className: 'learning-course-directory', 'data-pointer-inside': data.pointerInside, 'data-testid': 'learning-course-directory', 'aria-label': '工作区' },
+            h(WorkspaceHeader),
             h('div', { className: 'learning-library-course-heading' }, h('span', null, '工作区'),
-              h(Button, { size: 'sm', variant: 'ghost', 'aria-label': '添加工作区', title: '添加工作区',
+              h(Button, { size: 'sm', variant: 'ghost', className: 'learning-workspace-add', 'aria-label': '添加工作区', title: '添加工作区',
                 disabled: data.busy || data.adding || !!data.pending || !data.componentsReady || storageBlocked,
-                icon: h(components.Icon, { name: 'plus', size: 16 }), onClick: openCourseDialog })),
+                icon: h(components.Icon, { name: 'plus', size: 18 }), onClick: openCourseDialog })),
             h(HoverCardGroup, { className: 'learning-library-directory-scroll' },
               h('ul', { 'aria-label': '工作区列表', className: 'learning-workspace-list' },
                 ...orderedCourses(data).map(course => h(WorkspaceRow, { key: course.course_id, course })))),

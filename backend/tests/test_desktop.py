@@ -222,6 +222,47 @@ async def test_explicit_course_creation_seed_keeps_old_draft_and_does_not_inheri
         assert app.state.service.execution.starts == []
 
 
+async def test_explicit_independent_creation_keeps_old_course_draft_and_has_no_read_scope(tmp_path):
+    from learning_app.workspaces import ensure_unclassified, set_workspaces
+
+    app = app_at(tmp_path)
+    async with app.router.lifespan_context(app):
+        repo = app.state.repository
+        repo.create_course("数学", "math")
+        repo.create_course("英语", "english")
+        independent = ensure_unclassified(repo)
+        gateway = app.state.desktop_gateway
+        old = await gateway.open_course("math")
+        set_workspaces(repo, old["chat_id"], ["math", "english"])
+        draft = save_draft(repo, old["chat_id"], DraftInput(expected_revision=0, text="旧草稿"))
+        request = native_envelope("session/create", {
+            "sessionId": "learning-create-independent", "workspaceId": independent,
+        })
+        created = await gateway.rpc("session/create", request)
+        assert await gateway.rpc("session/create", request) == created
+        mapped = gateway.read_mapping(created["sessionId"])
+        assert mapped["chat_id"] != old["chat_id"]
+        assert mapped["course_id"] == independent and mapped["workspace_ids"] == []
+        assert gateway.read_mapping(old["session_id"])["workspace_ids"] == ["math", "english"]
+        assert read_draft(repo, old["chat_id"]) == draft
+        assert app.state.service.execution.starts == []
+
+
+def test_sidebar_brand_resource_only_exposes_the_exact_static_mark(tmp_path):
+    with TestClient(app_at(tmp_path), base_url="http://127.0.0.1:8765") as client:
+        path = "/desktop/branding/dsh-study/mark.svg"
+        assert client.get(path).status_code == 200
+        csrf = {"X-Learning-CSRF": client.get("/api/v1/session").json()["csrf_token"]}
+        picture = client.get(path)
+        assert picture.status_code == 200
+        assert picture.headers["content-type"].startswith("image/svg+xml")
+        asset = client.app.state.config.project_root / "resources/branding/dsh-study/mark-dark.svg"
+        assert picture.content == asset.read_bytes()
+        assert client.head(path).status_code == 200
+        assert client.post(path, headers=csrf).status_code == 403
+        assert client.get("/desktop/branding/dsh-study/icon.ico").status_code == 403
+
+
 async def test_native_prompt_uses_business_submission_id_and_keeps_model_selection(tmp_path):
     execution = NativeFixture(tmp_path)
     app = app_at(tmp_path, execution)

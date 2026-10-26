@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import type { Ref } from "react";
 import { api, ApiError, errorMessage } from "../api/client";
 import type { Schema } from "../api/client";
 import { Button } from "../components/ui/button";
 import { INTEGRATIONS_CHANGED } from "./bilibiliUi";
+import { ImportVideoCover } from "./ImportVideoCover";
+import { importDuration } from "./importDuration";
+import { Icon } from "../components/ui/Icon";
 
 type Kind = Schema<"FavoriteFolderBrowse">["kind"];
+export type FavoriteBrowserHandle = { open: () => void };
 const unavailable = {
   removed: "已失效",
   unsupported: "此资源类型尚未接入",
@@ -14,9 +19,13 @@ const unavailable = {
 export function FavoriteBrowser({
   onSelect,
   disabled,
+  active,
+  controllerRef,
 }: {
   onSelect: (url: string, connectionId: string, origin: Schema<"FavoriteOrigin">) => void;
   disabled: boolean;
+  active?: boolean;
+  controllerRef?: Ref<FavoriteBrowserHandle>;
 }) {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<Kind>("created");
@@ -124,9 +133,15 @@ export function FavoriteBrowser({
         setPage(result);
       }
     });
+  useImperativeHandle(controllerRef, () => ({
+    open: () => {
+      if (!open) void readFolders();
+    },
+  }));
   return (
     <div className="integration-favorites">
       <Button
+        className={active === undefined ? "" : "integration-favorite-refresh"}
         size="sm"
         variant="outline"
         disabled={disabled || busy}
@@ -134,92 +149,104 @@ export function FavoriteBrowser({
           void readFolders();
         }}
       >
-        浏览账号收藏夹
+        {active === undefined ? "浏览账号收藏夹" : "刷新收藏夹"}
       </Button>
       {open && (
-        <section aria-label="B站收藏来源">
-          <div className="integration-favorite-pages">
-            <Button
-              size="sm"
-              variant="outline"
-              aria-pressed={kind === "created"}
-              disabled={disabled || busy}
-              onClick={() => {
-                void readFolders("created");
-              }}
-            >
-              我创建的收藏夹
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              aria-pressed={kind === "collected"}
-              disabled={disabled || busy}
-              onClick={() => {
-                void readFolders("collected");
-              }}
-            >
-              我收藏的合集和收藏夹
-            </Button>
-          </div>
-          {folders && (
-            <section aria-label="B站收藏目录">
-              <div className="integration-favorite-items">
-                {folders.items.map((value) => (
+        <section className="integration-favorite-layout" aria-label="B站收藏来源">
+          <aside className="integration-favorite-sidebar">
+            <div className="integration-favorite-kinds">
+              <Button
+                size="sm"
+                variant="outline"
+                aria-pressed={kind === "created"}
+                disabled={disabled || busy}
+                onClick={() => {
+                  void readFolders("created");
+                }}
+              >
+                我创建的收藏夹
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                aria-pressed={kind === "collected"}
+                disabled={disabled || busy}
+                onClick={() => {
+                  void readFolders("collected");
+                }}
+              >
+                我收藏的合集和收藏夹
+              </Button>
+            </div>
+            {folders && (
+              <section aria-label="B站收藏目录">
+                <div className="integration-favorite-items">
+                  {folders.items.map((value) => (
+                    <Button
+                      key={value.resource_type + value.folder_id}
+                      size="sm"
+                      variant="ghost"
+                      disabled={disabled || busy}
+                      aria-pressed={
+                        folder?.folder_id === value.folder_id &&
+                        folder?.resource_type === value.resource_type
+                      }
+                      onClick={() => {
+                        void browse(value, 1);
+                      }}
+                    >
+                      {value.resource_type === "collection" && "合集 · "}
+                      {value.title}（{value.count}）
+                    </Button>
+                  ))}
+                </div>
+                {!folders.items.length && <p>此连接当前没有这类收藏目录。</p>}
+                <p className="muted">目录第 {folders.page} 页</p>
+                <div className="integration-favorite-pages">
                   <Button
-                    key={value.resource_type + value.folder_id}
                     size="sm"
-                    variant="ghost"
-                    disabled={disabled || busy}
-                    aria-pressed={
-                      folder?.folder_id === value.folder_id &&
-                      folder?.resource_type === value.resource_type
-                    }
+                    variant="outline"
+                    disabled={disabled || busy || folders.page <= 1}
                     onClick={() => {
-                      void browse(value, 1);
+                      if (connection) void readFolders(kind, folders.page - 1, connection);
                     }}
                   >
-                    {value.resource_type === "collection" && "合集 · "}
-                    {value.title}（{value.count}）
+                    上一页目录
                   </Button>
-                ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={disabled || busy || !folders.has_more}
+                    onClick={() => {
+                      if (connection) void readFolders(kind, folders.page + 1, connection);
+                    }}
+                  >
+                    下一页目录
+                  </Button>
+                </div>
+              </section>
+            )}
+          </aside>
+          {page ? (
+            <section className="integration-favorite-videos" aria-label="收藏目录视频">
+              <div className="integration-video-list-heading">
+                <strong>{page.title}</strong>
+                <span>
+                  第 {page.page} 页 · 共 {page.total} 项
+                </span>
               </div>
-              {!folders.items.length && <p>此连接当前没有这类收藏目录。</p>}
-              <p>
-                目录第 {folders.page} 页 · 共 {folders.total} 个目录
-              </p>
-              <div className="integration-favorite-pages">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={disabled || busy || folders.page <= 1}
-                  onClick={() => {
-                    if (connection) void readFolders(kind, folders.page - 1, connection);
-                  }}
-                >
-                  上一页目录
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={disabled || busy || !folders.has_more}
-                  onClick={() => {
-                    if (connection) void readFolders(kind, folders.page + 1, connection);
-                  }}
-                >
-                  下一页目录
-                </Button>
-              </div>
-            </section>
-          )}
-          {page && (
-            <section aria-label="收藏目录视频">
-              <strong>{page.title}</strong>
-              <div className="integration-favorite-items">
+              <div className="integration-video-rows">
                 {page.items.map((video) => (
                   <Button
                     key={video.resource_id}
                     variant="ghost"
+                    className="integration-video-row"
+                    aria-label={
+                      video.title +
+                      (video.unavailable_reason
+                        ? `（${unavailable[video.unavailable_reason]}）`
+                        : "")
+                    }
                     disabled={disabled || busy || !video.available}
                     onClick={() => {
                       if (video.available && video.bvid && connection)
@@ -232,15 +259,21 @@ export function FavoriteBrowser({
                         });
                     }}
                   >
-                    {video.title}
-                    {video.unavailable_reason && `（${unavailable[video.unavailable_reason]}）`}
+                    <ImportVideoCover path={video.cover_path} title={video.title} />
+                    <span className="integration-video-row-info">
+                      <strong>{video.title}</strong>
+                      <small>{video.author}</small>
+                      <small>
+                        {video.unavailable_reason
+                          ? unavailable[video.unavailable_reason]
+                          : importDuration(video.duration_ms)}
+                      </small>
+                    </span>
+                    <Icon name="chevron" size={16} />
                   </Button>
                 ))}
               </div>
               {!page.items.length && <p>此目录当前没有视频。</p>}
-              <p>
-                视频第 {page.page} 页 · 共 {page.total} 项 · 选中视频后再读取并手选分P。
-              </p>
               <div className="integration-favorite-pages">
                 <Button
                   size="sm"
@@ -264,6 +297,11 @@ export function FavoriteBrowser({
                 </Button>
               </div>
             </section>
+          ) : (
+            <div className="integration-import-empty">
+              <Icon name="folder" size={30} />
+              <p>选择收藏夹，浏览视频</p>
+            </div>
           )}
         </section>
       )}

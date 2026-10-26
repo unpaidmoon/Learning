@@ -214,6 +214,7 @@ class BilibiliProvider:
             raise AppError("BILI_PART_NOT_FOUND", "指定分P不存在", 404)
         return {
             "title": data["title"],
+            "author": (data.get("owner") or {}).get("name"),
             "parts": parts,
             "complete": True,
             "multipart": len(pages) > 1,
@@ -269,6 +270,7 @@ class BilibiliProvider:
             raise AppError("BILI_COURSE_EPISODE_NOT_FOUND", "当前课程没有此分集", 404)
         return {
             "title": data.get("title") or "B站课程",
+            "author": (data.get("up_info") or {}).get("uname"),
             "parts": parts,
             "complete": True,
             "multipart": len(episodes) > 1,
@@ -381,10 +383,10 @@ class BilibiliProvider:
                         )
                     identity = access.request(grant, "extract-media")
                     try:
-                        with httpx.Client(
-                            timeout=25, follow_redirects=False, headers=provider.headers(grant, url)
-                        ) as client:
-                            response = client.get(url)
+                        # Reuse TLS connections within this resolution, while
+                        # credentials still come only from the checked grant.
+                        client.cookies.clear()
+                        response = client.get(url, headers=provider.headers(grant, url))
                     except httpx.HTTPError:
                         access.receipt(identity)
                         raise
@@ -425,6 +427,11 @@ class BilibiliProvider:
         observed_durations = []
 
         class ScopedExtractor(extractor):
+            def _get_chapters(inner, *args, **kwargs):
+                # The player consumes tracks only. Upstream otherwise waits on
+                # a separate optional metadata service before returning them.
+                return None
+
             def _real_extract(inner, url):
                 try:
                     return super()._real_extract(url)
@@ -491,7 +498,10 @@ class BilibiliProvider:
             "writeautomaticsub": False,
             "plugin_dirs": [],
         }
-        with GuardedDL(options, auto_init=False) as downloader:
+        with (
+            httpx.Client(timeout=25, follow_redirects=False) as client,
+            GuardedDL(options, auto_init=False) as downloader,
+        ):
             downloader.add_info_extractor(ScopedExtractor())
             for key, value in self.private.get(grant.connection_id).get("cookies", {}).items():
                 downloader.cookiejar.set_cookie(

@@ -171,6 +171,7 @@
     const workspaceRef = { current: null };
     const videoHandles = new Map();
     let aiCollapsed = false;
+    let aiMotion;
     const materials = new Map();
     const listeners = new Set();
     const bindings = new Map();
@@ -398,7 +399,7 @@
       return h(React.Fragment, null,
         h('header', { className: 'learning-ai-header', 'data-testid': 'learning-ai-header' },
           h('div', { className: 'learning-ai-title' }, h(HistoryTitle, { displayTitle: title })), h('div', { className: 'learning-ai-actions', role: 'toolbar', 'aria-label': '对话操作' },
-            h(WorkspaceMenu), h(VideoButton), h(CollapseAiButton))),
+            h(WorkspaceMenu), h(VideoButton), !aiCollapsed && h(ToggleAiButton))),
         readOnlyHistory() && h('div', { className: 'learning-import-history-notice', role: 'status' },
           bindings.get(activeSessionId)?.has_unresolved_history ? '导入历史只读；旧请求结果仍待核对，不会重新发送。' : '导入历史只读；继续提问将使用新的执行身份。',
           h(Button, { size: 'sm', onClick: () => { const mapped = bindings.get(activeSessionId);
@@ -408,6 +409,17 @@
         !readOnlyHistory() && bindings.get(activeSessionId)?.history_available && h(Button, { size: 'sm', onClick: () => {
           void chooseCourse({ course_id: selectedCourse }, bindings.get(activeSessionId).chat_id, 'history').catch(reportError);
         } }, '查看导入历史'));
+    }
+    function StudySidebarHeader() {
+      useRevision();
+      return h('header', { className: 'learning-study-header' },
+        h('div', { className: 'learning-study-brand', 'aria-label': 'DSH Study' },
+          h('span', { className: 'learning-study-mark', 'aria-hidden': true }),
+          h('span', { className: 'learning-study-name' }, 'DSH Study')),
+        h(Button, { variant: 'outline', className: 'learning-study-new-session', 'aria-label': '新会话',
+          icon: h(primitives.IconNewChatOutlineMedium, { size: 14 }),
+          disabled: !drafts || !!newChatPending || navigationPending || !!captureRequest,
+          onClick: () => { void newCourseChat('course_unclassified').catch(reportError); } }, '新会话'));
     }
     function AttachmentsButton() {
       useRevision();
@@ -429,12 +441,46 @@
       }, [complete]);
       return null;
     }
-    function CollapseAiButton() {
-      return h(Button, { variant: 'ghost', size: 'sm', className: 'learning-icon-action', 'aria-label': '收起 AI', title: '收起 AI · Ctrl+Shift+A',
+    function ToggleAiButton() {
+      const label = aiCollapsed ? '展开 AI' : '收起 AI';
+      return h(Button, { variant: 'ghost', size: 'sm', className: 'learning-icon-action learning-ai-toggle',
+        'aria-label': label, 'aria-expanded': !aiCollapsed, title: label + ' · Ctrl+Shift+A',
         icon: h(library.components.Icon, { name: 'panel', size: 16 }), onClick: toggleAi });
     }
     function toggleAi() {
-      aiCollapsed = !aiCollapsed; notify();
+      const frame = document.querySelector('[data-learning-frame]');
+      const panel = frame?.querySelector('[data-learning-region="ai"]');
+      const closing = !aiCollapsed;
+      const width = panel?.getBoundingClientRect().width;
+      const previousTransform = aiMotion && panel ? getComputedStyle(panel).transform : null;
+      if (aiMotion) { aiMotion.onfinish = null; aiMotion.cancel(); aiMotion = null; }
+      if (frame) { delete frame.dataset.learningAiMotion; frame.style.removeProperty('--learning-ai-motion-width'); }
+      aiCollapsed = closing;
+      if (frame && panel) {
+        const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (closing && animate) {
+          frame.style.setProperty('--learning-ai-motion-width', width + 'px');
+          frame.dataset.learningAiMotion = 'closing';
+        }
+        // Commit the final grid once; only the resident chat panel moves.
+        frame.dataset.learningAiCollapsed = String(closing);
+        panel.inert = closing;
+        if (animate) {
+          const motion = panel.animate([
+            { transform: previousTransform || (closing ? 'translateX(0)' : 'translateX(100%)') },
+            { transform: closing ? 'translateX(100%)' : 'translateX(0)' },
+          ], { duration: 140, easing: 'cubic-bezier(.2,0,0,1)' });
+          aiMotion = motion;
+          motion.onfinish = () => {
+            if (aiMotion !== motion) return;
+            aiMotion = null;
+            delete frame.dataset.learningAiMotion;
+            frame.style.removeProperty('--learning-ai-motion-width');
+            motion.cancel();
+          };
+        }
+      }
+      notify();
       if (!aiCollapsed && activeSessionId) inputFor(activeSessionId).focus();
       else if (immersive) void videoHandles.get(materialState().active)?.current?.getElement()?.play().catch(() => {});
     }
@@ -864,7 +910,8 @@
         frame.style.setProperty('--learning-ai-width', width + 'px');
       };
       return h('section', { className: 'learning-materials', 'data-testid': 'learning-materials', 'data-session-id': activeSessionId },
-        h('div', { className: 'learning-material-tabs', role: 'tablist', 'aria-label': '资料标签' },
+        h('div', { className: 'learning-material-header' },
+          h('div', { className: 'learning-material-tabs', role: 'tablist', 'aria-label': '资料标签' },
           h(Button, { role: 'tab', 'aria-selected': state.active === 'files', size: 'sm', variant: state.active === 'files' ? 'outline' : 'ghost',
             title: courseTitle, onClick: () => { ++sourceJumpRevision; state.active = 'files'; notify(); } }, courseTitle),
           state.tabs.map(item => h('span', { key: item.id, className: 'learning-material-tab' },
@@ -880,10 +927,7 @@
               if (state.active === item.id) state.active = 'files';
               notify();
             } }, '×'))),
-        ),
-        aiCollapsed && !immersive && h('aside', { className: 'learning-ai-rail', 'aria-label': 'AI 侧栏' },
-          h(Button, { size: 'sm', variant: 'ghost', className: 'learning-icon-action', 'aria-label': '展开 AI', title: '展开 AI · Ctrl+Shift+A',
-            icon: h(library.components.Icon, { name: 'panel', size: 16 }), onClick: toggleAi })),
+          ), aiCollapsed && h(ToggleAiButton)),
         immersive && aiCollapsed && h(Button, { className: 'learning-immersive-ai-edge', 'aria-label': '展开 AI 问答', title: 'Ctrl+Shift+A',
           onMouseEnter: toggleAi, onFocus: toggleAi, onClick: () => { if (aiCollapsed) toggleAi(); } }, '问答'),
         h('div', { className: 'learning-material-body', role: 'tabpanel' },
@@ -944,7 +988,7 @@
         const disposers = [];
         library = window.LearningCourseLibrary.create({ React, ReactDOM, Button, Input, Modal, Menu,
           HoverCard: primitives.HoverCard, HoverCardGroup: primitives.HoverCardGroup, Tooltip: primitives.Tooltip,
-          icons: primitives, api, chooseCourse, newCourseChat, resolveWorkspaceInfo });
+          icons: primitives, api, chooseCourse, newCourseChat, resolveWorkspaceInfo, WorkspaceHeader: StudySidebarHeader });
         videoComponents = window.LearningVideoComponents.create({ React, Button, Menu });
         await Promise.all([library.components.initialize(), videoComponents.initialize()]);
         drafts = window.NativeDraftBridge.create({ ctx, api, getDraftController: library.components.getDraftController,
@@ -994,6 +1038,40 @@
           submissionUnknown: (...args) => drafts.submissionUnknown(...args),
           uploadHeaders: drafts.uploadHeaders, error: reportError });
         disposers.push(() => drafts.dispose());
+        disposers.push(library.components.installCourseFileDrag({
+          canAttach: () => {
+            const binding = bindings.get(activeSessionId);
+            return !!binding && !binding.read_only && !navigationPending && !captureRequest
+              && library.components.getDraftController(binding.chat_id).snapshot().ready
+              && !['submitting', 'adjudicating'].includes(inputFor(activeSessionId).state.getSnapshot().phase);
+          },
+          onAttach: async value => {
+            const sid = activeSessionId, navigation = navigationRevision;
+            const input = inputFor(sid);
+            const binding = await bindingFor(sid);
+            let submitted = false;
+            const observe = () => { if (['submitting', 'adjudicating'].includes(input.state.getSnapshot().phase)) submitted = true; };
+            const unsubscribe = input.state.subscribe(observe);
+            try {
+              const files = await library.components.readCourseDragFiles(value);
+              if (submitted || activeSessionId !== sid || navigationRevision !== navigation || navigationPending || readOnlyHistory())
+                throw new Error('对话已切换或问题已发送，请重新添加附件（FILE_ATTACHMENT_CONTEXT_CHANGED）');
+              if (input.state.getSnapshot().attachmentIds.length + files.length > 8)
+                throw new Error('每次最多添加 8 个附件，请先移除部分附件（FILE_ATTACHMENT_LIMIT）');
+              if (!library.components.getDraftController(binding.chat_id).snapshot().ready)
+                throw new Error('原对话草稿尚未就绪，请稍后重试（DRAFT_NOT_READY）');
+              const prepared = ctx.conversation.createDrafts(sid, files);
+              if (!input.addAttachments(prepared.map(file => file.id))) {
+                ctx.conversation.releaseDraftAttachments(prepared);
+                throw new Error('输入框正在提交，请稍后重试（FILE_ATTACHMENT_BUSY）');
+              }
+              await drafts.beforeNavigate(sid);
+              if (activeSessionId === sid && navigationRevision === navigation) { aiCollapsed = false; notify(); input.focus(); }
+            } catch (error) { throw Object.assign(error, { sessionId: sid }); }
+            finally { unsubscribe(); }
+          },
+          onError: reportError,
+        }));
         disposers.push(ctx.inject(['commandUi'], scope => scope.effect(() => {
           const commands = library.components.installBilibiliCommand({
             commandUi: scope.get('commandUi'),
@@ -1080,6 +1158,8 @@
           if (frame.style.getPropertyValue('--learning-course-width') !== width) frame.style.setProperty('--learning-course-width', width);
           const collapsed = aiCollapsed ? 'true' : 'false';
           if (frame.dataset.learningAiCollapsed !== collapsed) frame.dataset.learningAiCollapsed = collapsed;
+          const aiPanel = frame.querySelector('[data-learning-region="ai"]');
+          if (aiPanel) aiPanel.inert = aiCollapsed;
           frame.dataset.learningImmersive = String(immersive);
           frame.dataset.learningHistory = String(readOnlyHistory());
           frame.dataset.learningSidebarNarrow = String(nativeWidth < 100);

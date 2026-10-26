@@ -21,6 +21,7 @@ import "./library.css";
 import { FileToolbar } from "./FileToolbar";
 import type { FileMenuProps } from "./FileToolbar";
 import { requestBilibiliImport } from "../integrations/bilibiliUi";
+import { COURSE_FILES_FORMAT } from "./fileDrag";
 
 type Entry = Schema<"CourseFileEntry">;
 type Listing = Schema<"CourseFileListResponse">;
@@ -29,7 +30,7 @@ type OperationStatus = Schema<"CourseOperationStatusResponse">;
 type Result = Schema<"CourseFileOperationResponse"> | Schema<"CourseImportResponse">;
 type FileClipboard = { courseId: string; paths: string[]; mode: "copy" | "move" };
 type Action = "directory" | "rename" | "move" | "properties";
-const CLIPBOARD_FORMAT = "application/x-learning-course-files";
+const CLIPBOARD_FORMAT = COURSE_FILES_FORMAT;
 class FileClipboardState {
   private value: FileClipboard | null = null;
   private writing = false;
@@ -122,6 +123,7 @@ export function FileManager({
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [opening, setOpening] = useState<Entry | null>(null);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("name");
@@ -135,6 +137,7 @@ export function FileManager({
   const [properties, setProperties] = useState<Schema<"CourseFilePropertiesResponse"> | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [dropFolder, setDropFolder] = useState<string | null>(null);
   const [progress, setProgress] = useState("");
   const [review, setReview] = useState<OperationStatus | null>(null);
   const root = useRef<HTMLElement>(null);
@@ -142,9 +145,20 @@ export function FileManager({
   const anchor = useRef<string | null>(null);
   const dragDepth = useRef(0);
   const working = useRef(false);
+  const openRequest = useRef<object | null>(null);
   const propertyRequest = useRef(0);
   const { pending, receipt } = useFileOperation(courseId);
   const prefix = `/courses/${encodeURIComponent(courseId)}/files`;
+
+  useEffect(() => {
+    const reset = () => {
+      dragDepth.current = 0;
+      setDragOver(false);
+      setDropFolder(null);
+    };
+    window.addEventListener("dragend", reset);
+    return () => window.removeEventListener("dragend", reset);
+  }, []);
 
   useEffect(() => {
     if (!action) return;
@@ -194,8 +208,12 @@ export function FileManager({
 
   useEffect(() => {
     const at = ++epoch.current;
+    void Promise.resolve().then(() => {
+      if (epoch.current === at) setOpening(null);
+    });
     return () => {
       if (epoch.current === at) epoch.current += 1;
+      openRequest.current = null;
     };
   }, [courseId]);
 
@@ -209,6 +227,10 @@ export function FileManager({
             ? old
             : { paths: [...old.paths.slice(0, old.at + 1), path], at: old.at + 1 },
         );
+      if (!cancelled) {
+        openRequest.current = null;
+        setOpening(null);
+      }
     });
     return () => {
       cancelled = true;
@@ -307,6 +329,8 @@ export function FileManager({
   const selectedEntries = entries.filter((entry) => selection.includes(entry.path));
 
   const navigate = (next: string, at?: number) => {
+    openRequest.current = null;
+    setOpening(null);
     setSelection([]);
     setQuery("");
     setContextMenu(null);
@@ -321,17 +345,26 @@ export function FileManager({
   };
 
   const open = async (entry: Entry) => {
-    if (entry.kind === "blocked" || !connected || busy) return;
+    if (entry.kind === "blocked" || !connected || busy || openRequest.current) return;
     if (entry.kind === "directory") {
       navigate(entry.path);
       return;
     }
     const at = epoch.current;
+    const request = {};
+    openRequest.current = request;
+    setError("");
+    setOpening(entry.viewer === "video" ? entry : null);
     try {
       const value = await api.write<OpenFile>(`${prefix}/open`, { path: entry.path });
-      if (at === epoch.current) onOpen(value);
+      if (at === epoch.current && openRequest.current === request) onOpen(value);
     } catch (reason) {
-      if (at === epoch.current) setError(errorMessage(reason));
+      if (at === epoch.current && openRequest.current === request) setError(errorMessage(reason));
+    } finally {
+      if (openRequest.current === request) {
+        openRequest.current = null;
+        setOpening(null);
+      }
     }
   };
 
@@ -869,18 +902,18 @@ export function FileManager({
         event.preventDefault();
         event.stopPropagation();
         dragDepth.current += 1;
-        if (
-          Array.from(event.dataTransfer.types).some(
-            (type) => type === "Files" || type === CLIPBOARD_FORMAT,
-          )
-        )
-          setDragOver(true);
+        setDragOver(
+          !event.dataTransfer.types.includes(CLIPBOARD_FORMAT) &&
+            event.dataTransfer.types.includes("Files"),
+        );
       }}
       onDragOver={(event) => {
         event.preventDefault();
         event.stopPropagation();
         event.dataTransfer.dropEffect = event.dataTransfer.types.includes(CLIPBOARD_FORMAT)
-          ? "move"
+          ? event.ctrlKey
+            ? "copy"
+            : "move"
           : "copy";
       }}
       onDragLeave={(event) => {
@@ -1040,6 +1073,7 @@ export function FileManager({
         hideTrigger={!!MenuComponent}
         courseId={courseId}
         destinationPath={currentPath}
+        destinationLabel={[listing?.title || "当前工作区", currentPath].filter(Boolean).join(" / ")}
         connected={connected}
         onImported={() => {
           onChanged?.();
@@ -1168,138 +1202,162 @@ export function FileManager({
           {progress}
         </p>
       )}
-      <div
-        className={`file-manager-content ${view === "icons" ? "file-grid" : "file-list"}`}
-        role="listbox"
-        aria-label="文件列表"
-        aria-multiselectable="true"
-        aria-busy={loading}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            setSelection([]);
-            root.current?.focus();
-          }
-        }}
-        onContextMenu={(event) => {
-          event.preventDefault();
-          if (event.target === event.currentTarget) setSelection([]);
-          setContextMenu({
-            x: Math.min(event.clientX, window.innerWidth - 180),
-            y: Math.min(event.clientY, window.innerHeight - 330),
-          });
-        }}
-      >
-        {view === "list" && (
-          <div className="file-list-heading" aria-hidden="true">
-            <span>名称</span>
-            <span>修改时间</span>
-            <span>类型</span>
-            <span>大小</span>
-          </div>
-        )}
-        {loading ? (
-          <p className="file-manager-empty" role="status">
-            正在读取文件…
-          </p>
-        ) : !listing || listing.root_status !== "ready" ? (
-          <div className="file-manager-empty">
-            <Icon name="folder" size={44} />
-            <p>
-              {listing?.root_status === "unbound"
-                ? "请先为当前课程选择文件夹。"
-                : "课程文件夹暂不可用。"}
+      <div className={`file-manager-body${opening ? " is-opening" : ""}`}>
+        <div
+          className={`file-manager-content ${view === "icons" ? "file-grid" : "file-list"}`}
+          role="listbox"
+          aria-label="文件列表"
+          aria-multiselectable="true"
+          aria-busy={loading || !!opening}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelection([]);
+              root.current?.focus();
+            }
+          }}
+          onContextMenu={(event) => {
+            event.preventDefault();
+            if (event.target === event.currentTarget) setSelection([]);
+            setContextMenu({
+              x: Math.min(event.clientX, window.innerWidth - 180),
+              y: Math.min(event.clientY, window.innerHeight - 330),
+            });
+          }}
+        >
+          {view === "list" && (
+            <div className="file-list-heading" aria-hidden="true">
+              <span>名称</span>
+              <span>修改时间</span>
+              <span>类型</span>
+              <span>大小</span>
+            </div>
+          )}
+          {loading ? (
+            <p className="file-manager-empty" role="status">
+              正在读取文件…
             </p>
-          </div>
-        ) : !entries.length ? (
-          <div className="file-manager-empty">
-            <Icon name="folder" size={44} />
-            <p>{query ? "当前文件夹没有匹配的文件" : "此文件夹为空"}</p>
-          </div>
-        ) : (
-          entries.map((entry) => (
-            <button
-              key={entry.path}
-              role="option"
-              className={`file-manager-entry ${entry.kind === "directory" ? "is-directory" : ""} ${clipboard?.mode === "move" && clipboard.courseId === courseId && clipboard.paths.includes(entry.path) ? "is-cut" : ""}`}
-              aria-selected={selection.includes(entry.path)}
-              aria-label={entry.name}
-              data-file-path={entry.path}
-              disabled={!connected || entry.kind === "blocked"}
-              title={entry.name}
-              draggable={!disabled && entry.kind !== "blocked"}
-              onClick={(event) => select(event, entry)}
-              onDoubleClick={() => void open(entry)}
-              onContextMenu={(event) => {
-                if (!selection.includes(entry.path)) setSelection([entry.path]);
-                anchor.current = entry.path;
-                event.preventDefault();
-              }}
-              onDragStart={(event) => {
-                const paths = selection.includes(entry.path) ? selection : [entry.path];
-                const data: FileClipboard = { courseId, paths, mode: "move" };
-                event.dataTransfer.setData(CLIPBOARD_FORMAT, JSON.stringify(data));
-                event.dataTransfer.effectAllowed = "copyMove";
-              }}
-              onDragOver={(event) => {
-                if (entry.kind === "directory") {
+          ) : !listing || listing.root_status !== "ready" ? (
+            <div className="file-manager-empty">
+              <Icon name="folder" size={44} />
+              <p>
+                {listing?.root_status === "unbound"
+                  ? "请先为当前课程选择文件夹。"
+                  : "课程文件夹暂不可用。"}
+              </p>
+            </div>
+          ) : !entries.length ? (
+            <div className="file-manager-empty">
+              <Icon name="folder" size={44} />
+              <p>{query ? "当前文件夹没有匹配的文件" : "此文件夹为空"}</p>
+            </div>
+          ) : (
+            entries.map((entry) => (
+              <button
+                key={entry.path}
+                role="option"
+                className={`file-manager-entry ${entry.kind === "directory" ? "is-directory" : ""} ${dropFolder === entry.path ? "is-drop-target" : ""} ${clipboard?.mode === "move" && clipboard.courseId === courseId && clipboard.paths.includes(entry.path) ? "is-cut" : ""}`}
+                aria-selected={selection.includes(entry.path)}
+                aria-label={entry.name}
+                data-file-path={entry.path}
+                disabled={!connected || entry.kind === "blocked" || !!opening}
+                title={entry.name}
+                draggable={!disabled && entry.kind !== "blocked"}
+                onClick={(event) => select(event, entry)}
+                onDoubleClick={() => void open(entry)}
+                onContextMenu={(event) => {
+                  if (!selection.includes(entry.path)) setSelection([entry.path]);
+                  anchor.current = entry.path;
                   event.preventDefault();
-                  event.stopPropagation();
-                  event.dataTransfer.dropEffect = event.dataTransfer.types.includes(
-                    CLIPBOARD_FORMAT,
+                }}
+                onDragStart={(event) => {
+                  const paths = selection.includes(entry.path) ? selection : [entry.path];
+                  const data: FileClipboard = { courseId, paths, mode: "move" };
+                  event.dataTransfer.clearData();
+                  event.dataTransfer.setData(CLIPBOARD_FORMAT, JSON.stringify(data));
+                  event.dataTransfer.effectAllowed = "copyMove";
+                }}
+                onDragOver={(event) => {
+                  if (entry.kind === "directory") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setDropFolder(entry.path);
+                    event.dataTransfer.dropEffect = event.dataTransfer.types.includes(
+                      CLIPBOARD_FORMAT,
+                    )
+                      ? event.ctrlKey
+                        ? "copy"
+                        : "move"
+                      : "copy";
+                  }
+                }}
+                onDragLeave={(event) => {
+                  if (
+                    !(event.relatedTarget instanceof Node) ||
+                    !event.currentTarget.contains(event.relatedTarget)
                   )
-                    ? "move"
-                    : "copy";
-                }
-              }}
-              onDrop={(event) => {
-                if (entry.kind === "directory") drop(event, entry.path);
-              }}
-            >
-              <span className="file-manager-file-icon">
-                {entry.platform === "bilibili" && entry.asset_id && entry.source_version ? (
-                  <BilibiliFileIcon
-                    key={entry.asset_id + entry.source_version}
-                    courseId={courseId}
-                    assetId={entry.asset_id}
-                    sourceVersion={entry.source_version}
-                    size={view === "icons" ? 42 : 19}
-                    preview={view === "icons"}
-                  />
-                ) : renderFileIcon ? (
-                  renderFileIcon(entry)
-                ) : (
-                  <Icon
-                    name={
-                      entry.kind === "directory"
-                        ? "folder"
-                        : entry.viewer === "video"
-                          ? "video"
-                          : entry.viewer === "pdf"
-                            ? "file-pdf"
-                            : entry.viewer === "text"
-                              ? "file-text"
-                              : "file"
-                    }
-                    size={view === "icons" ? 42 : 19}
-                  />
+                    setDropFolder(null);
+                }}
+                onDrop={(event) => {
+                  if (entry.kind === "directory") drop(event, entry.path);
+                }}
+              >
+                <span className="file-manager-file-icon">
+                  {entry.platform === "bilibili" && entry.asset_id && entry.source_version ? (
+                    <BilibiliFileIcon
+                      key={entry.asset_id + entry.source_version}
+                      courseId={courseId}
+                      assetId={entry.asset_id}
+                      sourceVersion={entry.source_version}
+                      size={view === "icons" ? 42 : 19}
+                      preview={view === "icons"}
+                    />
+                  ) : renderFileIcon ? (
+                    renderFileIcon(entry)
+                  ) : (
+                    <Icon
+                      name={
+                        entry.kind === "directory"
+                          ? "folder"
+                          : entry.viewer === "video"
+                            ? "video"
+                            : entry.viewer === "pdf"
+                              ? "file-pdf"
+                              : entry.viewer === "text"
+                                ? "file-text"
+                                : "file"
+                      }
+                      size={view === "icons" ? 42 : 19}
+                    />
+                  )}
+                </span>
+                <span className="file-manager-file-name">{entry.name}</span>
+                {view === "list" && (
+                  <>
+                    <span>{displayTime(entry.modified_at)}</span>
+                    <span>
+                      {entry.kind === "directory"
+                        ? "文件夹"
+                        : entry.name.includes(".")
+                          ? `${entry.name.split(".").pop()?.toUpperCase()} 文件`
+                          : "文件"}
+                    </span>
+                    <span>{entry.kind === "directory" ? "—" : displaySize(entry.size_bytes)}</span>
+                  </>
                 )}
-              </span>
-              <span className="file-manager-file-name">{entry.name}</span>
-              {view === "list" && (
-                <>
-                  <span>{displayTime(entry.modified_at)}</span>
-                  <span>
-                    {entry.kind === "directory"
-                      ? "文件夹"
-                      : entry.name.includes(".")
-                        ? `${entry.name.split(".").pop()?.toUpperCase()} 文件`
-                        : "文件"}
-                  </span>
-                  <span>{entry.kind === "directory" ? "—" : displaySize(entry.size_bytes)}</span>
-                </>
-              )}
-            </button>
-          ))
+              </button>
+            ))
+          )}
+        </div>
+        {opening && (
+          <div className="file-manager-opening" role="status" aria-live="polite">
+            <span className="file-manager-opening-symbol" aria-hidden="true">
+              <Icon name="video" size={24} />
+            </span>
+            <span className="file-manager-opening-title">正在打开视频…</span>
+            <span className="file-manager-opening-name" title={opening.name}>
+              {opening.name}
+            </span>
+          </div>
         )}
       </div>
       <div className="file-manager-status">

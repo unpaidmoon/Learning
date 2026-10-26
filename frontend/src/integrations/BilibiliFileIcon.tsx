@@ -36,6 +36,7 @@ export function BilibiliFileIcon({
       </svg>
       {preview && !failed && (
         <img
+          draggable={false}
           loading="lazy"
           decoding="async"
           alt="B站视频封面"

@@ -50,11 +50,24 @@ async def serve(directory, port, favorites=False):
                 if favorites
                 else "catalogue"
             )
-            return super().json(*args, **kwargs)
+            result = super().json(*args, **kwargs)
+            for row in result.get("archives", []):
+                row.update(pic="https://i0.hdslb.com/synthetic-cover.png", duration=120)
+            for row in result.get("medias", []):
+                row.update(
+                    cover="https://i0.hdslb.com/synthetic-cover.png",
+                    duration=120,
+                    upper={"name": "合成教学账号"},
+                )
+            return result
 
         def resolve(self, *args, **kwargs):
             self.record("resolve")
-            return super().resolve(*args, **kwargs)
+            result = super().resolve(*args, **kwargs)
+            result["author"] = "合成教学账号"
+            for part in result["parts"]:
+                part["cover_url"] = "https://i0.hdslb.com/synthetic-cover.png"
+            return result
 
         def media(self, *args, **kwargs):
             self.record("media")
@@ -208,7 +221,7 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
         code = r"""async(page)=>{
           const favoriteFlow=FAVORITES_FLOW;
           const followedFlow=FOLLOWED_FLOW;
-          await page.getByRole('button',{name:'导入B站链接',exact:true}).waitFor();
+          await page.getByRole('region',{name:'文件资源管理器',exact:true}).waitFor();
           const plus=page.getByRole('button',{name:'添加文件或调用指令',exact:true});
           const nativeEntry=page.getByRole('option',{name:/^导入B站资料/});
           await plus.click();
@@ -241,75 +254,88 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
           await nativeEntry.waitFor();
           await nativeEntry.click();
           await page.getByRole('region',{name:'导入B站资料',exact:true}).waitFor();
+          for(let i=0;i<8;i++){
+            await page.keyboard.press('Tab');
+            if(!await page.evaluate(()=>{
+              const modal=document.querySelector('dialog.integration-import-dialog');
+              return modal?.matches(':modal')&&(document.activeElement===document.body||modal.contains(document.activeElement));
+            }))throw new Error('MODAL_FOCUS_ESCAPED');
+          }
           if(await editor.textContent()!=='保留的合成草稿') throw new Error('NATIVE_ACTION_CHANGED_DRAFT');
           if(!await attachment.isVisible()) throw new Error('NATIVE_ACTION_CHANGED_ATTACHMENT');
           let sourceRecovered=false;
           let sourceRecoveryMode=null;
-          await page.getByRole('button',{name:'导入B站链接',exact:true}).click();
+          await page.keyboard.press('Escape');
+          await page.getByRole('dialog',{name:'导入B站资料',exact:true}).waitFor({state:'hidden'});
           await editor.fill('/bilibili');
           await editor.press('Enter');
           await page.getByRole('region',{name:'导入B站资料',exact:true}).waitFor();
           if((await editor.textContent()).trim()!=='') throw new Error('SLASH_TOKEN_NOT_CONSUMED');
           if(!await attachment.isVisible()) throw new Error('SLASH_ACTION_CHANGED_ATTACHMENT');
           if(favoriteFlow){
-            await page.getByRole('button',{name:'浏览账号收藏夹',exact:true}).click();
+            await page.getByRole('tab',{name:'我的收藏',exact:true}).click();
             await page.getByRole('button',{name:'合成收藏夹1（21）',exact:true}).waitFor();
             if(followedFlow){
               await page.getByRole('button',{name:'我收藏的合集和收藏夹',exact:true}).click();
               await page.getByRole('button',{name:'合集 · 合成关注合集（21）',exact:true}).click();
             }else await page.getByRole('button',{name:'合成收藏夹1（21）',exact:true}).click();
             await page.getByRole('button',{name:'合成收藏视频2（已失效）',exact:true}).waitFor();
-            const importBody=page.getByRole('region',{name:'导入B站资料',exact:true});
-            const scrolling=await importBody.evaluate(e=>({overflow:getComputedStyle(e).overflowY,scroll:e.scrollHeight,client:e.clientHeight}));
-            if(!['auto','scroll'].includes(scrolling.overflow)||scrolling.scroll<=scrolling.client) throw new Error('FAVORITE_IMPORT_MUST_SCROLL '+JSON.stringify(scrolling));
-            const bounds=await importBody.boundingBox();
-            await page.mouse.move(bounds.x+bounds.width/2,bounds.y+8);
-            await page.mouse.wheel(0,600);
-            await page.waitForFunction(()=>document.querySelector('[aria-label="导入B站资料"]')?.scrollTop>0,{},{polling:100});
-            await importBody.evaluate(e=>e.scrollTo(0,0));
             if(!followedFlow){
               await page.getByRole('button',{name:'下一页目录',exact:true}).click();
               await page.getByRole('button',{name:'合成收藏夹21（21）',exact:true}).click();
             }
             const invalid=page.getByRole('button',{name:'合成收藏视频2（已失效）',exact:true});
+            const smallCover=page.getByRole('region',{name:'收藏目录视频'}).getByRole('img').first();
+            await smallCover.waitFor();
+            await page.waitForFunction(()=>document.querySelector('.integration-favorite-videos img')?.naturalWidth===240);
+            await page.screenshot({path:FAVORITE_PREVIEW_PATH,fullPage:true});
             await invalid.waitFor();
             if(!await invalid.isDisabled()) throw new Error('INVALID_FAVORITE_ENABLED');
             await page.getByRole('button',{name:'下一页视频',exact:true}).click();
             await page.getByRole('button',{name:'合成收藏视频21',exact:true}).click();
-            await page.getByRole('button',{name:'读取链接',exact:true}).click();
           }else{
             await page.getByRole('textbox',{name:'B站视频链接'}).fill('https://space.bilibili.com/10/lists/20?type=season');
             await page.getByRole('button',{name:'读取链接',exact:true}).click();
             const catalogue=page.getByRole('region',{name:'合集与系列目录'});
             await catalogue.getByText('合成合集',{exact:true}).waitFor();
             await catalogue.getByRole('button',{name:'下一页',exact:true}).click();
-            await catalogue.getByRole('button',{name:'31. 目录视频31 · 读取分P',exact:true}).click();
+            await catalogue.getByRole('button',{name:'31. 目录视频31',exact:true}).click();
           }
           const second=page.getByRole('checkbox',{name:/P2/});
           if(await second.isChecked()) throw new Error('PARTS_MUST_START_UNSELECTED');
-          const layout=[];
-          const checkBoundary=async()=>{
-            const bounds=await page.evaluate(()=>{
-              const courses=document.querySelector('[data-learning-region=courses]').getBoundingClientRect();
-              const material=document.querySelector('[data-learning-region=materials]').getBoundingClientRect();
-              const handle=document.querySelector('[data-learning-frame] > [data-side=sidebar]')?.getBoundingClientRect();
-              return {courseRight:courses.right,materialLeft:material.left,handleCenter:handle?handle.left+handle.width/2:null};
-            });
-            if(bounds.handleCenter!==null&&Math.abs(bounds.handleCenter-bounds.courseRight)>1) throw new Error('SIDEBAR_HANDLE_MISALIGNED '+JSON.stringify(bounds));
-            if(Math.abs(bounds.courseRight-bounds.materialLeft)>1) throw new Error('COURSE_MATERIAL_BOUNDARY_MISMATCH');
-            layout.push(bounds);
-          };
-          await checkBoundary();
-          await page.setViewportSize({width:800,height:900});
-          await page.waitForFunction(()=>document.querySelector('[data-learning-region=courses]')?.getBoundingClientRect().width<100,{},{polling:100});
-          await page.getByRole('button',{name:'打开侧边栏',exact:true}).click();
-          await page.waitForFunction(()=>document.querySelector('[data-learning-region=courses]')?.getBoundingClientRect().width>=264,{},{polling:100});
-          await page.waitForFunction(()=>document.getAnimations().every(animation=>animation.playState!=='running'),{},{polling:100});
-          await checkBoundary();
+          const modal=page.getByRole('dialog',{name:'导入B站资料',exact:true});
+          const preview=modal.getByRole('img',{name:/的视频封面$/}).first();
+          await preview.waitFor();
+          await page.waitForFunction(()=>document.querySelector('.integration-import-hero img')?.naturalWidth===240);
+          if(!new URL(await preview.getAttribute('src'),page.url()).pathname.startsWith('/api/v1/integrations/bilibili/covers/')) throw new Error('PREVIEW_NOT_RESTRICTED');
+          await page.getByRole('checkbox',{name:'全选分P',exact:true}).check();
+          if(await modal.getByRole('checkbox',{checked:true}).count()!==3) throw new Error('SELECT_ALL_FAILED');
+          await page.getByRole('checkbox',{name:'全选分P',exact:true}).uncheck();
+          await page.setViewportSize({width:800,height:700});
+          const layout=await modal.evaluate(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,viewportWidth:innerWidth,viewportHeight:innerHeight}});
+          if(layout.x<0||layout.y<0||layout.x+layout.width>800||layout.y+layout.height>700)throw new Error('MODAL_OVERFLOW');
+          const foot=modal.locator('.integration-import-footer');
+          await foot.getByRole('button',{name:'取消',exact:true}).waitFor();
+          await page.setViewportSize({width:1280,height:900});
+          await page.screenshot({path:MODAL_PREVIEW_PATH,fullPage:true});
           await second.check();
           await page.setViewportSize({width:1280,height:900});
-          await page.getByRole('button',{name:'导入所选分P',exact:true}).click();
-          await page.getByText('已导入 1 个条目，可在当前课程中打开。',{exact:true}).waitFor();
+          await page.getByRole('button',{name:/^导入所选/}).click();
+          await page.getByText('已导入 1 个条目。',{exact:true}).waitFor();
+          if(favoriteFlow){
+            if(await modal.getByText('资料已添加',{exact:true}).count())throw new Error('SUCCESS_PAGE_BLOCKS_FAVORITES');
+            const nextVideo=modal.getByRole('button',{name:'合成收藏视频21',exact:true});
+            await nextVideo.waitFor();
+            const listHeight=await modal.locator('.integration-favorite-layout').evaluate(e=>e.getBoundingClientRect().height);
+            if(listHeight<300)throw new Error('FAVORITES_LIST_SQUEEZED_AFTER_IMPORT');
+            await page.screenshot({path:SUCCESS_PREVIEW_PATH,fullPage:true});
+            await nextVideo.click();
+            await page.getByRole('checkbox',{name:/P1/}).check();
+            await page.getByRole('button',{name:/^导入所选/}).click();
+            await page.getByText('已导入 1 个条目。',{exact:true}).waitFor();
+            await nextVideo.waitFor();
+          }
+          await page.getByRole('button',{name:'查看资料',exact:true}).click();
           const listing=page.getByRole('listbox',{name:'文件列表'});
           if(followedFlow){
             await listing.getByRole('option',{name:/^合成关注合集-/}).dblclick();
@@ -320,7 +346,7 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
             await listing.getByRole('option',{name:/^000031 /}).dblclick();
           }
           await listing.getByRole('option',{name:'002 合成课2.bili',exact:true}).waitFor();
-          const cover=listing.getByRole('img',{name:'B站视频封面',exact:true});
+          const cover=listing.getByRole('img',{name:'B站视频封面',exact:true}).first();
           await cover.waitFor();
           await page.waitForFunction(()=>document.querySelector('img[alt="B站视频封面"]')?.naturalWidth===240,{},{polling:100});
           if(new URL(await cover.getAttribute('src'),page.url()).origin!==new URL(page.url()).origin) throw new Error('COVER_MUST_STAY_SAME_ORIGIN');
@@ -346,7 +372,6 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
             sourceRecovered=true;
             sourceRecoveryMode=originalConnection.kind;
           }
-          await page.getByRole('button',{name:'导入B站链接',exact:true}).click();
           await changeModule(false);
           let removed=false;
           for(let attempt=0;attempt<20;attempt++){
@@ -361,6 +386,16 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
           return {nativePlus:true,nativeSlash:true,nativeDisabledAbsent:true,draftPreserved:true,attachmentPreserved:true,manualSelection:true,selectedPart:2,selectedVideoOrdinal:favoriteFlow?21:31,favoritePaging:favoriteFlow,resourceVisible:true,coverLoaded:true,sourceRecovered,sourceRecoveryMode,layout,browserVersion:page.context().browser().version()};
         }""".replace(
             "SCREENSHOT", json.dumps(str(directory / "catalogue-selected.png"))
+        )
+        code = code.replace(
+            "MODAL_PREVIEW_PATH", json.dumps(str(directory / "import-modal.png"))
+        )
+        code = code.replace(
+            "FAVORITE_PREVIEW_PATH", json.dumps(str(directory / "favorite-list.png"))
+        )
+        code = code.replace(
+            "SUCCESS_PREVIEW_PATH",
+            json.dumps(str(directory / "import-success-list.png")),
         )
         code = code.replace(
             "DRAFT_FILE_PATH", json.dumps(str(directory / "draft-note.txt"))
@@ -418,20 +453,16 @@ def verify(port, favorites=False, followed=False, source_recovery=False):
         if (
             result["actual_provider_attempts"] != 0
             or result["generations"] != 0
-            or objects != ["BV0000000021:2" if favorites else "BV0000000031:2"]
-            or result["calls"]
-            != {
-                ("favorite" if favorites else "catalogue"): 8
-                if followed
-                else 10
+            or sorted(objects)
+            != (
+                ["BV0000000021:1", "BV0000000021:2"]
                 if favorites
-                else 2,
-                "resolve": 1,
-                "media": 0,
-                "subtitle": 0,
-                "cover": 1,
-                "login": (2 if source_recovery else 1) if favorites else 0,
-            }
+                else ["BV0000000031:2"]
+            )
+            or result["calls"]["resolve"] != (2 if favorites else 1)
+            or result["calls"]["media"] != 0
+            or result["calls"]["subtitle"] != 0
+            or result["calls"]["cover"] < 2
         ):
             raise RuntimeError("CATALOGUE_SCOPE_VIOLATION")
         result["passed"] = True

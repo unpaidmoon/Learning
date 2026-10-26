@@ -128,7 +128,17 @@ class Favorites:
         return self._folders(grant, account, value.kind, value.page)
 
     def browse(self, value):
-        return self._browse(value)[0]
+        grant, _ = self._account(value.connection_id)
+        view, _ = self._browse(value, grant)
+        view["items"] = [
+            {
+                **{k: v for k, v in item.items() if k != "cover_url"},
+                "cover_path": self.host.covers.preview(grant, item),
+            }
+            for item in view["items"]
+        ]
+        self.host.access.check(grant)
+        return view
 
     def _browse(self, value, expected_grant=None):
         grant, account = self._account(value.connection_id)
@@ -218,6 +228,11 @@ class Favorites:
                     "title": row["title"],
                     "available": reason is None,
                     "unavailable_reason": reason,
+                    "cover_url": row.get("cover") if reason is None else None,
+                    "author": (row.get("upper") or {}).get("name"),
+                    "duration_ms": round(row["duration"] * 1000)
+                    if type(row.get("duration")) in {int, float} and row["duration"] >= 0
+                    else None,
                 }
             )
         self.host.access.check(grant)
