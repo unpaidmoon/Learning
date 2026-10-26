@@ -161,7 +161,7 @@
   "project_sources": {
     "profiles/learning.patch.json": "830023594223b0275f6f7a464af194240c2746b73fc9c178f82a3c1242da992f",
     "profiles/package.json": "302d9af6a90f100fb351028728ec47f2431141ac5a1ee86fda132eeec0a2cbee",
-    "plugins/learning-guard.mjs": "c6d9f57d334fbd77a3d51581fac18dbc344df3c7d4923fbb462c2a4de6b4108b",
+    "plugins/learning-guard.mjs": "64fa704c8a53efbd55dc744b473b50c681cc289fbc53bd0859efb3da1876347a",
     "plugins/native-images.mjs": "cfc3640010b6ed75f9e69b50f8f5e51893a4b6f37bf16441a89b71c033de16f2",
     "plugins/native-attempt.mjs": "7c860a37621fe7258711218c69aa67af5e3d43039054dc2597b044353e2afd13",
     "plugins/native-lease.mjs": "dd897c5ad61f8b452fe91e5b076d3e7d62d538e0a1b0b83198d00e0e6f219e22",

@@ -8,6 +8,7 @@ from dataclasses import asdict
 from pydantic import ValidationError
 from sqlalchemy import func, insert, select, update
 
+from learning_app import chat_attachments
 from learning_app.drafts import message_selection_ids
 from learning_app.errors import AppError
 from learning_app.execution.native_tools import KnownToolFailure, NativeCall, ToolRejected
@@ -276,6 +277,8 @@ class NativeBusiness:
                 if "read_course_ids" in current
                 else read_workspaces(conn, chat)
             )
+            file_ids = (previous.get("chat_attachments", []) if previous is not None
+                        else chat_attachments.freeze(conn, context))
             if requested:
                 sources = list(dict.fromkeys([*sources, *requested["source_snapshot_ids"]]))
             scope = self._ensure(
@@ -288,6 +291,7 @@ class NativeBusiness:
                 [
                     "skill",
                     "read_source_handle",
+                    *([chat_attachments.TOOL] if file_ids else []),
                     *(["search_course_concept"] if query_courses else []),
                     *([DOCUMENT_IMAGE_TOOL] if image_enabled else []),
                     *([ADMISSION_TOOL] if requested else []),
@@ -302,6 +306,7 @@ class NativeBusiness:
                 {
                     "task_id": None,
                     "context_snapshot_id": run["snapshot_id"],
+                    **({"chat_attachments": file_ids} if file_ids else {}),
                     "context_hash": context.get("context_hash"),
                     **({"corpus_course_ids": query_courses} if query_courses is not None else {}),
                     **({"document_image_history": image_history} if image_enabled else {}),
@@ -661,7 +666,9 @@ class NativeBusiness:
                 raise AppError("NATIVE_RUN_CANCEL_REQUESTED", "原执行已请求停止", 409)
             if run["state"] not in _ACTIVE_RUNS:
                 raise AppError("NATIVE_CHAT_NOT_ACTIVE", "原对话执行已结束或不再活动", 409)
-        if call.tool_name == DOCUMENT_IMAGE_TOOL:
+        if call.tool_name == chat_attachments.TOOL:
+            chat_attachments.authorize(scope, arguments)
+        elif call.tool_name == DOCUMENT_IMAGE_TOOL:
             self.document_images.authorize(self, conn, scope, arguments)
         elif call.tool_name == "read_source_handle":
             self._source(conn, scope, arguments)
@@ -851,6 +858,8 @@ class NativeBusiness:
 
     def invoke(self, call: NativeCall, arguments: dict) -> dict:
         try:
+            if call.tool_name == chat_attachments.TOOL:
+                return chat_attachments.invoke(self, call, arguments)
             if call.tool_name == DOCUMENT_IMAGE_TOOL:
                 return self.document_images.invoke(self, call, arguments)
             if call.tool_name == ADMISSION_TOOL:
@@ -1343,7 +1352,7 @@ class NativeBusiness:
                 return ResearchExternal.receipt(conn, call)
             if call.tool_name == DOCUMENT_IMAGE_TOOL:
                 return self.document_images.receipt(conn, call)
-            if call.tool_name in {"search_course_concept", "read_nearby_subtitles"}:
+            if call.tool_name in {"search_course_concept", "read_nearby_subtitles", chat_attachments.TOOL}:
                 query = (
                     conn.execute(
                         select(corpus_s.query_receipts).where(

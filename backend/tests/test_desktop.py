@@ -426,13 +426,13 @@ async def test_native_documents_are_whole_scoped_and_restore_without_preparation
         assert app.state.service.execution.starts == []
         assert gateway.document(aid, opened["chat_id"]) == aid
         images, instruction = expand_document_parts(repo, opened["chat_id"], [repo.resolve_attachment(aid)])
-        assert len(images) == 2 and "1至2" in instruction
+        assert not images and "read_chat_attachment" in instruction
         with patch("learning_app.documents.prepare_document", side_effect=AssertionError("reprepared")):
             restored = await gateway.upload_file(
                 opened["session_id"], "整份资料.pdf", pdf, existing_document=aid,
             )
         assert restored == uploaded
-        with pytest.raises(AppError, match="不一致"):
+        with pytest.raises(AppError, match="内容已变化"):
             await gateway.upload_file(opened["session_id"], "整份资料.pdf", pdf + b"x", existing_document=aid)
         other = repo.create_chat("course")
         with pytest.raises(AppError) as foreign:
@@ -441,7 +441,7 @@ async def test_native_documents_are_whole_scoped_and_restore_without_preparation
         text = "完整的文本\nEND-WHOLE-TEXT"
         uploaded_text = await gateway.upload_file(opened["session_id"], "题目.md", text.encode(), upload_id="whole-md")
         images, instruction = expand_document_parts(repo, opened["chat_id"], [repo.resolve_attachment(uploaded_text["receiptId"])])
-        assert not images and text in instruction
+        assert not images and text not in instruction and "read_chat_attachment" in instruction
         fallback = await gateway.rpc("fileUploads/upload", {
             "payload": {"args": {"agentId": opened["session_id"], "request": {
                 "name": "原生回退.txt", "data": base64.b64encode(b"FULL-FALLBACK").decode(),
@@ -513,7 +513,7 @@ def test_native_raw_document_upload_requires_csrf_and_never_dispatches(tmp_path)
         changed = client.post(url, params=params, headers=headers, content=b"CHANGED").json()
         assert changed["error"]["code"] == "DOCUMENT_UPLOAD_CONFLICT"
         unsupported = client.post(url, params={**params, "name": "video.mp4"}, headers=csrf, content=b"video").json()
-        assert unsupported["error"]["code"] == "DESKTOP_ATTACHMENT_UNSUPPORTED"
+        assert unsupported["ok"] and unsupported["value"]["file"]["name"] == "video.mp4"
         assert app.state.service.execution.starts == []
 
 

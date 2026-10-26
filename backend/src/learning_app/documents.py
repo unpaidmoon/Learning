@@ -48,7 +48,7 @@ MAX_DISPATCH_IMAGE_BYTES = 14 * 1024 * 1024
 MAX_DISPATCH_IMAGES = 64
 MAX_DISPATCH_TEXT_CHARACTERS = 300_000
 _UPLOAD_GATE = threading.Lock()
-_IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp"}
+_IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 _EXTENSIONS = {
     "application/pdf": {".pdf"},
     "text/plain": {".txt"},
@@ -82,7 +82,7 @@ class AttachmentMetadataResponse(BaseModel):
     media_type: str
     size_bytes: int
     confirmed: bool
-    kind: Literal["image", "pdf", "text", "markdown"]
+    kind: Literal["image", "pdf", "text", "markdown", "file"]
     filename: str
     page_count: int | None = None
     character_count: int | None = None
@@ -207,7 +207,12 @@ def validate_document_scope(
 def requires_images(repository: Repository, attachment_ids: Iterable[str]) -> bool:
     for aid in dict.fromkeys(attachment_ids):
         item = repository.resolve_attachment(aid)
-        if item["media_type"] in _IMAGE_TYPES or item["media_type"] == "application/pdf":
+        document = _document(repository, aid)
+        if document and document["kind"] == "file":
+            continue
+        if item["media_type"] in _IMAGE_TYPES or (
+            item["media_type"] == "application/pdf" and document and document["kind"] == "pdf"
+        ):
             return True
     return False
 
@@ -217,7 +222,7 @@ def expand_document_parts(
 ) -> tuple[list[dict], str]:
     """Use immutable preparation records; do not read arbitrary filesystem paths."""
     validate_document_scope(repository, chat_id, [item["attachment_id"] for item in originals])
-    images, texts = [], []
+    images, texts, legacy_pdf = [], [], False
     for original in originals:
         document = _document(repository, original["attachment_id"])
         if document is None:
@@ -232,7 +237,14 @@ def expand_document_parts(
             {"filename": document["filename"], "attachment_id": original["attachment_id"]},
             ensure_ascii=False,
         )
-        if document["kind"] == "pdf":
+        if document["kind"] == "file":
+            descriptor = {"filename": document["filename"], "attachment_id": original["attachment_id"],
+                          "sha256": original["content_hash"], "size_bytes": original["byte_length"]}
+            texts.append("用户提交的只读附件（内容尚未读取；需要时调用 read_chat_attachment，"
+                         "按返回的next_offset或页码续读，不能把部分读取称作全文）："
+                         + json.dumps(descriptor, ensure_ascii=False))
+        elif document["kind"] == "pdf":
+            legacy_pdf = True
             if len(payload["pages"]) != payload["page_count"]:
                 raise AppError("DOCUMENT_INTEGRITY_ERROR", "PDF页面不完整，未发送部分页面", 409)
             texts.append(
@@ -254,7 +266,9 @@ def expand_document_parts(
             )
     if (
         len(images) > MAX_DISPATCH_IMAGES
-        or sum(item["byte_length"] for item in images) > MAX_DISPATCH_IMAGE_BYTES
+        or sum(item["byte_length"] for item in images) > (
+            MAX_DISPATCH_IMAGE_BYTES if legacy_pdf else 200 * 1024 * 1024
+        )
         or sum(len(text) for text in texts) > MAX_DISPATCH_TEXT_CHARACTERS
     ):
         raise AppError("DOCUMENT_CONTEXT_LIMIT", "确认附件总量超过单次输入上限，未截断或发送", 422)

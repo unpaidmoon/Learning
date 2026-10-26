@@ -375,10 +375,11 @@ class Repository:
             except AppError as exc:
                 raise StorageError(exc.code) from exc
         else:
-            if media_type not in {"image/png", "image/jpeg", "image/webp"}:
+            if media_type not in {"image/png", "image/jpeg", "image/webp", "image/gif"}:
                 raise StorageError("ATTACHMENT_TYPE_UNSUPPORTED")
             valid = (
-                (media_type == "image/png" and data.startswith(b"\x89PNG\r\n\x1a\n"))
+                (media_type == "image/gif" and data[:6] in {b"GIF87a", b"GIF89a"})
+                or (media_type == "image/png" and data.startswith(b"\x89PNG\r\n\x1a\n"))
                 or (media_type == "image/jpeg" and data.startswith(b"\xff\xd8\xff"))
                 or (media_type == "image/webp" and data[:4] == b"RIFF" and data[8:12] == b"WEBP")
             )
@@ -386,7 +387,7 @@ class Repository:
                 raise StorageError("ATTACHMENT_CONTENT_INVALID")
             try:
                 with Image.open(io.BytesIO(data)) as image:
-                    if image.width * image.height > 40_000_000:
+                    if image.width * image.height > 64_000_000 or max(image.size) > 8192:
                         raise StorageError("ATTACHMENT_DIMENSIONS_INVALID")
                     if Image.MIME.get(image.format) != media_type:
                         raise StorageError("ATTACHMENT_CONTENT_INVALID")
@@ -451,6 +452,46 @@ class Repository:
         _checked_id(attachment_id)
         with self.engine.connect() as conn:
             return self._attachment(conn, attachment_id)
+
+    def stage_file(self, source: Path, *, attachment_id: str, media_type: str) -> dict:
+        """Publish a streamed user file verbatim, without collecting it in memory."""
+        attachment_id = _checked_id(attachment_id)
+        temporary = self.staging / f"{uuid4().hex}.partial"
+        digest, size = hashlib.sha256(), 0
+        try:
+            with source.open("rb") as incoming, temporary.open("xb") as output:
+                while chunk := incoming.read(1024 * 1024):
+                    digest.update(chunk)
+                    size += len(chunk)
+                    output.write(chunk)
+                output.flush()
+                os.fsync(output.fileno())
+            content_hash = digest.hexdigest()
+            final = self._object_path(content_hash)
+            final.parent.mkdir(exist_ok=True)
+            with self._lock, self.engine.begin() as conn:
+                existing = conn.execute(select(s.attachments).where(
+                    s.attachments.c.attachment_id == attachment_id
+                )).mappings().first()
+                if existing:
+                    if (existing["content_hash"] != content_hash
+                        or existing["media_type"] != media_type or not existing["confirmed"]):
+                        raise StorageError("ATTACHMENT_ID_CONFLICT")
+                    return dict(existing)
+                if final.exists():
+                    if _file_hash(final) != content_hash:
+                        raise StorageError("ATTACHMENT_INTEGRITY_ERROR")
+                else:
+                    _atomic_publish(temporary, final)
+                values = dict(attachment_id=attachment_id, content_hash=content_hash,
+                              media_type=media_type, byte_length=size, confirmed=True,
+                              state="staged", created_at=_now())
+                conn.execute(insert(s.attachments).values(**values))
+                return values
+        except OSError as exc:
+            raise StorageError("ATTACHMENT_WRITE_FAILED") from exc
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def _attachment(self, conn: Connection, attachment_id: str) -> dict[str, Any]:
         row = _one(

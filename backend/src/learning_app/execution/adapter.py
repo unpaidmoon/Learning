@@ -554,7 +554,7 @@ class ExecutionAdapter:
             data = path.read_bytes()
             if hashlib.sha256(data).hexdigest() != attachment.sha256:
                 raise ExecutionError("CONFIRMED_ATTACHMENT_CHANGED")
-            if attachment.media_type not in {"image/png", "image/jpeg", "image/webp"}:
+            if attachment.media_type not in {"image/png", "image/jpeg", "image/webp", "image/gif"}:
                 raise ExecutionError("ATTACHMENT_MEDIA_UNSUPPORTED")
             content.append(
                 {

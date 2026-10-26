@@ -12,7 +12,9 @@ import binascii
 import hashlib
 import json
 import logging
+import os
 import re
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -22,6 +24,7 @@ from fastapi import FastAPI, Query, Request, WebSocket
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
+from learning_app.chat_attachments import upload_file as upload_chat_file
 from learning_app.chat_presentation import ChatPresentation
 from learning_app.desktop_avatar import (
     picture_reference,
@@ -29,11 +32,8 @@ from learning_app.desktop_avatar import (
     read_account_picture,
 )
 from learning_app.desktop_theme import DesktopThemePreferences
-from learning_app.document_processing import MAX_PDF_BYTES
 from learning_app.documents import (
-    DocumentAttachmentInput,
     attachment_metadata,
-    upload_document,
     validate_document_scope,
 )
 from learning_app.dto import SubmissionInput
@@ -101,13 +101,7 @@ _STREAM_METHODS = frozenset(
 _MESSAGE_FEEDBACK_METHODS = frozenset(
     {"messageFeedback/list", "messageFeedback/put", "messageFeedback/delete"}
 )
-_IMAGE_TYPES = frozenset({"image/png", "image/jpeg", "image/webp"})
-_DOCUMENT_TYPES = {
-    ".pdf": "application/pdf",
-    ".txt": "text/plain",
-    ".md": "text/markdown",
-    ".markdown": "text/markdown",
-}
+_IMAGE_TYPES = frozenset({"image/png", "image/jpeg", "image/webp", "image/gif"})
 _CAPTURE_NAME = re.compile(r"^learning-capture_(attachment_[A-Za-z0-9_-]+)\.png$")
 _STATIC_ROOTS = ("assets/", "plugins/", "fonts/")
 _STATIC_NAMES = frozenset(
@@ -620,8 +614,8 @@ class DesktopGateway:
         except (KeyError, TypeError, ValueError, binascii.Error) as exc:
             raise AppError("IMAGE_INVALID", "图片编码无效", 422) from exc
         media_type = part.get("mediaType")
-        if media_type not in _IMAGE_TYPES or not data or len(data) > 10_000_000:
-            raise AppError("IMAGE_SIZE_INVALID", "图片格式无效或超过 10MB", 422)
+        if media_type not in _IMAGE_TYPES or not data or len(data) > 20 * 1024 * 1024:
+            raise AppError("IMAGE_SIZE_INVALID", "图片格式无效或超过 20MiB", 422)
         repository = self.service.repository
         match = _CAPTURE_NAME.fullmatch(part.get("name", ""))
         if match:
@@ -660,56 +654,29 @@ class DesktopGateway:
         )["attachment_id"]
 
     async def upload_file(
-        self,
-        session_id: str,
-        name: str,
-        data: bytes,
-        *,
-        upload_id: str | None = None,
-        existing_document: str | None = None,
+        self, session_id: str, name: str, data: bytes | Path, *,
+        upload_id: str | None = None, existing_document: str | None = None,
     ) -> dict:
         mapped = self.mapping(session_id)
         repository = self.service.repository
         if not isinstance(name, str) or not name:
-            raise AppError(
-                "DOCUMENT_FILENAME_REQUIRED", "请选择带文件名的 PDF、TXT 或 Markdown 文件", 422
-            )
+            raise AppError("FILE_NAME_INVALID", "请选择带有效文件名的附件", 422)
         restored = re.fullmatch(r"learning-document_(document_[A-Za-z0-9_-]+)__(.+)", name)
         if restored:
             existing_document, name = restored.groups()
-        media_type = _DOCUMENT_TYPES.get(Path(name).suffix.lower())
-        if media_type is None:
-            raise AppError(
-                "DESKTOP_ATTACHMENT_UNSUPPORTED", "附件支持图片、PDF、TXT 和 Markdown", 422
-            )
-        if not data or len(data) > MAX_PDF_BYTES:
-            raise AppError("DOCUMENT_SIZE_INVALID", "文件为空或超过整份附件上限", 422)
-        if existing_document:
-            validate_document_scope(repository, mapped["chat_id"], [existing_document])
-            metadata = attachment_metadata(repository, existing_document)
-            if (
-                metadata["filename"] != name
-                or metadata["media_type"] != media_type
-                or metadata["sha256"] != hashlib.sha256(data).hexdigest()
-                or metadata["size_bytes"] != len(data)
-                or not metadata["confirmed"]
-            ):
-                raise AppError("DOCUMENT_UPLOAD_CONFLICT", "恢复的附件内容与已确认原件不一致", 409)
-        else:
+        with tempfile.TemporaryDirectory(prefix="chat-upload-", dir=repository.staging) as work:
+            source = data if isinstance(data, Path) else Path(work) / "upload"
+            if not isinstance(data, Path):
+                source.write_bytes(data)
             if upload_id is None:
-                upload_id = hashlib.sha256(f"{session_id}:{name}:".encode() + data).hexdigest()
-            try:
-                value = DocumentAttachmentInput(
-                    chat_id=mapped["chat_id"],
-                    filename=name,
-                    media_type=media_type,
-                    confirmed=True,
-                    upload_id=upload_id,
-                    data_base64=base64.b64encode(data).decode("ascii"),
-                )
-            except ValueError as exc:
-                raise AppError("DOCUMENT_INVALID", "附件名称或上传身份无效", 422) from exc
-            metadata = await asyncio.to_thread(upload_document, repository, value)
+                # RPC fallback has no browser upload header; retain stable identity.
+                from learning_app.storage.repository import _file_hash
+                upload_id = await asyncio.to_thread(
+                    lambda: hashlib.sha256(f"{session_id}:{name}:{_file_hash(source)}".encode()).hexdigest())
+            metadata = await asyncio.to_thread(
+                upload_chat_file, repository, mapped["chat_id"], name, source, upload_id,
+                existing_document=existing_document,
+            )
         return {"receiptId": metadata["attachment_id"], "file": _file_ref(metadata)}
 
     def document(self, receipt_id: str, chat_id: str) -> str:
@@ -717,7 +684,7 @@ class DesktopGateway:
             raise AppError("DOCUMENT_RECEIPT_INVALID", "文件上传回执无效，请重新核对草稿附件", 422)
         validate_document_scope(self.service.repository, chat_id, [receipt_id])
         metadata = attachment_metadata(self.service.repository, receipt_id)
-        if metadata["kind"] not in {"pdf", "text", "markdown"} or not metadata["confirmed"]:
+        if metadata["kind"] not in {"pdf", "text", "markdown", "file"} or not metadata["confirmed"]:
             raise AppError("DOCUMENT_NOT_READY", "文件尚未完整准备好", 409)
         return receipt_id
 
@@ -748,7 +715,7 @@ class DesktopGateway:
         if request.get("mode", "queue") != "queue":
             raise AppError("DESKTOP_STEER_UNAVAILABLE", "请停止当前回答后再追问", 409)
         parts = request.get("content")
-        if not isinstance(parts, list) or len(parts) > 40:
+        if not isinstance(parts, list):
             raise AppError("DESKTOP_CONTENT_INVALID", "问题内容无效", 422)
         texts, attachment_ids = [], []
         for index, part in enumerate(parts):
@@ -1514,19 +1481,27 @@ def install_desktop_routes(app: FastAPI, sessions) -> None:
             if request.method != "POST":
                 raise AppError("DESKTOP_METHOD_DENIED", "附件请求方式无效", 403)
             try:
-                data = bytearray()
-                async for chunk in request.stream():
-                    if len(data) + len(chunk) > MAX_PDF_BYTES:
-                        raise AppError("DOCUMENT_SIZE_INVALID", "文件超过整份附件上限", 422)
-                    data.extend(chunk)
-                value = await gateway.upload_file(
-                    request.query_params.get("sessionId", ""),
-                    request.query_params.get("name", ""),
-                    bytes(data),
-                    upload_id=request.headers.get("x-learning-upload-id"),
-                    existing_document=request.headers.get("x-learning-existing-document"),
-                )
+                gateway.mapping(request.query_params.get("sessionId", ""))
+                with tempfile.TemporaryDirectory(prefix="chat-intake-", dir=gateway.service.repository.staging) as work:
+                    source = Path(work) / "upload"
+                    with source.open("xb") as output:
+                        async for chunk in request.stream():
+                            await asyncio.to_thread(output.write, chunk)
+                        await asyncio.to_thread(output.flush)
+                        await asyncio.to_thread(os.fsync, output.fileno())
+                    value = await gateway.upload_file(
+                        request.query_params.get("sessionId", ""),
+                        request.query_params.get("name", ""), source,
+                        upload_id=request.headers.get("x-learning-upload-id"),
+                        existing_document=request.headers.get("x-learning-existing-document"),
+                    )
                 return JSONResponse({"ok": True, "value": value})
+            except OSError:
+                return JSONResponse({"ok": False, "error": {
+                    "code": "FILE_UPLOAD_WRITE_FAILED",
+                    "message": "附件未保存，请检查数据位置的可写权限和可用空间；原件仍保留",
+                    "details": {},
+                }})
             except (AppError, StorageError, ExecutionError) as exc:
                 return JSONResponse(
                     {

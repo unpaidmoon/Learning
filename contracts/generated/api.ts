@@ -873,6 +873,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/courses/{course_id}/files/attachment-source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attachment Source */
+        post: operations["attachment_source_api_v1_courses__course_id__files_attachment_source_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/courses/{course_id}/files/open": {
         parameters: {
             query?: never;
@@ -3900,7 +3917,7 @@ export interface components {
              * Media Type
              * @enum {string}
              */
-            media_type: "image/png" | "image/jpeg" | "image/webp";
+            media_type: "image/png" | "image/jpeg" | "image/webp" | "image/gif";
             /**
              * Confirmed
              * @constant
@@ -3923,7 +3940,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "image" | "pdf" | "text" | "markdown";
+            kind: "image" | "pdf" | "text" | "markdown" | "file";
             /** Filename */
             filename: string;
             /** Page Count */
@@ -11344,6 +11361,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CourseFileOperationResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attachment_source_api_v1_courses__course_id__files_attachment_source_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoursePathInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseFileOpenResponse"];
                 };
             };
             /** @description Forbidden */

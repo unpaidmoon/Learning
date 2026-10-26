@@ -1,5 +1,7 @@
 # AI 辅助学习项目
 
+2026-10-26 聊天附件改为 Harness 的原件上传／按需读取方式：原生输入框可选择普通文件，上传后保存原件，发送后由主回答模型按需读取。新上传文件不再套用8个附件、PDF20MiB／32页及TXT1MiB／20万字符的旧准备限额；PDF按页读取文字或所需页图，常见Office支持文本读取。未知格式可保存但不保证解析，音视频不会自动抽帧或转写。草稿、历史、原件下载和精确提交权限保留；旧整份文档记录继续兼容。已通过定向业务／固定Host／原生浏览器及合成JSON真实问答验证；实际范围与限制见本机[MVP计划](docs/plans/MVP开发计划.md)。
+
 **当前推荐入口：双击 [启动学习.cmd](启动学习.cmd)。** [启动Harness桌面.cmd](启动Harness桌面.cmd)也指向同一入口，无需输入命令或手动结束进程。已有窗口会恢复；后台正常但窗口已退出时会重新打开窗口；其他程序占用默认端口时自动选择空闲端口。点击窗口右上角“×”是收起到托盘；彻底退出请右键右下角“AI 辅助学习”图标，选择“退出 AI 辅助学习”。启动失败会显示中文提示。
 
 2026-10-25当前源码功能与精简验收见[Windows定向改造记录](research/reports/workbench/Windows定向改造与精简验收-2026-10-25.md)。下方2026-10-22的浏览器入口、课程门槛和旧迁移范围保留历史含义，不覆盖新的独立聊天、PDF原生阅读及取消自动准备规则。
@@ -46,7 +48,7 @@ Windows 个人学习工作台：左侧课程切换与当前课程文件树，中
 .\backend\.venv\Scripts\python.exe scripts/harness/account_login.py --data-dir .runtime/app/data --timeout 1200
 ```
 
-本轮技术结果与未覆盖项见 [交互修订验证报告](research/reports/workspace-v2/MVP-A交互修订验收报告-2026-10-22.md)。合成学习页可看 [浅色预览](output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-light.png)／[深色预览](output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-dark.png)；均为合成资料。当前 PDF 附件最多 20 MiB／32 页，TXT／Markdown 最多 1 MiB／20 万字符，超限整份拒绝。允许历史中的 PDF 页可能重复附带，增加实际输入；详细限制和未覆盖项见报告。
+本轮技术结果与未覆盖项见 [交互修订验证报告](research/reports/workspace-v2/MVP-A交互修订验收报告-2026-10-22.md)。合成学习页可看 [浅色预览](output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-light.png)／[深色预览](output/playwright/workspace-v2-browser-20261022-r1/browser/learning-files-dark.png)；均为合成资料。该历史批次的整份准备附件最多20MiB／32页，TXT／Markdown最多1MiB／20万字符；新上传附件以上方2026-10-26增量为准。允许历史中的 PDF 页可能重复附带，增加实际输入；详细限制和未覆盖项见报告。
 
 ## 开发与验证
 

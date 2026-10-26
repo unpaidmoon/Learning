@@ -19,7 +19,7 @@ from learning_app.data_routes import DataTransferService, install_data_routes
 from learning_app.desktop import install_desktop_routes
 from learning_app.desktop_update_routes import install_update_routes
 from learning_app.desktop_updates import DesktopUpdates
-from learning_app.documents import document_content, install_document_routes
+from learning_app.documents import attachment_metadata, document_content, install_document_routes
 from learning_app.drafts import install_draft_routes
 from learning_app.dto import (
     AttachmentInput,
@@ -316,18 +316,18 @@ def create_app(
             data = base64.b64decode(value.data_base64, validate=True)
         except (ValueError, binascii.Error) as exc:
             raise AppError("IMAGE_INVALID", "图片编码无效", 422) from exc
-        if not data or len(data) > 10_000_000:
-            raise AppError("IMAGE_SIZE_INVALID", "图片为空或超过10MB", 422)
+        if not data or len(data) > 20 * 1024 * 1024:
+            raise AppError("IMAGE_SIZE_INVALID", "图片为空或超过20MiB", 422)
         # Decode user-selected bytes only; no path, video or screen acquisition capability.
         from PIL import Image, UnidentifiedImageError
 
         try:
             with Image.open(io.BytesIO(data)) as image:
-                if image.format not in {"PNG", "JPEG", "WEBP"}:
-                    raise AppError("IMAGE_INVALID", "仅支持PNG、JPEG和WebP图片", 422)
-                if image.width * image.height > 40_000_000:
+                if image.format not in {"PNG", "JPEG", "WEBP", "GIF"}:
+                    raise AppError("IMAGE_INVALID", "仅支持PNG、JPEG、WebP和GIF图片", 422)
+                if image.width * image.height > 64_000_000 or max(image.size) > 8192:
                     raise AppError("IMAGE_SIZE_INVALID", "图片尺寸过大", 422)
-                expected_type = {"PNG": "image/png", "JPEG": "image/jpeg", "WEBP": "image/webp"}[
+                expected_type = {"PNG": "image/png", "JPEG": "image/jpeg", "WEBP": "image/webp", "GIF": "image/gif"}[
                     image.format
                 ]
                 if expected_type != value.media_type:
@@ -345,7 +345,9 @@ def create_app(
     @app.get("/api/v1/attachments/{attachment_id}")
     async def read_attachment(attachment_id: str):
         attachment = app.state.repository.resolve_attachment(attachment_id)
-        if not attachment["media_type"].startswith("image/"):
+        if not attachment["media_type"].startswith("image/") or attachment_metadata(
+            app.state.repository, attachment_id
+        )["kind"] == "file":
             return document_content(app.state.repository, attachment_id)
         return FileResponse(attachment["path"], media_type=attachment["media_type"])
 
