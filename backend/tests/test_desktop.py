@@ -20,6 +20,7 @@ from learning_app.drafts import DraftInput, read_draft, save_draft
 from learning_app.dto import SubmissionInput
 from learning_app.errors import AppError
 from learning_app.execution.types import ExecutionBinding, NormalizedEvent
+from learning_app.storage import StorageError
 
 
 class NativeFixture:
@@ -82,6 +83,65 @@ def native_envelope(method, request):
             "payload": {"args": {"request": request}}}
 
 
+@pytest.mark.parametrize("method", [
+    "messageFeedback/list", "messageFeedback/put", "messageFeedback/delete",
+])
+async def test_native_message_feedback_is_forwarded_only_for_project_sessions(tmp_path, method):
+    app = app_at(tmp_path)
+    async with app.router.lifespan_context(app):
+        gateway = app.state.desktop_gateway
+        opened = await gateway.create_chat(None, None)
+        request = {"sessionId": opened["session_id"]}
+        assert await gateway.rpc(method, native_envelope(method, request)) is None
+        with pytest.raises(StorageError) as failure:
+            foreign = {"sessionId": "unmapped-session"}
+            await gateway.rpc(method, native_envelope(method, foreign))
+        assert failure.value.code == "CHAT_NOT_FOUND"
+        for invalid in ({}, {"sessionId": ""}, {"sessionId": 123}):
+            with pytest.raises(AppError) as failure:
+                await gateway.rpc(method, native_envelope(method, invalid))
+            assert failure.value.code == "DESKTOP_SESSION_INVALID"
+
+
+def test_native_message_feedback_http_preserves_host_results_and_csrf(tmp_path):
+    from unittest.mock import patch
+
+    app = app_at(tmp_path)
+    forwarded = []
+    host_value = {"ok": False, "error": {"code": "version-conflict", "current": None}}
+
+    def upstream(request):
+        if request.url.params.get("token"):
+            return httpx.Response(303, headers={"Set-Cookie": "host-cookie=private; Path=/"})
+        envelope = json.loads(request.content)
+        forwarded.append(envelope)
+        return httpx.Response(200, json={
+            "type": "server-response", "rpcId": envelope["rpcId"],
+            "result": {"ok": True, "value": host_value},
+        })
+
+    original_client = httpx.AsyncClient
+    transport = httpx.MockTransport(upstream)
+    with TestClient(app, base_url="http://127.0.0.1:8765") as client:
+        csrf = {"X-Learning-CSRF": client.get("/api/v1/session").json()["csrf_token"]}
+        sid = client.post("/api/v1/desktop/default/open", headers=csrf).json()["session_id"]
+        with patch("learning_app.desktop.httpx.AsyncClient",
+                   side_effect=lambda *a, **kw: original_client(*a, **kw, transport=transport)):
+            for operation in ("list", "put", "delete"):
+                method = "messageFeedback/" + operation
+                envelope = native_envelope(method, {
+                    "sessionId": sid, "messageId": "assistant-1", "ifVersion": "v1",
+                    "rating": "positive",
+                })
+                url = "/desktop/api/" + method
+                assert client.post(url, json=envelope).status_code == 403
+                response = client.post(url, headers=csrf, json=envelope)
+                assert response.json()["result"] == {"ok": True, "value": host_value}
+                assert forwarded[-1] == envelope
+                assert "host-cookie" not in response.headers.get("set-cookie", "")
+            assert len(forwarded) == 3
+
+
 async def test_course_initialization_and_repeated_new_keep_unsent_draft(tmp_path):
     app = app_at(tmp_path)
     async with app.router.lifespan_context(app):
@@ -135,6 +195,31 @@ async def test_named_creation_receipt_and_selected_model_survive_gateway_restart
         assert await restarted.create_chat("course", "native-named-create") == first
         assert restarted.selected(first["session_id"]) == ("deepseek-v4-pro", "none")
         assert len(repo.list_chats("course")) == 1
+
+
+async def test_explicit_course_creation_seed_keeps_old_draft_and_does_not_inherit_scope(tmp_path):
+    from learning_app.workspaces import set_workspaces
+
+    app = app_at(tmp_path)
+    async with app.router.lifespan_context(app):
+        repo = app.state.repository
+        repo.create_course("数学", "math")
+        repo.create_course("英语", "english")
+        gateway = app.state.desktop_gateway
+        old = await gateway.open_course("math")
+        set_workspaces(repo, old["chat_id"], ["math", "english"])
+        draft = save_draft(repo, old["chat_id"], DraftInput(expected_revision=0, text="旧对话草稿"))
+        request = native_envelope("session/create", {"sessionId": "learning-create-explicit", "workspaceId": "math"})
+        created = await gateway.rpc("session/create", request)
+        replay = await gateway.rpc("session/create", request)
+        assert created == replay
+        mapped = gateway.read_mapping(created["sessionId"])
+        assert mapped["chat_id"] != old["chat_id"]
+        assert mapped["course_id"] == "math" and mapped["workspace_ids"] == ["math"]
+        assert gateway.read_mapping(old["session_id"])["workspace_ids"] == ["math", "english"]
+        assert read_draft(repo, old["chat_id"]) == draft
+        assert len(repo.list_chats("math")) == 2
+        assert app.state.service.execution.starts == []
 
 
 async def test_native_prompt_uses_business_submission_id_and_keeps_model_selection(tmp_path):

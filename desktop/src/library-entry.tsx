@@ -13,6 +13,7 @@ import { Icon } from "../../frontend/src/components/ui/Icon";
 import type { ReadingActionHandler, SourceJump } from "../../frontend/src/reading/actions";
 
 export { CourseExplorer } from "../../frontend/src/library/CourseExplorer";
+export { NativeDirectoryFlow } from "@learning/native-directory-flow";
 export { AccountPanel } from "../../frontend/src/account/AccountPanel";
 export { PlatformSettings } from "../../frontend/src/integrations/PlatformSettings";
 export { installBilibiliCommand } from "../../frontend/src/integrations/nativeCommands";

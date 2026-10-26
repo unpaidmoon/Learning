@@ -10,6 +10,12 @@ const compiler = JSON.parse(await readFile(path.join(compilerRoot, 'package.json
 if (compiler.version !== '1.2.14') throw new Error('DESKTOP_LIBRARY_COMPILER_VERSION_MISMATCH');
 const { rolldown } = await import(pathToFileURL(path.join(compilerRoot, 'dist/index.mjs')).href);
 const digest = value => createHash('sha256').update(value).digest('hex');
+const directoryFlow = path.join(root, '.runtime/desktop/upstream/packages/client/ui-directory-picker-native/src/client/flow.ts');
+const sourceLock = JSON.parse(await readFile(path.join(root, 'harness/desktop.lock.json'), 'utf8'));
+if (sourceLock.reference_source.commit !== '687f282e8625c6b8d11ff58211a90524be2e4317'
+    || digest(await readFile(directoryFlow)) !== 'd4bb4bf3383fe3240d32ad7e8676151607482327ec2758f411d7c2c505c78d36') {
+  throw new Error('DESKTOP_DIRECTORY_FLOW_SOURCE_MISMATCH');
+}
 const css = new Map();
 const usedSource = new Set();
 const normalize = value => value.replaceAll('\\', '/');
@@ -28,6 +34,7 @@ const build = await rolldown({
   plugins: [{
     name: 'learning-native-controls-and-styles',
     resolveId(source, importer) {
+      if (source === '@learning/native-directory-flow') return directoryFlow;
       if (!importer || !source.startsWith('.')) return null;
       const candidate = normalize(path.resolve(path.dirname(importer), source));
       if (candidate === buttonPath.slice(0, -4) || candidate === buttonPath) return '\0learning-native-button';

@@ -92,6 +92,9 @@ _STREAM_METHODS = frozenset(
         "account/watchExpiry",
     }
 )
+_MESSAGE_FEEDBACK_METHODS = frozenset(
+    {"messageFeedback/list", "messageFeedback/put", "messageFeedback/delete"}
+)
 _IMAGE_TYPES = frozenset({"image/png", "image/jpeg", "image/webp"})
 _DOCUMENT_TYPES = {
     ".pdf": "application/pdf",
@@ -779,6 +782,14 @@ class DesktopGateway:
             if method == "session/modelCatalog":
                 return await self.native_read(method, envelope)
             raise AppError("IMPORTED_EXECUTION_READ_ONLY", "导入历史只读，未提交新的执行请求")
+        if method in _MESSAGE_FEEDBACK_METHODS:
+            # Native feedback belongs to one persisted Host session. Keep its
+            # versioned writes upstream, but admit only project-owned sessions.
+            session_id = request.get("sessionId")
+            if not isinstance(session_id, str) or not session_id:
+                raise AppError("DESKTOP_SESSION_INVALID", "请选择当前对话", 422)
+            self.mapping(session_id)
+            return None
         if method in {"session/list", "session/search"}:
             value = await self.native_read(method, envelope)
             aliases = self.history.views
